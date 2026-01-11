@@ -140,10 +140,10 @@ async function airtableCreate<T>(
 export async function verifyGCMember(email: string): Promise<GCMember | null> {
   try {
     const cleanEmail = email.toLowerCase().trim();
-    const filter = encodeURIComponent(`LOWER({Email}) = '${cleanEmail}'`);
 
     const response = await airtableGet<GCMemberFields>(
-      `${GC_TABLES.MEMBERS}?filterByFormula=${filter}`
+      GC_TABLES.MEMBERS,
+      { filterByFormula: `LOWER({Email}) = '${cleanEmail}'` }
     );
 
     if (response.records && response.records.length > 0) {
@@ -180,10 +180,9 @@ function mapGCMember(record: AirtableRecord<GCMemberFields>): GCMember {
 
 export async function fetchMemberTools(memberId: string): Promise<ToolAccess[]> {
   try {
-    const filter = encodeURIComponent(`FIND('${memberId}', ARRAYJOIN({Member}))`);
-
     const response = await airtableGet<ToolAccessFields>(
-      `${GC_TABLES.TOOL_ACCESS}?filterByFormula=${filter}`
+      GC_TABLES.TOOL_ACCESS,
+      { filterByFormula: `FIND('${memberId}', ARRAYJOIN({Member}))` }
     );
 
     return response.records.map(mapToolAccess);
@@ -243,10 +242,9 @@ function mapOnboardingChecklistItem(record: AirtableRecord<OnboardingChecklistFi
 
 export async function fetchMemberProgress(memberId: string): Promise<MemberProgress[]> {
   try {
-    const filter = encodeURIComponent(`FIND('${memberId}', ARRAYJOIN({Member}))`);
-
     const response = await airtableGet<MemberProgressFields>(
-      `${GC_TABLES.MEMBER_PROGRESS}?filterByFormula=${filter}`
+      GC_TABLES.MEMBER_PROGRESS,
+      { filterByFormula: `FIND('${memberId}', ARRAYJOIN({Member}))` }
     );
 
     return response.records.map(mapMemberProgress);
@@ -390,10 +388,9 @@ export async function updateMemberProgress(
 
 export async function fetchMemberICP(memberId: string): Promise<MemberICP | null> {
   try {
-    const filter = encodeURIComponent(`FIND('${memberId}', ARRAYJOIN({Member}))`);
-
     const response = await airtableGet<MemberICPFields>(
-      `${GC_TABLES.MEMBER_ICP}?filterByFormula=${filter}`
+      GC_TABLES.MEMBER_ICP,
+      { filterByFormula: `FIND('${memberId}', ARRAYJOIN({Member}))` }
     );
 
     if (response.records.length > 0) {
@@ -462,10 +459,13 @@ export async function updateMemberICP(
 
 export async function fetchMemberCampaigns(memberId: string): Promise<Campaign[]> {
   try {
-    const filter = encodeURIComponent(`FIND('${memberId}', ARRAYJOIN({Member}))`);
-
     const response = await airtableGet<CampaignFields>(
-      `${GC_TABLES.CAMPAIGNS}?filterByFormula=${filter}&sort%5B0%5D%5Bfield%5D=Start%20Date&sort%5B0%5D%5Bdirection%5D=desc`
+      GC_TABLES.CAMPAIGNS,
+      {
+        filterByFormula: `FIND('${memberId}', ARRAYJOIN({Member}))`,
+        'sort[0][field]': 'Start Date',
+        'sort[0][direction]': 'desc',
+      }
     );
 
     return response.records.map(mapCampaign);
