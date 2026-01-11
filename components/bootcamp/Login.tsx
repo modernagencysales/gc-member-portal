@@ -23,7 +23,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
     if (user) {
       onLogin(user);
     } else {
-      setError("Email not found. Please check your spelling.");
+      setError('Email not found. Please check your spelling.');
     }
     setLoading(false);
   };
@@ -36,9 +36,11 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
             <ShieldCheck size={40} />
           </div>
         </div>
-        
+
         <div className="text-center mb-10">
-          <h1 className="text-2xl font-black text-slate-900 dark:text-white mb-2 tracking-tight">Welcome Back</h1>
+          <h1 className="text-2xl font-black text-slate-900 dark:text-white mb-2 tracking-tight">
+            Welcome Back
+          </h1>
           <p className="text-slate-500 dark:text-slate-400 text-sm font-medium">
             Enter your email to access your training dashboard.
           </p>
@@ -46,7 +48,10 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label htmlFor="email" className="block text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2 px-1">
+            <label
+              htmlFor="email"
+              className="block text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-2 px-1"
+            >
               Email Address
             </label>
             <div className="relative">
@@ -63,7 +68,11 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
                 required
               />
             </div>
-            {error && <p className="mt-3 text-[10px] font-bold text-red-500 uppercase tracking-wide px-1">{error}</p>}
+            {error && (
+              <p className="mt-3 text-[10px] font-bold text-red-500 uppercase tracking-wide px-1">
+                {error}
+              </p>
+            )}
           </div>
 
           <button
@@ -71,13 +80,20 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
             disabled={loading}
             className="w-full flex items-center justify-center gap-3 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 py-4 px-4 rounded-2xl font-bold text-xs uppercase tracking-widest hover:opacity-90 transition-all active:scale-[0.98] disabled:opacity-50 shadow-xl shadow-slate-900/10 dark:shadow-none"
           >
-            {loading ? <Loader2 size={18} className="animate-spin" /> : <>Log In <ArrowRight size={18} /></>}
+            {loading ? (
+              <Loader2 size={18} className="animate-spin" />
+            ) : (
+              <>
+                Log In <ArrowRight size={18} />
+              </>
+            )}
           </button>
         </form>
-        
+
         <div className="mt-10 pt-8 border-t border-slate-100 dark:border-slate-800 text-center">
           <p className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] leading-relaxed">
-            Training Portal<br />
+            Training Portal
+            <br />
             &copy; 2024 GTM OS
           </p>
         </div>

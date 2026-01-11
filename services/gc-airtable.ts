@@ -51,10 +51,7 @@ const GC_TABLES = {
 // Helper Functions
 // ============================================
 
-async function airtableFetch<T>(
-  endpoint: string,
-  options: RequestInit = {}
-): Promise<T> {
+async function airtableFetch<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   // Don't encode the entire endpoint - it may contain query params
   const url = `${BASE_URL}/${endpoint}`;
   const response = await fetch(url, {
@@ -111,10 +108,7 @@ async function airtablePatch<T>(
   return response.json();
 }
 
-async function airtableCreate<T>(
-  table: string,
-  fields: Partial<T>
-): Promise<AirtableRecord<T>> {
+async function airtableCreate<T>(table: string, fields: Partial<T>): Promise<AirtableRecord<T>> {
   const url = `${BASE_URL}/${encodeURIComponent(table)}`;
   const response = await fetch(url, {
     method: 'POST',
@@ -141,10 +135,9 @@ export async function verifyGCMember(email: string): Promise<GCMember | null> {
   try {
     const cleanEmail = email.toLowerCase().trim();
 
-    const response = await airtableGet<GCMemberFields>(
-      GC_TABLES.MEMBERS,
-      { filterByFormula: `LOWER({Email}) = '${cleanEmail}'` }
-    );
+    const response = await airtableGet<GCMemberFields>(GC_TABLES.MEMBERS, {
+      filterByFormula: `LOWER({Email}) = '${cleanEmail}'`,
+    });
 
     if (response.records && response.records.length > 0) {
       return mapGCMember(response.records[0]);
@@ -180,10 +173,9 @@ function mapGCMember(record: AirtableRecord<GCMemberFields>): GCMember {
 
 export async function fetchMemberTools(memberId: string): Promise<ToolAccess[]> {
   try {
-    const response = await airtableGet<ToolAccessFields>(
-      GC_TABLES.TOOL_ACCESS,
-      { filterByFormula: `FIND('${memberId}', ARRAYJOIN({Member}))` }
-    );
+    const response = await airtableGet<ToolAccessFields>(GC_TABLES.TOOL_ACCESS, {
+      filterByFormula: `FIND('${memberId}', ARRAYJOIN({Member}))`,
+    });
 
     return response.records.map(mapToolAccess);
   } catch (error) {
@@ -215,13 +207,10 @@ function mapToolAccess(record: AirtableRecord<ToolAccessFields>): ToolAccess {
 
 export async function fetchOnboardingChecklist(): Promise<OnboardingChecklistItem[]> {
   try {
-    const response = await airtableGet<OnboardingChecklistFields>(
-      GC_TABLES.ONBOARDING_CHECKLIST,
-      {
-        'sort[0][field]': 'Order',
-        'sort[0][direction]': 'asc',
-      }
-    );
+    const response = await airtableGet<OnboardingChecklistFields>(GC_TABLES.ONBOARDING_CHECKLIST, {
+      'sort[0][field]': 'Order',
+      'sort[0][direction]': 'asc',
+    });
 
     return response.records.map(mapOnboardingChecklistItem);
   } catch (error) {
@@ -230,7 +219,9 @@ export async function fetchOnboardingChecklist(): Promise<OnboardingChecklistIte
   }
 }
 
-function mapOnboardingChecklistItem(record: AirtableRecord<OnboardingChecklistFields>): OnboardingChecklistItem {
+function mapOnboardingChecklistItem(
+  record: AirtableRecord<OnboardingChecklistFields>
+): OnboardingChecklistItem {
   const f = record.fields;
   return {
     id: record.id,
@@ -246,10 +237,9 @@ function mapOnboardingChecklistItem(record: AirtableRecord<OnboardingChecklistFi
 
 export async function fetchMemberProgress(memberId: string): Promise<MemberProgress[]> {
   try {
-    const response = await airtableGet<MemberProgressFields>(
-      GC_TABLES.MEMBER_PROGRESS,
-      { filterByFormula: `FIND('${memberId}', ARRAYJOIN({Member}))` }
-    );
+    const response = await airtableGet<MemberProgressFields>(GC_TABLES.MEMBER_PROGRESS, {
+      filterByFormula: `FIND('${memberId}', ARRAYJOIN({Member}))`,
+    });
 
     return response.records.map(mapMemberProgress);
   } catch (error) {
@@ -312,7 +302,13 @@ export async function fetchOnboardingWithProgress(
   });
 
   // Group by category
-  const categoryOrder: OnboardingCategory[] = ['Before Kickoff', 'Week 1', 'Week 2', 'Week 3-4', 'Ongoing'];
+  const categoryOrder: OnboardingCategory[] = [
+    'Before Kickoff',
+    'Week 1',
+    'Week 2',
+    'Week 3-4',
+    'Ongoing',
+  ];
   const categoryMap = new Map<OnboardingCategory, OnboardingProgressItem[]>();
 
   itemsWithProgress.forEach((item) => {
@@ -392,10 +388,9 @@ export async function updateMemberProgress(
 
 export async function fetchMemberICP(memberId: string): Promise<MemberICP | null> {
   try {
-    const response = await airtableGet<MemberICPFields>(
-      GC_TABLES.MEMBER_ICP,
-      { filterByFormula: `FIND('${memberId}', ARRAYJOIN({Member}))` }
-    );
+    const response = await airtableGet<MemberICPFields>(GC_TABLES.MEMBER_ICP, {
+      filterByFormula: `FIND('${memberId}', ARRAYJOIN({Member}))`,
+    });
 
     if (response.records.length > 0) {
       return mapMemberICP(response.records[0]);
@@ -463,14 +458,11 @@ export async function updateMemberICP(
 
 export async function fetchMemberCampaigns(memberId: string): Promise<Campaign[]> {
   try {
-    const response = await airtableGet<CampaignFields>(
-      GC_TABLES.CAMPAIGNS,
-      {
-        filterByFormula: `FIND('${memberId}', ARRAYJOIN({Member}))`,
-        'sort[0][field]': 'Start Date',
-        'sort[0][direction]': 'desc',
-      }
-    );
+    const response = await airtableGet<CampaignFields>(GC_TABLES.CAMPAIGNS, {
+      filterByFormula: `FIND('${memberId}', ARRAYJOIN({Member}))`,
+      'sort[0][field]': 'Start Date',
+      'sort[0][direction]': 'desc',
+    });
 
     return response.records.map(mapCampaign);
   } catch (error) {
@@ -533,23 +525,18 @@ export async function updateCampaignMetrics(
 
 export async function fetchResources(memberPlan: MemberPlan): Promise<Resource[]> {
   try {
-    const response = await airtableGet<ResourceFields>(
-      GC_TABLES.RESOURCES,
-      {
-        'sort[0][field]': 'Order',
-        'sort[0][direction]': 'asc',
-      }
-    );
+    const response = await airtableGet<ResourceFields>(GC_TABLES.RESOURCES, {
+      'sort[0][field]': 'Order',
+      'sort[0][direction]': 'asc',
+    });
 
     const isFullPlan = memberPlan === 'Full ($1000/mo)';
 
-    return response.records
-      .map(mapResource)
-      .filter((r) => {
-        if (r.planRequired === 'All Plans') return true;
-        if (r.planRequired === 'Full Only' && isFullPlan) return true;
-        return false;
-      });
+    return response.records.map(mapResource).filter((r) => {
+      if (r.planRequired === 'All Plans') return true;
+      if (r.planRequired === 'Full Only' && isFullPlan) return true;
+      return false;
+    });
   } catch (error) {
     console.error('Failed to fetch resources:', error);
     return [];

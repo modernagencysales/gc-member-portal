@@ -12,18 +12,13 @@ function AllProviders({ children }: AllProvidersProps) {
   return (
     <BrowserRouter>
       <ThemeProvider>
-        <AuthProvider>
-          {children}
-        </AuthProvider>
+        <AuthProvider>{children}</AuthProvider>
       </ThemeProvider>
     </BrowserRouter>
   );
 }
 
-function customRender(
-  ui: ReactElement,
-  options?: Omit<RenderOptions, 'wrapper'>
-) {
+function customRender(ui: ReactElement, options?: Omit<RenderOptions, 'wrapper'>) {
   return render(ui, { wrapper: AllProviders, ...options });
 }
 

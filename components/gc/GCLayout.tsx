@@ -29,10 +29,7 @@ const GCLayout: React.FC = () => {
     const loadProgress = async () => {
       if (gcMember) {
         try {
-          const { totalProgress } = await fetchOnboardingWithProgress(
-            gcMember.id,
-            gcMember.plan
-          );
+          const { totalProgress } = await fetchOnboardingWithProgress(gcMember.id, gcMember.plan);
           setOnboardingProgress(totalProgress);
         } catch (error) {
           console.error('Failed to load onboarding progress:', error);
@@ -58,10 +55,7 @@ const GCLayout: React.FC = () => {
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
-        <GCHeader
-          onMenuClick={() => setSidebarOpen(true)}
-          title={pageTitle}
-        />
+        <GCHeader onMenuClick={() => setSidebarOpen(true)} title={pageTitle} />
 
         {/* Page Content */}
         <main
@@ -82,8 +76,10 @@ export default GCLayout;
 
 // Hook to access layout context from child pages
 export function useLayoutContext() {
-  return React.useContext(React.createContext<{
-    onboardingProgress: number;
-    setOnboardingProgress: (progress: number) => void;
-  }>({ onboardingProgress: 0, setOnboardingProgress: () => {} }));
+  return React.useContext(
+    React.createContext<{
+      onboardingProgress: number;
+      setOnboardingProgress: (progress: number) => void;
+    }>({ onboardingProgress: 0, setOnboardingProgress: () => {} })
+  );
 }

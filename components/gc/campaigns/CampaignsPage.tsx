@@ -61,9 +61,7 @@ const CampaignsPage: React.FC = () => {
   // Group campaigns by status
   const liveCampaigns = campaigns.filter((c) => c.status === 'Live');
   const warmingCampaigns = campaigns.filter((c) => c.status === 'Warming Up');
-  const otherCampaigns = campaigns.filter(
-    (c) => c.status !== 'Live' && c.status !== 'Warming Up'
-  );
+  const otherCampaigns = campaigns.filter((c) => c.status !== 'Live' && c.status !== 'Warming Up');
 
   return (
     <div className="space-y-6">
@@ -148,15 +146,11 @@ const CampaignsPage: React.FC = () => {
       )}
 
       {campaigns.length === 0 && (
-        <div
-          className={`text-center py-12 rounded-xl ${
-            isDarkMode ? 'bg-slate-900' : 'bg-white'
-          }`}
-        >
-          <Target className={`w-12 h-12 mx-auto mb-4 ${isDarkMode ? 'text-slate-600' : 'text-slate-300'}`} />
-          <p className={isDarkMode ? 'text-slate-400' : 'text-slate-500'}>
-            No campaigns yet
-          </p>
+        <div className={`text-center py-12 rounded-xl ${isDarkMode ? 'bg-slate-900' : 'bg-white'}`}>
+          <Target
+            className={`w-12 h-12 mx-auto mb-4 ${isDarkMode ? 'text-slate-600' : 'text-slate-300'}`}
+          />
+          <p className={isDarkMode ? 'text-slate-400' : 'text-slate-500'}>No campaigns yet</p>
         </div>
       )}
     </div>
@@ -178,9 +172,7 @@ const SummaryCard: React.FC<SummaryCardProps> = ({ label, value, icon: Icon, isD
   >
     <div className="flex items-center gap-2 mb-1">
       <Icon className={`w-4 h-4 ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`} />
-      <span className={`text-xs ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>
-        {label}
-      </span>
+      <span className={`text-xs ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>{label}</span>
     </div>
     <p className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
       {value.toLocaleString()}
@@ -210,9 +202,11 @@ const CampaignSection: React.FC<CampaignSectionProps> = ({
   isDarkMode,
 }) => (
   <div className="space-y-3">
-    <h2 className={`text-sm font-semibold uppercase tracking-wider ${
-      isDarkMode ? 'text-slate-400' : 'text-slate-500'
-    }`}>
+    <h2
+      className={`text-sm font-semibold uppercase tracking-wider ${
+        isDarkMode ? 'text-slate-400' : 'text-slate-500'
+      }`}
+    >
       {title}
     </h2>
     {campaigns.map((campaign) => (
@@ -285,7 +279,9 @@ const CampaignCard: React.FC<CampaignCardProps> = ({
               isDarkMode ? 'bg-slate-800' : 'bg-slate-100'
             }`}
           >
-            <ChannelIcon className={`w-5 h-5 ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`} />
+            <ChannelIcon
+              className={`w-5 h-5 ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}
+            />
           </div>
           <div className="text-left">
             <h3 className={`font-semibold ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
@@ -314,18 +310,24 @@ const CampaignCard: React.FC<CampaignCardProps> = ({
           {isExpanded ? (
             <ChevronUp className={`w-5 h-5 ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`} />
           ) : (
-            <ChevronDown className={`w-5 h-5 ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`} />
+            <ChevronDown
+              className={`w-5 h-5 ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}
+            />
           )}
         </div>
       </button>
 
       {/* Expanded Content */}
       {isExpanded && (
-        <div className={`px-5 pb-5 border-t ${isDarkMode ? 'border-slate-800' : 'border-slate-200'}`}>
+        <div
+          className={`px-5 pb-5 border-t ${isDarkMode ? 'border-slate-800' : 'border-slate-200'}`}
+        >
           {/* Metrics Funnel */}
           <div className="pt-4">
             <div className="flex items-center justify-between mb-3">
-              <h4 className={`text-sm font-medium ${isDarkMode ? 'text-slate-300' : 'text-slate-700'}`}>
+              <h4
+                className={`text-sm font-medium ${isDarkMode ? 'text-slate-300' : 'text-slate-700'}`}
+              >
                 Metrics (Self-Reported)
               </h4>
               <button
@@ -334,7 +336,9 @@ const CampaignCard: React.FC<CampaignCardProps> = ({
                   onToggleEdit();
                 }}
                 className={`flex items-center gap-1 text-xs font-medium ${
-                  isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-700'
+                  isDarkMode
+                    ? 'text-blue-400 hover:text-blue-300'
+                    : 'text-blue-600 hover:text-blue-700'
                 }`}
               >
                 <Edit2 className="w-3 h-3" />
@@ -428,9 +432,7 @@ const MetricsForm: React.FC<MetricsFormProps> = ({ metrics, onChange, onSave, is
             <input
               type="number"
               value={metrics[field.key]}
-              onChange={(e) =>
-                onChange({ ...metrics, [field.key]: parseInt(e.target.value) || 0 })
-              }
+              onChange={(e) => onChange({ ...metrics, [field.key]: parseInt(e.target.value) || 0 })}
               className={`w-full mt-1 px-3 py-2 rounded-lg text-sm font-medium ${
                 isDarkMode
                   ? 'bg-slate-800 border-slate-700 text-white'

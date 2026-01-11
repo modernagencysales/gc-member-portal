@@ -115,9 +115,7 @@ describe('Onboarding Checkbox Toggle', () => {
 
     // Wait for loading to finish and checkboxes to appear
     const checkboxes = await screen.findAllByRole('checkbox', {}, { timeout: 3000 });
-    const incompleteCheckbox = checkboxes.find(
-      (cb) => !(cb as HTMLInputElement).checked
-    );
+    const incompleteCheckbox = checkboxes.find((cb) => !(cb as HTMLInputElement).checked);
 
     if (incompleteCheckbox) {
       await userEvent.click(incompleteCheckbox);

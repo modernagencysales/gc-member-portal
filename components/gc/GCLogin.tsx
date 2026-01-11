@@ -55,11 +55,7 @@ const GCLogin: React.FC = () => {
           >
             Growth Collective
           </h1>
-          <p
-            className={`text-sm mt-2 ${
-              isDarkMode ? 'text-slate-400' : 'text-slate-600'
-            }`}
-          >
+          <p className={`text-sm mt-2 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
             Member Portal
           </p>
         </div>
@@ -73,18 +69,10 @@ const GCLogin: React.FC = () => {
           }`}
         >
           <div className="text-center mb-6">
-            <h2
-              className={`text-lg font-semibold ${
-                isDarkMode ? 'text-white' : 'text-slate-900'
-              }`}
-            >
+            <h2 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
               Welcome back
             </h2>
-            <p
-              className={`text-sm mt-1 ${
-                isDarkMode ? 'text-slate-400' : 'text-slate-600'
-              }`}
-            >
+            <p className={`text-sm mt-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
               Enter your email to access your dashboard
             </p>
           </div>
@@ -150,16 +138,9 @@ const GCLogin: React.FC = () => {
 
           {/* Bootcamp Link */}
           <div className="mt-6 pt-6 border-t border-slate-200 dark:border-slate-700 text-center">
-            <p
-              className={`text-xs ${
-                isDarkMode ? 'text-slate-500' : 'text-slate-500'
-              }`}
-            >
+            <p className={`text-xs ${isDarkMode ? 'text-slate-500' : 'text-slate-500'}`}>
               Looking for the bootcamp?{' '}
-              <a
-                href="/bootcamp"
-                className="text-blue-500 hover:text-blue-600 font-medium"
-              >
+              <a href="/bootcamp" className="text-blue-500 hover:text-blue-600 font-medium">
                 Go to Bootcamp
               </a>
             </p>
@@ -168,9 +149,7 @@ const GCLogin: React.FC = () => {
 
         {/* Footer */}
         <p
-          className={`text-center text-xs mt-6 ${
-            isDarkMode ? 'text-slate-600' : 'text-slate-400'
-          }`}
+          className={`text-center text-xs mt-6 ${isDarkMode ? 'text-slate-600' : 'text-slate-400'}`}
         >
           Need help?{' '}
           <a href="mailto:support@modernagencysales.com" className="text-blue-500 hover:underline">

@@ -142,8 +142,7 @@ const BootcampApp: React.FC = () => {
 
   const currentWeek = courseData.weeks.find(
     (w) =>
-      w.lessons.some((l) => l.id === currentLesson.id) ||
-      currentLesson.id === `${w.id}:checklist`
+      w.lessons.some((l) => l.id === currentLesson.id) || currentLesson.id === `${w.id}:checklist`
   );
 
   return (

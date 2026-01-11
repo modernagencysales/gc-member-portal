@@ -148,7 +148,9 @@ const DashboardHome: React.FC = () => {
           icon={Wrench}
           linkTo="/tools"
           isDarkMode={isDarkMode}
-          alert={toolsWithIssues.length > 0 ? `${toolsWithIssues.length} need attention` : undefined}
+          alert={
+            toolsWithIssues.length > 0 ? `${toolsWithIssues.length} need attention` : undefined
+          }
         >
           <div className="space-y-3">
             {tools.slice(0, 4).map((tool) => (
@@ -178,13 +180,16 @@ const DashboardHome: React.FC = () => {
             {activeCampaigns.slice(0, 3).map((campaign) => (
               <div key={campaign.id} className="space-y-1">
                 <div className="flex items-center justify-between">
-                  <span className={`text-sm font-medium ${isDarkMode ? 'text-slate-300' : 'text-slate-700'}`}>
+                  <span
+                    className={`text-sm font-medium ${isDarkMode ? 'text-slate-300' : 'text-slate-700'}`}
+                  >
                     {campaign.campaignName}
                   </span>
                   <StatusBadge status={campaign.status} size="sm" />
                 </div>
                 <div className={`text-xs ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>
-                  {campaign.metrics.contactsReached} reached • {campaign.metrics.replies} replies • {campaign.metrics.meetingsBooked} meetings
+                  {campaign.metrics.contactsReached} reached • {campaign.metrics.replies} replies •{' '}
+                  {campaign.metrics.meetingsBooked} meetings
                 </div>
               </div>
             ))}
@@ -239,20 +244,12 @@ interface StatCardProps {
 }
 
 const StatCard: React.FC<StatCardProps> = ({ label, value, icon: Icon, isDarkMode }) => (
-  <div
-    className={`rounded-xl p-4 ${
-      isDarkMode ? 'bg-slate-800/50' : 'bg-white/80'
-    }`}
-  >
+  <div className={`rounded-xl p-4 ${isDarkMode ? 'bg-slate-800/50' : 'bg-white/80'}`}>
     <div className="flex items-center gap-2 mb-1">
       <Icon className={`w-4 h-4 ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`} />
-      <span className={`text-xs ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>
-        {label}
-      </span>
+      <span className={`text-xs ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>{label}</span>
     </div>
-    <p className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
-      {value}
-    </p>
+    <p className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>{value}</p>
   </div>
 );
 
@@ -281,9 +278,7 @@ const DashboardCard: React.FC<DashboardCardProps> = ({
     <div className="flex items-center justify-between mb-4">
       <div className="flex items-center gap-2">
         <Icon className={`w-5 h-5 ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`} />
-        <h2 className={`font-semibold ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
-          {title}
-        </h2>
+        <h2 className={`font-semibold ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>{title}</h2>
       </div>
       {alert && (
         <span className="flex items-center gap-1 text-xs text-amber-500">

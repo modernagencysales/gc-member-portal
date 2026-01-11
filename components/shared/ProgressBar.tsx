@@ -32,9 +32,7 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
     <div className={`w-full ${className}`}>
       {showLabel && (
         <div className="flex justify-between items-center mb-1">
-          <span className="text-xs font-medium text-slate-600 dark:text-slate-400">
-            Progress
-          </span>
+          <span className="text-xs font-medium text-slate-600 dark:text-slate-400">Progress</span>
           <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
             {clampedProgress}%
           </span>

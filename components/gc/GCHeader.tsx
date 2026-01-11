@@ -27,20 +27,14 @@ const GCHeader: React.FC<GCHeaderProps> = ({ onMenuClick, title }) => {
           <button
             onClick={onMenuClick}
             className={`md:hidden p-2 rounded-lg transition-colors ${
-              isDarkMode
-                ? 'hover:bg-slate-800 text-slate-400'
-                : 'hover:bg-slate-100 text-slate-600'
+              isDarkMode ? 'hover:bg-slate-800 text-slate-400' : 'hover:bg-slate-100 text-slate-600'
             }`}
           >
             <Menu className="w-5 h-5" />
           </button>
 
           {title && (
-            <h1
-              className={`text-lg font-bold ${
-                isDarkMode ? 'text-white' : 'text-slate-900'
-              }`}
-            >
+            <h1 className={`text-lg font-bold ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
               {title}
             </h1>
           )}
@@ -69,9 +63,7 @@ const GCHeader: React.FC<GCHeaderProps> = ({ onMenuClick, title }) => {
               <div className="hidden md:flex items-center gap-2">
                 <div
                   className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
-                    isDarkMode
-                      ? 'bg-slate-800 text-slate-300'
-                      : 'bg-slate-100 text-slate-600'
+                    isDarkMode ? 'bg-slate-800 text-slate-300' : 'bg-slate-100 text-slate-600'
                   }`}
                 >
                   {gcMember.name?.charAt(0)?.toUpperCase() ||

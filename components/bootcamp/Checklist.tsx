@@ -11,15 +11,15 @@ interface ChecklistProps {
   title?: string;
 }
 
-const Checklist: React.FC<ChecklistProps> = ({ 
-  items, 
-  completedIds, 
-  proofOfWork, 
-  onToggle, 
-  onUpdateProof, 
-  title = "Weekly Action Plan" 
+const Checklist: React.FC<ChecklistProps> = ({
+  items,
+  completedIds,
+  proofOfWork,
+  onToggle,
+  onUpdateProof,
+  title = 'Weekly Action Plan',
 }) => {
-  const completedCount = items.filter(item => completedIds.has(item.id)).length;
+  const completedCount = items.filter((item) => completedIds.has(item.id)).length;
   const totalCount = items.length;
   const progress = totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
 
@@ -33,8 +33,8 @@ const Checklist: React.FC<ChecklistProps> = ({
           </span>
         </div>
         <div className="w-full bg-gray-200 rounded-full h-2">
-          <div 
-            className="bg-brand-500 h-2 rounded-full transition-all duration-1000 ease-out" 
+          <div
+            className="bg-brand-500 h-2 rounded-full transition-all duration-1000 ease-out"
             style={{ width: `${progress}%` }}
           />
         </div>
@@ -54,18 +54,19 @@ const Checklist: React.FC<ChecklistProps> = ({
                 onClick={() => onToggle(item.id)}
                 className={`w-full text-left p-4 flex items-start gap-3 hover:bg-gray-50 transition-colors`}
               >
-                <div 
+                <div
                   className={`
                     flex-shrink-0 mt-0.5 w-6 h-6 rounded-md border-2 flex items-center justify-center transition-all
-                    ${isCompleted 
-                      ? 'bg-brand-600 border-brand-600 text-white shadow-md' 
-                      : 'border-slate-200 group-hover:border-brand-300 bg-white'
+                    ${
+                      isCompleted
+                        ? 'bg-brand-600 border-brand-600 text-white shadow-md'
+                        : 'border-slate-200 group-hover:border-brand-300 bg-white'
                     }
                   `}
                 >
                   {isCompleted && <Check size={14} strokeWidth={3} />}
                 </div>
-                <span 
+                <span
                   className={`
                     text-sm leading-relaxed transition-all pt-0.5
                     ${isCompleted ? 'text-slate-400' : 'text-slate-700 font-semibold'}
@@ -80,9 +81,9 @@ const Checklist: React.FC<ChecklistProps> = ({
                 <div className="px-4 pb-4 ml-9 animate-slide-in">
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-                       <Link size={14} />
+                      <Link size={14} />
                     </div>
-                    <input 
+                    <input
                       type="text"
                       placeholder="Paste link to proof (Loom, Table, etc.)"
                       value={currentProof}

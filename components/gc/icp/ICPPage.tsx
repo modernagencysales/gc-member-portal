@@ -1,5 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Save, Users, Target, MessageSquare, Award, AlertTriangle, Gift, Loader2 } from 'lucide-react';
+import {
+  Save,
+  Users,
+  Target,
+  MessageSquare,
+  Award,
+  AlertTriangle,
+  Gift,
+  Loader2,
+} from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
 import { useTheme } from '../../../context/ThemeContext';
 import { LoadingState } from '../../shared/LoadingSpinner';
@@ -167,8 +176,8 @@ const ICPPage: React.FC = () => {
             hasChanges && !saving
               ? 'bg-blue-600 hover:bg-blue-700 text-white'
               : isDarkMode
-              ? 'bg-slate-800 text-slate-500 cursor-not-allowed'
-              : 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                ? 'bg-slate-800 text-slate-500 cursor-not-allowed'
+                : 'bg-slate-100 text-slate-400 cursor-not-allowed'
           }`}
         >
           {saving ? (
@@ -198,7 +207,9 @@ const ICPPage: React.FC = () => {
           </h2>
         </div>
         <div>
-          <label className={`text-sm font-medium ${isDarkMode ? 'text-slate-300' : 'text-slate-700'}`}>
+          <label
+            className={`text-sm font-medium ${isDarkMode ? 'text-slate-300' : 'text-slate-700'}`}
+          >
             Company Name
           </label>
           <input
@@ -224,7 +235,9 @@ const ICPPage: React.FC = () => {
           }`}
         >
           <div className="flex items-center gap-3 mb-4">
-            <section.icon className={`w-5 h-5 ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`} />
+            <section.icon
+              className={`w-5 h-5 ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}
+            />
             <h2 className={`font-semibold ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
               {section.title}
             </h2>
@@ -233,7 +246,9 @@ const ICPPage: React.FC = () => {
           <div className="space-y-4">
             {section.fields.map((field) => (
               <div key={field.key}>
-                <label className={`text-sm font-medium ${isDarkMode ? 'text-slate-300' : 'text-slate-700'}`}>
+                <label
+                  className={`text-sm font-medium ${isDarkMode ? 'text-slate-300' : 'text-slate-700'}`}
+                >
                   {field.label}
                 </label>
                 {field.type === 'textarea' ? (

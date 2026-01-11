@@ -1,5 +1,4 @@
-
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenAI } from '@google/genai';
 
 // Initialize Gemini Client
 // Always use a named parameter and obtain API key directly from process.env.API_KEY.
@@ -7,16 +6,19 @@ const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
 
 /**
  * Simulates fetching a transcript from YouTube.
- * 
+ *
  * Since we cannot fetch actual YouTube captions client-side without a backend proxy,
  * this function uses a hybrid approach for the demo:
  * 1. Returns a hardcoded transcript for the specific demo video.
  * 2. Uses GenAI to "hallucinate" a realistic transcript for any other video title.
  *    This ensures the "Summarize" feature works impressively for ANY video in the prototype.
  */
-export async function getYouTubeTranscript(videoId: string, videoTitle: string = 'Video Lesson'): Promise<string> {
+export async function getYouTubeTranscript(
+  videoId: string,
+  videoTitle: string = 'Video Lesson'
+): Promise<string> {
   // Simulate network delay
-  await new Promise(resolve => setTimeout(resolve, 800));
+  await new Promise((resolve) => setTimeout(resolve, 800));
 
   // 1. Hardcoded Mock for the specific Demo Video (Course Kickoff)
   // ID from constants.ts: aqz-KE-bpKQ
@@ -44,7 +46,7 @@ export async function getYouTubeTranscript(videoId: string, videoTitle: string =
   // 2. AI-Generated Transcript for all other videos
   // This allows the demo to feel "real" for any video the user clicks on.
   try {
-    if (!process.env.API_KEY) throw new Error("No API Key");
+    if (!process.env.API_KEY) throw new Error('No API Key');
 
     // Use gemini-3-flash-preview for basic text tasks
     const model = 'gemini-3-flash-preview';
@@ -68,7 +70,7 @@ export async function getYouTubeTranscript(videoId: string, videoTitle: string =
     // Access the .text property directly
     return response.text || `[Transcript auto-generation failed for: ${videoTitle}]`;
   } catch (error) {
-    console.warn("Mock transcript generation failed:", error);
+    console.warn('Mock transcript generation failed:', error);
     return `
       In this video lesson titled "${videoTitle}", the instructor covers the core concepts of the topic.
       They demonstrate how to configure the necessary tools and discuss best practices for implementation.
@@ -80,10 +82,13 @@ export async function getYouTubeTranscript(videoId: string, videoTitle: string =
 /**
  * Uses Gemini to summarize the transcript.
  */
-export async function summarizeLesson(lessonTitle: string, transcriptText: string): Promise<string> {
+export async function summarizeLesson(
+  lessonTitle: string,
+  transcriptText: string
+): Promise<string> {
   try {
     if (!process.env.API_KEY) {
-      throw new Error("API_KEY not configured");
+      throw new Error('API_KEY not configured');
     }
 
     // Use gemini-3-flash-preview for basic text tasks
@@ -108,9 +113,9 @@ export async function summarizeLesson(lessonTitle: string, transcriptText: strin
     });
 
     // Use the .text property directly (do not call as a method)
-    return response.text || "Could not generate summary.";
+    return response.text || 'Could not generate summary.';
   } catch (error) {
-    console.error("Gemini Summarization Failed:", error);
-    return "Unable to generate summary at this time. Please ensure the API Key is configured correctly.";
+    console.error('Gemini Summarization Failed:', error);
+    return 'Unable to generate summary at this time. Please ensure the API Key is configured correctly.';
   }
 }

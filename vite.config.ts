@@ -1,11 +1,11 @@
-import { defineConfig, loadEnv } from 'vite'
-import react from '@vitejs/plugin-react'
+import { defineConfig, loadEnv } from 'vite';
+import react from '@vitejs/plugin-react';
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
   // Load env file based on `mode` in the current working directory.
   // Set the third parameter to '' to load all env regardless of the `VITE_` prefix.
-  const env = loadEnv(mode, (process as any).cwd(), '')
+  const env = loadEnv(mode, (process as any).cwd(), '');
 
   // Use environment variable for Gemini API key
   // Set VITE_GEMINI_API_KEY in .env.local for local development
@@ -14,16 +14,16 @@ export default defineConfig(({ mode }) => {
     plugins: [react()],
     define: {
       // Expose process.env to the client-side code so AIRTABLE keys and API_KEY work
-      'process.env': env
+      'process.env': env,
     },
     server: {
-      port: 3000
+      port: 3000,
     },
     build: {
       rollupOptions: {
         // Treat @google/genai as external since it's loaded via importmap in index.html
-        external: ['@google/genai']
-      }
-    }
-  }
-})
+        external: ['@google/genai'],
+      },
+    },
+  };
+});

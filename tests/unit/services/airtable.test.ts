@@ -292,7 +292,7 @@ describe('airtable service (bootcamp)', () => {
       const result = await fetchCourseData('Global', 'me@example.com');
 
       // When action item is assigned to different user, it should be filtered out
-      const allActionItems = result.weeks.flatMap(w => w.actionItems);
+      const allActionItems = result.weeks.flatMap((w) => w.actionItems);
       expect(allActionItems).toHaveLength(0);
     });
   });

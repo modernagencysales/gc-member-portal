@@ -1,8 +1,5 @@
 {
   "name": "Copy of GTM OS",
   "description": "A responsive LMS dashboard for hosting Guidde step-by-step guides with a sidebar curriculum and interactive transcripts.",
-  "requestFramePermissions": [
-    "microphone",
-    "camera"
-  ]
+  "requestFramePermissions": ["microphone", "camera"]
 }

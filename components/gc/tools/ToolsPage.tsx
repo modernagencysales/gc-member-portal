@@ -1,13 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {
-  ExternalLink,
-  Copy,
-  Check,
-  Eye,
-  EyeOff,
-  AlertCircle,
-  Wrench,
-} from 'lucide-react';
+import { ExternalLink, Copy, Check, Eye, EyeOff, AlertCircle, Wrench } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
 import { useTheme } from '../../../context/ThemeContext';
 import StatusBadge from '../../shared/StatusBadge';
@@ -75,7 +67,12 @@ const ToolsPage: React.FC = () => {
       {/* Quick Stats */}
       <div className="flex gap-4 flex-wrap">
         <StatPill label="Active" count={activeTools.length} color="green" isDarkMode={isDarkMode} />
-        <StatPill label="Pending Setup" count={pendingTools.length} color="yellow" isDarkMode={isDarkMode} />
+        <StatPill
+          label="Pending Setup"
+          count={pendingTools.length}
+          color="yellow"
+          isDarkMode={isDarkMode}
+        />
         {issueTools.length > 0 && (
           <StatPill label="Issues" count={issueTools.length} color="red" isDarkMode={isDarkMode} />
         )}
@@ -89,12 +86,10 @@ const ToolsPage: React.FC = () => {
       </div>
 
       {tools.length === 0 && (
-        <div
-          className={`text-center py-12 rounded-xl ${
-            isDarkMode ? 'bg-slate-900' : 'bg-white'
-          }`}
-        >
-          <Wrench className={`w-12 h-12 mx-auto mb-4 ${isDarkMode ? 'text-slate-600' : 'text-slate-300'}`} />
+        <div className={`text-center py-12 rounded-xl ${isDarkMode ? 'bg-slate-900' : 'bg-white'}`}>
+          <Wrench
+            className={`w-12 h-12 mx-auto mb-4 ${isDarkMode ? 'text-slate-600' : 'text-slate-300'}`}
+          />
           <p className={isDarkMode ? 'text-slate-400' : 'text-slate-500'}>
             No tools have been set up yet
           </p>
@@ -155,7 +150,9 @@ const ToolCard: React.FC<ToolCardProps> = ({ tool, isDarkMode }) => {
       {/* Header */}
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3">
-          <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-xl ${colors.bg} ${colors.darkBg}`}>
+          <div
+            className={`w-10 h-10 rounded-xl flex items-center justify-center text-xl ${colors.bg} ${colors.darkBg}`}
+          >
             {colors.icon}
           </div>
           <div>
@@ -271,9 +268,7 @@ const CredentialField: React.FC<CredentialFieldProps> = ({
   onTogglePassword,
 }) => (
   <div>
-    <span className={`text-xs ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>
-      {label}
-    </span>
+    <span className={`text-xs ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>{label}</span>
     <div
       className={`mt-1 flex items-center gap-2 px-3 py-2 rounded-lg ${
         isDarkMode ? 'bg-slate-800' : 'bg-slate-50'
@@ -302,11 +297,7 @@ const CredentialField: React.FC<CredentialFieldProps> = ({
           isDarkMode ? 'hover:bg-slate-700 text-slate-400' : 'hover:bg-slate-200 text-slate-500'
         }`}
       >
-        {isCopied ? (
-          <Check className="w-4 h-4 text-green-500" />
-        ) : (
-          <Copy className="w-4 h-4" />
-        )}
+        {isCopied ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
       </button>
     </div>
   </div>

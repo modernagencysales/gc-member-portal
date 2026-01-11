@@ -231,12 +231,7 @@ describe('gc-airtable service', () => {
         json: async () => mockCreated,
       });
 
-      const result = await updateMemberProgress(
-        undefined,
-        'rec123',
-        'check1',
-        'Complete'
-      );
+      const result = await updateMemberProgress(undefined, 'rec123', 'check1', 'Complete');
 
       expect(mockFetch).toHaveBeenCalledWith(
         expect.stringContaining('Member%20Progress'),
@@ -260,12 +255,7 @@ describe('gc-airtable service', () => {
         json: async () => mockUpdated,
       });
 
-      const result = await updateMemberProgress(
-        'prog1',
-        'rec123',
-        'check1',
-        'In Progress'
-      );
+      const result = await updateMemberProgress('prog1', 'rec123', 'check1', 'In Progress');
 
       expect(mockFetch).toHaveBeenCalledWith(
         expect.stringContaining('prog1'),

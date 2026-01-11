@@ -44,12 +44,7 @@ const GCSidebar: React.FC<GCSidebarProps> = ({ isOpen, onClose, onboardingProgre
   return (
     <>
       {/* Mobile Overlay */}
-      {isOpen && (
-        <div
-          className="md:hidden fixed inset-0 bg-black/50 z-40"
-          onClick={onClose}
-        />
-      )}
+      {isOpen && <div className="md:hidden fixed inset-0 bg-black/50 z-40" onClick={onClose} />}
 
       {/* Sidebar */}
       <aside
@@ -73,9 +68,7 @@ const GCSidebar: React.FC<GCSidebarProps> = ({ isOpen, onClose, onboardingProgre
                 <h1 className="font-bold text-sm text-slate-900 dark:text-white">
                   Growth Collective
                 </h1>
-                <p className="text-[10px] text-slate-500 dark:text-slate-400">
-                  Member Portal
-                </p>
+                <p className="text-[10px] text-slate-500 dark:text-slate-400">Member Portal</p>
               </div>
             </div>
             <button
@@ -93,9 +86,7 @@ const GCSidebar: React.FC<GCSidebarProps> = ({ isOpen, onClose, onboardingProgre
             <div className="flex items-center gap-3">
               <div
                 className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold ${
-                  isDarkMode
-                    ? 'bg-slate-800 text-slate-300'
-                    : 'bg-slate-100 text-slate-600'
+                  isDarkMode ? 'bg-slate-800 text-slate-300' : 'bg-slate-100 text-slate-600'
                 }`}
               >
                 {gcMember.name?.charAt(0)?.toUpperCase() || gcMember.email.charAt(0).toUpperCase()}
@@ -145,8 +136,8 @@ const GCSidebar: React.FC<GCSidebarProps> = ({ isOpen, onClose, onboardingProgre
                       ? 'bg-blue-600/20 text-blue-400'
                       : 'bg-blue-50 text-blue-700'
                     : isDarkMode
-                    ? 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'
-                    : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                      ? 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'
+                      : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
                 }`
               }
             >
@@ -188,9 +179,7 @@ const GCSidebar: React.FC<GCSidebarProps> = ({ isOpen, onClose, onboardingProgre
           <button
             onClick={handleLogout}
             className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
-              isDarkMode
-                ? 'text-red-400 hover:bg-red-900/20'
-                : 'text-red-600 hover:bg-red-50'
+              isDarkMode ? 'text-red-400 hover:bg-red-900/20' : 'text-red-600 hover:bg-red-50'
             }`}
           >
             <LogOut className="w-5 h-5" />

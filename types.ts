@@ -1,4 +1,3 @@
-
 export interface TranscriptEntry {
   timestamp: string;
   text: string;
@@ -42,9 +41,9 @@ export interface CourseData {
 }
 
 export interface UserProgress {
-  completedItems: string[]; 
-  proofOfWork: Record<string, string>; 
+  completedItems: string[];
+  proofOfWork: Record<string, string>;
   taskNotes: Record<string, string>;
   lastLessonId?: string;
-  isSubmitted?: Record<string, boolean>; 
+  isSubmitted?: Record<string, boolean>;
 }

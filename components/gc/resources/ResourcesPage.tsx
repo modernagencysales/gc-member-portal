@@ -145,12 +145,7 @@ const ResourcesPage: React.FC = () => {
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
             {featuredResources.map((resource) => (
-              <ResourceCard
-                key={resource.id}
-                resource={resource}
-                isDarkMode={isDarkMode}
-                compact
-              />
+              <ResourceCard key={resource.id} resource={resource} isDarkMode={isDarkMode} compact />
             ))}
           </div>
         </div>
@@ -242,17 +237,11 @@ const ResourcesPage: React.FC = () => {
       ))}
 
       {filteredResources.length === 0 && (
-        <div
-          className={`text-center py-12 rounded-xl ${
-            isDarkMode ? 'bg-slate-900' : 'bg-white'
-          }`}
-        >
+        <div className={`text-center py-12 rounded-xl ${isDarkMode ? 'bg-slate-900' : 'bg-white'}`}>
           <BookOpen
             className={`w-12 h-12 mx-auto mb-4 ${isDarkMode ? 'text-slate-600' : 'text-slate-300'}`}
           />
-          <p className={isDarkMode ? 'text-slate-400' : 'text-slate-500'}>
-            No resources found
-          </p>
+          <p className={isDarkMode ? 'text-slate-400' : 'text-slate-500'}>No resources found</p>
           {(searchQuery || selectedTool !== 'All' || selectedCategory !== 'All') && (
             <button
               onClick={() => {
@@ -261,7 +250,9 @@ const ResourcesPage: React.FC = () => {
                 setSelectedCategory('All');
               }}
               className={`mt-2 text-sm ${
-                isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-700'
+                isDarkMode
+                  ? 'text-blue-400 hover:text-blue-300'
+                  : 'text-blue-600 hover:text-blue-700'
               }`}
             >
               Clear filters
@@ -343,7 +334,9 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ resource, isDarkMode, compa
             >
               {resource.tool}
             </span>
-            <ExternalLink className={`w-3 h-3 ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`} />
+            <ExternalLink
+              className={`w-3 h-3 ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}
+            />
           </div>
         </div>
       </div>

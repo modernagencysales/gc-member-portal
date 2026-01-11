@@ -14,10 +14,7 @@ import { useTheme } from '../../../context/ThemeContext';
 import { ProgressBar } from '../../shared/ProgressBar';
 import StatusBadge from '../../shared/StatusBadge';
 import { LoadingState } from '../../shared/LoadingSpinner';
-import {
-  fetchOnboardingWithProgress,
-  updateMemberProgress,
-} from '../../../services/gc-airtable';
+import { fetchOnboardingWithProgress, updateMemberProgress } from '../../../services/gc-airtable';
 import {
   OnboardingCategoryGroup,
   OnboardingProgressItem,
@@ -47,9 +44,7 @@ const OnboardingPage: React.FC = () => {
       setTotalProgress(data.totalProgress);
 
       // Expand first incomplete category by default
-      const firstIncomplete = data.categories.find(
-        (c) => c.completedCount < c.totalCount
-      );
+      const firstIncomplete = data.categories.find((c) => c.completedCount < c.totalCount);
       if (firstIncomplete) {
         setExpandedCategories(new Set([firstIncomplete.name]));
       }
@@ -79,12 +74,7 @@ const OnboardingPage: React.FC = () => {
     setUpdatingItems((prev) => new Set(prev).add(item.id));
 
     try {
-      await updateMemberProgress(
-        item.progressId,
-        gcMember.id,
-        item.id,
-        newStatus
-      );
+      await updateMemberProgress(item.progressId, gcMember.id, item.id, newStatus);
 
       // Reload data to get updated progress
       await loadOnboardingData();
@@ -142,12 +132,10 @@ const OnboardingPage: React.FC = () => {
       </div>
 
       {categories.length === 0 && (
-        <div
-          className={`text-center py-12 rounded-xl ${
-            isDarkMode ? 'bg-slate-900' : 'bg-white'
-          }`}
-        >
-          <HelpCircle className={`w-12 h-12 mx-auto mb-4 ${isDarkMode ? 'text-slate-600' : 'text-slate-300'}`} />
+        <div className={`text-center py-12 rounded-xl ${isDarkMode ? 'bg-slate-900' : 'bg-white'}`}>
+          <HelpCircle
+            className={`w-12 h-12 mx-auto mb-4 ${isDarkMode ? 'text-slate-600' : 'text-slate-300'}`}
+          />
           <p className={isDarkMode ? 'text-slate-400' : 'text-slate-500'}>
             No onboarding items found
           </p>
@@ -191,9 +179,13 @@ const CategorySection: React.FC<CategorySectionProps> = ({
       >
         <div className="flex items-center gap-3">
           {isExpanded ? (
-            <ChevronDown className={`w-5 h-5 ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`} />
+            <ChevronDown
+              className={`w-5 h-5 ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}
+            />
           ) : (
-            <ChevronRight className={`w-5 h-5 ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`} />
+            <ChevronRight
+              className={`w-5 h-5 ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}
+            />
           )}
           <span className={`font-semibold ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
             {category.name}
@@ -268,8 +260,8 @@ const ChecklistItem: React.FC<ChecklistItemProps> = ({
             isComplete
               ? 'bg-green-500 border-green-500'
               : isDarkMode
-              ? 'border-slate-600 hover:border-slate-500'
-              : 'border-slate-300 hover:border-slate-400'
+                ? 'border-slate-600 hover:border-slate-500'
+                : 'border-slate-300 hover:border-slate-400'
           }
         `}
       >
@@ -286,8 +278,8 @@ const ChecklistItem: React.FC<ChecklistItemProps> = ({
                   ? 'text-slate-500 line-through'
                   : 'text-slate-400 line-through'
                 : isDarkMode
-                ? 'text-white'
-                : 'text-slate-900'
+                  ? 'text-white'
+                  : 'text-slate-900'
             }`}
           >
             {item.item}
@@ -296,11 +288,7 @@ const ChecklistItem: React.FC<ChecklistItemProps> = ({
         </div>
 
         {item.description && (
-          <p
-            className={`text-sm mt-1 ${
-              isDarkMode ? 'text-slate-400' : 'text-slate-600'
-            }`}
-          >
+          <p className={`text-sm mt-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
             {item.description}
           </p>
         )}
@@ -321,7 +309,9 @@ const ChecklistItem: React.FC<ChecklistItemProps> = ({
               target="_blank"
               rel="noopener noreferrer"
               className={`text-xs flex items-center gap-1 ${
-                isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-700'
+                isDarkMode
+                  ? 'text-blue-400 hover:text-blue-300'
+                  : 'text-blue-600 hover:text-blue-700'
               }`}
             >
               View Guide
