@@ -1,0 +1,45 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - generic [ref=e4]:
+      - heading "GTM Automation System" [level=1] [ref=e5]
+      - paragraph [ref=e6]: Automate your lead magnet creation, distribution, and monetization with n8n-orchestrated workflows
+    - generic [ref=e7]:
+      - link "Dashboard View your GTM command center with real-time metrics, funnel analytics, and system health monitoring. Open Dashboard" [ref=e8] [cursor=pointer]:
+        - /url: /dashboard
+        - generic [ref=e9]:
+          - img [ref=e11]
+          - heading "Dashboard" [level=2] [ref=e13]
+        - paragraph [ref=e14]: View your GTM command center with real-time metrics, funnel analytics, and system health monitoring.
+        - generic [ref=e15]:
+          - text: Open Dashboard
+          - img [ref=e16]
+      - link "Install System Set up a new GTM system for a client with guided configuration and automatic provisioning. Start Setup" [ref=e18] [cursor=pointer]:
+        - /url: /installer
+        - generic [ref=e19]:
+          - img [ref=e21]
+          - heading "Install System" [level=2] [ref=e24]
+        - paragraph [ref=e25]: Set up a new GTM system for a client with guided configuration and automatic provisioning.
+        - generic [ref=e26]:
+          - text: Start Setup
+          - img [ref=e27]
+      - generic [ref=e29]:
+        - generic [ref=e30]:
+          - img [ref=e32]
+          - heading "Tech Stack" [level=2] [ref=e34]
+        - list [ref=e35]:
+          - listitem [ref=e36]: Clay (GTM Hub)
+          - listitem [ref=e38]: n8n (Orchestration)
+          - listitem [ref=e40]: Loops (Email)
+          - listitem [ref=e42]: LeadShark, HeyReach, PlusVibe
+          - listitem [ref=e44]: Clarify.ai (Sales CRM)
+    - generic [ref=e46]:
+      - heading "System Architecture" [level=2] [ref=e47]
+      - generic [ref=e49]: ┌─────────────────────────────────────────────┐ │ LEAD SOURCES │ │ LeadShark │ Kondo DMs │ Cold Lists │ Organic│ └──────────────────┬──────────────────────────┘ │ ▼ ┌──────────────────────────────────────────────────────────┐ │ CLAY (GTM Hub) │ │ Enrich (50+ sources) → Score & Qualify → AI Write Copy │ └──────────────────────────────────────────────────────────┘ │ │ │ │ Cold │ Warm │ Sales-Ready ▼ ▼ ▼ ┌─────────────┐ ┌────────────┐ ┌────────────┐ │ PlusVibe │ │ Loops │ │ Clarify.ai │ │ HeyReach │ │ Triggered │ │ Sales CRM │ │ Outreach │ │ Emails │ │ │ └─────────────┘ └────────────┘ └────────────┘ │ ▼ ┌────────────┐ │ Cal.com │ │ Booking │ └────────────┘
+    - paragraph [ref=e51]: Built with Next.js, Supabase, and n8n
+  - button "Open Next.js Dev Tools" [ref=e57] [cursor=pointer]:
+    - img [ref=e58]
+  - alert [ref=e61]
+```
