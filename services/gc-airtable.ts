@@ -55,7 +55,8 @@ async function airtableFetch<T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> {
-  const url = `${BASE_URL}/${encodeURIComponent(endpoint)}`;
+  // Don't encode the entire endpoint - it may contain query params
+  const url = `${BASE_URL}/${endpoint}`;
   const response = await fetch(url, {
     ...options,
     headers: {
@@ -77,10 +78,12 @@ async function airtableGet<T>(
   table: string,
   params?: Record<string, string>
 ): Promise<{ records: AirtableRecord<T>[] }> {
-  let url = table;
+  // Encode the table name (for spaces, etc.) but not the query params
+  const encodedTable = encodeURIComponent(table);
+  let url = encodedTable;
   if (params) {
     const searchParams = new URLSearchParams(params);
-    url = `${table}?${searchParams.toString()}`;
+    url = `${encodedTable}?${searchParams.toString()}`;
   }
   return airtableFetch<{ records: AirtableRecord<T>[] }>(url);
 }
