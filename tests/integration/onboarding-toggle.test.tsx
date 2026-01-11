@@ -1,24 +1,15 @@
 import React from 'react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { render } from '../test-utils';
+import { BrowserRouter } from 'react-router-dom';
 
-// Mock the gc-airtable service
+// Mock modules BEFORE any imports that use them
 vi.mock('../../services/gc-airtable', () => ({
   fetchOnboardingWithProgress: vi.fn(),
   updateMemberProgress: vi.fn(),
 }));
 
-import { fetchOnboardingWithProgress, updateMemberProgress } from '../../services/gc-airtable';
-
-const mockFetchOnboarding = vi.mocked(fetchOnboardingWithProgress);
-const mockUpdateProgress = vi.mocked(updateMemberProgress);
-
-// Import after mocking
-import OnboardingPage from '../../components/gc/onboarding/OnboardingPage';
-
-// Mock the AuthContext to provide a test member
 vi.mock('../../context/AuthContext', () => ({
   useAuth: () => ({
     gcMember: {
@@ -31,8 +22,28 @@ vi.mock('../../context/AuthContext', () => ({
     isAuthenticated: true,
     mode: 'gc',
   }),
-  AuthProvider: ({ children }: { children: React.ReactNode }) => children,
+  AuthProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
+
+vi.mock('../../context/ThemeContext', () => ({
+  useTheme: () => ({
+    isDarkMode: false,
+    toggleTheme: vi.fn(),
+  }),
+  ThemeProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+}));
+
+// Import after mocking
+import { fetchOnboardingWithProgress, updateMemberProgress } from '../../services/gc-airtable';
+import OnboardingPage from '../../components/gc/onboarding/OnboardingPage';
+
+const mockFetchOnboarding = vi.mocked(fetchOnboardingWithProgress);
+const mockUpdateProgress = vi.mocked(updateMemberProgress);
+
+// Custom render for this test
+const renderWithRouter = (ui: React.ReactElement) => {
+  return render(<BrowserRouter>{ui}</BrowserRouter>);
+};
 
 describe('Onboarding Checkbox Toggle', () => {
   const mockCategories = [
@@ -73,8 +84,8 @@ describe('Onboarding Checkbox Toggle', () => {
     });
   });
 
-  it.skip('renders onboarding items', async () => {
-    render(<OnboardingPage />);
+  it('renders onboarding items', async () => {
+    renderWithRouter(<OnboardingPage />);
 
     await waitFor(() => {
       expect(screen.getByText('Complete ICP worksheet')).toBeInTheDocument();
@@ -82,12 +93,14 @@ describe('Onboarding Checkbox Toggle', () => {
     });
   });
 
-  it.skip('shows progress percentage', async () => {
-    render(<OnboardingPage />);
+  // TODO: These tests have a race condition with mock reset between tests.
+  // The mock works in isolation but vitest's module caching causes issues.
+  // Fix: Consider using MSW (Mock Service Worker) for more reliable API mocking.
 
-    await waitFor(() => {
-      expect(screen.getByText(/50%/)).toBeInTheDocument();
-    });
+  it.skip('shows progress percentage', async () => {
+    renderWithRouter(<OnboardingPage />);
+    await screen.findByText('Complete ICP worksheet');
+    expect(screen.getByText(/50%/)).toBeInTheDocument();
   });
 
   it.skip('calls updateMemberProgress when checkbox toggled', async () => {
@@ -98,7 +111,7 @@ describe('Onboarding Checkbox Toggle', () => {
       checklistItemId: 'check1',
     });
 
-    render(<OnboardingPage />);
+    renderWithRouter(<OnboardingPage />);
 
     // Wait for loading to finish and checkboxes to appear
     const checkboxes = await screen.findAllByRole('checkbox', {}, { timeout: 3000 });
@@ -122,11 +135,13 @@ describe('Onboarding Checkbox Toggle', () => {
   });
 
   it.skip('displays different support types correctly', async () => {
-    render(<OnboardingPage />);
+    renderWithRouter(<OnboardingPage />);
 
-    await waitFor(() => {
-      expect(screen.getByText(/Self-Service/i)).toBeInTheDocument();
-      expect(screen.getByText(/Initial Setup Help/i)).toBeInTheDocument();
-    });
+    // Wait for content to load first
+    await screen.findByText('Complete ICP worksheet');
+
+    // Then check for support types
+    expect(screen.getByText(/Self-Service/i)).toBeInTheDocument();
+    expect(screen.getByText(/Initial Setup Help/i)).toBeInTheDocument();
   });
 });
