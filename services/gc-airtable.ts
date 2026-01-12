@@ -247,11 +247,19 @@ function mapOnboardingChecklistItem(
 
 export async function fetchMemberProgress(memberId: string): Promise<MemberProgress[]> {
   try {
+    const filterFormula = `FIND('${memberId}', ARRAYJOIN({Member}))`;
+    console.log('Fetching member progress with filter:', filterFormula);
+
     const response = await airtableGet<MemberProgressFields>(GC_TABLES.MEMBER_PROGRESS, {
-      filterByFormula: `FIND('${memberId}', ARRAYJOIN({Member}))`,
+      filterByFormula: filterFormula,
     });
 
-    return response.records.map(mapMemberProgress);
+    console.log('Raw progress records from Airtable:', response.records);
+
+    const mapped = response.records.map(mapMemberProgress);
+    console.log('Mapped progress records:', mapped);
+
+    return mapped;
   } catch (error) {
     console.error('Failed to fetch progress:', error);
     return [];
