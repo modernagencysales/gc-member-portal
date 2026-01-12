@@ -14,7 +14,7 @@ import { useTheme } from '../../../context/ThemeContext';
 import { ProgressBar } from '../../shared/ProgressBar';
 import StatusBadge from '../../shared/StatusBadge';
 import { LoadingState } from '../../shared/LoadingSpinner';
-import { fetchOnboardingWithProgress, updateMemberProgress } from '../../../services/gc-airtable';
+import { fetchOnboardingWithProgress, updateMemberProgress } from '../../../services/supabase';
 import {
   OnboardingCategoryGroup,
   OnboardingProgressItem,

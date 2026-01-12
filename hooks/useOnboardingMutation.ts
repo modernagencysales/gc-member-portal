@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { updateMemberProgress } from '../services/gc-airtable';
+import { updateMemberProgress } from '../services/supabase';
 import { queryKeys } from '../lib/queryClient';
 import { OnboardingCategoryGroup, ProgressStatus } from '../types/gc-types';
 
@@ -108,7 +108,7 @@ export function useCampaignMetricsMutation() {
         meetingsBooked?: number;
       };
     }) => {
-      const { updateCampaignMetrics } = await import('../services/gc-airtable');
+      const { updateCampaignMetrics } = await import('../services/supabase');
       return updateCampaignMetrics(campaignId, metrics);
     },
 

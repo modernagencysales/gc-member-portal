@@ -14,7 +14,7 @@ import {
 import { useAuth } from '../../../context/AuthContext';
 import { useTheme } from '../../../context/ThemeContext';
 import { LoadingState } from '../../shared/LoadingSpinner';
-import { fetchMemberICP, updateMemberICP } from '../../../services/gc-airtable';
+import { fetchMemberICP, updateMemberICP } from '../../../services/supabase';
 import { MemberICP } from '../../../types/gc-types';
 import { generateICPSuggestions, ICPSuggestion } from '../../../services/ai';
 

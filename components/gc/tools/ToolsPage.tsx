@@ -4,7 +4,7 @@ import { useAuth } from '../../../context/AuthContext';
 import { useTheme } from '../../../context/ThemeContext';
 import StatusBadge from '../../shared/StatusBadge';
 import { LoadingState } from '../../shared/LoadingSpinner';
-import { fetchMemberTools } from '../../../services/gc-airtable';
+import { fetchMemberTools } from '../../../services/supabase';
 import { ToolAccess } from '../../../types/gc-types';
 
 // Tool icons/colors mapping

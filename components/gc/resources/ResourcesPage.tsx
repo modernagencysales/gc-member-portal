@@ -3,7 +3,7 @@ import { Search, ExternalLink, FileText, BookOpen, Star, Filter } from 'lucide-r
 import { useAuth } from '../../../context/AuthContext';
 import { useTheme } from '../../../context/ThemeContext';
 import { LoadingState } from '../../shared/LoadingSpinner';
-import { fetchResources } from '../../../services/gc-airtable';
+import { fetchResources } from '../../../services/supabase';
 import { Resource, ResourceCategory, ResourceTool } from '../../../types/gc-types';
 
 const categoryOrder: ResourceCategory[] = [

@@ -4,7 +4,7 @@ import GCSidebar from './GCSidebar';
 import GCHeader from './GCHeader';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
-import { fetchOnboardingWithProgress } from '../../services/gc-airtable';
+import { fetchOnboardingWithProgress } from '../../services/supabase';
 
 const routeTitles: Record<string, string> = {
   '/': 'Dashboard',

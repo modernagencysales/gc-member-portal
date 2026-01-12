@@ -17,7 +17,7 @@ import { useAuth } from '../../../context/AuthContext';
 import { useTheme } from '../../../context/ThemeContext';
 import StatusBadge from '../../shared/StatusBadge';
 import { LoadingState } from '../../shared/LoadingSpinner';
-import { fetchMemberCampaigns, updateCampaignMetrics } from '../../../services/gc-airtable';
+import { fetchMemberCampaigns, updateCampaignMetrics } from '../../../services/supabase';
 import { Campaign, CampaignMetrics } from '../../../types/gc-types';
 import CampaignAnalytics from './CampaignAnalytics';
 

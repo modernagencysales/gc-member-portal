@@ -4,8 +4,8 @@ import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { render } from '../test-utils';
 
-// Mock the gc-airtable service
-vi.mock('../../services/gc-airtable', () => ({
+// Mock the supabase service
+vi.mock('../../services/supabase', () => ({
   verifyGCMember: vi.fn(),
 }));
 
@@ -22,7 +22,7 @@ vi.mock('../../context/AuthContext', () => ({
 
 import GCLogin from '../../components/gc/GCLogin';
 
-import { verifyGCMember } from '../../services/gc-airtable';
+import { verifyGCMember } from '../../services/supabase';
 
 const mockVerifyGCMember = vi.mocked(verifyGCMember);
 

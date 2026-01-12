@@ -19,7 +19,7 @@ import {
   fetchMemberTools,
   fetchMemberCampaigns,
   fetchFeaturedResources,
-} from '../../../services/gc-airtable';
+} from '../../../services/supabase';
 import { ToolAccess, Campaign, Resource, OnboardingCategoryGroup } from '../../../types/gc-types';
 
 const DashboardHome: React.FC = () => {

@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { GCMember, AppMode, AuthState } from '../types/gc-types';
 import { User } from '../types';
-import { verifyGCMember } from '../services/gc-airtable';
+import { verifyGCMember } from '../services/supabase';
 import { verifyUser } from '../services/airtable';
 
 interface AuthContextType extends AuthState {

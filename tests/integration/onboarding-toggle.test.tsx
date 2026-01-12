@@ -5,7 +5,7 @@ import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
 
 // Mock modules BEFORE any imports that use them
-vi.mock('../../services/gc-airtable', () => ({
+vi.mock('../../services/supabase', () => ({
   fetchOnboardingWithProgress: vi.fn(),
   updateMemberProgress: vi.fn(),
 }));
@@ -34,7 +34,7 @@ vi.mock('../../context/ThemeContext', () => ({
 }));
 
 // Import after mocking
-import { fetchOnboardingWithProgress, updateMemberProgress } from '../../services/gc-airtable';
+import { fetchOnboardingWithProgress, updateMemberProgress } from '../../services/supabase';
 import OnboardingPage from '../../components/gc/onboarding/OnboardingPage';
 
 const mockFetchOnboarding = vi.mocked(fetchOnboardingWithProgress);
