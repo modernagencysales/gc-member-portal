@@ -12,10 +12,12 @@ import {
   LogOut,
   X,
   Sparkles,
+  Shield,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 import { ProgressBar } from '../shared/ProgressBar';
+import { isAdminEmail } from '../../config/adminConfig';
 
 interface GCSidebarProps {
   isOpen: boolean;
@@ -155,6 +157,21 @@ const GCSidebar: React.FC<GCSidebarProps> = ({ isOpen, onClose, onboardingProgre
 
         {/* Footer Actions */}
         <div className="p-3 border-t border-slate-200 dark:border-slate-800 space-y-1">
+          {/* Admin Link - only for admins */}
+          {gcMember && isAdminEmail(gcMember.email) && (
+            <a
+              href="/admin"
+              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                isDarkMode
+                  ? 'text-amber-400 hover:bg-amber-900/20'
+                  : 'text-amber-600 hover:bg-amber-50'
+              }`}
+            >
+              <Shield className="w-5 h-5" />
+              Admin Dashboard
+            </a>
+          )}
+
           {/* Theme Toggle */}
           <button
             onClick={toggleTheme}
