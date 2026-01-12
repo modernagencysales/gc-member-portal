@@ -4,10 +4,7 @@
  */
 
 // Add authorized admin emails here
-export const ADMIN_EMAILS: string[] = [
-  'kristaps@peak9.co',
-  // Add more admin emails as needed
-];
+export const ADMIN_EMAILS: string[] = ['kristaps@peak9.co', 'tim@keen.digital'];
 
 /**
  * Check if an email has admin access
