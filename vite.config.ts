@@ -20,10 +20,7 @@ export default defineConfig(({ mode }) => {
       port: 3000,
     },
     build: {
-      rollupOptions: {
-        // Treat @google/genai as external since it's loaded via importmap in index.html
-        external: ['@google/genai'],
-      },
+      // @google/genai is bundled normally from node_modules
     },
   };
 });
