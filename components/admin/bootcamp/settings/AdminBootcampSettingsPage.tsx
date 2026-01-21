@@ -5,7 +5,7 @@ import { queryKeys } from '../../../../lib/queryClient';
 import { useTheme } from '../../../../context/ThemeContext';
 import { useUpdateBootcampSettingMutation } from '../../../../hooks/useBootcampAdminMutations';
 import { BootcampSettings } from '../../../../types/bootcamp-types';
-import { Settings, Video, Sparkles, Info, Save } from 'lucide-react';
+import { Settings, Video, Sparkles, Info, Save, Bot } from 'lucide-react';
 
 const AdminBootcampSettingsPage: React.FC = () => {
   const { isDarkMode } = useTheme();
@@ -178,6 +178,121 @@ const AdminBootcampSettingsPage: React.FC = () => {
                 onChange={(e) => handleChange('welcomeMessage', e.target.value)}
                 placeholder="Welcome to the LinkedIn Bootcamp! We're excited to have you here."
                 rows={3}
+                className={`w-full px-4 py-2.5 rounded-lg border resize-none ${
+                  isDarkMode
+                    ? 'bg-slate-800 border-slate-700 text-white'
+                    : 'bg-white border-slate-300 text-slate-900'
+                } focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* AI Tools Page Customization */}
+        <div
+          className={`rounded-xl border overflow-hidden ${
+            isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+          }`}
+        >
+          <div
+            className={`px-6 py-4 border-b flex items-center gap-3 ${
+              isDarkMode ? 'bg-slate-800/50 border-slate-800' : 'bg-slate-50 border-slate-200'
+            }`}
+          >
+            <Bot className={`w-5 h-5 ${isDarkMode ? 'text-purple-400' : 'text-purple-600'}`} />
+            <h3 className="font-semibold">AI Tools Page</h3>
+          </div>
+          <div className="p-6 space-y-6">
+            {/* AI Tools Title */}
+            <div>
+              <label className="font-medium">Page Title</label>
+              <p
+                className={`text-sm mt-0.5 mb-3 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}
+              >
+                Main heading displayed on the AI Tools page
+              </p>
+              <input
+                type="text"
+                value={
+                  typeof localSettings.aiToolsTitle === 'string' ? localSettings.aiToolsTitle : ''
+                }
+                onChange={(e) => handleChange('aiToolsTitle', e.target.value)}
+                placeholder="Your AI-Powered Toolkit"
+                className={`w-full px-4 py-2.5 rounded-lg border ${
+                  isDarkMode
+                    ? 'bg-slate-800 border-slate-700 text-white'
+                    : 'bg-white border-slate-300 text-slate-900'
+                } focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+              />
+            </div>
+
+            {/* AI Tools Subtitle */}
+            <div>
+              <label className="font-medium">Page Subtitle</label>
+              <p
+                className={`text-sm mt-0.5 mb-3 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}
+              >
+                Description text shown below the title
+              </p>
+              <textarea
+                value={
+                  typeof localSettings.aiToolsSubtitle === 'string'
+                    ? localSettings.aiToolsSubtitle
+                    : ''
+                }
+                onChange={(e) => handleChange('aiToolsSubtitle', e.target.value)}
+                placeholder="As part of your bootcamp access, you have full access to these AI tools to accelerate your LinkedIn outreach."
+                rows={2}
+                className={`w-full px-4 py-2.5 rounded-lg border resize-none ${
+                  isDarkMode
+                    ? 'bg-slate-800 border-slate-700 text-white'
+                    : 'bg-white border-slate-300 text-slate-900'
+                } focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+              />
+            </div>
+
+            {/* AI Tools Info Title */}
+            <div>
+              <label className="font-medium">Info Box Title</label>
+              <p
+                className={`text-sm mt-0.5 mb-3 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}
+              >
+                Title for the info box at the bottom
+              </p>
+              <input
+                type="text"
+                value={
+                  typeof localSettings.aiToolsInfoTitle === 'string'
+                    ? localSettings.aiToolsInfoTitle
+                    : ''
+                }
+                onChange={(e) => handleChange('aiToolsInfoTitle', e.target.value)}
+                placeholder="Full Access Included"
+                className={`w-full px-4 py-2.5 rounded-lg border ${
+                  isDarkMode
+                    ? 'bg-slate-800 border-slate-700 text-white'
+                    : 'bg-white border-slate-300 text-slate-900'
+                } focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+              />
+            </div>
+
+            {/* AI Tools Info Text */}
+            <div>
+              <label className="font-medium">Info Box Text</label>
+              <p
+                className={`text-sm mt-0.5 mb-3 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}
+              >
+                Description text shown in the info box
+              </p>
+              <textarea
+                value={
+                  typeof localSettings.aiToolsInfoText === 'string'
+                    ? localSettings.aiToolsInfoText
+                    : ''
+                }
+                onChange={(e) => handleChange('aiToolsInfoText', e.target.value)}
+                placeholder="All AI tools are included with your bootcamp access. You'll learn how to use each one effectively throughout the curriculum."
+                rows={2}
                 className={`w-full px-4 py-2.5 rounded-lg border resize-none ${
                   isDarkMode
                     ? 'bg-slate-800 border-slate-700 text-white'

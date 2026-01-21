@@ -365,7 +365,20 @@ const BootcampApp: React.FC = () => {
         )}
 
         {onboardingStep === 'ai-tools' && (
-          <OnboardingAITools onContinue={handleAIToolsContinue} onBack={() => goToStep('survey')} />
+          <OnboardingAITools
+            title={typeof settings?.aiToolsTitle === 'string' ? settings.aiToolsTitle : undefined}
+            subtitle={
+              typeof settings?.aiToolsSubtitle === 'string' ? settings.aiToolsSubtitle : undefined
+            }
+            infoTitle={
+              typeof settings?.aiToolsInfoTitle === 'string' ? settings.aiToolsInfoTitle : undefined
+            }
+            infoText={
+              typeof settings?.aiToolsInfoText === 'string' ? settings.aiToolsInfoText : undefined
+            }
+            onContinue={handleAIToolsContinue}
+            onBack={() => goToStep('survey')}
+          />
         )}
 
         {onboardingStep === 'complete' && (

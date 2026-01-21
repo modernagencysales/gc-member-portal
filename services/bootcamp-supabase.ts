@@ -524,14 +524,33 @@ function mapBootcampStudentSurvey(record: Record<string, unknown>): BootcampStud
 // Settings
 // ============================================
 
+// Map camelCase TypeScript keys to snake_case database keys
+const SETTINGS_KEY_MAP: Record<keyof BootcampSettings, string> = {
+  aiToolsVisible: 'ai_tools_visible',
+  introVideoUrl: 'intro_video_url',
+  slackChannelIds: 'slack_channel_ids',
+  calendarEventIds: 'calendar_event_ids',
+  welcomeMessage: 'welcome_message',
+  aiToolsTitle: 'ai_tools_title',
+  aiToolsSubtitle: 'ai_tools_subtitle',
+  aiToolsInfoTitle: 'ai_tools_info_title',
+  aiToolsInfoText: 'ai_tools_info_text',
+};
+
+// Reverse map: snake_case to camelCase
+const SETTINGS_KEY_REVERSE_MAP: Record<string, keyof BootcampSettings> = Object.fromEntries(
+  Object.entries(SETTINGS_KEY_MAP).map(([k, v]) => [v, k as keyof BootcampSettings])
+) as Record<string, keyof BootcampSettings>;
+
 export async function fetchBootcampSetting<K extends keyof BootcampSettings>(
   key: K
 ): Promise<BootcampSettings[K] | null> {
   try {
+    const dbKey = SETTINGS_KEY_MAP[key];
     const { data, error } = await supabase
       .from('bootcamp_settings')
       .select('value')
-      .eq('key', key)
+      .eq('key', dbKey)
       .single();
 
     if (error || !data) {
@@ -557,8 +576,11 @@ export async function fetchAllBootcampSettings(): Promise<Partial<BootcampSettin
 
     const settings: Partial<BootcampSettings> = {};
     data?.forEach((row) => {
-      const key = row.key as keyof BootcampSettings;
-      (settings as Record<string, unknown>)[key] = row.value;
+      const dbKey = row.key as string;
+      const tsKey = SETTINGS_KEY_REVERSE_MAP[dbKey];
+      if (tsKey) {
+        (settings as Record<string, unknown>)[tsKey] = row.value;
+      }
     });
 
     return settings;
@@ -572,7 +594,8 @@ export async function updateBootcampSetting<K extends keyof BootcampSettings>(
   key: K,
   value: BootcampSettings[K]
 ): Promise<void> {
-  const { error } = await supabase.from('bootcamp_settings').update({ value }).eq('key', key);
+  const dbKey = SETTINGS_KEY_MAP[key];
+  const { error } = await supabase.from('bootcamp_settings').update({ value }).eq('key', dbKey);
 
   if (error) throw new Error(error.message);
 }

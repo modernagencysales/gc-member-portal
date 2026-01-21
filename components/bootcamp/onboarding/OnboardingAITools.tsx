@@ -20,6 +20,10 @@ interface AITool {
 
 interface OnboardingAIToolsProps {
   tools?: AITool[];
+  title?: string;
+  subtitle?: string;
+  infoTitle?: string;
+  infoText?: string;
   onContinue: () => void;
   onBack?: () => void;
 }
@@ -53,8 +57,19 @@ const DEFAULT_TOOLS: AITool[] = [
   },
 ];
 
+const DEFAULT_TITLE = 'Your AI-Powered Toolkit';
+const DEFAULT_SUBTITLE =
+  'As part of your bootcamp access, you have full access to these AI tools to accelerate your LinkedIn outreach.';
+const DEFAULT_INFO_TITLE = 'Full Access Included';
+const DEFAULT_INFO_TEXT =
+  "All AI tools are included with your bootcamp access. You'll learn how to use each one effectively throughout the curriculum.";
+
 const OnboardingAITools: React.FC<OnboardingAIToolsProps> = ({
   tools = DEFAULT_TOOLS,
+  title = DEFAULT_TITLE,
+  subtitle = DEFAULT_SUBTITLE,
+  infoTitle = DEFAULT_INFO_TITLE,
+  infoText = DEFAULT_INFO_TEXT,
   onContinue,
   onBack,
 }) => {
@@ -66,13 +81,8 @@ const OnboardingAITools: React.FC<OnboardingAIToolsProps> = ({
           <Sparkles className="w-4 h-4" />
           <span>AI Tools</span>
         </div>
-        <h1 className="text-xl font-semibold text-zinc-900 dark:text-white mb-2">
-          Your AI-Powered Toolkit
-        </h1>
-        <p className="text-zinc-600 dark:text-zinc-400">
-          As part of your bootcamp access, you have full access to these AI tools to accelerate your
-          LinkedIn outreach.
-        </p>
+        <h1 className="text-xl font-semibold text-zinc-900 dark:text-white mb-2">{title}</h1>
+        <p className="text-zinc-600 dark:text-zinc-400">{subtitle}</p>
       </div>
 
       {/* Tools Grid */}
@@ -132,13 +142,8 @@ const OnboardingAITools: React.FC<OnboardingAIToolsProps> = ({
           <div className="flex gap-3">
             <Sparkles className="w-5 h-5 text-violet-600 dark:text-violet-400 flex-shrink-0 mt-0.5" />
             <div>
-              <h4 className="font-medium text-violet-900 dark:text-violet-200 mb-1">
-                Full Access Included
-              </h4>
-              <p className="text-sm text-violet-700 dark:text-violet-300">
-                All AI tools are included with your bootcamp access. You'll learn how to use each
-                one effectively throughout the curriculum.
-              </p>
+              <h4 className="font-medium text-violet-900 dark:text-violet-200 mb-1">{infoTitle}</h4>
+              <p className="text-sm text-violet-700 dark:text-violet-300">{infoText}</p>
             </div>
           </div>
         </div>

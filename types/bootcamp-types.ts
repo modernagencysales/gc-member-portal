@@ -143,6 +143,11 @@ export interface BootcampSettings {
   slackChannelIds: string[];
   calendarEventIds: string[];
   welcomeMessage: string;
+  // AI Tools page customization
+  aiToolsTitle: string;
+  aiToolsSubtitle: string;
+  aiToolsInfoTitle: string;
+  aiToolsInfoText: string;
 }
 
 // ============================================
