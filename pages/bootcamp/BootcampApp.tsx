@@ -42,7 +42,14 @@ const BootcampApp: React.FC = () => {
   const isRegisterPath = window.location.pathname.includes('/register');
 
   // Registration mode state
-  const [showRegister, setShowRegister] = useState(!!inviteCodeFromUrl || isRegisterPath);
+  const [showRegister, setShowRegister] = useState(false);
+
+  // Update showRegister when URL has invite code
+  useEffect(() => {
+    if (inviteCodeFromUrl || isRegisterPath) {
+      setShowRegister(true);
+    }
+  }, [inviteCodeFromUrl, isRegisterPath]);
 
   // Legacy state for curriculum
   const [courseData, setCourseData] = useState<CourseData | null>(null);
