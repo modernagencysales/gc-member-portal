@@ -368,10 +368,14 @@ const BootcampApp: React.FC = () => {
 
   // Login or Register screen
   if (!user) {
-    if (showRegister) {
+    // Check URL directly at render time for invite code
+    const urlHasCode = new URLSearchParams(window.location.search).get('code');
+    const urlHasRegister = window.location.pathname.includes('/register');
+
+    if (showRegister || urlHasCode || urlHasRegister) {
       return (
         <Register
-          initialCode={inviteCodeFromUrl || undefined}
+          initialCode={urlHasCode || inviteCodeFromUrl || undefined}
           onRegister={handleRegister}
           onBackToLogin={handleBackToLogin}
         />
