@@ -5,9 +5,11 @@ import {
   useCreateAIToolMutation,
   useUpdateAIToolMutation,
   useDeleteAIToolMutation,
+  useBulkUpdateAIToolsMutation,
 } from '../../../../hooks/useChatMutation';
 import { AITool, AIToolInput } from '../../../../types/chat-types';
 import AIToolModal from './AIToolModal';
+import BulkEditModal from './BulkEditModal';
 import {
   Plus,
   Search,
@@ -18,6 +20,7 @@ import {
   CheckCircle,
   XCircle,
   Copy,
+  Settings2,
 } from 'lucide-react';
 
 const AdminAIToolsPage: React.FC = () => {
@@ -26,9 +29,11 @@ const AdminAIToolsPage: React.FC = () => {
   // State
   const [searchQuery, setSearchQuery] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isBulkEditModalOpen, setIsBulkEditModalOpen] = useState(false);
   const [editingTool, setEditingTool] = useState<AITool | null>(null);
   const [deletingTool, setDeletingTool] = useState<AITool | null>(null);
   const [copiedSlug, setCopiedSlug] = useState<string | null>(null);
+  const [selectedToolIds, setSelectedToolIds] = useState<Set<string>>(new Set());
 
   // Queries
   const { data: tools, isLoading, refetch } = useAITools();
@@ -37,6 +42,7 @@ const AdminAIToolsPage: React.FC = () => {
   const createMutation = useCreateAIToolMutation();
   const updateMutation = useUpdateAIToolMutation();
   const deleteMutation = useDeleteAIToolMutation();
+  const bulkUpdateMutation = useBulkUpdateAIToolsMutation();
 
   // Filter tools
   const filteredTools = useMemo(() => {
@@ -104,6 +110,36 @@ const AdminAIToolsPage: React.FC = () => {
     setTimeout(() => setCopiedSlug(null), 2000);
   };
 
+  // Selection handlers
+  const handleSelectTool = (toolId: string) => {
+    setSelectedToolIds((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(toolId)) {
+        newSet.delete(toolId);
+      } else {
+        newSet.add(toolId);
+      }
+      return newSet;
+    });
+  };
+
+  const handleSelectAll = () => {
+    if (selectedToolIds.size === filteredTools.length) {
+      setSelectedToolIds(new Set());
+    } else {
+      setSelectedToolIds(new Set(filteredTools.map((t) => t.id)));
+    }
+  };
+
+  const handleBulkUpdate = async (updates: { model?: string; maxTokens?: number }) => {
+    await bulkUpdateMutation.mutateAsync({
+      toolIds: Array.from(selectedToolIds),
+      updates,
+    });
+    setSelectedToolIds(new Set());
+    setIsBulkEditModalOpen(false);
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -122,6 +158,15 @@ const AdminAIToolsPage: React.FC = () => {
           >
             <RefreshCw className="w-5 h-5" />
           </button>
+          {selectedToolIds.size > 0 && (
+            <button
+              onClick={() => setIsBulkEditModalOpen(true)}
+              className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-violet-600 text-white hover:bg-violet-700"
+            >
+              <Settings2 className="w-4 h-4" />
+              Edit {selectedToolIds.size} Tool{selectedToolIds.size !== 1 ? 's' : ''}
+            </button>
+          )}
           <button
             onClick={handleAddTool}
             className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-blue-600 text-white hover:bg-blue-700"
@@ -190,9 +235,20 @@ const AdminAIToolsPage: React.FC = () => {
           <table className="w-full">
             <thead className={`text-xs uppercase ${isDarkMode ? 'bg-slate-800' : 'bg-slate-50'}`}>
               <tr>
+                <th className="px-4 py-3 text-left w-10">
+                  <input
+                    type="checkbox"
+                    checked={
+                      filteredTools.length > 0 && selectedToolIds.size === filteredTools.length
+                    }
+                    onChange={handleSelectAll}
+                    className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                  />
+                </th>
                 <th className="px-4 py-3 text-left">Tool</th>
                 <th className="px-4 py-3 text-left">Slug</th>
                 <th className="px-4 py-3 text-left">Model</th>
+                <th className="px-4 py-3 text-left">Max Tokens</th>
                 <th className="px-4 py-3 text-center">Status</th>
                 <th className="px-4 py-3 text-right">Actions</th>
               </tr>
@@ -201,7 +257,7 @@ const AdminAIToolsPage: React.FC = () => {
               {filteredTools.length === 0 ? (
                 <tr>
                   <td
-                    colSpan={5}
+                    colSpan={7}
                     className={`px-4 py-8 text-center ${
                       isDarkMode ? 'text-slate-400' : 'text-slate-500'
                     }`}
@@ -213,8 +269,22 @@ const AdminAIToolsPage: React.FC = () => {
                 filteredTools.map((tool) => (
                   <tr
                     key={tool.id}
-                    className={`${isDarkMode ? 'hover:bg-slate-800/50' : 'hover:bg-slate-50'}`}
+                    className={`${isDarkMode ? 'hover:bg-slate-800/50' : 'hover:bg-slate-50'} ${
+                      selectedToolIds.has(tool.id)
+                        ? isDarkMode
+                          ? 'bg-blue-900/20'
+                          : 'bg-blue-50'
+                        : ''
+                    }`}
                   >
+                    <td className="px-4 py-3">
+                      <input
+                        type="checkbox"
+                        checked={selectedToolIds.has(tool.id)}
+                        onChange={() => handleSelectTool(tool.id)}
+                        className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                      />
+                    </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
                         <div
@@ -256,6 +326,13 @@ const AdminAIToolsPage: React.FC = () => {
                         className={`text-sm ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}
                       >
                         {tool.model.replace('claude-', '')}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <span
+                        className={`text-sm ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}
+                      >
+                        {tool.maxTokens.toLocaleString()}
                       </span>
                     </td>
                     <td className="px-4 py-3 text-center">
@@ -360,6 +437,15 @@ const AdminAIToolsPage: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Bulk Edit Modal */}
+      <BulkEditModal
+        isOpen={isBulkEditModalOpen}
+        onClose={() => setIsBulkEditModalOpen(false)}
+        onSubmit={handleBulkUpdate}
+        selectedCount={selectedToolIds.size}
+        isLoading={bulkUpdateMutation.isPending}
+      />
     </div>
   );
 };

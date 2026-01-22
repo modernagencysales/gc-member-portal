@@ -147,6 +147,25 @@ export async function deleteAITool(toolId: string): Promise<void> {
   if (error) throw new Error(error.message);
 }
 
+export async function bulkUpdateAITools(
+  toolIds: string[],
+  updates: { model?: string; maxTokens?: number }
+): Promise<AITool[]> {
+  const updateData: Record<string, unknown> = {};
+
+  if (updates.model !== undefined) updateData.model = updates.model;
+  if (updates.maxTokens !== undefined) updateData.max_tokens = updates.maxTokens;
+
+  const { data, error } = await supabase
+    .from('ai_tools')
+    .update(updateData)
+    .in('id', toolIds)
+    .select();
+
+  if (error) throw new Error(error.message);
+  return (data || []).map(mapAITool);
+}
+
 // ============================================
 // Chat Conversations
 // ============================================

@@ -4,6 +4,7 @@ import {
   createAITool,
   updateAITool,
   deleteAITool,
+  bulkUpdateAITools,
   createConversation,
   updateConversationTitle,
   deleteConversation,
@@ -44,6 +45,23 @@ export function useDeleteAIToolMutation() {
 
   return useMutation({
     mutationFn: (toolId: string) => deleteAITool(toolId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.aiTools() });
+    },
+  });
+}
+
+export function useBulkUpdateAIToolsMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      toolIds,
+      updates,
+    }: {
+      toolIds: string[];
+      updates: { model?: string; maxTokens?: number };
+    }) => bulkUpdateAITools(toolIds, updates),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.aiTools() });
     },
