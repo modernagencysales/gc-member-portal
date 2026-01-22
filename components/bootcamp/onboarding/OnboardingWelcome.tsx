@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { ArrowRight, Sparkles, Play } from 'lucide-react';
+import React from 'react';
+import { ArrowRight, Sparkles } from 'lucide-react';
 
 interface OnboardingWelcomeProps {
   studentName?: string;
@@ -17,14 +17,15 @@ const getEmbedUrl = (url: string) => {
   const match = url.match(regExp);
 
   if (match && match[2].length === 11) {
-    return `https://www.youtube.com/embed/${match[2]}?enablejsapi=1`;
+    // modestbranding=1 hides logo, rel=0 prevents related videos, showinfo=0 hides title
+    return `https://www.youtube.com/embed/${match[2]}?modestbranding=1&rel=0&showinfo=0`;
   }
 
   // Handle Loom URLs
   if (url.includes('loom.com')) {
     const loomMatch = url.match(/loom\.com\/(share|embed)\/([a-zA-Z0-9]+)/);
     if (loomMatch) {
-      return `https://www.loom.com/embed/${loomMatch[2]}`;
+      return `https://www.loom.com/embed/${loomMatch[2]}?hide_title=true&hide_owner=true&hide_share=true`;
     }
   }
 
@@ -37,7 +38,6 @@ const OnboardingWelcome: React.FC<OnboardingWelcomeProps> = ({
   videoUrl,
   onContinue,
 }) => {
-  const [isPlaying, setIsPlaying] = useState(false);
   const embedUrl = videoUrl ? getEmbedUrl(videoUrl) : '';
 
   return (
@@ -53,34 +53,20 @@ const OnboardingWelcome: React.FC<OnboardingWelcomeProps> = ({
         </h1>
         <p className="text-base text-violet-100 max-w-lg">
           {welcomeMessage ||
-            "You're about to master LinkedIn outreach and start generating quality leads for your business. Watch the intro video below, then let's get you set up."}
+            'Welcome to the GTM Engineering Bootcamp. Watch this video to get started.'}
         </p>
       </div>
 
       {/* Video Section */}
       {embedUrl && (
-        <div className="relative bg-zinc-900">
-          <div className="aspect-video">
-            {isPlaying ? (
-              <iframe
-                src={embedUrl}
-                className="w-full h-full"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-                title="Intro Video"
-              />
-            ) : (
-              <button
-                onClick={() => setIsPlaying(true)}
-                className="w-full h-full flex flex-col items-center justify-center gap-4 bg-gradient-to-br from-zinc-800 to-zinc-900 hover:from-zinc-700 hover:to-zinc-800 transition-colors"
-              >
-                <div className="w-16 h-16 rounded-full bg-white/10 backdrop-blur flex items-center justify-center">
-                  <Play className="w-8 h-8 text-white ml-1" fill="white" />
-                </div>
-                <span className="text-white font-medium">Watch Intro Video</span>
-              </button>
-            )}
-          </div>
+        <div className="aspect-video">
+          <iframe
+            src={embedUrl}
+            className="w-full h-full"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+            title="Intro Video"
+          />
         </div>
       )}
 

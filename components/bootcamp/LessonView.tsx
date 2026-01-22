@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { Lesson, Week, ActionItem } from '../../types';
+import { Lesson, Week } from '../../types';
 import {
   CheckCircle,
   Target,
   Check,
   ClipboardList,
-  ArrowRight,
   ChevronDown,
   ChevronUp,
   ExternalLink,
   ShieldAlert,
   Bot,
 } from 'lucide-react';
+import { ChatInterface } from '../chat';
 
 interface LessonViewProps {
   lesson: Lesson;
@@ -25,6 +25,7 @@ interface LessonViewProps {
   isWeekSubmitted?: boolean;
   onWeekSubmit: (weekId: string) => void;
   onSelectLesson: (lesson: Lesson) => void;
+  studentId?: string;
 }
 
 const LessonView: React.FC<LessonViewProps> = ({
@@ -36,7 +37,8 @@ const LessonView: React.FC<LessonViewProps> = ({
   onToggleItem,
   onUpdateProof,
   onUpdateNote,
-  onSelectLesson,
+  onSelectLesson: _onSelectLesson,
+  studentId,
 }) => {
   const [activeTaskId, setActiveTaskId] = useState<string | null>(null);
 
@@ -45,9 +47,21 @@ const LessonView: React.FC<LessonViewProps> = ({
   const isAistudio = lesson.embedUrl.includes('aistudio.google.com');
   const isTextContent = lesson.embedUrl.startsWith('text:');
 
-  // 1. Detect Pickaxe Content
+  // 1. Detect Custom AI Tool (replaces Pickaxe)
+  const isCustomAITool = lesson.embedUrl.startsWith('ai-tool:');
+  const aiToolSlug = isCustomAITool ? lesson.embedUrl.replace('ai-tool:', '').trim() : null;
+
+  console.log('[LessonView] AI Tool detection:', {
+    embedUrl: lesson.embedUrl,
+    isCustomAITool,
+    aiToolSlug,
+    studentId,
+  });
+
+  // 2. Detect Pickaxe Content (legacy)
   const isPickaxe =
     !isTextContent &&
+    !isCustomAITool &&
     (lesson.embedUrl.startsWith('custom-embed:') ||
       lesson.embedUrl.startsWith('pickaxe:') ||
       lesson.embedUrl.includes('modernagencysales.com') ||
@@ -243,6 +257,16 @@ const LessonView: React.FC<LessonViewProps> = ({
                 className="bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200 dark:border-zinc-800 p-8 md:p-12 text-sm leading-relaxed text-zinc-700 dark:text-zinc-300 whitespace-pre-wrap"
                 dangerouslySetInnerHTML={{ __html: lesson.embedUrl.replace(/^text:\s*/, '') }}
               />
+            ) : isCustomAITool && aiToolSlug ? (
+              studentId ? (
+                <ChatInterface toolSlug={aiToolSlug} studentId={studentId} />
+              ) : (
+                <div className="w-full h-[600px] bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200 dark:border-zinc-800 flex items-center justify-center">
+                  <div className="text-center text-zinc-500 dark:text-zinc-400">
+                    <p>Loading AI Tool...</p>
+                  </div>
+                </div>
+              )
             ) : isPickaxe && pickaxeId ? (
               <div className="w-full min-h-[800px] bg-white dark:bg-zinc-900 rounded-lg overflow-hidden border border-zinc-200 dark:border-zinc-800 flex flex-col">
                 <div
@@ -274,32 +298,6 @@ const LessonView: React.FC<LessonViewProps> = ({
               </div>
             )}
           </div>
-
-          {!isPickaxe && !isAistudio && (
-            <div className="bg-zinc-900 p-8 rounded-lg flex flex-col md:flex-row items-center justify-between gap-6 border border-zinc-800">
-              <div className="flex items-center gap-5">
-                <Target size={28} className="text-violet-400" />
-                <div>
-                  <h4 className="font-semibold text-white text-lg">Ready to implement?</h4>
-                  <p className="text-sm text-zinc-400">
-                    Log your progress in the project workflow.
-                  </p>
-                </div>
-              </div>
-              <button
-                onClick={() =>
-                  onSelectLesson({
-                    id: `${currentWeek?.id}:checklist`,
-                    title: 'Tasks',
-                    embedUrl: 'virtual:checklist',
-                  })
-                }
-                className="bg-violet-500 hover:bg-violet-600 text-white px-6 py-3 rounded-lg font-medium transition-colors flex items-center gap-2"
-              >
-                Go to Checklist <ArrowRight size={18} />
-              </button>
-            </div>
-          )}
         </div>
       )}
     </div>

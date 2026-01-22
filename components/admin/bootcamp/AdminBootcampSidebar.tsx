@@ -9,6 +9,7 @@ import {
   GraduationCap,
   FolderKanban,
   Ticket,
+  Bot,
 } from 'lucide-react';
 import { useTheme } from '../../../context/ThemeContext';
 
@@ -22,6 +23,7 @@ const navItems = [
   { to: '/admin/bootcamp/cohorts', icon: FolderKanban, label: 'Cohorts' },
   { to: '/admin/bootcamp/invite-codes', icon: Ticket, label: 'Invite Codes' },
   { to: '/admin/bootcamp/onboarding', icon: ListChecks, label: 'Onboarding Checklist' },
+  { to: '/admin/bootcamp/ai-tools', icon: Bot, label: 'AI Tools' },
   { to: '/admin/bootcamp/settings', icon: Settings, label: 'Settings' },
 ];
 

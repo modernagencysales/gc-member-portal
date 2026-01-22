@@ -79,4 +79,15 @@ export const queryKeys = {
   bootcampInviteCodes: () => ['bootcamp', 'inviteCodes'] as const,
   bootcampInviteCodesByCohort: (cohortId: string) =>
     ['bootcamp', 'inviteCodes', 'cohort', cohortId] as const,
+
+  // AI Tools
+  aiTools: () => ['ai', 'tools'] as const,
+  aiToolById: (toolId: string) => ['ai', 'tools', toolId] as const,
+  aiToolBySlug: (slug: string) => ['ai', 'tools', 'slug', slug] as const,
+
+  // Chat
+  chatConversations: (studentId: string) => ['chat', 'conversations', studentId] as const,
+  chatConversationsByTool: (studentId: string, toolId: string) =>
+    ['chat', 'conversations', studentId, toolId] as const,
+  chatMessages: (conversationId: string) => ['chat', 'messages', conversationId] as const,
 };

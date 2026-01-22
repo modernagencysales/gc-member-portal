@@ -595,7 +595,10 @@ export async function updateBootcampSetting<K extends keyof BootcampSettings>(
   value: BootcampSettings[K]
 ): Promise<void> {
   const dbKey = SETTINGS_KEY_MAP[key];
-  const { error } = await supabase.from('bootcamp_settings').update({ value }).eq('key', dbKey);
+  // Use upsert to create the row if it doesn't exist
+  const { error } = await supabase
+    .from('bootcamp_settings')
+    .upsert({ key: dbKey, value }, { onConflict: 'key' });
 
   if (error) throw new Error(error.message);
 }

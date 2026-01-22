@@ -31,15 +31,21 @@ const AdminBootcampSettingsPage: React.FC = () => {
   };
 
   const handleSave = async () => {
-    for (const [key, value] of Object.entries(localSettings)) {
-      if (settings?.[key as keyof BootcampSettings] !== value) {
-        await updateMutation.mutateAsync({
-          key: key as keyof BootcampSettings,
-          value: value as BootcampSettings[keyof BootcampSettings],
-        });
+    try {
+      for (const [key, value] of Object.entries(localSettings)) {
+        if (settings?.[key as keyof BootcampSettings] !== value) {
+          console.log(`Saving setting: ${key} = ${value}`);
+          await updateMutation.mutateAsync({
+            key: key as keyof BootcampSettings,
+            value: value as BootcampSettings[keyof BootcampSettings],
+          });
+        }
       }
+      setHasChanges(false);
+    } catch (error) {
+      console.error('Failed to save settings:', error);
+      window.alert('Failed to save settings. Check console for details.');
     }
-    setHasChanges(false);
   };
 
   if (isLoading) {

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSearchParams } from 'react-router-dom';
-import { fetchCourseData, verifyUser } from '../../services/airtable';
+import { fetchCourseData } from '../../services/airtable';
 import {
   verifyBootcampStudent,
   saveBootcampStudentSurvey,
@@ -34,7 +34,7 @@ const BootcampApp: React.FC = () => {
 
   // Check for invite code in URL
   const inviteCodeFromUrl = searchParams.get('code');
-  const isRegisterPath = window.location.pathname.includes('/register');
+  const _isRegisterPath = window.location.pathname.includes('/register');
 
   // Registration mode state - check URL directly on init
   const [showRegister, setShowRegister] = useState(() => {
@@ -109,13 +109,14 @@ const BootcampApp: React.FC = () => {
           }
 
           await loadUserData(parsedUser);
-        } catch (e) {
+        } catch (_e) {
           localStorage.removeItem('lms_user_obj');
         }
       }
       setLoading(false);
     };
     init();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const getStorageKey = (email: string) => {
@@ -250,7 +251,7 @@ const BootcampApp: React.FC = () => {
     goToStep('survey');
   };
 
-  const handleSurveySave = (data: BootcampSurveyFormData, step: number) => {
+  const handleSurveySave = (data: BootcampSurveyFormData, _step: number) => {
     setSurveyData(data);
     if (bootcampStudent) {
       surveyMutation.mutate({ data, complete: false });
@@ -447,6 +448,7 @@ const BootcampApp: React.FC = () => {
               isWeekSubmitted={currentWeek ? submittedWeeks[currentWeek.id] : false}
               onWeekSubmit={handleWeekSubmit}
               onSelectLesson={setCurrentLesson}
+              studentId={bootcampStudent?.id}
             />
           </div>
         </main>

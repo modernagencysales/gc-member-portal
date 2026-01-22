@@ -26,6 +26,7 @@ import AdminBootcampCohortsPage from './components/admin/bootcamp/cohorts/AdminB
 import AdminBootcampInviteCodesPage from './components/admin/bootcamp/invite-codes/AdminBootcampInviteCodesPage';
 import AdminBootcampOnboardingPage from './components/admin/bootcamp/onboarding/AdminBootcampOnboardingPage';
 import AdminBootcampSettingsPage from './components/admin/bootcamp/settings/AdminBootcampSettingsPage';
+import AdminAIToolsPage from './components/admin/bootcamp/ai-tools/AdminAIToolsPage';
 
 import { useAuth } from './context/AuthContext';
 
@@ -70,6 +71,7 @@ const App: React.FC = () => {
         <Route path="cohorts" element={<AdminBootcampCohortsPage />} />
         <Route path="invite-codes" element={<AdminBootcampInviteCodesPage />} />
         <Route path="onboarding" element={<AdminBootcampOnboardingPage />} />
+        <Route path="ai-tools" element={<AdminAIToolsPage />} />
         <Route path="settings" element={<AdminBootcampSettingsPage />} />
       </Route>
 
