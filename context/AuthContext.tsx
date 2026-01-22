@@ -26,7 +26,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   });
 
   // Separate bootcamp user state (kept for bootcamp compatibility)
-  const [bootcampUser, setBootcampUser] = useState<User | null>(null);
+  const [_bootcampUser, setBootcampUser] = useState<User | null>(null);
 
   // Load saved auth state on mount
   useEffect(() => {

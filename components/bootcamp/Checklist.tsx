@@ -1,6 +1,6 @@
 import React from 'react';
 import { ActionItem } from '../../types';
-import { Check, Link, Send, AlertCircle } from 'lucide-react';
+import { Check, Link, AlertCircle } from 'lucide-react';
 
 interface ChecklistProps {
   items: ActionItem[];

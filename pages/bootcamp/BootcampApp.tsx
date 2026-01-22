@@ -109,7 +109,7 @@ const BootcampApp: React.FC = () => {
           }
 
           await loadUserData(parsedUser);
-        } catch (_e) {
+        } catch {
           localStorage.removeItem('lms_user_obj');
         }
       }

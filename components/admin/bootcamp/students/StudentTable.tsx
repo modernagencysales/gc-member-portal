@@ -1,14 +1,5 @@
 import React from 'react';
-import {
-  Check,
-  X,
-  MessageSquare,
-  Calendar,
-  Eye,
-  Pencil,
-  ClipboardList,
-  MoreVertical,
-} from 'lucide-react';
+import { Check, X, MessageSquare, Calendar, Eye, Pencil, ClipboardList } from 'lucide-react';
 import { BootcampStudent, BootcampStudentSurvey } from '../../../../types/bootcamp-types';
 import { useTheme } from '../../../../context/ThemeContext';
 import { getStatusColor, STATUS_COLORS } from '../../../../types/gc-types';

@@ -9,9 +9,6 @@ import {
   CHALLENGE_OPTIONS,
   LEAD_GEN_METHOD_OPTIONS,
   TOOLS_OPTIONS,
-  CompanySize,
-  LinkedInExperience,
-  MonthlyOutreachVolume,
 } from '../../../types/bootcamp-types';
 
 interface OnboardingSurveyProps {

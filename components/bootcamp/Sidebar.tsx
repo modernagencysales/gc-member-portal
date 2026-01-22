@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { CourseData, Lesson, Week, User } from '../../types';
+import { CourseData, Lesson, User } from '../../types';
 import {
   ChevronDown,
   ChevronRight,
@@ -117,7 +117,7 @@ const Sidebar: React.FC<SidebarProps> = ({
       .replace(/\s+/g, ' ')
       .trim();
 
-  const getLessonIcon = (lesson: Lesson, isActive: boolean) => {
+  const getLessonIcon = (lesson: Lesson, _isActive: boolean) => {
     const size = 14;
     if (lesson.id.endsWith(':checklist')) return <ClipboardList size={size} />;
     const url = lesson.embedUrl || '';

@@ -8,7 +8,7 @@ import {
   useUpdateInviteCodeMutation,
   useDeleteInviteCodeMutation,
 } from '../../../../hooks/useBootcampAdminMutations';
-import { BootcampInviteCode, BootcampCohort } from '../../../../types/bootcamp-types';
+import { BootcampInviteCode } from '../../../../types/bootcamp-types';
 import GenerateCodeModal from './GenerateCodeModal';
 import {
   Plus,
