@@ -4,8 +4,6 @@ import {
   LmsContentItem,
   LmsContentItemFormData,
   LmsContentType,
-  LmsCredentialsData,
-  LMS_CONTENT_TYPE_LABELS,
   detectContentType,
   normalizeEmbedUrl,
 } from '../../../../types/lms-types';
@@ -27,6 +25,7 @@ interface LmsContentItemModalProps {
   onClose: () => void;
   onSubmit: (data: LmsContentItemFormData) => Promise<void>;
   initialData?: LmsContentItem | null;
+  initialContentType?: LmsContentType;
   isLoading: boolean;
 }
 
@@ -46,6 +45,7 @@ const LmsContentItemModal: React.FC<LmsContentItemModalProps> = ({
   onClose,
   onSubmit,
   initialData,
+  initialContentType,
   isLoading,
 }) => {
   const { isDarkMode } = useTheme();
@@ -80,7 +80,7 @@ const LmsContentItemModal: React.FC<LmsContentItemModalProps> = ({
     } else {
       setFormData({
         title: '',
-        contentType: 'video',
+        contentType: initialContentType || 'video',
         embedUrl: '',
         aiToolSlug: '',
         contentText: '',
@@ -89,7 +89,7 @@ const LmsContentItemModal: React.FC<LmsContentItemModalProps> = ({
         isVisible: true,
       });
     }
-  }, [initialData, isOpen]);
+  }, [initialData, initialContentType, isOpen]);
 
   const handleUrlChange = (url: string) => {
     const detectedType = detectContentType(url);
