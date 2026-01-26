@@ -45,6 +45,11 @@ const Sidebar: React.FC<SidebarProps> = ({
   onToggleTheme,
 }) => {
   const { logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    window.location.reload();
+  };
   const [expandedWeeks, setExpandedWeeks] = useState<string[]>(data.weeks.map((w) => w.id));
   const [expandedGroups, setExpandedGroups] = useState<string[]>(['gpts', 'tables', 'logins']);
 
@@ -384,7 +389,7 @@ const Sidebar: React.FC<SidebarProps> = ({
               {isDarkMode ? <Sun size={16} /> : <Moon size={16} />}
             </button>
             <button
-              onClick={logout}
+              onClick={handleLogout}
               className="p-1.5 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 text-zinc-400 dark:text-zinc-500 hover:text-red-600 dark:hover:text-red-400 transition-colors"
               title="Log out"
             >
