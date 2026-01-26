@@ -9,6 +9,26 @@
 export type BootcampStudentStatus = 'Onboarding' | 'Active' | 'Completed' | 'Paused' | 'Churned';
 export type BootcampAccessLevel = 'Full Access' | 'Curriculum Only';
 
+export type SubscriptionStatus = 'none' | 'active' | 'canceled' | 'past_due';
+
+export type StudentCohortRole = 'student' | 'member' | 'resources';
+
+export interface StudentCohort {
+  studentId: string;
+  cohortId: string;
+  role: StudentCohortRole;
+  joinedAt: Date;
+}
+
+export interface SubscriptionEvent {
+  id: string;
+  studentId: string;
+  eventType: 'created' | 'paid' | 'canceled' | 'payment_failed' | 'reactivated';
+  stripeEventId?: string;
+  metadata?: Record<string, unknown>;
+  createdAt: Date;
+}
+
 export interface BootcampStudent {
   id: string;
   email: string;
@@ -25,6 +45,11 @@ export interface BootcampStudent {
   calendarAddedAt?: Date;
   paymentSource?: string;
   paymentId?: string;
+  subscriptionStatus: SubscriptionStatus;
+  subscriptionId?: string;
+  subscriptionStartedAt?: Date;
+  subscriptionEndsAt?: Date;
+  stripeCustomerId?: string;
   notes?: string;
   createdAt: Date;
   updatedAt: Date;

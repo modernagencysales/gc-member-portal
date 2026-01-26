@@ -164,6 +164,16 @@ function mapBootcampStudent(record: Record<string, unknown>): BootcampStudent {
       : undefined,
     paymentSource: record.payment_source as string | undefined,
     paymentId: record.payment_id as string | undefined,
+    subscriptionStatus:
+      (record.subscription_status as BootcampStudent['subscriptionStatus']) || 'none',
+    subscriptionId: record.subscription_id as string | undefined,
+    subscriptionStartedAt: record.subscription_started_at
+      ? new Date(record.subscription_started_at as string)
+      : undefined,
+    subscriptionEndsAt: record.subscription_ends_at
+      ? new Date(record.subscription_ends_at as string)
+      : undefined,
+    stripeCustomerId: record.stripe_customer_id as string | undefined,
     notes: record.notes as string | undefined,
     createdAt: new Date(record.created_at as string),
     updatedAt: new Date(record.updated_at as string),
