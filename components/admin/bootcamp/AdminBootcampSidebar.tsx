@@ -11,6 +11,7 @@ import {
   Ticket,
   Bot,
   BookOpen,
+  ClipboardList,
 } from 'lucide-react';
 import { useTheme } from '../../../context/ThemeContext';
 
@@ -21,6 +22,7 @@ interface AdminBootcampSidebarProps {
 
 const navItems = [
   { to: '/admin/bootcamp/students', icon: Users, label: 'Student Roster' },
+  { to: '/admin/bootcamp/surveys', icon: ClipboardList, label: 'Survey Responses' },
   { to: '/admin/lms/cohorts', icon: FolderKanban, label: 'Cohorts' },
   { to: '/admin/lms/curriculum', icon: BookOpen, label: 'Curriculum' },
   { to: '/admin/bootcamp/invite-codes', icon: Ticket, label: 'Invite Codes' },

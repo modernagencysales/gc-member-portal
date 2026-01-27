@@ -26,6 +26,7 @@ import AdminBootcampInviteCodesPage from './components/admin/bootcamp/invite-cod
 import AdminBootcampOnboardingPage from './components/admin/bootcamp/onboarding/AdminBootcampOnboardingPage';
 import AdminBootcampSettingsPage from './components/admin/bootcamp/settings/AdminBootcampSettingsPage';
 import AdminAIToolsPage from './components/admin/bootcamp/ai-tools/AdminAIToolsPage';
+import AdminSurveyResponsesPage from './components/admin/bootcamp/surveys/AdminSurveyResponsesPage';
 
 // LMS Admin Components
 import AdminLmsLayout from './components/admin/lms/AdminLmsLayout';
@@ -72,6 +73,7 @@ const App: React.FC = () => {
       <Route path="/admin/bootcamp" element={<AdminBootcampLayout />}>
         <Route index element={<Navigate to="/admin/bootcamp/students" replace />} />
         <Route path="students" element={<AdminStudentsPage />} />
+        <Route path="surveys" element={<AdminSurveyResponsesPage />} />
         <Route path="cohorts" element={<Navigate to="/admin/lms/cohorts" replace />} />
         <Route path="invite-codes" element={<AdminBootcampInviteCodesPage />} />
         <Route path="onboarding" element={<AdminBootcampOnboardingPage />} />
