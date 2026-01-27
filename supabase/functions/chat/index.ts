@@ -60,33 +60,50 @@ serve(async (req) => {
 
     if (conversationId) {
       // Get tool from conversation
-      const { data: conv } = await supabase
+      const { data: conv, error: convError } = await supabase
         .from('chat_conversations')
         .select('tool_id')
         .eq('id', conversationId)
-        .single();
+        .maybeSingle();
+
+      if (convError) {
+        console.error('Failed to fetch conversation:', convError);
+        throw new Error('Failed to fetch conversation');
+      }
 
       if (conv) {
-        const { data: t } = await supabase
+        const { data: t, error: toolError } = await supabase
           .from('ai_tools')
           .select('id, system_prompt, model, max_tokens')
           .eq('id', conv.tool_id)
-          .single();
+          .maybeSingle();
+        if (toolError) {
+          console.error('Failed to fetch tool:', toolError);
+          throw new Error('Failed to fetch AI tool');
+        }
         tool = t;
       }
     } else if (toolId) {
-      const { data: t } = await supabase
+      const { data: t, error: toolError } = await supabase
         .from('ai_tools')
         .select('id, system_prompt, model, max_tokens')
         .eq('id', toolId)
-        .single();
+        .maybeSingle();
+      if (toolError) {
+        console.error('Failed to fetch tool by ID:', toolError);
+        throw new Error('Failed to fetch AI tool');
+      }
       tool = t;
     } else if (toolSlug) {
-      const { data: t } = await supabase
+      const { data: t, error: toolError } = await supabase
         .from('ai_tools')
         .select('id, system_prompt, model, max_tokens')
         .eq('slug', toolSlug)
-        .single();
+        .maybeSingle();
+      if (toolError) {
+        console.error('Failed to fetch tool by slug:', toolError);
+        throw new Error('Failed to fetch AI tool');
+      }
       tool = t;
     }
 
@@ -97,17 +114,21 @@ serve(async (req) => {
     // 2. Get or create conversation
     if (!actualConversationId) {
       // Check for existing conversation
-      const { data: existingConv } = await supabase
+      const { data: existingConvs, error: existingConvError } = await supabase
         .from('chat_conversations')
         .select('id')
         .eq('student_id', studentId)
         .eq('tool_id', tool.id)
         .order('updated_at', { ascending: false })
-        .limit(1)
-        .single();
+        .limit(1);
 
-      if (existingConv) {
-        actualConversationId = existingConv.id;
+      if (existingConvError) {
+        console.error('Failed to check existing conversations:', existingConvError);
+        throw new Error('Failed to check existing conversations');
+      }
+
+      if (existingConvs && existingConvs.length > 0) {
+        actualConversationId = existingConvs[0].id;
       } else {
         // Create new conversation
         const { data: newConv, error: convError } = await supabase

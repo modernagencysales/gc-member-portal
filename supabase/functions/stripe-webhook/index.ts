@@ -2,7 +2,13 @@ import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import Stripe from 'https://esm.sh/stripe@14.14.0?target=deno';
 
-const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
+// Validate required environment variables at startup
+const stripeSecretKey = Deno.env.get('STRIPE_SECRET_KEY');
+if (!stripeSecretKey) {
+  throw new Error('STRIPE_SECRET_KEY environment variable is required');
+}
+
+const stripe = new Stripe(stripeSecretKey, {
   apiVersion: '2023-10-16',
   httpClient: Stripe.createFetchHttpClient(),
 });
@@ -23,8 +29,9 @@ serve(async (req) => {
   try {
     event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
   } catch (err) {
-    console.error('Webhook signature verification failed:', err.message);
-    return new Response(`Webhook Error: ${err.message}`, { status: 400 });
+    const message = err instanceof Error ? err.message : 'Unknown error';
+    console.error('Webhook signature verification failed:', message);
+    return new Response(`Webhook Error: ${message}`, { status: 400 });
   }
 
   const supabase = createClient(
@@ -44,7 +51,7 @@ serve(async (req) => {
         }
 
         // Update student subscription status
-        await supabase
+        const { error: updateError } = await supabase
           .from('bootcamp_students')
           .update({
             subscription_status: 'active',
@@ -55,21 +62,36 @@ serve(async (req) => {
           })
           .eq('id', studentId);
 
+        if (updateError) {
+          console.error('Failed to update student subscription:', updateError);
+          throw new Error(`Failed to update student: ${updateError.message}`);
+        }
+
         // Add to Members cohort
-        await supabase.from('student_cohorts').upsert({
+        const { error: cohortError } = await supabase.from('student_cohorts').upsert({
           student_id: studentId,
           cohort_id: MEMBERS_COHORT_ID,
           role: 'member',
           joined_at: new Date().toISOString(),
         });
 
+        if (cohortError) {
+          console.error('Failed to add student to Members cohort:', cohortError);
+          // Don't throw - student is subscribed, just missing cohort access
+        }
+
         // Log event
-        await supabase.from('subscription_events').insert({
+        const { error: eventError } = await supabase.from('subscription_events').insert({
           student_id: studentId,
           event_type: 'created',
           stripe_event_id: event.id,
           metadata: { session_id: session.id },
         });
+
+        if (eventError) {
+          console.error('Failed to log subscription event:', eventError);
+          // Don't throw - this is just logging
+        }
 
         console.log(`Subscription created for student ${studentId}`);
         break;
@@ -79,20 +101,30 @@ serve(async (req) => {
         const invoice = event.data.object as Stripe.Invoice;
         const customerId = invoice.customer as string;
 
-        const { data: student } = await supabase
+        const { data: student, error: fetchError } = await supabase
           .from('bootcamp_students')
           .select('id')
           .eq('stripe_customer_id', customerId)
-          .single();
+          .maybeSingle();
+
+        if (fetchError) {
+          console.error('Failed to fetch student by customer ID:', fetchError);
+          break;
+        }
 
         if (student) {
-          await supabase
+          const { error: updateError } = await supabase
             .from('bootcamp_students')
             .update({
               subscription_status: 'active',
               updated_at: new Date().toISOString(),
             })
             .eq('id', student.id);
+
+          if (updateError) {
+            console.error('Failed to update student status:', updateError);
+            throw new Error(`Failed to update student: ${updateError.message}`);
+          }
 
           await supabase.from('subscription_events').insert({
             student_id: student.id,
@@ -110,20 +142,30 @@ serve(async (req) => {
         const invoice = event.data.object as Stripe.Invoice;
         const customerId = invoice.customer as string;
 
-        const { data: student } = await supabase
+        const { data: student, error: fetchError } = await supabase
           .from('bootcamp_students')
           .select('id')
           .eq('stripe_customer_id', customerId)
-          .single();
+          .maybeSingle();
+
+        if (fetchError) {
+          console.error('Failed to fetch student by customer ID:', fetchError);
+          break;
+        }
 
         if (student) {
-          await supabase
+          const { error: updateError } = await supabase
             .from('bootcamp_students')
             .update({
               subscription_status: 'past_due',
               updated_at: new Date().toISOString(),
             })
             .eq('id', student.id);
+
+          if (updateError) {
+            console.error('Failed to update student status:', updateError);
+            throw new Error(`Failed to update student: ${updateError.message}`);
+          }
 
           await supabase.from('subscription_events').insert({
             student_id: student.id,
@@ -141,14 +183,19 @@ serve(async (req) => {
         const subscription = event.data.object as Stripe.Subscription;
         const customerId = subscription.customer as string;
 
-        const { data: student } = await supabase
+        const { data: student, error: fetchError } = await supabase
           .from('bootcamp_students')
           .select('id')
           .eq('stripe_customer_id', customerId)
-          .single();
+          .maybeSingle();
+
+        if (fetchError) {
+          console.error('Failed to fetch student by customer ID:', fetchError);
+          break;
+        }
 
         if (student) {
-          await supabase
+          const { error: updateError } = await supabase
             .from('bootcamp_students')
             .update({
               subscription_status: 'canceled',
@@ -156,6 +203,11 @@ serve(async (req) => {
               updated_at: new Date().toISOString(),
             })
             .eq('id', student.id);
+
+          if (updateError) {
+            console.error('Failed to update student status:', updateError);
+            throw new Error(`Failed to update student: ${updateError.message}`);
+          }
 
           await supabase.from('subscription_events').insert({
             student_id: student.id,
@@ -174,8 +226,9 @@ serve(async (req) => {
       headers: { 'Content-Type': 'application/json' },
     });
   } catch (error) {
-    console.error('Webhook handler error:', error);
-    return new Response(JSON.stringify({ error: error.message }), {
+    const message = error instanceof Error ? error.message : 'Unknown error';
+    console.error('Webhook handler error:', message);
+    return new Response(JSON.stringify({ error: message }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' },
     });
