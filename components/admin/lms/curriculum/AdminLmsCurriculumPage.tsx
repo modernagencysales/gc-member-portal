@@ -32,6 +32,7 @@ import {
   useCreateLmsActionItemMutation,
   useUpdateLmsActionItemMutation,
   useDeleteLmsActionItemMutation,
+  useReorderLmsActionItemsMutation,
 } from '../../../../hooks/useLmsMutations';
 import WeekEditor from './WeekEditor';
 import LmsContentItemModal from './LmsContentItemModal';
@@ -85,6 +86,7 @@ const AdminLmsCurriculumPage: React.FC = () => {
   const createActionMutation = useCreateLmsActionItemMutation();
   const updateActionMutation = useUpdateLmsActionItemMutation();
   const deleteActionMutation = useDeleteLmsActionItemMutation();
+  const reorderActionMutation = useReorderLmsActionItemsMutation();
 
   const selectedCohort = cohorts?.find((c) => c.id === cohortId);
 
@@ -313,6 +315,13 @@ const AdminLmsCurriculumPage: React.FC = () => {
                 onDeleteAction={(actionId) =>
                   deleteActionMutation.mutate({
                     itemId: actionId,
+                    weekId: week.id,
+                    cohortId,
+                  })
+                }
+                onReorderActions={(itemIds) =>
+                  reorderActionMutation.mutate({
+                    itemIds,
                     weekId: week.id,
                     cohortId,
                   })
