@@ -6,6 +6,7 @@ import { queryKeys } from '../../../lib/queryClient';
 import { useTheme } from '../../../context/ThemeContext';
 import { Prospect, ProspectStatus } from '../../../types/blueprint-types';
 import BlueprintTable from './BlueprintTable';
+import BlueprintDetailPanel from './BlueprintDetailPanel';
 
 type StatusFilter = 'all' | 'complete' | 'pending' | 'error';
 type OfferFilter = 'all' | 'unlocked' | 'locked';
@@ -18,6 +19,8 @@ const AdminBlueprintsPage: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [offerFilter, setOfferFilter] = useState<OfferFilter>('all');
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [selectedProspect, setSelectedProspect] = useState<Prospect | null>(null);
+  const [isDetailPanelOpen, setIsDetailPanelOpen] = useState(false);
 
   // Query
   const {
@@ -87,8 +90,17 @@ const AdminBlueprintsPage: React.FC = () => {
 
   // Handlers
   const handleRowClick = (prospect: Prospect) => {
-    // TODO: Open detail panel (for later task)
-    console.log('Open detail panel for:', prospect.id);
+    setSelectedProspect(prospect);
+    setIsDetailPanelOpen(true);
+  };
+
+  const handleCloseDetailPanel = () => {
+    setIsDetailPanelOpen(false);
+    setSelectedProspect(null);
+  };
+
+  const handleDetailPanelUpdate = () => {
+    refetch();
   };
 
   const handleCopyUrl = async (prospect: Prospect) => {
@@ -246,6 +258,14 @@ const AdminBlueprintsPage: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Blueprint Detail Panel */}
+      <BlueprintDetailPanel
+        prospect={selectedProspect}
+        isOpen={isDetailPanelOpen}
+        onClose={handleCloseDetailPanel}
+        onUpdate={handleDetailPanelUpdate}
+      />
     </div>
   );
 };
