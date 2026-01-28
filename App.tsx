@@ -33,6 +33,13 @@ import AdminLmsLayout from './components/admin/lms/AdminLmsLayout';
 import AdminLmsCohortsPage from './components/admin/lms/cohorts/AdminLmsCohortsPage';
 import AdminLmsCurriculumPage from './components/admin/lms/curriculum/AdminLmsCurriculumPage';
 
+// Blueprint Admin Components
+import AdminBlueprintsPage from './components/admin/blueprints/AdminBlueprintsPage';
+
+// Blueprint Public Pages
+import BlueprintPage from './components/blueprint/BlueprintPage';
+import OfferPage from './components/blueprint/OfferPage';
+
 import { useAuth } from './context/AuthContext';
 
 const App: React.FC = () => {
@@ -67,6 +74,7 @@ const App: React.FC = () => {
         <Route index element={<Navigate to="/admin/tools" replace />} />
         <Route path="tools" element={<AdminToolsPage />} />
         <Route path="onboarding" element={<AdminOnboardingPage />} />
+        <Route path="blueprints" element={<AdminBlueprintsPage />} />
       </Route>
 
       {/* Bootcamp Admin Dashboard */}
@@ -91,6 +99,10 @@ const App: React.FC = () => {
 
       {/* Bootcamp LMS - /bootcamp path */}
       <Route path="/bootcamp/*" element={<BootcampApp />} />
+
+      {/* Blueprint Public Pages (no auth required) */}
+      <Route path="/blueprint/:slug" element={<BlueprintPage />} />
+      <Route path="/blueprint/:slug/offer" element={<OfferPage />} />
 
       {/* Catch-all redirect to home */}
       <Route path="*" element={<Navigate to="/" replace />} />
