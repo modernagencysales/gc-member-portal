@@ -51,12 +51,28 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, isStreaming }) => {
           ) : (
             <ReactMarkdown
               components={{
-                p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
-                ul: ({ children }) => <ul className="list-none ml-0 mb-2 space-y-1">{children}</ul>,
-                ol: ({ children }) => <ol className="list-decimal ml-4 mb-2">{children}</ol>,
-                li: ({ children }) => <li className="mb-1">{children}</li>,
-                strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
-                code: ({ children, className }) => {
+                p: ({ children }: { children?: React.ReactNode }) => (
+                  <p className="mb-2 last:mb-0">{children}</p>
+                ),
+                ul: ({ children }: { children?: React.ReactNode }) => (
+                  <ul className="list-none ml-0 mb-2 space-y-1">{children}</ul>
+                ),
+                ol: ({ children }: { children?: React.ReactNode }) => (
+                  <ol className="list-decimal ml-4 mb-2">{children}</ol>
+                ),
+                li: ({ children }: { children?: React.ReactNode }) => (
+                  <li className="mb-1">{children}</li>
+                ),
+                strong: ({ children }: { children?: React.ReactNode }) => (
+                  <strong className="font-semibold">{children}</strong>
+                ),
+                code: ({
+                  children,
+                  className,
+                }: {
+                  children?: React.ReactNode;
+                  className?: string;
+                }) => {
                   const isBlock = className?.includes('language-');
                   return isBlock ? (
                     <code className="block bg-zinc-200 dark:bg-zinc-900 rounded p-2 my-2 text-xs overflow-x-auto">
@@ -68,11 +84,19 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, isStreaming }) => {
                     </code>
                   );
                 },
-                pre: ({ children }) => <pre className="my-2">{children}</pre>,
-                h1: ({ children }) => <h1 className="text-lg font-bold mb-2">{children}</h1>,
-                h2: ({ children }) => <h2 className="text-base font-bold mb-2">{children}</h2>,
-                h3: ({ children }) => <h3 className="text-sm font-bold mb-1">{children}</h3>,
-                a: ({ href, children }) => (
+                pre: ({ children }: { children?: React.ReactNode }) => (
+                  <pre className="my-2">{children}</pre>
+                ),
+                h1: ({ children }: { children?: React.ReactNode }) => (
+                  <h1 className="text-lg font-bold mb-2">{children}</h1>
+                ),
+                h2: ({ children }: { children?: React.ReactNode }) => (
+                  <h2 className="text-base font-bold mb-2">{children}</h2>
+                ),
+                h3: ({ children }: { children?: React.ReactNode }) => (
+                  <h3 className="text-sm font-bold mb-1">{children}</h3>
+                ),
+                a: ({ href, children }: { href?: string; children?: React.ReactNode }) => (
                   <a
                     href={href}
                     className="text-violet-600 dark:text-violet-400 underline"
@@ -82,7 +106,7 @@ const ChatMessage: React.FC<ChatMessageProps> = ({ message, isStreaming }) => {
                     {children}
                   </a>
                 ),
-                blockquote: ({ children }) => (
+                blockquote: ({ children }: { children?: React.ReactNode }) => (
                   <blockquote className="border-l-2 border-zinc-300 dark:border-zinc-600 pl-3 italic my-2">
                     {children}
                   </blockquote>
