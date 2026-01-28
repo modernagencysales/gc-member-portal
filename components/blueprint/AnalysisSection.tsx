@@ -8,6 +8,7 @@ import { Prospect } from '../../types/blueprint-types';
 
 interface AnalysisSectionProps {
   prospect: Prospect;
+  introParagraph?: string;
 }
 
 interface ParsedItem {
@@ -82,7 +83,7 @@ const AnalysisCard: React.FC<AnalysisCardProps> = ({ item, variant }) => {
 // AnalysisSection Component
 // ============================================
 
-const AnalysisSection: React.FC<AnalysisSectionProps> = ({ prospect }) => {
+const AnalysisSection: React.FC<AnalysisSectionProps> = ({ prospect, introParagraph }) => {
   // Parse what's working items
   const whatsWorkingItems: ParsedItem[] = [
     parseAnalysisItem(prospect.whatsWorking1),
@@ -110,13 +111,15 @@ const AnalysisSection: React.FC<AnalysisSectionProps> = ({ prospect }) => {
   return (
     <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-6">
       {/* Section Title */}
-      <h2 className="text-lg font-semibold text-zinc-100 mb-6">Your Analysis</h2>
+      <h2 className="text-2xl font-bold text-zinc-100 mb-2">Here&apos;s What We Found</h2>
+      {introParagraph && <p className="text-zinc-400 leading-relaxed mb-6">{introParagraph}</p>}
+      {!introParagraph && <div className="mb-6" />}
 
       {/* What's Working Section */}
       {hasWhatsWorking && (
         <div className="mb-8">
           <h3 className="text-sm font-medium text-zinc-400 uppercase tracking-wider mb-4">
-            What&apos;s Working
+            You&apos;re Already Doing These Things Right
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {whatsWorkingItems.map((item, index) => (
@@ -130,7 +133,7 @@ const AnalysisSection: React.FC<AnalysisSectionProps> = ({ prospect }) => {
       {hasRevenueLeaks && (
         <div className="mb-8">
           <h3 className="text-sm font-medium text-zinc-400 uppercase tracking-wider mb-4">
-            Revenue Leaks
+            But These Gaps Are Costing You Deals
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {revenueLeaksItems.map((item, index) => (
@@ -144,7 +147,7 @@ const AnalysisSection: React.FC<AnalysisSectionProps> = ({ prospect }) => {
       {hasBottomLine && (
         <div className="bg-violet-500/10 border border-violet-500/20 rounded-lg p-6 text-center">
           <h3 className="text-sm font-medium text-violet-400 uppercase tracking-wider mb-3">
-            The Bottom Line
+            What This Means For Your Pipeline
           </h3>
           <p className="text-zinc-100 text-lg leading-relaxed">{prospect.bottomLine}</p>
         </div>

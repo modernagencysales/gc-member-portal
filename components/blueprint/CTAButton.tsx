@@ -11,6 +11,8 @@ interface CTAButtonProps {
   className?: string;
   icon?: 'calendar' | 'arrow' | 'none';
   variant?: 'primary' | 'secondary';
+  size?: 'default' | 'large';
+  subtext?: string;
 }
 
 // ============================================
@@ -27,9 +29,13 @@ const CTAButton: React.FC<CTAButtonProps> = ({
   className = '',
   icon = 'calendar',
   variant = 'primary',
+  size = 'default',
+  subtext,
 }) => {
   const baseStyles =
-    'inline-flex items-center justify-center gap-2 font-medium rounded-lg px-6 py-3 transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500 focus:ring-offset-zinc-950';
+    'inline-flex flex-col items-center justify-center gap-0 font-medium rounded-lg transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500 focus:ring-offset-zinc-950';
+
+  const sizeStyles = size === 'large' ? 'px-8 py-4 text-lg' : 'px-6 py-3 text-base';
 
   const variantStyles =
     variant === 'primary'
@@ -42,10 +48,13 @@ const CTAButton: React.FC<CTAButtonProps> = ({
     <button
       type="button"
       onClick={onClick}
-      className={`${baseStyles} ${variantStyles} ${className}`}
+      className={`${baseStyles} ${sizeStyles} ${variantStyles} ${className}`}
     >
-      <span>{text}</span>
-      {IconComponent && <IconComponent className="w-4 h-4" />}
+      <span className="inline-flex items-center gap-2">
+        <span>{text}</span>
+        {IconComponent && <IconComponent className="w-4 h-4" />}
+      </span>
+      {subtext && <span className="block text-sm font-normal opacity-80 mt-1">{subtext}</span>}
     </button>
   );
 };

@@ -18,6 +18,7 @@ import {
 import BlueprintHeader from './BlueprintHeader';
 import ScoreRadar from './ScoreRadar';
 import AnalysisSection from './AnalysisSection';
+import LinkedInProfileMock from './LinkedInProfileMock';
 import ProfileRewrite from './ProfileRewrite';
 import LeadMagnets from './LeadMagnets';
 import ContentRoadmap from './ContentRoadmap';
@@ -25,6 +26,10 @@ import MarketingBlock from './MarketingBlock';
 import CTAButton from './CTAButton';
 import StickyCTA from './StickyCTA';
 import CalEmbed from './CalEmbed';
+import SectionBridge from './SectionBridge';
+import ValueStack from './ValueStack';
+import SimpleSteps from './SimpleSteps';
+import TestimonialQuote from './TestimonialQuote';
 
 // ============================================
 // Types
@@ -212,57 +217,108 @@ const BlueprintPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100 font-sans">
       {/* Main Content */}
-      <div className="max-w-4xl mx-auto px-4 py-8 space-y-8">
-        {/* 1. BlueprintHeader */}
-        <BlueprintHeader prospect={prospect} />
+      <div className="max-w-4xl mx-auto px-4 py-8 space-y-12 sm:space-y-16">
+        {/* 1. Hero — BlueprintHeader with bold hook + authority score + CTA */}
+        <BlueprintHeader
+          prospect={prospect}
+          onCTAClick={scrollToCalEmbed}
+          ctaText="See What You're Missing"
+        />
 
-        {/* 2. ScoreRadar */}
+        {/* 2. Bridge: problem identification intro */}
+        <SectionBridge
+          text="Here's where you stand right now — and what's standing between you and a full pipeline."
+          variant="accent"
+        />
+
+        {/* 3. ScoreRadar — problem identification */}
         <ScoreRadar prospect={prospect} />
 
-        {/* 3. MarketingBlock: "allbound_system" */}
+        {/* 4. AnalysisSection — what's working vs revenue leaks */}
+        <AnalysisSection
+          prospect={prospect}
+          introParagraph="We analyzed your LinkedIn presence across 5 key dimensions. Here's what stands out."
+        />
+
+        {/* 5. MarketingBlock: allbound system (if exists) */}
         <MarketingBlock block={allboundSystemBlock} />
 
-        {/* 4. AnalysisSection */}
-        <AnalysisSection prospect={prospect} />
+        {/* 6. Bridge: transition to solution */}
+        <SectionBridge
+          text="Now let's fix it. Here's your new profile — optimized to attract and convert your ideal buyers."
+          variant="gradient"
+        />
 
-        {/* 5. CTAButton #1 */}
-        <div className="flex justify-center">
-          <CTAButton text="Book Your Strategy Call" onClick={scrollToCalEmbed} />
-        </div>
+        {/* 7. LinkedInProfileMock — visual showcase */}
+        <LinkedInProfileMock prospect={prospect} />
 
-        {/* 6. ProfileRewrite */}
+        {/* 8. ProfileRewrite — detailed before/after */}
         <ProfileRewrite prospect={prospect} />
 
-        {/* 7. CTAButton #2 */}
+        {/* 9. CTA #1 */}
         <div className="flex justify-center">
-          <CTAButton text="Let's Talk Strategy" onClick={scrollToCalEmbed} icon="arrow" />
+          <CTAButton
+            text="Get Help Implementing This"
+            subtext="Book a 30-min strategy call"
+            onClick={scrollToCalEmbed}
+            size="large"
+          />
         </div>
 
-        {/* 8. LeadMagnets */}
+        {/* 10. Bridge: transition to content engine */}
+        <SectionBridge
+          text="But a great profile isn't enough. You need a content engine that keeps your pipeline full."
+          variant="accent"
+        />
+
+        {/* 11. LeadMagnets */}
         <LeadMagnets prospect={prospect} />
 
-        {/* 9. ContentRoadmap */}
+        {/* 12. ContentRoadmap */}
         <ContentRoadmap posts={posts} />
 
-        {/* 10. CTAButton #3 */}
+        {/* 13. CTA #2 */}
         <div className="flex justify-center">
-          <CTAButton text="Ready to Transform Your LinkedIn?" onClick={scrollToCalEmbed} />
+          <CTAButton
+            text="Turn This Blueprint Into Revenue"
+            subtext="Let's map out your implementation plan"
+            onClick={scrollToCalEmbed}
+            size="large"
+            icon="arrow"
+          />
         </div>
 
-        {/* 11. MarketingBlock: "bootcamp_pitch" */}
+        {/* 14. ValueStack — "Everything in Your Blueprint" */}
+        <ValueStack />
+
+        {/* 15. TestimonialQuote — social proof */}
+        <TestimonialQuote />
+
+        {/* 16. SimpleSteps — "3 Steps to Get Started" */}
+        <SimpleSteps />
+
+        {/* 17. MarketingBlock: bootcamp pitch */}
         <MarketingBlock block={bootcampPitchBlock} />
 
-        {/* 12. MarketingBlock: "faqs" */}
+        {/* 18. MarketingBlock: FAQs */}
         <MarketingBlock block={faqBlock} />
 
-        {/* 13. Testimonials (Senja embed) - Placeholder for future implementation */}
-        {/* TODO: Add Senja testimonials embed when ready */}
+        {/* 19. CTA #3 */}
+        <div className="flex justify-center">
+          <CTAButton
+            text="Book Your Strategy Call Now"
+            subtext="30 minutes. Zero pressure. Let's talk."
+            onClick={scrollToCalEmbed}
+            size="large"
+            icon="calendar"
+          />
+        </div>
 
-        {/* 14. CalEmbed */}
+        {/* 20. CalEmbed */}
         <CalEmbed ref={calEmbedRef} calLink={calBookingLink} />
       </div>
 
-      {/* 15. StickyCTA (fixed position) */}
+      {/* 21. StickyCTA (fixed position) */}
       <StickyCTA
         text="Book Your Strategy Call"
         calEmbedRef={calEmbedRef}

@@ -233,7 +233,11 @@ const ProfileRewrite: React.FC<ProfileRewriteProps> = ({ prospect }) => {
   return (
     <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-6">
       {/* Section Title */}
-      <h2 className="text-lg font-semibold text-zinc-100 mb-6">PROFILE REWRITE</h2>
+      <h2 className="text-2xl font-bold text-zinc-100 mb-2">Your New Magnetic Profile</h2>
+      <p className="text-zinc-400 leading-relaxed mb-6">
+        Every element below is ready to copy and paste directly into your LinkedIn profile. No
+        guesswork — just swap in the new copy.
+      </p>
 
       {/* Headline Section */}
       {hasHeadlineContent && (

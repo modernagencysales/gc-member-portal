@@ -81,7 +81,11 @@ const ScoreRadar: React.FC<ScoreRadarProps> = ({ prospect }) => {
   return (
     <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-6">
       {/* Section Title */}
-      <h2 className="text-lg font-semibold text-zinc-100 mb-4">Authority Score Breakdown</h2>
+      <h2 className="text-2xl font-bold text-zinc-100 mb-2">Where You Stand Right Now</h2>
+      <p className="text-zinc-400 leading-relaxed mb-6">
+        Your authority score measures how effectively your LinkedIn presence converts visitors into
+        leads. Here&apos;s where you rank across 5 key dimensions.
+      </p>
 
       {/* Radar Chart */}
       <div className="h-[350px] w-full">

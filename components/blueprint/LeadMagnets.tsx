@@ -229,7 +229,13 @@ const LeadMagnets: React.FC<LeadMagnetsProps> = ({ prospect }) => {
   return (
     <div className="space-y-4">
       {/* Section Title */}
-      <h2 className="text-lg font-semibold text-zinc-100">LEAD MAGNET IDEAS</h2>
+      <h2 className="text-2xl font-bold text-zinc-100 mb-2">
+        3 Lead Magnets That Will Fill Your Pipeline
+      </h2>
+      <p className="text-zinc-400 leading-relaxed">
+        These aren&apos;t generic templates. Each lead magnet is designed for your specific buyer
+        persona and expertise.
+      </p>
 
       {/* Cards Grid - Responsive: stack on mobile, 3 columns on large screens */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
