@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from 'react-router-dom';
 import { AlertCircle } from 'lucide-react';
 import {
@@ -13,6 +13,18 @@ import {
   BlueprintSettings,
   BlueprintContentBlock,
 } from '../../types/blueprint-types';
+
+// Import blueprint components
+import BlueprintHeader from './BlueprintHeader';
+import ScoreRadar from './ScoreRadar';
+import AnalysisSection from './AnalysisSection';
+import ProfileRewrite from './ProfileRewrite';
+import LeadMagnets from './LeadMagnets';
+import ContentRoadmap from './ContentRoadmap';
+import MarketingBlock from './MarketingBlock';
+import CTAButton from './CTAButton';
+import StickyCTA from './StickyCTA';
+import CalEmbed from './CalEmbed';
 
 // ============================================
 // Types
@@ -92,28 +104,6 @@ const BlueprintError: React.FC<BlueprintErrorProps> = ({
 );
 
 // ============================================
-// Placeholder Section Component
-// ============================================
-
-interface PlaceholderSectionProps {
-  name: string;
-  prospect: Prospect;
-  posts?: ProspectPost[];
-  settings?: BlueprintSettings | null;
-  contentBlocks?: BlueprintContentBlock[];
-  className?: string;
-}
-
-const PlaceholderSection: React.FC<PlaceholderSectionProps> = ({ name, className = '' }) => (
-  <div
-    className={`bg-zinc-900 border border-zinc-800 rounded-lg p-6 ${className}`}
-    data-section={name}
-  >
-    <div className="text-zinc-500 text-sm font-medium">{name}</div>
-  </div>
-);
-
-// ============================================
 // Main BlueprintPage Component
 // ============================================
 
@@ -125,6 +115,9 @@ const BlueprintPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [notFound, setNotFound] = useState(false);
   const [data, setData] = useState<BlueprintData | null>(null);
+
+  // Ref for CalEmbed intersection observer
+  const calEmbedRef = useRef<HTMLDivElement>(null);
 
   // Fetch data
   const fetchBlueprintData = async () => {
@@ -197,152 +190,84 @@ const BlueprintPage: React.FC = () => {
   const { prospect, posts, settings, contentBlocks } = data;
 
   // Filter content blocks by type for marketing sections
-  const allboundSystemBlock = contentBlocks.find((b) => b.blockType === 'feature');
-  const bootcampPitchBlock = contentBlocks.find((b) => b.blockType === 'cta');
-  const faqBlocks = contentBlocks.filter((b) => b.blockType === 'faq');
+  const allboundSystemBlock = contentBlocks.find(
+    (b) => b.blockType === 'feature' || b.title?.toLowerCase().includes('allbound')
+  );
+  const bootcampPitchBlock = contentBlocks.find(
+    (b) => b.blockType === 'cta' || b.title?.toLowerCase().includes('bootcamp')
+  );
+  const faqBlock = contentBlocks.find((b) => b.blockType === 'faq');
+
+  // Get calBookingLink from settings with fallback
+  const calBookingLink = settings?.calBookingLink || 'timkeen/30min';
+
+  // Scroll to CalEmbed handler
+  const scrollToCalEmbed = () => {
+    calEmbedRef.current?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+    });
+  };
 
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100 font-sans">
       {/* Main Content */}
       <div className="max-w-4xl mx-auto px-4 py-8 space-y-8">
         {/* 1. BlueprintHeader */}
-        <PlaceholderSection
-          name="BlueprintHeader"
-          prospect={prospect}
-          posts={posts}
-          settings={settings}
-          contentBlocks={contentBlocks}
-        />
+        <BlueprintHeader prospect={prospect} />
 
         {/* 2. ScoreRadar */}
-        <PlaceholderSection
-          name="ScoreRadar"
-          prospect={prospect}
-          posts={posts}
-          settings={settings}
-          contentBlocks={contentBlocks}
-        />
+        <ScoreRadar prospect={prospect} />
 
         {/* 3. MarketingBlock: "allbound_system" */}
-        <PlaceholderSection
-          name="MarketingBlock: allbound_system"
-          prospect={prospect}
-          posts={posts}
-          settings={settings}
-          contentBlocks={allboundSystemBlock ? [allboundSystemBlock] : []}
-        />
+        <MarketingBlock block={allboundSystemBlock} />
 
         {/* 4. AnalysisSection */}
-        <PlaceholderSection
-          name="AnalysisSection"
-          prospect={prospect}
-          posts={posts}
-          settings={settings}
-          contentBlocks={contentBlocks}
-        />
+        <AnalysisSection prospect={prospect} />
 
         {/* 5. CTAButton #1 */}
-        <PlaceholderSection
-          name="CTAButton #1"
-          prospect={prospect}
-          posts={posts}
-          settings={settings}
-          contentBlocks={contentBlocks}
-        />
+        <div className="flex justify-center">
+          <CTAButton text="Book Your Strategy Call" onClick={scrollToCalEmbed} />
+        </div>
 
         {/* 6. ProfileRewrite */}
-        <PlaceholderSection
-          name="ProfileRewrite"
-          prospect={prospect}
-          posts={posts}
-          settings={settings}
-          contentBlocks={contentBlocks}
-        />
+        <ProfileRewrite prospect={prospect} />
 
         {/* 7. CTAButton #2 */}
-        <PlaceholderSection
-          name="CTAButton #2"
-          prospect={prospect}
-          posts={posts}
-          settings={settings}
-          contentBlocks={contentBlocks}
-        />
+        <div className="flex justify-center">
+          <CTAButton text="Let's Talk Strategy" onClick={scrollToCalEmbed} icon="arrow" />
+        </div>
 
         {/* 8. LeadMagnets */}
-        <PlaceholderSection
-          name="LeadMagnets"
-          prospect={prospect}
-          posts={posts}
-          settings={settings}
-          contentBlocks={contentBlocks}
-        />
+        <LeadMagnets prospect={prospect} />
 
         {/* 9. ContentRoadmap */}
-        <PlaceholderSection
-          name="ContentRoadmap"
-          prospect={prospect}
-          posts={posts}
-          settings={settings}
-          contentBlocks={contentBlocks}
-        />
+        <ContentRoadmap posts={posts} />
 
         {/* 10. CTAButton #3 */}
-        <PlaceholderSection
-          name="CTAButton #3"
-          prospect={prospect}
-          posts={posts}
-          settings={settings}
-          contentBlocks={contentBlocks}
-        />
+        <div className="flex justify-center">
+          <CTAButton text="Ready to Transform Your LinkedIn?" onClick={scrollToCalEmbed} />
+        </div>
 
         {/* 11. MarketingBlock: "bootcamp_pitch" */}
-        <PlaceholderSection
-          name="MarketingBlock: bootcamp_pitch"
-          prospect={prospect}
-          posts={posts}
-          settings={settings}
-          contentBlocks={bootcampPitchBlock ? [bootcampPitchBlock] : []}
-        />
+        <MarketingBlock block={bootcampPitchBlock} />
 
         {/* 12. MarketingBlock: "faqs" */}
-        <PlaceholderSection
-          name="MarketingBlock: faqs"
-          prospect={prospect}
-          posts={posts}
-          settings={settings}
-          contentBlocks={faqBlocks}
-        />
+        <MarketingBlock block={faqBlock} />
 
-        {/* 13. Testimonials (Senja embed) */}
-        <PlaceholderSection
-          name="Testimonials (Senja embed)"
-          prospect={prospect}
-          posts={posts}
-          settings={settings}
-          contentBlocks={contentBlocks}
-        />
+        {/* 13. Testimonials (Senja embed) - Placeholder for future implementation */}
+        {/* TODO: Add Senja testimonials embed when ready */}
 
         {/* 14. CalEmbed */}
-        <PlaceholderSection
-          name="CalEmbed"
-          prospect={prospect}
-          posts={posts}
-          settings={settings}
-          contentBlocks={contentBlocks}
-        />
+        <CalEmbed ref={calEmbedRef} calLink={calBookingLink} />
       </div>
 
       {/* 15. StickyCTA (fixed position) */}
-      <div className="fixed bottom-0 left-0 right-0 z-50">
-        <PlaceholderSection
-          name="StickyCTA"
-          prospect={prospect}
-          posts={posts}
-          settings={settings}
-          contentBlocks={contentBlocks}
-          className="rounded-none border-x-0 border-b-0"
-        />
-      </div>
+      <StickyCTA
+        text="Book Your Strategy Call"
+        calEmbedRef={calEmbedRef}
+        isVisible={settings?.stickyCTAEnabled ?? true}
+      />
     </div>
   );
 };
