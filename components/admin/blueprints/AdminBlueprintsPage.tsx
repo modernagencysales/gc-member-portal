@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Settings, Search, Filter, RefreshCw } from 'lucide-react';
+import { Settings, Search, Filter, RefreshCw, FileText } from 'lucide-react';
 import { listProspects } from '../../../services/blueprint-supabase';
 import { queryKeys } from '../../../lib/queryClient';
 import { useTheme } from '../../../context/ThemeContext';
@@ -8,6 +8,7 @@ import { Prospect, ProspectStatus } from '../../../types/blueprint-types';
 import BlueprintTable from './BlueprintTable';
 import BlueprintDetailPanel from './BlueprintDetailPanel';
 import BlueprintSettingsModal from './BlueprintSettingsModal';
+import ContentEditor from './ContentEditor';
 
 type StatusFilter = 'all' | 'complete' | 'pending' | 'error';
 type OfferFilter = 'all' | 'unlocked' | 'locked';
@@ -20,6 +21,7 @@ const AdminBlueprintsPage: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [offerFilter, setOfferFilter] = useState<OfferFilter>('all');
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isContentEditorOpen, setIsContentEditorOpen] = useState(false);
   const [selectedProspect, setSelectedProspect] = useState<Prospect | null>(null);
   const [isDetailPanelOpen, setIsDetailPanelOpen] = useState(false);
 
@@ -124,6 +126,14 @@ const AdminBlueprintsPage: React.FC = () => {
     setIsSettingsOpen(false);
   };
 
+  const handleOpenContentEditor = () => {
+    setIsContentEditorOpen(true);
+  };
+
+  const handleCloseContentEditor = () => {
+    setIsContentEditorOpen(false);
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -141,6 +151,13 @@ const AdminBlueprintsPage: React.FC = () => {
             title="Refresh"
           >
             <RefreshCw className="w-5 h-5" />
+          </button>
+          <button
+            onClick={handleOpenContentEditor}
+            className={`p-2 rounded-lg ${isDarkMode ? 'hover:bg-slate-800' : 'hover:bg-slate-100'}`}
+            title="Content Editor"
+          >
+            <FileText className="w-5 h-5" />
           </button>
           <button
             onClick={handleOpenSettings}
@@ -244,6 +261,9 @@ const AdminBlueprintsPage: React.FC = () => {
 
       {/* Settings Modal */}
       <BlueprintSettingsModal isOpen={isSettingsOpen} onClose={handleCloseSettings} />
+
+      {/* Content Editor Modal */}
+      <ContentEditor isOpen={isContentEditorOpen} onClose={handleCloseContentEditor} />
 
       {/* Blueprint Detail Panel */}
       <BlueprintDetailPanel
