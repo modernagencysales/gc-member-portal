@@ -961,6 +961,65 @@ function mapBootcampInviteCode(record: Record<string, unknown>): BootcampInviteC
 }
 
 // ============================================
+// Prospect Linking
+// ============================================
+
+/**
+ * Find a prospect by their email address
+ * Used to link bootcamp students to their prospect record for Blueprint access
+ * @param email - The email address to search for
+ * @returns The prospect ID if found, null otherwise
+ */
+export async function findProspectByEmail(email: string): Promise<string | null> {
+  try {
+    const { data, error } = await supabase
+      .from('prospects')
+      .select('id')
+      .ilike('email', email)
+      .maybeSingle();
+
+    if (error) {
+      console.error('Error finding prospect by email:', error);
+      return null;
+    }
+
+    if (!data) {
+      console.log('No prospect found for email:', email);
+      return null;
+    }
+
+    console.log('Found prospect for email:', email, '-> prospect_id:', data.id);
+    return data.id as string;
+  } catch (error) {
+    console.error('Failed to find prospect by email:', error);
+    return null;
+  }
+}
+
+/**
+ * Link a bootcamp student to their prospect record
+ * @param studentId - The bootcamp student ID
+ * @param prospectId - The prospect ID to link
+ */
+async function linkStudentToProspect(studentId: string, prospectId: string): Promise<void> {
+  try {
+    const { error } = await supabase
+      .from('bootcamp_students')
+      .update({ prospect_id: prospectId })
+      .eq('id', studentId);
+
+    if (error) {
+      console.error('Failed to link student to prospect:', error);
+      return;
+    }
+
+    console.log('Successfully linked student', studentId, 'to prospect', prospectId);
+  } catch (error) {
+    console.error('Error linking student to prospect:', error);
+  }
+}
+
+// ============================================
 // Self-Registration
 // ============================================
 
@@ -994,7 +1053,28 @@ export async function registerBootcampStudent(
     accessLevel: 'Full Access',
   });
 
-  // 5. Increment invite code usage
+  // 5. Try to link student to prospect (graceful - don't fail registration if this fails)
+  try {
+    const prospectId = await findProspectByEmail(email);
+    if (prospectId) {
+      await linkStudentToProspect(student.id, prospectId);
+      console.log('Bootcamp student linked to prospect:', {
+        studentId: student.id,
+        prospectId,
+        email,
+      });
+    } else {
+      console.log('No prospect found to link for bootcamp student:', {
+        studentId: student.id,
+        email,
+      });
+    }
+  } catch (error) {
+    // Log but don't fail registration if prospect linking fails
+    console.error('Failed to link bootcamp student to prospect (non-fatal):', error);
+  }
+
+  // 6. Increment invite code usage
   await incrementInviteCodeUsage(validCode.id);
 
   return student;
