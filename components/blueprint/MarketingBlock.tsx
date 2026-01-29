@@ -29,6 +29,25 @@ interface ContentWithItems {
 // ============================================
 
 /**
+ * Parse plain-text FAQ content into structured items.
+ * Detects patterns like "**Question?**\nAnswer text" separated by double newlines.
+ */
+function parsePlainTextFAQ(content: string): FAQItem[] | null {
+  const blocks = content.split(/\n\n+/).filter((b) => b.trim());
+  const items: FAQItem[] = [];
+
+  for (const block of blocks) {
+    // Match **bold question** followed by newline and answer
+    const match = block.match(/^\*\*(.+?)\*\*\s*\n([\s\S]+)$/);
+    if (match) {
+      items.push({ question: match[1].trim(), answer: match[2].trim() });
+    }
+  }
+
+  return items.length > 0 ? items : null;
+}
+
+/**
  * Parse content that could be a string or JSON object
  */
 function parseContent(content: string | undefined): string | ContentWithItems {
@@ -260,13 +279,19 @@ const MarketingBlock: React.FC<MarketingBlockProps> = ({ block, className = '' }
     : (parsedContent as string);
   const contentItems = isObjectContent ? (parsedContent as ContentWithItems).items : undefined;
 
-  // Determine if this is an FAQ block
-  const isFAQ = block.blockType === 'faq' && contentItems && Array.isArray(contentItems);
+  // Determine if this is an FAQ block - check JSON items first, then try plain-text parsing
+  const faqItems =
+    block.blockType === 'faq' && contentItems && Array.isArray(contentItems)
+      ? contentItems
+      : block.blockType === 'faq' && typeof contentBody === 'string'
+        ? parsePlainTextFAQ(contentBody)
+        : null;
+  const isFAQ = faqItems && faqItems.length > 0;
 
   // Check if there's anything to render
   const hasTitle = block.title || contentTitle;
   const hasBody = contentBody && contentBody.trim() !== '';
-  const hasFAQItems = isFAQ && contentItems && contentItems.length > 0;
+  const hasFAQItems = isFAQ;
   const hasCTA = block.ctaText && block.ctaUrl;
 
   if (!hasTitle && !hasBody && !hasFAQItems && !hasCTA) {
@@ -292,7 +317,7 @@ const MarketingBlock: React.FC<MarketingBlockProps> = ({ block, className = '' }
       )}
 
       {/* FAQ Accordion */}
-      {hasFAQItems && <FAQAccordion items={contentItems as FAQItem[]} />}
+      {hasFAQItems && <FAQAccordion items={faqItems as FAQItem[]} />}
 
       {/* CTA Button */}
       {hasCTA && (

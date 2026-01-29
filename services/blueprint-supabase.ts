@@ -519,6 +519,31 @@ export async function getProspectPosts(prospectId: string): Promise<ProspectPost
 }
 
 // ============================================
+// Prospect Count Function
+// ============================================
+
+/**
+ * Get total number of prospects (scorecards delivered)
+ */
+export async function getProspectCount(): Promise<number> {
+  try {
+    const { count, error } = await supabase
+      .from('prospects')
+      .select('*', { count: 'exact', head: true });
+
+    if (error) {
+      console.error('Error fetching prospect count:', error);
+      return 0;
+    }
+
+    return count ?? 0;
+  } catch (error) {
+    console.error('Failed to fetch prospect count:', error);
+    return 0;
+  }
+}
+
+// ============================================
 // Blueprint Settings Functions
 // ============================================
 

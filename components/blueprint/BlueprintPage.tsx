@@ -6,6 +6,7 @@ import {
   getProspectPosts,
   getBlueprintSettings,
   getAllContentBlocks,
+  getProspectCount,
 } from '../../services/blueprint-supabase';
 import {
   Prospect,
@@ -42,6 +43,7 @@ interface BlueprintData {
   posts: ProspectPost[];
   settings: BlueprintSettings | null;
   contentBlocks: BlueprintContentBlock[];
+  scorecardCount: number;
 }
 
 // ============================================
@@ -155,10 +157,11 @@ const BlueprintPage: React.FC = () => {
       }
 
       // Fetch remaining data in parallel
-      const [posts, settings, contentBlocks] = await Promise.all([
+      const [posts, settings, contentBlocks, scorecardCount] = await Promise.all([
         getProspectPosts(prospect.id),
         getBlueprintSettings(),
         getAllContentBlocks(),
+        getProspectCount(),
       ]);
 
       setData({
@@ -166,6 +169,7 @@ const BlueprintPage: React.FC = () => {
         posts,
         settings,
         contentBlocks,
+        scorecardCount,
       });
     } catch (err) {
       console.error('Failed to load blueprint data:', err);
@@ -200,7 +204,7 @@ const BlueprintPage: React.FC = () => {
     return <BlueprintError message="No data available" onRetry={fetchBlueprintData} />;
   }
 
-  const { prospect, posts, settings, contentBlocks } = data;
+  const { prospect, posts, settings, contentBlocks, scorecardCount } = data;
 
   // Filter content blocks by type for marketing sections
   const allboundSystemBlock = contentBlocks.find(
@@ -232,6 +236,7 @@ const BlueprintPage: React.FC = () => {
           prospect={prospect}
           onCTAClick={scrollToCalEmbed}
           ctaText="See What You're Missing"
+          scorecardCount={scorecardCount}
         />
 
         {/* 2. Logo Bar — instant social proof */}
