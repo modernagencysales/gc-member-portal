@@ -918,6 +918,141 @@ export async function deleteContentBlock(id: string): Promise<void> {
 }
 
 // ============================================
+// Client Logos Functions
+// ============================================
+
+export interface ClientLogo {
+  id: string;
+  name: string;
+  imageUrl: string;
+  sortOrder: number;
+  isVisible: boolean;
+  createdAt: string;
+}
+
+function mapClientLogo(record: Record<string, unknown>): ClientLogo {
+  return {
+    id: record.id as string,
+    name: record.name as string,
+    imageUrl: record.image_url as string,
+    sortOrder: record.sort_order as number,
+    isVisible: record.is_visible as boolean,
+    createdAt: record.created_at as string,
+  };
+}
+
+/**
+ * Fetch all visible client logos ordered by sort_order
+ */
+export async function getClientLogos(): Promise<ClientLogo[]> {
+  try {
+    const { data, error } = await supabase
+      .from('client_logos')
+      .select('*')
+      .eq('is_visible', true)
+      .order('sort_order', { ascending: true });
+
+    if (error) {
+      console.error('Error fetching client logos:', error);
+      return [];
+    }
+
+    return (data || []).map(mapClientLogo);
+  } catch (error) {
+    console.error('Failed to fetch client logos:', error);
+    return [];
+  }
+}
+
+/**
+ * Fetch all client logos (including hidden) for admin
+ */
+export async function getAllClientLogos(): Promise<ClientLogo[]> {
+  try {
+    const { data, error } = await supabase
+      .from('client_logos')
+      .select('*')
+      .order('sort_order', { ascending: true });
+
+    if (error) {
+      console.error('Error fetching all client logos:', error);
+      return [];
+    }
+
+    return (data || []).map(mapClientLogo);
+  } catch (error) {
+    console.error('Failed to fetch all client logos:', error);
+    return [];
+  }
+}
+
+/**
+ * Create a new client logo
+ */
+export async function createClientLogo(logo: {
+  name: string;
+  imageUrl: string;
+  sortOrder?: number;
+}): Promise<ClientLogo> {
+  const { data, error } = await supabase
+    .from('client_logos')
+    .insert({
+      name: logo.name,
+      image_url: logo.imageUrl,
+      sort_order: logo.sortOrder ?? 0,
+    })
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error creating client logo:', error);
+    throw new Error(error.message);
+  }
+
+  return mapClientLogo(data);
+}
+
+/**
+ * Update a client logo
+ */
+export async function updateClientLogo(
+  id: string,
+  updates: Partial<{ name: string; imageUrl: string; sortOrder: number; isVisible: boolean }>
+): Promise<ClientLogo> {
+  const updateData: Record<string, unknown> = {};
+  if (updates.name !== undefined) updateData.name = updates.name;
+  if (updates.imageUrl !== undefined) updateData.image_url = updates.imageUrl;
+  if (updates.sortOrder !== undefined) updateData.sort_order = updates.sortOrder;
+  if (updates.isVisible !== undefined) updateData.is_visible = updates.isVisible;
+
+  const { data, error } = await supabase
+    .from('client_logos')
+    .update(updateData)
+    .eq('id', id)
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error updating client logo:', error);
+    throw new Error(error.message);
+  }
+
+  return mapClientLogo(data);
+}
+
+/**
+ * Delete a client logo
+ */
+export async function deleteClientLogo(id: string): Promise<void> {
+  const { error } = await supabase.from('client_logos').delete().eq('id', id);
+
+  if (error) {
+    console.error('Error deleting client logo:', error);
+    throw new Error(error.message);
+  }
+}
+
+// ============================================
 // Composite Functions
 // ============================================
 

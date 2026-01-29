@@ -8,7 +8,7 @@ import CTAButton from './CTAButton';
 interface StickyCTAProps {
   text: string;
   calEmbedRef: React.RefObject<HTMLDivElement>;
-  isVisible?: boolean; // from settings - controls whether sticky CTA is enabled
+  isVisible?: boolean;
   onCTAClick?: () => void;
 }
 
@@ -16,11 +16,6 @@ interface StickyCTAProps {
 // StickyCTA Component
 // ============================================
 
-/**
- * Fixed bottom bar with CTA button
- * Hides when Cal embed section is in viewport using IntersectionObserver
- * Semi-transparent background with backdrop blur
- */
 const StickyCTA: React.FC<StickyCTAProps> = ({
   text,
   calEmbedRef,
@@ -29,7 +24,6 @@ const StickyCTA: React.FC<StickyCTAProps> = ({
 }) => {
   const [isCalEmbedVisible, setIsCalEmbedVisible] = useState(false);
 
-  // Use IntersectionObserver to detect when CalEmbed is in viewport
   useEffect(() => {
     const calEmbedElement = calEmbedRef.current;
 
@@ -39,16 +33,12 @@ const StickyCTA: React.FC<StickyCTAProps> = ({
 
     const observer = new IntersectionObserver(
       (entries) => {
-        // Entry is intersecting when CalEmbed is visible in viewport
         entries.forEach((entry) => {
           setIsCalEmbedVisible(entry.isIntersecting);
         });
       },
       {
-        // Trigger when any part of the CalEmbed is visible
         threshold: 0,
-        // Show sticky CTA until CalEmbed is nearly in view, hide while visible,
-        // reappear when user scrolls back up past it
         rootMargin: '0px 0px -100px 0px',
       }
     );
@@ -60,14 +50,12 @@ const StickyCTA: React.FC<StickyCTAProps> = ({
     };
   }, [calEmbedRef]);
 
-  // Handle CTA click - scroll to CalEmbed section
   const handleCTAClick = () => {
     if (onCTAClick) {
       onCTAClick();
       return;
     }
 
-    // Default behavior: scroll to CalEmbed section
     const calEmbedElement = calEmbedRef.current;
     if (calEmbedElement) {
       calEmbedElement.scrollIntoView({
@@ -77,7 +65,6 @@ const StickyCTA: React.FC<StickyCTAProps> = ({
     }
   };
 
-  // Don't render if disabled via settings or CalEmbed is visible
   const shouldHide = !isVisible || isCalEmbedVisible;
 
   return (
@@ -91,8 +78,16 @@ const StickyCTA: React.FC<StickyCTAProps> = ({
       `}
       aria-hidden={shouldHide}
     >
-      <div className="max-w-4xl mx-auto px-4 py-4">
-        <div className="flex items-center justify-center">
+      <div className="max-w-4xl mx-auto px-4 py-3 sm:py-4">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-4">
+          {/* Urgency text — hidden on mobile to keep it compact */}
+          <div className="hidden sm:block text-sm text-zinc-500 dark:text-zinc-400">
+            <span className="inline-flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+              Limited spots available this month
+            </span>
+          </div>
+
           <CTAButton text={text} onClick={handleCTAClick} icon="calendar" variant="primary" />
         </div>
       </div>

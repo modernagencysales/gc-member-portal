@@ -1,51 +1,26 @@
 import React from 'react';
+import { ClientLogo } from '../../services/blueprint-supabase';
 
-// ============================================
-// LogoBar Component
-// ============================================
+interface LogoBarProps {
+  logos: ClientLogo[];
+}
 
-/**
- * Social proof logo bar showing companies/platforms
- * that the service has been featured on or works with.
- * Displayed near the top of the blueprint page to build trust fast.
- */
+const LogoBar: React.FC<LogoBarProps> = ({ logos }) => {
+  if (logos.length === 0) return null;
 
-const LOGOS = [
-  {
-    name: 'LinkedIn',
-    svg: 'M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z',
-  },
-  {
-    name: 'HubSpot',
-    svg: 'M18.164 7.93V5.084a2.198 2.198 0 001.267-1.984v-.066A2.2 2.2 0 0017.238.84h-.065a2.2 2.2 0 00-2.194 2.194v.066c0 .87.512 1.621 1.252 1.976v2.862a5.92 5.92 0 00-2.905 1.373L6.172 3.95a2.57 2.57 0 00.074-.592A2.558 2.558 0 003.688.8 2.558 2.558 0 001.13 3.358a2.558 2.558 0 002.541 2.558c.51 0 .983-.153 1.38-.413l6.987 5.313A5.9 5.9 0 0011.3 13.5c0 1.05.28 2.034.766 2.887l-2.28 2.28a1.925 1.925 0 00-.564-.089 1.947 1.947 0 101.947 1.947c0-.197-.035-.385-.09-.564l2.244-2.244a5.936 5.936 0 003.587 1.2 5.95 5.95 0 005.95-5.95 5.94 5.94 0 00-4.696-5.037zm-1.12 8.6a3.56 3.56 0 110-7.12 3.56 3.56 0 010 7.12z',
-  },
-  {
-    name: 'Salesforce',
-    svg: 'M10.006 5.415a4.195 4.195 0 013.045-1.306c1.56 0 2.954.9 3.69 2.205a4.79 4.79 0 012.344-.615C21.244 5.7 23.1 7.584 23.1 9.89a4.258 4.258 0 01-.03.47 3.57 3.57 0 011.93 3.172c0 1.98-1.59 3.59-3.555 3.59-.255 0-.495-.03-.735-.075a3.87 3.87 0 01-3.39 2.01c-.54 0-1.065-.12-1.53-.33a4.678 4.678 0 01-4.14 2.535c-1.845 0-3.42-1.11-4.14-2.655A4.033 4.033 0 016.87 19a4.1 4.1 0 01-3.885-2.76c-.18.03-.36.045-.555.045-1.98 0-3.57-1.62-3.57-3.6 0-1.305.69-2.46 1.725-3.09A4.36 4.36 0 010 7.8c0-2.43 1.95-4.395 4.35-4.395 1.38 0 2.61.645 3.42 1.65l.015.015a4.48 4.48 0 012.22-.585v-.07z',
-  },
-  {
-    name: 'Stripe',
-    svg: 'M13.976 9.15c-2.172-.806-3.356-1.426-3.356-2.409 0-.831.683-1.305 1.901-1.305 2.227 0 4.515.858 6.09 1.631l.89-5.494C18.252.975 15.697 0 12.165 0 9.667 0 7.589.654 6.104 1.872 4.56 3.147 3.757 4.992 3.757 7.218c0 4.039 2.467 5.76 6.476 7.219 2.585.92 3.445 1.574 3.445 2.583 0 .98-.846 1.573-2.344 1.573-1.857 0-4.698-.87-6.727-2.142l-.89 5.57c1.787 1.032 5.09 1.979 8.525 1.979 2.63 0 4.791-.652 6.332-1.929 1.653-1.364 2.426-3.322 2.426-5.686 0-4.108-2.56-5.804-7.024-7.235z',
-  },
-  {
-    name: 'Zoom',
-    svg: 'M5.23 10.55a1.7 1.7 0 011.7-1.7h5.74a1.7 1.7 0 011.7 1.7v5.74a1.7 1.7 0 01-1.7 1.7H6.93a1.7 1.7 0 01-1.7-1.7v-5.74zm11.17 1.2l3.5-2.4a.66.66 0 011.1.5v7.1a.66.66 0 01-1.1.5l-3.5-2.4v-3.3zM12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0z',
-  },
-];
-
-const LogoBar: React.FC = () => {
   return (
     <div className="py-8">
       <p className="text-xs font-medium text-zinc-400 dark:text-zinc-500 uppercase tracking-widest text-center mb-6">
-        Trusted by teams using
+        Trusted by leaders at
       </p>
-      <div className="flex flex-wrap items-center justify-center gap-8 sm:gap-12 opacity-40 dark:opacity-30">
-        {LOGOS.map((logo) => (
-          <div key={logo.name} className="flex items-center gap-2 text-zinc-400 dark:text-zinc-500">
-            <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5" aria-hidden="true">
-              <path d={logo.svg} />
-            </svg>
-            <span className="text-sm font-medium">{logo.name}</span>
+      <div className="flex flex-wrap items-center justify-center gap-8 sm:gap-10">
+        {logos.map((logo) => (
+          <div key={logo.id} className="flex-shrink-0">
+            <img
+              src={logo.imageUrl}
+              alt={logo.name}
+              className="h-8 sm:h-10 w-auto object-contain opacity-60 dark:opacity-40 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-200"
+            />
           </div>
         ))}
       </div>

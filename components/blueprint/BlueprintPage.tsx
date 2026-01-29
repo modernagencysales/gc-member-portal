@@ -7,6 +7,8 @@ import {
   getBlueprintSettings,
   getAllContentBlocks,
   getProspectCount,
+  getClientLogos,
+  ClientLogo,
 } from '../../services/blueprint-supabase';
 import {
   Prospect,
@@ -44,6 +46,7 @@ interface BlueprintData {
   settings: BlueprintSettings | null;
   contentBlocks: BlueprintContentBlock[];
   scorecardCount: number;
+  clientLogos: ClientLogo[];
 }
 
 // ============================================
@@ -157,11 +160,12 @@ const BlueprintPage: React.FC = () => {
       }
 
       // Fetch remaining data in parallel
-      const [posts, settings, contentBlocks, scorecardCount] = await Promise.all([
+      const [posts, settings, contentBlocks, scorecardCount, clientLogos] = await Promise.all([
         getProspectPosts(prospect.id),
         getBlueprintSettings(),
         getAllContentBlocks(),
         getProspectCount(),
+        getClientLogos(),
       ]);
 
       setData({
@@ -170,6 +174,7 @@ const BlueprintPage: React.FC = () => {
         settings,
         contentBlocks,
         scorecardCount,
+        clientLogos,
       });
     } catch (err) {
       console.error('Failed to load blueprint data:', err);
@@ -204,7 +209,7 @@ const BlueprintPage: React.FC = () => {
     return <BlueprintError message="No data available" onRetry={fetchBlueprintData} />;
   }
 
-  const { prospect, posts, settings, contentBlocks, scorecardCount } = data;
+  const { prospect, posts, settings, contentBlocks, scorecardCount, clientLogos } = data;
 
   // Filter content blocks by type for marketing sections
   const bootcampPitchBlock = contentBlocks.find(
@@ -237,7 +242,7 @@ const BlueprintPage: React.FC = () => {
         />
 
         {/* 2. Logo Bar — instant social proof */}
-        <LogoBar />
+        <LogoBar logos={clientLogos} />
 
         {/* 3. Bridge: problem identification intro */}
         <SectionBridge

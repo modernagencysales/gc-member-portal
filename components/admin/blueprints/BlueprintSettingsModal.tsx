@@ -1,10 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { X, Check } from 'lucide-react';
+import { X, Check, Plus, Trash2, GripVertical } from 'lucide-react';
 import { BlueprintSettings } from '../../../types/blueprint-types';
 import {
   getBlueprintSettings,
   updateBlueprintSettings,
+  getAllClientLogos,
+  createClientLogo,
+  updateClientLogo,
+  deleteClientLogo,
+  ClientLogo,
 } from '../../../services/blueprint-supabase';
 import { queryKeys } from '../../../lib/queryClient';
 
@@ -106,11 +111,69 @@ const BlueprintSettingsModal: React.FC<BlueprintSettingsModalProps> = ({ isOpen,
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
+  // ---- Client Logos ----
+  const [logos, setLogos] = useState<ClientLogo[]>([]);
+  const [newLogoName, setNewLogoName] = useState('');
+  const [newLogoUrl, setNewLogoUrl] = useState('');
+  const [logoSaving, setLogoSaving] = useState(false);
+
+  const { data: logosData } = useQuery({
+    queryKey: ['clientLogos'],
+    queryFn: getAllClientLogos,
+    enabled: isOpen,
+  });
+
+  useEffect(() => {
+    if (logosData) setLogos(logosData);
+  }, [logosData]);
+
+  const handleAddLogo = async () => {
+    if (!newLogoName.trim() || !newLogoUrl.trim()) return;
+    setLogoSaving(true);
+    try {
+      const created = await createClientLogo({
+        name: newLogoName.trim(),
+        imageUrl: newLogoUrl.trim(),
+        sortOrder: logos.length,
+      });
+      setLogos((prev) => [...prev, created]);
+      setNewLogoName('');
+      setNewLogoUrl('');
+      queryClient.invalidateQueries({ queryKey: ['clientLogos'] });
+    } catch (err) {
+      console.error('Failed to add logo:', err);
+    } finally {
+      setLogoSaving(false);
+    }
+  };
+
+  const handleDeleteLogo = async (id: string) => {
+    try {
+      await deleteClientLogo(id);
+      setLogos((prev) => prev.filter((l) => l.id !== id));
+      queryClient.invalidateQueries({ queryKey: ['clientLogos'] });
+    } catch (err) {
+      console.error('Failed to delete logo:', err);
+    }
+  };
+
+  const handleToggleLogoVisibility = async (logo: ClientLogo) => {
+    try {
+      await updateClientLogo(logo.id, { isVisible: !logo.isVisible });
+      setLogos((prev) =>
+        prev.map((l) => (l.id === logo.id ? { ...l, isVisible: !l.isVisible } : l))
+      );
+      queryClient.invalidateQueries({ queryKey: ['clientLogos'] });
+    } catch (err) {
+      console.error('Failed to toggle logo:', err);
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="w-full max-w-md bg-zinc-900 border border-zinc-800 rounded-lg shadow-xl">
+      <div className="w-full max-w-lg bg-zinc-900 border border-zinc-800 rounded-lg shadow-xl max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-800">
           <h3 className="text-lg font-semibold text-white">Blueprint Settings</h3>
@@ -296,6 +359,90 @@ const BlueprintSettingsModal: React.FC<BlueprintSettingsModalProps> = ({ isOpen,
               <p className="text-xs text-zinc-500 mt-2">
                 Leave blank to auto-calculate from offer schedule
               </p>
+            </div>
+
+            {/* Client Logos */}
+            <div className="pt-4 border-t border-zinc-800">
+              <h4 className="text-sm font-semibold text-zinc-300 mb-3">Client Logos</h4>
+              <p className="text-xs text-zinc-500 mb-3">
+                Add company logos shown on the blueprint page. Use direct image URLs (PNG/SVG
+                preferred).
+              </p>
+
+              {/* Existing logos */}
+              {logos.length > 0 && (
+                <div className="space-y-2 mb-4">
+                  {logos.map((logo) => (
+                    <div
+                      key={logo.id}
+                      className={`flex items-center gap-3 p-2.5 rounded-lg border ${
+                        logo.isVisible
+                          ? 'bg-zinc-800/50 border-zinc-700'
+                          : 'bg-zinc-800/20 border-zinc-800 opacity-50'
+                      }`}
+                    >
+                      <GripVertical className="w-4 h-4 text-zinc-600 flex-shrink-0" />
+                      <img
+                        src={logo.imageUrl}
+                        alt={logo.name}
+                        className="h-6 w-auto max-w-[80px] object-contain flex-shrink-0"
+                        onError={(e) => {
+                          const img = e.target as unknown as { style: { display: string } };
+                          img.style.display = 'none';
+                        }}
+                      />
+                      <span className="text-sm text-zinc-300 truncate flex-1">{logo.name}</span>
+                      <button
+                        type="button"
+                        onClick={() => handleToggleLogoVisibility(logo)}
+                        className={`text-xs px-2 py-0.5 rounded ${
+                          logo.isVisible
+                            ? 'bg-green-500/20 text-green-400'
+                            : 'bg-zinc-700 text-zinc-400'
+                        }`}
+                      >
+                        {logo.isVisible ? 'Visible' : 'Hidden'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteLogo(logo.id)}
+                        className="p-1 rounded hover:bg-red-500/20 text-zinc-500 hover:text-red-400 transition-colors"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Add new logo */}
+              <div className="space-y-2">
+                <div className="grid grid-cols-2 gap-2">
+                  <input
+                    type="text"
+                    value={newLogoName}
+                    onChange={(e) => setNewLogoName(e.target.value)}
+                    placeholder="Company name"
+                    className="px-3 py-2 rounded-lg border bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500 text-sm focus:ring-2 focus:ring-violet-500 focus:border-transparent"
+                  />
+                  <input
+                    type="url"
+                    value={newLogoUrl}
+                    onChange={(e) => setNewLogoUrl(e.target.value)}
+                    placeholder="https://logo.clearbit.com/company.com"
+                    className="px-3 py-2 rounded-lg border bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500 text-sm focus:ring-2 focus:ring-violet-500 focus:border-transparent"
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={handleAddLogo}
+                  disabled={logoSaving || !newLogoName.trim() || !newLogoUrl.trim()}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-violet-600 text-white hover:bg-violet-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  {logoSaving ? 'Adding...' : 'Add Logo'}
+                </button>
+              </div>
             </div>
 
             {/* Actions */}
