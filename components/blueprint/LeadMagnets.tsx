@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { ChevronDown, ChevronUp, Copy, Check } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Copy, Check, X } from 'lucide-react';
 import { Prospect, LeadMagnetCard } from '../../types/blueprint-types';
 
 // ============================================
@@ -60,32 +60,147 @@ const CopyButton: React.FC<CopyButtonProps> = ({ text }) => {
 };
 
 // ============================================
-// Lead Magnet Card Component
+// Lead Magnet Modal Component
+// ============================================
+
+interface LeadMagnetModalProps {
+  data: LeadMagnetData;
+  onClose: () => void;
+}
+
+const LeadMagnetModal: React.FC<LeadMagnetModalProps> = ({ data, onClose }) => {
+  const { card, description, samplePost } = data;
+
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    },
+    [onClose]
+  );
+
+  useEffect(() => {
+    document.addEventListener('keydown', handleKeyDown);
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = '';
+    };
+  }, [handleKeyDown]);
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onClose}>
+      {/* Backdrop */}
+      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
+
+      {/* Modal */}
+      <div
+        className="relative bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl w-full max-w-3xl max-h-[85vh] flex flex-col"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="flex items-start justify-between gap-4 p-6 border-b border-zinc-200 dark:border-zinc-800 shrink-0">
+          <div className="min-w-0">
+            {card?.contentType && (
+              <span className="inline-block px-2 py-0.5 text-xs font-medium bg-violet-50 text-violet-600 dark:bg-violet-500/20 dark:text-violet-400 rounded mb-2">
+                {card.contentType}
+              </span>
+            )}
+            {card?.headline && (
+              <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+                {card.headline}
+              </h3>
+            )}
+            {card?.subheadline && (
+              <p className="text-sm text-zinc-600 dark:text-zinc-400 mt-1">{card.subheadline}</p>
+            )}
+          </div>
+          <button
+            onClick={onClose}
+            className="p-1.5 text-zinc-500 hover:text-zinc-700 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:text-zinc-200 dark:hover:bg-zinc-800 rounded-lg transition-colors shrink-0"
+            aria-label="Close"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Body */}
+        <div className="flex-1 overflow-y-auto p-6 space-y-6">
+          {/* Why This Fits */}
+          {card?.match && (
+            <div>
+              <h4 className="text-xs font-medium text-zinc-500 uppercase tracking-wider mb-2">
+                Why This Fits
+              </h4>
+              <p className="text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed">
+                {card.match}
+              </p>
+            </div>
+          )}
+
+          {/* Estimated Time */}
+          {card?.estHours && (
+            <div className="flex items-center gap-2 text-sm">
+              <span className="text-zinc-500">Estimated time:</span>
+              <span className="font-medium text-zinc-700 dark:text-zinc-300">{card.estHours}</span>
+            </div>
+          )}
+
+          {/* Full Description */}
+          {description && (
+            <div>
+              <h4 className="text-xs font-medium text-zinc-500 uppercase tracking-wider mb-2">
+                Full Description
+              </h4>
+              <p className="text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed whitespace-pre-wrap">
+                {description}
+              </p>
+            </div>
+          )}
+
+          {/* Sample Post */}
+          {samplePost && (
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <h4 className="text-xs font-medium text-zinc-500 uppercase tracking-wider">
+                  Sample Promotional Post
+                </h4>
+                <CopyButton text={samplePost} />
+              </div>
+              <div className="bg-zinc-50 border border-zinc-200 dark:bg-zinc-800/50 dark:border-zinc-700 rounded-lg p-4">
+                <pre className="text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed whitespace-pre-wrap font-sans">
+                  {samplePost}
+                </pre>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ============================================
+// Lead Magnet Card Component (Clickable)
 // ============================================
 
 interface LeadMagnetCardComponentProps {
   data: LeadMagnetData;
-  isExpanded: boolean;
-  onToggle: () => void;
+  onClick: () => void;
 }
 
-const LeadMagnetCardComponent: React.FC<LeadMagnetCardComponentProps> = ({
-  data,
-  isExpanded,
-  onToggle,
-}) => {
-  const { card, description, samplePost } = data;
+const LeadMagnetCardComponent: React.FC<LeadMagnetCardComponentProps> = ({ data, onClick }) => {
+  const { card } = data;
 
-  // Don't render if there's no card data
   if (!card) {
     return null;
   }
 
-  const hasExpandableContent = description || samplePost;
-
   return (
-    <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm dark:shadow-none overflow-hidden">
-      {/* Card Header - Always Visible */}
+    <button
+      type="button"
+      onClick={onClick}
+      className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm dark:shadow-none overflow-hidden text-left w-full hover:border-violet-300 dark:hover:border-violet-500/50 hover:shadow-md transition-all cursor-pointer"
+    >
       <div className="p-4">
         {/* Content Type Badge */}
         {card.contentType && (
@@ -110,7 +225,9 @@ const LeadMagnetCardComponent: React.FC<LeadMagnetCardComponentProps> = ({
             <span className="text-xs font-medium text-zinc-500 uppercase tracking-wider">
               Why this fits:
             </span>
-            <p className="text-sm text-zinc-700 dark:text-zinc-300 mt-1">{card.match}</p>
+            <p className="text-sm text-zinc-700 dark:text-zinc-300 mt-1 line-clamp-2">
+              {card.match}
+            </p>
           </div>
         )}
 
@@ -122,62 +239,12 @@ const LeadMagnetCardComponent: React.FC<LeadMagnetCardComponentProps> = ({
           </div>
         )}
 
-        {/* Expand/Collapse Button */}
-        {hasExpandableContent && (
-          <button
-            onClick={onToggle}
-            className="flex items-center gap-1.5 mt-4 text-sm font-medium text-violet-600 hover:text-violet-500 dark:text-violet-400 dark:hover:text-violet-300 transition-colors"
-            aria-expanded={isExpanded}
-          >
-            {isExpanded ? (
-              <>
-                <ChevronUp className="w-4 h-4" />
-                <span>Show less</span>
-              </>
-            ) : (
-              <>
-                <ChevronDown className="w-4 h-4" />
-                <span>Show more</span>
-              </>
-            )}
-          </button>
-        )}
-      </div>
-
-      {/* Expanded Content */}
-      {isExpanded && hasExpandableContent && (
-        <div className="border-t border-zinc-200 dark:border-zinc-800 p-4 space-y-4">
-          {/* Full Description */}
-          {description && (
-            <div>
-              <h5 className="text-xs font-medium text-zinc-500 uppercase tracking-wider mb-2">
-                Full Description
-              </h5>
-              <p className="text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed whitespace-pre-wrap">
-                {description}
-              </p>
-            </div>
-          )}
-
-          {/* Sample Post */}
-          {samplePost && (
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <h5 className="text-xs font-medium text-zinc-500 uppercase tracking-wider">
-                  Sample Promotional Post
-                </h5>
-                <CopyButton text={samplePost} />
-              </div>
-              <div className="bg-zinc-50 border border-zinc-200 dark:bg-zinc-800/50 dark:border-zinc-700 rounded-lg p-4">
-                <pre className="text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed whitespace-pre-wrap font-sans">
-                  {samplePost}
-                </pre>
-              </div>
-            </div>
-          )}
+        {/* Click hint */}
+        <div className="mt-4 text-xs font-medium text-violet-600 dark:text-violet-400">
+          Click to view details →
         </div>
-      )}
-    </div>
+      </div>
+    </button>
   );
 };
 
@@ -186,7 +253,7 @@ const LeadMagnetCardComponent: React.FC<LeadMagnetCardComponentProps> = ({
 // ============================================
 
 const LeadMagnets: React.FC<LeadMagnetsProps> = ({ prospect }) => {
-  const [expandedCards, setExpandedCards] = useState<Set<number>>(new Set());
+  const [selectedCard, setSelectedCard] = useState<LeadMagnetData | null>(null);
 
   // Build lead magnet data array
   const leadMagnetData: LeadMagnetData[] = [
@@ -218,18 +285,6 @@ const LeadMagnets: React.FC<LeadMagnetsProps> = ({ prospect }) => {
     return null;
   }
 
-  const toggleCard = (cardNumber: number) => {
-    setExpandedCards((prev) => {
-      const next = new Set(prev);
-      if (next.has(cardNumber)) {
-        next.delete(cardNumber);
-      } else {
-        next.add(cardNumber);
-      }
-      return next;
-    });
-  };
-
   return (
     <div className="space-y-4">
       {/* Section Title */}
@@ -244,14 +299,14 @@ const LeadMagnets: React.FC<LeadMagnetsProps> = ({ prospect }) => {
       {/* Cards Grid - Responsive: stack on mobile, 3 columns on large screens */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {validLeadMagnets.map((lm) => (
-          <LeadMagnetCardComponent
-            key={lm.number}
-            data={lm}
-            isExpanded={expandedCards.has(lm.number)}
-            onToggle={() => toggleCard(lm.number)}
-          />
+          <LeadMagnetCardComponent key={lm.number} data={lm} onClick={() => setSelectedCard(lm)} />
         ))}
       </div>
+
+      {/* Modal */}
+      {selectedCard && (
+        <LeadMagnetModal data={selectedCard} onClose={() => setSelectedCard(null)} />
+      )}
     </div>
   );
 };
