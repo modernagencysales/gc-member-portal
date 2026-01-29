@@ -336,6 +336,7 @@ const MonthGrid: React.FC<MonthGridProps> = ({ label, posts, onSelectPost }) => 
 
 const ContentRoadmap: React.FC<ContentRoadmapProps> = ({ posts }) => {
   const [selectedPost, setSelectedPost] = useState<ProspectPost | null>(null);
+  const [activeMonth, setActiveMonth] = useState<1 | 2>(1);
 
   // Sort posts by number if available, otherwise by creation date
   const sortedPosts = [...posts].sort((a, b) => {
@@ -365,6 +366,8 @@ const ContentRoadmap: React.FC<ContentRoadmapProps> = ({ posts }) => {
     );
   }
 
+  const hasMonth2 = month2Posts.length > 0;
+
   return (
     <div className="space-y-4">
       {/* Section Header */}
@@ -389,13 +392,40 @@ const ContentRoadmap: React.FC<ContentRoadmapProps> = ({ posts }) => {
         Copy, customize, and post.
       </p>
 
-      {/* Calendar Grids */}
-      <div className="flex flex-col lg:flex-row gap-6">
-        <MonthGrid label="Month 1" posts={month1Posts} onSelectPost={setSelectedPost} />
-        {month2Posts.length > 0 && (
-          <MonthGrid label="Month 2" posts={month2Posts} onSelectPost={setSelectedPost} />
-        )}
-      </div>
+      {/* Month Toggle Tabs */}
+      {hasMonth2 && (
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={() => setActiveMonth(1)}
+            className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+              activeMonth === 1
+                ? 'bg-violet-600 text-white'
+                : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-700'
+            }`}
+          >
+            Month 1 <span className="text-xs opacity-75">({month1Posts.length} posts)</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveMonth(2)}
+            className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+              activeMonth === 2
+                ? 'bg-violet-600 text-white'
+                : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-700'
+            }`}
+          >
+            Month 2 <span className="text-xs opacity-75">({month2Posts.length} posts)</span>
+          </button>
+        </div>
+      )}
+
+      {/* Calendar Grid - Full Width */}
+      <MonthGrid
+        label={hasMonth2 ? `Month ${activeMonth}` : 'Month 1'}
+        posts={activeMonth === 1 ? month1Posts : month2Posts}
+        onSelectPost={setSelectedPost}
+      />
 
       {/* Legend */}
       <div className="flex flex-wrap items-center gap-4 text-xs text-zinc-500 pt-2">
