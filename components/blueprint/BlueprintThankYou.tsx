@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { CheckCircle, BarChart3, AlertTriangle, User, Lightbulb, Calendar } from 'lucide-react';
 import ThemeToggle from './ThemeToggle';
@@ -35,6 +35,11 @@ const BlueprintThankYou: React.FC = () => {
   const location = useLocation();
   const state = location.state as LocationState | null;
   const reportUrl = state?.reportUrl;
+  const calEmbedRef = useRef<HTMLDivElement>(null);
+
+  const scrollToCalEmbed = () => {
+    calEmbedRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
 
   return (
     <div className="min-h-screen bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 font-sans">
@@ -67,15 +72,13 @@ const BlueprintThankYou: React.FC = () => {
               Book a free 30-minute strategy call. I&apos;ll walk you through your blueprint, answer
               your questions, and map out your next steps.
             </p>
-            <a
-              href={`https://cal.com/${CAL_BOOKING_LINK}`}
-              target="_blank"
-              rel="noopener noreferrer"
+            <button
+              onClick={scrollToCalEmbed}
               className="inline-flex items-center gap-2 px-8 py-4 rounded-xl text-lg font-semibold bg-violet-500 hover:bg-violet-600 text-white transition-colors shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40"
             >
               <Calendar className="w-5 h-5" />
               Book Your Free Walkthrough
-            </a>
+            </button>
           </div>
         </section>
 
@@ -111,9 +114,11 @@ const BlueprintThankYou: React.FC = () => {
             </a>
           </div>
         )}
+      </div>
 
-        {/* CalEmbed */}
-        <CalEmbed calLink={CAL_BOOKING_LINK} />
+      {/* CalEmbed — wider container so month view doesn't collapse to mobile */}
+      <div className="max-w-5xl mx-auto px-4 pb-12 sm:pb-16">
+        <CalEmbed ref={calEmbedRef} calLink={CAL_BOOKING_LINK} />
       </div>
 
       {/* Footer */}
