@@ -246,6 +246,8 @@ const BlueprintPage: React.FC = () => {
         <SectionBridge
           text="Here's where you stand right now — and what's standing between you and a full pipeline."
           variant="accent"
+          stepNumber={1}
+          stepLabel="Diagnose"
         />
 
         {/* 4. ScoreRadar — problem identification */}
@@ -296,6 +298,8 @@ const BlueprintPage: React.FC = () => {
         <SectionBridge
           text="Now let's fix it. Here's your new profile — optimized to attract and convert your ideal buyers."
           variant="gradient"
+          stepNumber={2}
+          stepLabel="Rebuild"
         />
 
         {/* 9. LinkedInProfileMock — visual showcase */}
@@ -317,8 +321,10 @@ const BlueprintPage: React.FC = () => {
 
         {/* 12. Bridge: transition to content engine */}
         <SectionBridge
-          text="But a great profile isn't enough. You need a content engine that keeps your pipeline full."
+          text="A great profile gets attention. Now you need a content engine that turns that attention into pipeline."
           variant="accent"
+          stepNumber={3}
+          stepLabel="Activate"
         />
 
         {/* 13. LeadMagnets */}
