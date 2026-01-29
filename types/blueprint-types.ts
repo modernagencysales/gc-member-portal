@@ -310,6 +310,11 @@ export interface BlueprintSettings {
   dfyOfferUrl: string;
   // Default unlock settings
   defaultOfferUnlocked: boolean;
+  // Cohort settings
+  nextCohortDateFoundations?: string;
+  nextCohortDateEngineering?: string;
+  spotsRemainingFoundations?: number;
+  spotsRemainingEngineering?: number;
   // Timestamps
   createdAt: Date;
   updatedAt: Date;
@@ -339,6 +344,10 @@ export interface BlueprintSettingsFormData {
   dfyOfferCta: string;
   dfyOfferUrl: string;
   defaultOfferUnlocked: boolean;
+  nextCohortDateFoundations?: string;
+  nextCohortDateEngineering?: string;
+  spotsRemainingFoundations?: number;
+  spotsRemainingEngineering?: number;
 }
 
 // ============================================

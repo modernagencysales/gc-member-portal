@@ -18,6 +18,10 @@ interface FormData {
   foundationsPaymentUrl: string;
   engineeringPaymentUrl: string;
   calBookingLink: string;
+  nextCohortDateFoundations: string;
+  nextCohortDateEngineering: string;
+  spotsRemainingFoundations: string;
+  spotsRemainingEngineering: string;
 }
 
 const BlueprintSettingsModal: React.FC<BlueprintSettingsModalProps> = ({ isOpen, onClose }) => {
@@ -27,6 +31,10 @@ const BlueprintSettingsModal: React.FC<BlueprintSettingsModalProps> = ({ isOpen,
     foundationsPaymentUrl: '',
     engineeringPaymentUrl: '',
     calBookingLink: '',
+    nextCohortDateFoundations: '',
+    nextCohortDateEngineering: '',
+    spotsRemainingFoundations: '',
+    spotsRemainingEngineering: '',
   });
   const [showSuccess, setShowSuccess] = useState(false);
 
@@ -45,6 +53,10 @@ const BlueprintSettingsModal: React.FC<BlueprintSettingsModalProps> = ({ isOpen,
         foundationsPaymentUrl: settings.foundationsPaymentUrl || '',
         engineeringPaymentUrl: settings.engineeringPaymentUrl || '',
         calBookingLink: settings.calBookingLink || '',
+        nextCohortDateFoundations: settings.nextCohortDateFoundations || '',
+        nextCohortDateEngineering: settings.nextCohortDateEngineering || '',
+        spotsRemainingFoundations: settings.spotsRemainingFoundations?.toString() || '',
+        spotsRemainingEngineering: settings.spotsRemainingEngineering?.toString() || '',
       });
     }
   }, [settings]);
@@ -71,6 +83,14 @@ const BlueprintSettingsModal: React.FC<BlueprintSettingsModalProps> = ({ isOpen,
       foundationsPaymentUrl: formData.foundationsPaymentUrl,
       engineeringPaymentUrl: formData.engineeringPaymentUrl,
       calBookingLink: formData.calBookingLink,
+      nextCohortDateFoundations: formData.nextCohortDateFoundations || undefined,
+      nextCohortDateEngineering: formData.nextCohortDateEngineering || undefined,
+      spotsRemainingFoundations: formData.spotsRemainingFoundations
+        ? parseInt(formData.spotsRemainingFoundations, 10)
+        : undefined,
+      spotsRemainingEngineering: formData.spotsRemainingEngineering
+        ? parseInt(formData.spotsRemainingEngineering, 10)
+        : undefined,
     });
   };
 
@@ -174,6 +194,64 @@ const BlueprintSettingsModal: React.FC<BlueprintSettingsModalProps> = ({ isOpen,
               </div>
               <p className="text-xs text-zinc-500 mt-1">
                 Your Cal.com booking path (e.g., timkeen/30min)
+              </p>
+            </div>
+
+            {/* Cohort Settings */}
+            <div className="pt-4 border-t border-zinc-800">
+              <h4 className="text-sm font-semibold text-zinc-300 mb-3">Cohort Settings</h4>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-zinc-200 mb-1.5">
+                    Foundations Next Cohort
+                  </label>
+                  <input
+                    type="date"
+                    value={formData.nextCohortDateFoundations}
+                    onChange={(e) => handleChange('nextCohortDateFoundations', e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-lg border bg-zinc-800 border-zinc-700 text-white focus:ring-2 focus:ring-violet-500 focus:border-transparent"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-zinc-200 mb-1.5">
+                    Foundations Spots
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={formData.spotsRemainingFoundations}
+                    onChange={(e) => handleChange('spotsRemainingFoundations', e.target.value)}
+                    placeholder="30"
+                    className="w-full px-4 py-2.5 rounded-lg border bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500 focus:ring-2 focus:ring-violet-500 focus:border-transparent"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-zinc-200 mb-1.5">
+                    Engineering Next Cohort
+                  </label>
+                  <input
+                    type="date"
+                    value={formData.nextCohortDateEngineering}
+                    onChange={(e) => handleChange('nextCohortDateEngineering', e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-lg border bg-zinc-800 border-zinc-700 text-white focus:ring-2 focus:ring-violet-500 focus:border-transparent"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-zinc-200 mb-1.5">
+                    Engineering Spots
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={formData.spotsRemainingEngineering}
+                    onChange={(e) => handleChange('spotsRemainingEngineering', e.target.value)}
+                    placeholder="15"
+                    className="w-full px-4 py-2.5 rounded-lg border bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500 focus:ring-2 focus:ring-violet-500 focus:border-transparent"
+                  />
+                </div>
+              </div>
+              <p className="text-xs text-zinc-500 mt-2">
+                Leave blank to auto-calculate from offer schedule
               </p>
             </div>
 

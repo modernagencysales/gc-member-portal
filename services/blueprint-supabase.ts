@@ -249,6 +249,10 @@ function mapBlueprintSettings(record: Record<string, unknown>): BlueprintSetting
     dfyOfferCta: (record.dfy_offer_cta as string) || '',
     dfyOfferUrl: (record.dfy_offer_url as string) || '',
     defaultOfferUnlocked: (record.default_offer_unlocked as boolean) ?? false,
+    nextCohortDateFoundations: record.next_cohort_date_foundations as string | undefined,
+    nextCohortDateEngineering: record.next_cohort_date_engineering as string | undefined,
+    spotsRemainingFoundations: record.spots_remaining_foundations as number | undefined,
+    spotsRemainingEngineering: record.spots_remaining_engineering as number | undefined,
     createdAt: new Date(record.created_at as string),
     updatedAt: new Date(record.updated_at as string),
   };
@@ -517,6 +521,10 @@ export async function updateBlueprintSettings(
     dfyOfferCta: string;
     dfyOfferUrl: string;
     defaultOfferUnlocked: boolean;
+    nextCohortDateFoundations: string;
+    nextCohortDateEngineering: string;
+    spotsRemainingFoundations: number;
+    spotsRemainingEngineering: number;
   }>
 ): Promise<BlueprintSettings> {
   const updateData: Record<string, unknown> = {};
@@ -580,6 +588,18 @@ export async function updateBlueprintSettings(
   }
   if (settings.defaultOfferUnlocked !== undefined) {
     updateData.default_offer_unlocked = settings.defaultOfferUnlocked;
+  }
+  if (settings.nextCohortDateFoundations !== undefined) {
+    updateData.next_cohort_date_foundations = settings.nextCohortDateFoundations;
+  }
+  if (settings.nextCohortDateEngineering !== undefined) {
+    updateData.next_cohort_date_engineering = settings.nextCohortDateEngineering;
+  }
+  if (settings.spotsRemainingFoundations !== undefined) {
+    updateData.spots_remaining_foundations = settings.spotsRemainingFoundations;
+  }
+  if (settings.spotsRemainingEngineering !== undefined) {
+    updateData.spots_remaining_engineering = settings.spotsRemainingEngineering;
   }
 
   // Update the first settings row (upsert pattern)
