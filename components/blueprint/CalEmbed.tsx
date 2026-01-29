@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useRef } from 'react';
+import React, { forwardRef, useEffect } from 'react';
 
 // ============================================
 // Types
@@ -14,82 +14,46 @@ interface CalEmbedProps {
 // ============================================
 
 /**
- * Cal.com inline embed using the official embed loader.
- * The loader bootstraps the Cal namespace, then we call Cal('inline')
- * to render the booking widget in the parent page context so redirectUrl works.
+ * Cal.com inline embed via iframe.
+ * Listens for postMessage from the Cal.com iframe to detect booking
+ * completion and redirect to the call-booked thank-you page.
  */
 const CalEmbed = forwardRef<HTMLDivElement, CalEmbedProps>(({ calLink, className = '' }, ref) => {
-  const embedContainerId = 'cal-embed-container';
-  const initialized = useRef(false);
+  const isDark =
+    typeof window !== 'undefined' && document.documentElement.classList.contains('dark');
+  const calUrl = `https://cal.com/${calLink}?embed=true&theme=${isDark ? 'dark' : 'light'}&layout=month_view`;
+  const redirectUrl = `${window.location.origin}/blueprint/call-booked`;
 
   useEffect(() => {
-    if (initialized.current) return;
-    initialized.current = true;
-
-    const isDark = document.documentElement.classList.contains('dark');
-    const redirectUrl = `${window.location.origin}/blueprint/call-booked`;
-
-    // Cal.com embed loader IIFE — bootstraps the Cal namespace before embed.js loads
-    (function (C: string, A: string, _L: string) {
-      const p = function (a: unknown, ar?: unknown) {
-        (p as unknown as { q: unknown[] }).q.push([a, ar]);
-      };
-      (p as unknown as { q: unknown[] }).q = [];
-      const d = document;
-      (window as unknown as Record<string, unknown>)[C] = p;
-      const s = d.createElement('script');
-      s.src = A;
-      s.async = true;
-      d.head.appendChild(s);
-    })('Cal', 'https://app.cal.com/embed/embed.js', 'init');
-
-    // Wait for embed.js to load and process the queue
-    const interval = setInterval(() => {
-      const Cal = (window as unknown as Record<string, unknown>).Cal as
-        | ((action: string, ...args: unknown[]) => void)
-        | undefined;
-
-      if (Cal && typeof Cal === 'function' && (Cal as unknown as { loaded?: boolean }).loaded) {
-        clearInterval(interval);
-
-        Cal('init', { origin: 'https://cal.com' });
-
-        Cal('inline', {
-          elementOrSelector: `#${embedContainerId}`,
-          calLink,
-          layout: 'month_view',
-          config: {
-            theme: isDark ? 'dark' : 'light',
-          },
-        });
-
-        Cal('ui', {
-          theme: isDark ? 'dark' : 'light',
-          styles: { branding: { brandColor: '#8b5cf6' } },
-          hideEventTypeDetails: false,
-        });
-      }
-    }, 100);
-
-    // Redirect on booking complete via postMessage from Cal embed
     const handleMessage = (event: { origin: string; data: unknown }) => {
-      if (event.origin !== 'https://app.cal.com') return;
+      // Cal.com embeds post messages from these origins
+      if (!event.origin.includes('cal.com') && !event.origin.includes('app.cal.com')) {
+        return;
+      }
+
       try {
-        const data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
-        if (data?.action === 'bookingSuccessful' || data?.type === 'booking_successful') {
+        const raw = event.data;
+        const data = typeof raw === 'string' ? JSON.parse(raw) : raw;
+
+        // Cal.com uses different event formats — check for all known booking signals
+        if (
+          data?.action === 'bookingSuccessful' ||
+          data?.type === 'booking_successful' ||
+          data?.data?.type === 'booking_successful' ||
+          (data?.type === '__routeChanged' &&
+            typeof data?.data === 'string' &&
+            data.data.includes('booking'))
+        ) {
           window.location.href = redirectUrl;
         }
       } catch {
-        // Not a JSON message we care about
+        // Not a message we care about
       }
     };
-    window.addEventListener('message', handleMessage);
 
-    return () => {
-      clearInterval(interval);
-      window.removeEventListener('message', handleMessage);
-    };
-  }, [calLink]);
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, [redirectUrl]);
 
   return (
     <div
@@ -98,7 +62,15 @@ const CalEmbed = forwardRef<HTMLDivElement, CalEmbedProps>(({ calLink, className
       data-section="CalEmbed"
       style={{ scrollMarginTop: '16px' }}
     >
-      <div id={embedContainerId} style={{ width: '100%', minHeight: '650px', overflow: 'auto' }} />
+      <div className="relative w-full" style={{ minHeight: '650px' }}>
+        <iframe
+          src={calUrl}
+          title="Book a call"
+          className="w-full h-full absolute inset-0 border-0"
+          style={{ minHeight: '650px' }}
+          allow="payment"
+        />
+      </div>
     </div>
   );
 });
