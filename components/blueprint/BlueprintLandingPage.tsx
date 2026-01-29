@@ -122,13 +122,14 @@ const Hero: React.FC<HeroProps> = ({ onSubmit, isSubmitting, error }) => {
 
         {/* Headline */}
         <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-zinc-900 dark:text-zinc-100 text-center leading-tight mb-6 max-w-4xl mx-auto">
-          Discover What&apos;s Holding Back Your LinkedIn Pipeline
+          We&apos;ll Rewrite Your Entire LinkedIn Presence — For Free
         </h1>
 
         {/* Subtitle */}
         <p className="text-lg sm:text-xl text-zinc-600 dark:text-zinc-400 text-center max-w-2xl mx-auto mb-12 leading-relaxed">
-          Get a free, personalized LinkedIn Authority Blueprint — your profile scored across 5
-          dimensions with specific fixes to start booking calls.
+          Get a personalized blueprint with a complete profile rewrite, 60-day content calendar, 3
+          custom lead magnets, and a full authority audit. $3,000+ in value, delivered in 15
+          minutes.
         </p>
 
         {/* Opt-In Form Card */}
