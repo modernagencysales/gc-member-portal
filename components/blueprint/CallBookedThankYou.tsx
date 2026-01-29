@@ -1,19 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import {
-  CheckCircle,
-  Mail,
-  FileText,
-  Target,
-  Monitor,
-  ClipboardList,
-  Users,
-  Zap,
-} from 'lucide-react';
+import { CheckCircle, Mail, FileText, Target, Monitor, ClipboardList, Zap } from 'lucide-react';
 import { getBlueprintSettings } from '../../services/blueprint-supabase';
 import { BlueprintSettings } from '../../types/blueprint-types';
 import ThemeToggle from './ThemeToggle';
-import TestimonialQuote from './TestimonialQuote';
 
 // ============================================
 // Types
@@ -53,29 +43,39 @@ const WHAT_TO_EXPECT = [
   { icon: Zap, text: 'Get a clear action plan you can start implementing immediately' },
 ];
 
-const TESTIMONIALS = [
-  {
-    quote:
-      'The strategy call was a game-changer. Tim walked me through exactly what to focus on first, and I booked 3 discovery calls within the first two weeks.',
-    author: 'Sarah M.',
-    role: 'B2B Marketing Consultant',
-    result: '3 calls in 2 weeks',
-  },
-  {
-    quote:
-      'I went in with a dozen questions and left with total clarity on my LinkedIn strategy. The blueprint review alone was worth it — Tim spotted opportunities I completely missed.',
-    author: 'James R.',
-    role: 'SaaS Founder',
-    result: 'Clear action plan',
-  },
-  {
-    quote:
-      "Best 30 minutes I've spent on my business this quarter. Tim helped me prioritize the changes that would actually move the needle instead of trying to do everything at once.",
-    author: 'Michelle K.',
-    role: 'Executive Coach',
-    result: 'Focused strategy',
-  },
-];
+const SENJA_WIDGET_ID = 'ec06dbf2-1417-4d3e-ba0a-0ade12fa83e1';
+
+// ============================================
+// Senja Embed Component
+// ============================================
+
+const SenjaEmbed: React.FC = () => {
+  useEffect(() => {
+    const scriptId = `senja-script-${SENJA_WIDGET_ID}`;
+    if (document.getElementById(scriptId)) return;
+
+    const script = document.createElement('script');
+    script.id = scriptId;
+    script.src = `https://widget.senja.io/widget/${SENJA_WIDGET_ID}/platform.js`;
+    script.async = true;
+    document.body.appendChild(script);
+
+    return () => {
+      const el = document.getElementById(scriptId);
+      if (el) el.remove();
+    };
+  }, []);
+
+  return (
+    <div
+      className="senja-embed"
+      data-id={SENJA_WIDGET_ID}
+      data-mode="shadow"
+      data-lazyload="false"
+      style={{ display: 'block', width: '100%' }}
+    />
+  );
+};
 
 // ============================================
 // CallBookedThankYou Component
@@ -196,23 +196,9 @@ const CallBookedThankYou: React.FC = () => {
           </div>
         </section>
 
-        {/* Testimonials */}
+        {/* Testimonials — Senja widget */}
         <section className="mb-12">
-          <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 mb-6 text-center">
-            <Users className="w-5 h-5 inline-block mr-2 -mt-0.5 text-violet-600 dark:text-violet-400" />
-            What Others Say About the Call
-          </h2>
-          <div className="space-y-6">
-            {TESTIMONIALS.map((t) => (
-              <TestimonialQuote
-                key={t.author}
-                quote={t.quote}
-                author={t.author}
-                role={t.role}
-                result={t.result}
-              />
-            ))}
-          </div>
+          <SenjaEmbed />
         </section>
       </div>
 
