@@ -393,21 +393,7 @@ const BlueprintPage: React.FC = () => {
         {/* 17. What Happens Next — rewritten SimpleSteps */}
         <SimpleSteps />
 
-        {/* 18. Risk reversal callout */}
-        <div className="max-w-3xl mx-auto">
-          <div className="bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/20 rounded-xl p-6 sm:p-8 text-center">
-            <h3 className="text-sm font-medium text-green-700 dark:text-green-400 uppercase tracking-wider mb-3">
-              Our Guarantee
-            </h3>
-            <p className="text-zinc-800 dark:text-zinc-200 text-lg leading-relaxed max-w-2xl mx-auto">
-              If you implement the top 3 recommendations from your strategy call and don&apos;t see
-              at least one new qualified conversation within 30 days, we&apos;ll extend your
-              implementation support at no cost.
-            </p>
-          </div>
-        </div>
-
-        {/* 19. CalEmbed */}
+        {/* 18. CalEmbed */}
         <CalEmbed ref={calEmbedRef} calLink={calBookingLink} />
 
         {/* 20. Facilitator credibility note */}
