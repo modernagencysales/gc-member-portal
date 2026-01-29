@@ -60,7 +60,7 @@ const StickyCTA: React.FC<StickyCTAProps> = ({
     if (calEmbedElement) {
       calEmbedElement.scrollIntoView({
         behavior: 'smooth',
-        block: 'center',
+        block: 'start',
       });
     }
   };

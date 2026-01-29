@@ -278,7 +278,7 @@ const BlueprintPage: React.FC = () => {
   const scrollToCalEmbed = () => {
     calEmbedRef.current?.scrollIntoView({
       behavior: 'smooth',
-      block: 'center',
+      block: 'start',
     });
   };
 
@@ -404,7 +404,10 @@ const BlueprintPage: React.FC = () => {
           </div>
         </div>
 
-        {/* 19. Facilitator credibility card */}
+        {/* 19. CalEmbed */}
+        <CalEmbed ref={calEmbedRef} calLink={calBookingLink} />
+
+        {/* 20. Facilitator credibility card */}
         <div className="max-w-3xl mx-auto">
           <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm dark:shadow-none p-6 sm:p-8 text-center">
             <p className="text-zinc-700 dark:text-zinc-300 text-base leading-relaxed max-w-2xl mx-auto">
@@ -414,9 +417,6 @@ const BlueprintPage: React.FC = () => {
             </p>
           </div>
         </div>
-
-        {/* 20. CalEmbed */}
-        <CalEmbed ref={calEmbedRef} calLink={calBookingLink} />
       </div>
 
       {/* 22. StickyCTA (fixed position) */}
