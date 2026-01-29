@@ -1,11 +1,11 @@
-import React, { forwardRef } from 'react';
+import React, { forwardRef, useEffect, useRef } from 'react';
 
 // ============================================
 // Types
 // ============================================
 
 interface CalEmbedProps {
-  calLink: string; // e.g., "timkeen/30min"
+  calLink: string; // e.g., "vlad-timinski-pqqica/30min"
   className?: string;
 }
 
@@ -14,17 +14,52 @@ interface CalEmbedProps {
 // ============================================
 
 /**
- * Cal.com inline embed component
- * Uses iframe to embed the Cal.com booking page
- * Accepts a ref for IntersectionObserver (used by StickyCTA)
+ * Cal.com inline embed component using the official Cal.com embed script.
+ * Runs in the parent page context so redirectUrl works after booking.
+ * Accepts a ref for IntersectionObserver (used by StickyCTA).
  */
 const CalEmbed = forwardRef<HTMLDivElement, CalEmbedProps>(({ calLink, className = '' }, ref) => {
-  // Construct the Cal.com embed URL
-  // Format: https://cal.com/{calLink}?embed=true&theme=dark
-  const isDark =
-    typeof window !== 'undefined' && document.documentElement.classList.contains('dark');
-  const redirectUrl = `${window.location.origin}/blueprint/call-booked`;
-  const calUrl = `https://cal.com/${calLink}?embed=true&theme=${isDark ? 'dark' : 'light'}&layout=month_view&redirectUrl=${encodeURIComponent(redirectUrl)}`;
+  const embedContainerId = 'cal-embed-container';
+  const initialized = useRef(false);
+
+  useEffect(() => {
+    if (initialized.current) return;
+    initialized.current = true;
+
+    const isDark = document.documentElement.classList.contains('dark');
+    const redirectUrl = `${window.location.origin}/blueprint/call-booked`;
+
+    // Load Cal.com embed script
+    const script = document.createElement('script');
+    script.src = 'https://app.cal.com/embed/embed.js';
+    script.async = true;
+    script.onload = () => {
+      const Cal = (window as unknown as Record<string, unknown>).Cal as (
+        action: string,
+        ...args: unknown[]
+      ) => void;
+
+      if (!Cal) return;
+
+      Cal('init');
+      Cal('inline', {
+        elementOrSelector: `#${embedContainerId}`,
+        calLink,
+        layout: 'month_view',
+        config: {
+          theme: isDark ? 'dark' : 'light',
+          redirectUrl,
+        },
+      });
+
+      Cal('ui', {
+        theme: isDark ? 'dark' : 'light',
+        styles: { branding: { brandColor: '#8b5cf6' } },
+        hideEventTypeDetails: false,
+      });
+    };
+    document.head.appendChild(script);
+  }, [calLink]);
 
   return (
     <div
@@ -33,16 +68,7 @@ const CalEmbed = forwardRef<HTMLDivElement, CalEmbedProps>(({ calLink, className
       data-section="CalEmbed"
       style={{ scrollMarginTop: '16px' }}
     >
-      {/* Cal.com Iframe */}
-      <div className="relative w-full" style={{ minHeight: '650px' }}>
-        <iframe
-          src={calUrl}
-          title="Book a call"
-          className="w-full h-full absolute inset-0 border-0"
-          style={{ minHeight: '650px' }}
-          allow="payment"
-        />
-      </div>
+      <div id={embedContainerId} style={{ width: '100%', minHeight: '650px', overflow: 'auto' }} />
     </div>
   );
 });
