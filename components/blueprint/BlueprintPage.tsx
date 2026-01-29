@@ -207,9 +207,6 @@ const BlueprintPage: React.FC = () => {
   const { prospect, posts, settings, contentBlocks, scorecardCount } = data;
 
   // Filter content blocks by type for marketing sections
-  const allboundSystemBlock = contentBlocks.find(
-    (b) => b.blockType === 'feature' || b.title?.toLowerCase().includes('allbound')
-  );
   const bootcampPitchBlock = contentBlocks.find(
     (b) => b.blockType === 'cta' || b.title?.toLowerCase().includes('bootcamp')
   );
@@ -282,17 +279,6 @@ const BlueprintPage: React.FC = () => {
           prospect={prospect}
           introParagraph="We analyzed your LinkedIn presence across 5 key dimensions. Here's what stands out."
         />
-
-        {/* 6. Testimonial #1 — social proof right after problem reveal */}
-        <TestimonialQuote
-          quote="The blueprint showed me exactly where I was leaving money on the table. Within 30 days of implementing the profile rewrite and content plan, I had 3 new discovery calls booked from LinkedIn alone."
-          author="Recent Blueprint Client"
-          role="B2B Consultant"
-          result="3 calls in 30 days"
-        />
-
-        {/* 7. MarketingBlock: allbound system (if exists) */}
-        <MarketingBlock block={allboundSystemBlock} />
 
         {/* 8. Bridge: transition to solution */}
         <SectionBridge
