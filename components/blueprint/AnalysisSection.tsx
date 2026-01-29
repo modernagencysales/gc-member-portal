@@ -115,20 +115,21 @@ const AnalysisSection: React.FC<AnalysisSectionProps> = ({ prospect, introParagr
   }
 
   return (
-    <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm dark:shadow-none p-6">
+    <div className="space-y-8">
       {/* Section Title */}
-      <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mb-2">
-        Here&apos;s What We Found
-      </h2>
-      {introParagraph && (
-        <p className="text-zinc-600 dark:text-zinc-400 leading-relaxed mb-6">{introParagraph}</p>
-      )}
-      {!introParagraph && <div className="mb-6" />}
+      <div>
+        <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mb-2">
+          Here&apos;s What We Found
+        </h2>
+        {introParagraph && (
+          <p className="text-zinc-600 dark:text-zinc-400 leading-relaxed">{introParagraph}</p>
+        )}
+      </div>
 
       {/* What's Working Section */}
       {hasWhatsWorking && (
-        <div className="mb-8">
-          <h3 className="text-sm font-medium text-zinc-600 dark:text-zinc-400 uppercase tracking-wider mb-4">
+        <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm dark:shadow-none p-6">
+          <h3 className="text-sm font-medium text-green-600 dark:text-green-400 uppercase tracking-wider mb-4">
             You&apos;re Already Doing These Things Right
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -141,8 +142,8 @@ const AnalysisSection: React.FC<AnalysisSectionProps> = ({ prospect, introParagr
 
       {/* Revenue Leaks Section */}
       {hasRevenueLeaks && (
-        <div className="mb-8">
-          <h3 className="text-sm font-medium text-zinc-600 dark:text-zinc-400 uppercase tracking-wider mb-4">
+        <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm dark:shadow-none p-6">
+          <h3 className="text-sm font-medium text-red-600 dark:text-red-400 uppercase tracking-wider mb-4">
             But These Gaps Are Costing You Deals
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -155,11 +156,11 @@ const AnalysisSection: React.FC<AnalysisSectionProps> = ({ prospect, introParagr
 
       {/* Bottom Line Callout */}
       {hasBottomLine && (
-        <div className="bg-violet-50 dark:bg-violet-500/10 border border-violet-200 dark:border-violet-500/20 rounded-lg p-6 text-center">
-          <h3 className="text-sm font-medium text-violet-600 dark:text-violet-400 uppercase tracking-wider mb-3">
+        <div className="bg-violet-50 dark:bg-violet-500/10 border border-violet-200 dark:border-violet-500/20 rounded-xl p-8 text-center">
+          <h3 className="text-sm font-medium text-violet-600 dark:text-violet-400 uppercase tracking-wider mb-4">
             What This Means For Your Pipeline
           </h3>
-          <p className="text-zinc-900 dark:text-zinc-100 text-lg leading-relaxed">
+          <p className="text-zinc-900 dark:text-zinc-100 text-lg leading-relaxed max-w-2xl mx-auto">
             {prospect.bottomLine}
           </p>
         </div>
