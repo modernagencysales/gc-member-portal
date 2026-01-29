@@ -14,9 +14,9 @@ interface CalEmbedProps {
 // ============================================
 
 /**
- * Cal.com inline embed component using the official Cal.com embed script.
- * Runs in the parent page context so redirectUrl works after booking.
- * Accepts a ref for IntersectionObserver (used by StickyCTA).
+ * Cal.com inline embed using the official embed loader.
+ * The loader bootstraps the Cal namespace, then we call Cal('inline')
+ * to render the booking widget in the parent page context so redirectUrl works.
  */
 const CalEmbed = forwardRef<HTMLDivElement, CalEmbedProps>(({ calLink, className = '' }, ref) => {
   const embedContainerId = 'cal-embed-container';
@@ -29,36 +29,66 @@ const CalEmbed = forwardRef<HTMLDivElement, CalEmbedProps>(({ calLink, className
     const isDark = document.documentElement.classList.contains('dark');
     const redirectUrl = `${window.location.origin}/blueprint/call-booked`;
 
-    // Load Cal.com embed script
-    const script = document.createElement('script');
-    script.src = 'https://app.cal.com/embed/embed.js';
-    script.async = true;
-    script.onload = () => {
-      const Cal = (window as unknown as Record<string, unknown>).Cal as (
-        action: string,
-        ...args: unknown[]
-      ) => void;
+    // Cal.com embed loader IIFE — bootstraps the Cal namespace before embed.js loads
+    (function (C: string, A: string, _L: string) {
+      const p = function (a: unknown, ar?: unknown) {
+        (p as unknown as { q: unknown[] }).q.push([a, ar]);
+      };
+      (p as unknown as { q: unknown[] }).q = [];
+      const d = document;
+      (window as unknown as Record<string, unknown>)[C] = p;
+      const s = d.createElement('script');
+      s.src = A;
+      s.async = true;
+      d.head.appendChild(s);
+    })('Cal', 'https://app.cal.com/embed/embed.js', 'init');
 
-      if (!Cal) return;
+    // Wait for embed.js to load and process the queue
+    const interval = setInterval(() => {
+      const Cal = (window as unknown as Record<string, unknown>).Cal as
+        | ((action: string, ...args: unknown[]) => void)
+        | undefined;
 
-      Cal('init');
-      Cal('inline', {
-        elementOrSelector: `#${embedContainerId}`,
-        calLink,
-        layout: 'month_view',
-        config: {
+      if (Cal && typeof Cal === 'function' && (Cal as unknown as { loaded?: boolean }).loaded) {
+        clearInterval(interval);
+
+        Cal('init', { origin: 'https://cal.com' });
+
+        Cal('inline', {
+          elementOrSelector: `#${embedContainerId}`,
+          calLink,
+          layout: 'month_view',
+          config: {
+            theme: isDark ? 'dark' : 'light',
+          },
+        });
+
+        Cal('ui', {
           theme: isDark ? 'dark' : 'light',
-          redirectUrl,
-        },
-      });
+          styles: { branding: { brandColor: '#8b5cf6' } },
+          hideEventTypeDetails: false,
+        });
+      }
+    }, 100);
 
-      Cal('ui', {
-        theme: isDark ? 'dark' : 'light',
-        styles: { branding: { brandColor: '#8b5cf6' } },
-        hideEventTypeDetails: false,
-      });
+    // Redirect on booking complete via postMessage from Cal embed
+    const handleMessage = (event: { origin: string; data: unknown }) => {
+      if (event.origin !== 'https://app.cal.com') return;
+      try {
+        const data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
+        if (data?.action === 'bookingSuccessful' || data?.type === 'booking_successful') {
+          window.location.href = redirectUrl;
+        }
+      } catch {
+        // Not a JSON message we care about
+      }
     };
-    document.head.appendChild(script);
+    window.addEventListener('message', handleMessage);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('message', handleMessage);
+    };
   }, [calLink]);
 
   return (
