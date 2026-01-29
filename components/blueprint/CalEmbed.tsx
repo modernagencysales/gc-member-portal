@@ -23,7 +23,8 @@ const CalEmbed = forwardRef<HTMLDivElement, CalEmbedProps>(({ calLink, className
   // Format: https://cal.com/{calLink}?embed=true&theme=dark
   const isDark =
     typeof window !== 'undefined' && document.documentElement.classList.contains('dark');
-  const calUrl = `https://cal.com/${calLink}?embed=true&theme=${isDark ? 'dark' : 'light'}&layout=month_view`;
+  const redirectUrl = `${window.location.origin}/blueprint/call-booked`;
+  const calUrl = `https://cal.com/${calLink}?embed=true&theme=${isDark ? 'dark' : 'light'}&layout=month_view&redirectUrl=${encodeURIComponent(redirectUrl)}`;
 
   return (
     <div
