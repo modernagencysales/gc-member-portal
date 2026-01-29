@@ -293,7 +293,10 @@ const BlueprintPage: React.FC = () => {
         {/* 1. Hero — BlueprintHeader (no CTA button, hook subtitle, score context) */}
         <BlueprintHeader prospect={prospect} scorecardCount={scorecardCount} />
 
-        {/* 2. Logo Bar — instant social proof */}
+        {/* 2. ValueStack — what's in your blueprint */}
+        <ValueStack />
+
+        {/* 3. Logo Bar — instant social proof */}
         <LogoBar logos={clientLogos} />
 
         {/* 3. Bridge: problem identification intro */}
@@ -359,10 +362,7 @@ const BlueprintPage: React.FC = () => {
         {/* 11. LeadMagnets */}
         <LeadMagnets prospect={prospect} />
 
-        {/* 12. ValueStack */}
-        <ValueStack />
-
-        {/* 13. ContentRoadmap */}
+        {/* 12. ContentRoadmap */}
         <ContentRoadmap posts={posts} />
 
         {/* 14. CTA #1 — "Book Your 30-Min Strategy Call" */}
