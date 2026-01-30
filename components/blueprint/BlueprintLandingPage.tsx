@@ -1,6 +1,15 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Linkedin, Mail, Briefcase, CheckCircle, Sparkles, FileText, User } from 'lucide-react';
+import {
+  Linkedin,
+  Mail,
+  Briefcase,
+  CheckCircle,
+  Sparkles,
+  FileText,
+  User,
+  DollarSign,
+} from 'lucide-react';
 import ThemeToggle from './ThemeToggle';
 
 const INTAKE_API_URL = 'https://gtm-system-production.up.railway.app/api/webhooks/blueprint-form';
@@ -14,6 +23,7 @@ interface FormData {
   fullName: string;
   email: string;
   businessType: string;
+  monthlyIncome: string;
 }
 
 // ============================================
@@ -21,6 +31,8 @@ interface FormData {
 // ============================================
 
 const BUSINESS_TYPES = ['Agency', 'Consulting', 'Coaching', 'SaaS', 'Freelance', 'Other'];
+
+const REVENUE_RANGES = ['Under $5k', '$5k-$10k', '$10k-$30k', '$30k-$50k', '$50k-$100k', '$100k+'];
 
 const STATS = [
   { value: '300+', label: 'Blueprints Delivered' },
@@ -93,6 +105,7 @@ const Hero: React.FC<HeroProps> = ({ onSubmit, isSubmitting, error }) => {
     fullName: '',
     email: '',
     businessType: '',
+    monthlyIncome: '',
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -218,6 +231,35 @@ const Hero: React.FC<HeroProps> = ({ onSubmit, isSubmitting, error }) => {
                     {BUSINESS_TYPES.map((type) => (
                       <option key={type} value={type}>
                         {type}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Monthly Revenue */}
+              <div>
+                <label
+                  htmlFor="monthlyIncome"
+                  className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5"
+                >
+                  Monthly Revenue
+                </label>
+                <div className="relative">
+                  <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+                  <select
+                    id="monthlyIncome"
+                    required
+                    value={formData.monthlyIncome}
+                    onChange={(e) =>
+                      setFormData((prev) => ({ ...prev, monthlyIncome: e.target.value }))
+                    }
+                    className="w-full pl-10 pr-4 py-3 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-colors appearance-none"
+                  >
+                    <option value="">Select your revenue range</option>
+                    {REVENUE_RANGES.map((range) => (
+                      <option key={range} value={range}>
+                        {range}
                       </option>
                     ))}
                   </select>
@@ -398,6 +440,7 @@ const BlueprintLandingPage: React.FC = () => {
           full_name: formData.fullName,
           email: formData.email,
           business_type: formData.businessType,
+          monthly_income: formData.monthlyIncome,
           send_email: true,
           source_url: window.location.href,
           lead_magnet_source: 'blueprint-landing',
