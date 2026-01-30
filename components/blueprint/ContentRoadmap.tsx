@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import { Copy, Check, FileText, X } from 'lucide-react';
 import { ProspectPost } from '../../types/blueprint-types';
 
@@ -441,8 +442,12 @@ const ContentRoadmap: React.FC<ContentRoadmapProps> = ({ posts }) => {
         </span>
       </div>
 
-      {/* Post Detail Modal */}
-      {selectedPost && <PostModal post={selectedPost} onClose={() => setSelectedPost(null)} />}
+      {/* Post Detail Modal — portal to body so ScrollReveal transforms don't break fixed positioning */}
+      {selectedPost &&
+        createPortal(
+          <PostModal post={selectedPost} onClose={() => setSelectedPost(null)} />,
+          document.body
+        )}
     </div>
   );
 };
