@@ -123,6 +123,7 @@ const BlueprintSettingsModal: React.FC<BlueprintSettingsModalProps> = ({ isOpen,
   const [logoSaving, setLogoSaving] = useState(false);
   const [bulkUploading, setBulkUploading] = useState(false);
   const [bulkUploadProgress, setBulkUploadProgress] = useState('');
+  const [bulkUploadError, setBulkUploadError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { data: logosData } = useQuery({
@@ -182,6 +183,7 @@ const BlueprintSettingsModal: React.FC<BlueprintSettingsModalProps> = ({ isOpen,
     if (!files || files.length === 0) return;
 
     setBulkUploading(true);
+    setBulkUploadError(null);
     const startCount = logos.length;
     let uploaded = 0;
 
@@ -205,6 +207,8 @@ const BlueprintSettingsModal: React.FC<BlueprintSettingsModalProps> = ({ isOpen,
       queryClient.invalidateQueries({ queryKey: ['clientLogos'] });
     } catch (err) {
       console.error('Bulk upload failed:', err);
+      const message = err instanceof Error ? err.message : 'Upload failed';
+      setBulkUploadError(`Failed after ${uploaded} of ${files.length}: ${message}`);
     } finally {
       setBulkUploading(false);
       setBulkUploadProgress('');
@@ -519,6 +523,7 @@ const BlueprintSettingsModal: React.FC<BlueprintSettingsModalProps> = ({ isOpen,
                     {bulkUploading ? bulkUploadProgress : 'Bulk Upload PNGs'}
                   </button>
                 </div>
+                {bulkUploadError && <p className="text-xs text-red-400 mt-1">{bulkUploadError}</p>}
               </div>
             </div>
 
