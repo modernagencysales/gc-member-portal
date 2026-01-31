@@ -70,17 +70,6 @@ const STEPS = [
   },
 ];
 
-const PROOF_NAMES = [
-  'SaaS Founders',
-  'Agency Owners',
-  'Consultants',
-  'Coaches',
-  'Freelancers',
-  'B2B Executives',
-  'Marketing Leaders',
-  'Sales Directors',
-];
-
 // ============================================
 // Nav Bar
 // ============================================
@@ -329,7 +318,12 @@ const StatsRow: React.FC = () => (
 // Social Proof
 // ============================================
 
-const SocialProof: React.FC = () => (
+interface SocialProofProps {
+  logos: ClientLogo[];
+  maxLogos?: number;
+}
+
+const SocialProof: React.FC<SocialProofProps> = ({ logos, maxLogos }) => (
   <section className="bg-white dark:bg-zinc-950 py-16 sm:py-20">
     <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
       <h2 className="text-3xl sm:text-4xl font-bold text-zinc-900 dark:text-zinc-100 mb-4">
@@ -340,16 +334,7 @@ const SocialProof: React.FC = () => (
         LinkedIn presence.
       </p>
 
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        {PROOF_NAMES.map((name) => (
-          <div
-            key={name}
-            className="bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700 rounded-lg py-4 px-3"
-          >
-            <span className="text-sm font-medium text-zinc-600 dark:text-zinc-400">{name}</span>
-          </div>
-        ))}
-      </div>
+      <LogoBar logos={logos} maxLogos={maxLogos} />
     </div>
   </section>
 );
@@ -493,8 +478,7 @@ const BlueprintLandingPage: React.FC = () => {
       <NavBar />
       <Hero onSubmit={handleSubmit} isSubmitting={isSubmitting} error={error} />
       <StatsRow />
-      <LogoBar logos={logos} maxLogos={maxLogosLanding} />
-      <SocialProof />
+      <SocialProof logos={logos} maxLogos={maxLogosLanding} />
       <HowItWorks />
       <Footer />
     </div>
