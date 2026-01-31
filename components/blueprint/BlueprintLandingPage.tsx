@@ -334,7 +334,7 @@ const SocialProof: React.FC<SocialProofProps> = ({ logos, maxLogos }) => (
         LinkedIn presence.
       </p>
 
-      <LogoBar logos={logos} maxLogos={maxLogos} />
+      <LogoBar logos={logos} maxLogos={maxLogos} hideLabel />
     </div>
   </section>
 );
