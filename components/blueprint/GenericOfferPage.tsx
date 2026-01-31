@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Navigate } from 'react-router-dom';
 import { AlertCircle, Calendar, Check, X, Shield, Star, Zap, Clock } from 'lucide-react';
-import { getProspectBySlug, getBlueprintSettings } from '../../services/blueprint-supabase';
-import { Prospect, BlueprintSettings, getProspectDisplayName } from '../../types/blueprint-types';
+import { getBlueprintSettings } from '../../services/blueprint-supabase';
+import { BlueprintSettings } from '../../types/blueprint-types';
 import { OFFERS } from './offer-data';
 import {
   getNextCohortDate,
@@ -21,49 +21,13 @@ import {
 import ThemeToggle from './ThemeToggle';
 
 // ============================================
-// Types
-// ============================================
-
-interface OfferPageData {
-  prospect: Prospect;
-  settings: BlueprintSettings | null;
-}
-
-// ============================================
 // Loading State Component
 // ============================================
 
-const OfferLoadingState: React.FC = () => (
+const GenericOfferLoading: React.FC = () => (
   <div className="min-h-screen bg-white dark:bg-zinc-950 flex flex-col items-center justify-center">
     <div className="w-12 h-12 border-2 border-zinc-300 dark:border-zinc-700 border-t-violet-500 rounded-full animate-spin" />
-    <p className="mt-4 text-zinc-600 dark:text-zinc-400 text-sm font-medium">
-      Loading your offers...
-    </p>
-  </div>
-);
-
-// ============================================
-// 404 State Component
-// ============================================
-
-const OfferNotFound: React.FC = () => (
-  <div className="min-h-screen bg-white dark:bg-zinc-950 flex flex-col items-center justify-center px-4">
-    <div className="text-center max-w-md">
-      <h1 className="text-6xl font-bold text-zinc-900 dark:text-zinc-100 mb-4">404</h1>
-      <h2 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100 mb-2">
-        Offer Page Not Found
-      </h2>
-      <p className="text-zinc-600 dark:text-zinc-400 mb-8">
-        We couldn&rsquo;t find the offer page you&rsquo;re looking for. Please check the URL or
-        contact support if you believe this is an error.
-      </p>
-      <a
-        href="/"
-        className="inline-block px-6 py-3 bg-violet-600 hover:bg-violet-700 text-white font-medium rounded-lg transition-colors"
-      >
-        Go Home
-      </a>
-    </div>
+    <p className="mt-4 text-zinc-600 dark:text-zinc-400 text-sm font-medium">Loading offer...</p>
   </div>
 );
 
@@ -71,13 +35,8 @@ const OfferNotFound: React.FC = () => (
 // Error State Component
 // ============================================
 
-interface OfferErrorProps {
-  message?: string;
-  onRetry?: () => void;
-}
-
-const OfferError: React.FC<OfferErrorProps> = ({
-  message = 'Something went wrong while loading offers.',
+const GenericOfferError: React.FC<{ message?: string; onRetry?: () => void }> = ({
+  message = 'Something went wrong while loading the offer.',
   onRetry,
 }) => (
   <div className="min-h-screen bg-white dark:bg-zinc-950 flex flex-col items-center justify-center px-4">
@@ -86,7 +45,7 @@ const OfferError: React.FC<OfferErrorProps> = ({
         <AlertCircle className="w-8 h-8 text-red-500" />
       </div>
       <h2 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100 mb-2">
-        Error Loading Offers
+        Error Loading Offer
       </h2>
       <p className="text-zinc-600 dark:text-zinc-400 mb-8">{message}</p>
       {onRetry && (
@@ -102,48 +61,33 @@ const OfferError: React.FC<OfferErrorProps> = ({
 );
 
 // ============================================
-// Main OfferPage Component
+// Main GenericOfferPage Component
 // ============================================
 
-const OfferPage: React.FC = () => {
-  const { slug } = useParams<{ slug: string }>();
+const GenericOfferPage: React.FC = () => {
+  const { offerType } = useParams<{ offerType: string }>();
+
+  const isValidType = offerType === 'foundations' || offerType === 'engineering';
 
   // State
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [notFound, setNotFound] = useState(false);
-  const [data, setData] = useState<OfferPageData | null>(null);
+  const [settings, setSettings] = useState<BlueprintSettings | null>(null);
 
   // Accordion states
   const [openFAQ, setOpenFAQ] = useState<number | null>(null);
   const [openWeek, setOpenWeek] = useState<number | null>(0);
 
-  // Fetch data
-  const fetchOfferData = async () => {
-    if (!slug) {
-      setNotFound(true);
-      setLoading(false);
-      return;
-    }
-
+  // Fetch settings only (no prospect lookup)
+  const fetchSettings = async () => {
     setLoading(true);
     setError(null);
-    setNotFound(false);
 
     try {
-      const prospect = await getProspectBySlug(slug);
-
-      if (!prospect) {
-        setNotFound(true);
-        setLoading(false);
-        return;
-      }
-
-      const settings = await getBlueprintSettings();
-
-      setData({ prospect, settings });
+      const s = await getBlueprintSettings();
+      setSettings(s);
     } catch (err) {
-      console.error('Failed to load offer data:', err);
+      console.error('Failed to load offer settings:', err);
       setError(err instanceof Error ? err.message : 'An unexpected error occurred');
     } finally {
       setLoading(false);
@@ -151,22 +95,22 @@ const OfferPage: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchOfferData();
+    if (isValidType) {
+      fetchSettings();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [slug]);
+  }, [offerType]);
 
-  // Handle loading state
-  if (loading) return <OfferLoadingState />;
-  if (notFound) return <OfferNotFound />;
-  if (error) return <OfferError message={error} onRetry={fetchOfferData} />;
-  if (!data) return <OfferError message="No data available" onRetry={fetchOfferData} />;
+  // Validate offerType
+  if (!isValidType) {
+    return <Navigate to="/" replace />;
+  }
 
-  const { prospect, settings } = data;
+  const offer = OFFERS[offerType];
 
-  // Determine recommended offer
-  const recommendedType: 'foundations' | 'engineering' =
-    prospect.recommendedOffer === 'bootcamp' ? 'foundations' : 'engineering';
-  const offer = OFFERS[recommendedType];
+  // Handle loading/error states
+  if (loading) return <GenericOfferLoading />;
+  if (error) return <GenericOfferError message={error} onRetry={fetchSettings} />;
 
   // Payment URLs
   const foundationsPaymentUrl = settings?.foundationsPaymentUrl || undefined;
@@ -175,10 +119,10 @@ const OfferPage: React.FC = () => {
     type === 'foundations' ? foundationsPaymentUrl : engineeringPaymentUrl;
 
   // Cohort info
-  const cohortDate = getNextCohortDate(recommendedType, settings, offer);
+  const cohortDate = getNextCohortDate(offerType, settings, offer);
   const cohortDateStr = formatCohortDate(cohortDate);
   const daysUntil = getDaysUntilCohort(cohortDate);
-  const spotsRemaining = getSpotsRemaining(recommendedType, settings, offer);
+  const spotsRemaining = getSpotsRemaining(offerType, settings, offer);
 
   // Value stack total
   const valueTotal = offer.valueItems.reduce((sum, item) => {
@@ -193,28 +137,6 @@ const OfferPage: React.FC = () => {
     <div className="min-h-screen bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 font-sans">
       <ThemeToggle />
       <div className="max-w-4xl mx-auto px-4 py-8 sm:py-12">
-        {/* ===== Personalized Header ===== */}
-        <div className="text-center mb-4">
-          <p className="text-zinc-600 dark:text-zinc-400 text-lg">
-            Prepared for{' '}
-            <span className="text-zinc-800 dark:text-zinc-200 font-medium">
-              {prospect.firstName || getProspectDisplayName(prospect)}
-            </span>
-          </p>
-        </div>
-
-        {/* Seller's Personalized Note */}
-        {prospect.offerNote && (
-          <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-6 mb-10">
-            <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mb-3">
-              A Note For You
-            </h2>
-            <p className="text-zinc-700 dark:text-zinc-300 whitespace-pre-wrap">
-              {prospect.offerNote}
-            </p>
-          </div>
-        )}
-
         {/* ===== HERO SECTION ===== */}
         <section className="text-center mb-16">
           {/* Cohort date badge */}
@@ -234,7 +156,7 @@ const OfferPage: React.FC = () => {
             {offer.subheadline}
           </p>
 
-          <CTASection paymentUrl={getPaymentUrl(recommendedType)} offer={offer} variant="primary" />
+          <CTASection paymentUrl={getPaymentUrl(offerType)} offer={offer} variant="primary" />
         </section>
 
         <div className="space-y-16 sm:space-y-20">
@@ -319,11 +241,7 @@ const OfferPage: React.FC = () => {
 
           {/* ===== MID-PAGE CTA ===== */}
           <section className="text-center">
-            <CTASection
-              paymentUrl={getPaymentUrl(recommendedType)}
-              offer={offer}
-              variant="secondary"
-            />
+            <CTASection paymentUrl={getPaymentUrl(offerType)} offer={offer} variant="secondary" />
           </section>
 
           {/* ===== VALUE STACK ===== */}
@@ -456,11 +374,7 @@ const OfferPage: React.FC = () => {
               </div>
               <p className="text-zinc-600 dark:text-zinc-400 mb-6">{offer.paymentPlan}</p>
 
-              <CTASection
-                paymentUrl={getPaymentUrl(recommendedType)}
-                offer={offer}
-                variant="primary"
-              />
+              <CTASection paymentUrl={getPaymentUrl(offerType)} offer={offer} variant="primary" />
 
               {/* Guarantee */}
               <div className="mt-8 pt-6 border-t border-zinc-200 dark:border-zinc-800">
@@ -530,11 +444,7 @@ const OfferPage: React.FC = () => {
             <p className="text-zinc-600 dark:text-zinc-400 mb-8 max-w-2xl mx-auto">
               Next cohort starts {cohortDateStr}. {spotsRemaining} spots remaining.
             </p>
-            <CTASection
-              paymentUrl={getPaymentUrl(recommendedType)}
-              offer={offer}
-              variant="primary"
-            />
+            <CTASection paymentUrl={getPaymentUrl(offerType)} offer={offer} variant="primary" />
           </section>
 
           {/* ===== SENJA TESTIMONIAL EMBED ===== */}
@@ -548,11 +458,7 @@ const OfferPage: React.FC = () => {
             <p className="text-zinc-600 dark:text-zinc-400 mb-8 max-w-2xl mx-auto">
               Join the next cohort and build your client acquisition system.
             </p>
-            <CTASection
-              paymentUrl={getPaymentUrl(recommendedType)}
-              offer={offer}
-              variant="primary"
-            />
+            <CTASection paymentUrl={getPaymentUrl(offerType)} offer={offer} variant="primary" />
           </section>
         </div>
       </div>
@@ -560,4 +466,4 @@ const OfferPage: React.FC = () => {
   );
 };
 
-export default OfferPage;
+export default GenericOfferPage;
