@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, TrendingUp, Users, Target, MessageSquare } from 'lucide-react';
+import { ArrowRight, TrendingUp, Users, Target, MessageSquare, FileText } from 'lucide-react';
 import ThemeToggle from './ThemeToggle';
 
 // ============================================
@@ -435,6 +435,27 @@ const CaseStudiesPage: React.FC = () => (
     <CTASection />
 
     <Footer />
+
+    {/* Sticky CTA */}
+    <div className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 dark:bg-zinc-900/95 backdrop-blur-sm border-t border-zinc-200 dark:border-zinc-800 shadow-[0_-2px_10px_rgba(0,0,0,0.05)] dark:shadow-none">
+      <div className="max-w-4xl mx-auto px-4 py-3 sm:py-4">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-4">
+          <div className="hidden sm:block text-sm text-zinc-500 dark:text-zinc-400">
+            <span className="inline-flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+              Free personalized blueprint — $3,000+ value
+            </span>
+          </div>
+          <Link
+            to="/blueprint"
+            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold bg-violet-600 hover:bg-violet-700 text-white transition-colors shadow-lg shadow-violet-500/25"
+          >
+            <FileText className="w-4 h-4" />
+            Get Your Blueprint Now
+          </Link>
+        </div>
+      </div>
+    </div>
   </div>
 );
 
