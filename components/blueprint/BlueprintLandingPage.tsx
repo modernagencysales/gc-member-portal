@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Linkedin,
@@ -9,6 +9,7 @@ import {
   FileText,
   User,
   DollarSign,
+  ArrowUp,
 } from 'lucide-react';
 import ThemeToggle from './ThemeToggle';
 import LogoBar from './LogoBar';
@@ -109,23 +110,23 @@ const Hero: React.FC<HeroProps> = ({ onSubmit, isSubmitting, error }) => {
   };
 
   return (
-    <section className="bg-white dark:bg-zinc-950 py-10 sm:py-16">
+    <section className="bg-white dark:bg-zinc-950 py-6 sm:py-10">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         {/* Trust Badge */}
-        <div className="flex justify-center mb-8">
-          <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-violet-50 dark:bg-violet-500/10 border border-violet-200 dark:border-violet-500/20 text-sm font-medium text-violet-700 dark:text-violet-300">
-            <Sparkles className="w-4 h-4" />
+        <div className="flex justify-center mb-4">
+          <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-violet-50 dark:bg-violet-500/10 border border-violet-200 dark:border-violet-500/20 text-xs sm:text-sm font-medium text-violet-700 dark:text-violet-300">
+            <Sparkles className="w-3.5 h-3.5" />
             Powered by AI — analyzing 300+ LinkedIn profiles
           </span>
         </div>
 
         {/* Headline */}
-        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-zinc-900 dark:text-zinc-100 text-center leading-tight mb-6 max-w-4xl mx-auto">
+        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-zinc-900 dark:text-zinc-100 text-center leading-tight mb-3 max-w-4xl mx-auto">
           We&apos;ll Rewrite Your Entire LinkedIn Presence — For Free
         </h1>
 
         {/* Subtitle */}
-        <p className="text-lg sm:text-xl text-zinc-600 dark:text-zinc-400 text-center max-w-2xl mx-auto mb-12 leading-relaxed">
+        <p className="text-base sm:text-lg text-zinc-600 dark:text-zinc-400 text-center max-w-2xl mx-auto mb-6 leading-relaxed">
           Get a personalized blueprint with a complete profile rewrite, 60-day content calendar, 3
           custom lead magnets, and a full authority audit. $3,000+ in value, delivered in 15
           minutes.
@@ -133,13 +134,13 @@ const Hero: React.FC<HeroProps> = ({ onSubmit, isSubmitting, error }) => {
 
         {/* Opt-In Form Card */}
         <div className="max-w-md mx-auto">
-          <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-xl dark:shadow-none p-6 sm:p-8">
-            <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-xl dark:shadow-none p-5 sm:p-6">
+            <form onSubmit={handleSubmit} className="space-y-3">
               {/* LinkedIn URL */}
               <div>
                 <label
                   htmlFor="linkedinUrl"
-                  className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5"
+                  className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1"
                 >
                   Your LinkedIn URL
                 </label>
@@ -154,7 +155,7 @@ const Hero: React.FC<HeroProps> = ({ onSubmit, isSubmitting, error }) => {
                     onChange={(e) =>
                       setFormData((prev) => ({ ...prev, linkedinUrl: e.target.value }))
                     }
-                    className="w-full pl-10 pr-4 py-3 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-colors"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl text-sm border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-colors"
                   />
                 </div>
               </div>
@@ -163,7 +164,7 @@ const Hero: React.FC<HeroProps> = ({ onSubmit, isSubmitting, error }) => {
               <div>
                 <label
                   htmlFor="fullName"
-                  className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5"
+                  className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1"
                 >
                   Your Full Name
                 </label>
@@ -176,7 +177,7 @@ const Hero: React.FC<HeroProps> = ({ onSubmit, isSubmitting, error }) => {
                     placeholder="John Doe"
                     value={formData.fullName}
                     onChange={(e) => setFormData((prev) => ({ ...prev, fullName: e.target.value }))}
-                    className="w-full pl-10 pr-4 py-3 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-colors"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl text-sm border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-colors"
                   />
                 </div>
               </div>
@@ -185,7 +186,7 @@ const Hero: React.FC<HeroProps> = ({ onSubmit, isSubmitting, error }) => {
               <div>
                 <label
                   htmlFor="email"
-                  className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5"
+                  className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1"
                 >
                   Your Email
                 </label>
@@ -198,7 +199,7 @@ const Hero: React.FC<HeroProps> = ({ onSubmit, isSubmitting, error }) => {
                     placeholder="you@company.com"
                     value={formData.email}
                     onChange={(e) => setFormData((prev) => ({ ...prev, email: e.target.value }))}
-                    className="w-full pl-10 pr-4 py-3 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-colors"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl text-sm border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-colors"
                   />
                 </div>
               </div>
@@ -207,7 +208,7 @@ const Hero: React.FC<HeroProps> = ({ onSubmit, isSubmitting, error }) => {
               <div>
                 <label
                   htmlFor="businessType"
-                  className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5"
+                  className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1"
                 >
                   Your Business Type
                 </label>
@@ -220,7 +221,7 @@ const Hero: React.FC<HeroProps> = ({ onSubmit, isSubmitting, error }) => {
                     onChange={(e) =>
                       setFormData((prev) => ({ ...prev, businessType: e.target.value }))
                     }
-                    className="w-full pl-10 pr-4 py-3 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-colors appearance-none"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl text-sm border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-colors appearance-none"
                   >
                     <option value="">Select your business type</option>
                     {BUSINESS_TYPES.map((type) => (
@@ -236,7 +237,7 @@ const Hero: React.FC<HeroProps> = ({ onSubmit, isSubmitting, error }) => {
               <div>
                 <label
                   htmlFor="monthlyIncome"
-                  className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1.5"
+                  className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1"
                 >
                   Monthly Revenue
                 </label>
@@ -249,7 +250,7 @@ const Hero: React.FC<HeroProps> = ({ onSubmit, isSubmitting, error }) => {
                     onChange={(e) =>
                       setFormData((prev) => ({ ...prev, monthlyIncome: e.target.value }))
                     }
-                    className="w-full pl-10 pr-4 py-3 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-colors appearance-none"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl text-sm border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-colors appearance-none"
                   >
                     <option value="">Select your revenue range</option>
                     {REVENUE_RANGES.map((range) => (
@@ -268,7 +269,7 @@ const Hero: React.FC<HeroProps> = ({ onSubmit, isSubmitting, error }) => {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full py-4 rounded-xl text-lg font-semibold bg-violet-500 hover:bg-violet-600 disabled:bg-violet-400 text-white transition-colors shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40"
+                className="w-full py-3 rounded-xl text-base font-semibold bg-violet-500 hover:bg-violet-600 disabled:bg-violet-400 text-white transition-colors shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40"
               >
                 {isSubmitting ? 'Creating Your Blueprint...' : 'Get My Free Blueprint'}
               </button>
@@ -405,12 +406,27 @@ const BlueprintLandingPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [logos, setLogos] = useState<ClientLogo[]>([]);
   const [maxLogosLanding, setMaxLogosLanding] = useState<number | undefined>(6);
+  const [showStickyCta, setShowStickyCta] = useState(false);
+  const heroRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     getClientLogos().then(setLogos);
     getBlueprintSettings().then((s) => {
       if (s) setMaxLogosLanding(s.maxLogosLanding ?? 6);
     });
+  }, []);
+
+  // Show sticky CTA once hero scrolls out of view
+  useEffect(() => {
+    const el = heroRef.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => setShowStickyCta(!entry.isIntersecting),
+      { threshold: 0 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
   }, []);
 
   const handleSubmit = async (formData: FormData) => {
@@ -476,11 +492,42 @@ const BlueprintLandingPage: React.FC = () => {
     <div className="min-h-screen bg-white dark:bg-zinc-950">
       <ThemeToggle />
       <NavBar />
-      <Hero onSubmit={handleSubmit} isSubmitting={isSubmitting} error={error} />
+      <div ref={heroRef}>
+        <Hero onSubmit={handleSubmit} isSubmitting={isSubmitting} error={error} />
+      </div>
       <StatsRow />
       <SocialProof logos={logos} maxLogos={maxLogosLanding} />
       <HowItWorks />
       <Footer />
+
+      {/* Sticky CTA — appears after scrolling past the form */}
+      <div
+        className={`
+          fixed bottom-0 left-0 right-0 z-50
+          bg-white/95 dark:bg-zinc-900/95 backdrop-blur-sm
+          border-t border-zinc-200 dark:border-zinc-800 shadow-[0_-2px_10px_rgba(0,0,0,0.05)] dark:shadow-none
+          transform transition-all duration-300 ease-in-out
+          ${showStickyCta ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'}
+        `}
+      >
+        <div className="max-w-4xl mx-auto px-4 py-3 sm:py-4">
+          <div className="flex items-center justify-between gap-4">
+            <div className="hidden sm:block text-sm text-zinc-500 dark:text-zinc-400">
+              <span className="inline-flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                Free personalized blueprint — $3,000+ value
+              </span>
+            </div>
+            <button
+              onClick={() => heroRef.current?.scrollIntoView({ behavior: 'smooth' })}
+              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold bg-violet-600 hover:bg-violet-700 text-white transition-colors shadow-lg shadow-violet-500/25 ml-auto"
+            >
+              <ArrowUp className="w-4 h-4" />
+              Get Your Blueprint Now
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
