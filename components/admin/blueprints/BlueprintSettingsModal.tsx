@@ -31,6 +31,8 @@ interface FormData {
   blueprintVideoUrl: string;
   callBookedVideoUrl: string;
   senjaWidgetUrl: string;
+  maxLogosLanding: string;
+  maxLogosBlueprint: string;
 }
 
 const BlueprintSettingsModal: React.FC<BlueprintSettingsModalProps> = ({ isOpen, onClose }) => {
@@ -47,6 +49,8 @@ const BlueprintSettingsModal: React.FC<BlueprintSettingsModalProps> = ({ isOpen,
     blueprintVideoUrl: '',
     callBookedVideoUrl: '',
     senjaWidgetUrl: '',
+    maxLogosLanding: '',
+    maxLogosBlueprint: '',
   });
   const [showSuccess, setShowSuccess] = useState(false);
 
@@ -72,6 +76,8 @@ const BlueprintSettingsModal: React.FC<BlueprintSettingsModalProps> = ({ isOpen,
         blueprintVideoUrl: settings.blueprintVideoUrl || '',
         callBookedVideoUrl: settings.callBookedVideoUrl || '',
         senjaWidgetUrl: settings.senjaWidgetUrl || '',
+        maxLogosLanding: settings.maxLogosLanding?.toString() || '',
+        maxLogosBlueprint: settings.maxLogosBlueprint?.toString() || '',
       });
     }
   }, [settings]);
@@ -109,6 +115,12 @@ const BlueprintSettingsModal: React.FC<BlueprintSettingsModalProps> = ({ isOpen,
       blueprintVideoUrl: formData.blueprintVideoUrl || undefined,
       callBookedVideoUrl: formData.callBookedVideoUrl || undefined,
       senjaWidgetUrl: formData.senjaWidgetUrl || undefined,
+      maxLogosLanding: formData.maxLogosLanding
+        ? parseInt(formData.maxLogosLanding, 10)
+        : undefined,
+      maxLogosBlueprint: formData.maxLogosBlueprint
+        ? parseInt(formData.maxLogosBlueprint, 10)
+        : undefined,
     });
   };
 
@@ -430,6 +442,38 @@ const BlueprintSettingsModal: React.FC<BlueprintSettingsModalProps> = ({ isOpen,
                 Add company logos shown on the blueprint page. Use direct image URLs (PNG/SVG
                 preferred).
               </p>
+
+              {/* Logo count controls */}
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                  <label className="block text-sm font-medium text-zinc-200 mb-1.5">
+                    Logos on Opt-In Page
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={formData.maxLogosLanding}
+                    onChange={(e) => handleChange('maxLogosLanding', e.target.value)}
+                    placeholder="6"
+                    className="w-full px-4 py-2.5 rounded-lg border bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500 focus:ring-2 focus:ring-violet-500 focus:border-transparent"
+                  />
+                  <p className="text-xs text-zinc-500 mt-1">Blank = 6</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-zinc-200 mb-1.5">
+                    Logos on Blueprint Page
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={formData.maxLogosBlueprint}
+                    onChange={(e) => handleChange('maxLogosBlueprint', e.target.value)}
+                    placeholder="All"
+                    className="w-full px-4 py-2.5 rounded-lg border bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500 focus:ring-2 focus:ring-violet-500 focus:border-transparent"
+                  />
+                  <p className="text-xs text-zinc-500 mt-1">Blank = show all</p>
+                </div>
+              </div>
 
               {/* Existing logos */}
               {logos.length > 0 && (

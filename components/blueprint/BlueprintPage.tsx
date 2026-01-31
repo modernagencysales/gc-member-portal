@@ -347,7 +347,7 @@ const BlueprintPage: React.FC = () => {
 
         {/* 3. Logo Bar — instant social proof */}
         <ScrollReveal delay={200}>
-          <LogoBar logos={clientLogos} />
+          <LogoBar logos={clientLogos} maxLogos={settings?.maxLogosBlueprint} />
         </ScrollReveal>
 
         {/* 3. Bridge: problem identification intro */}

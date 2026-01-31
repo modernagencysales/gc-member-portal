@@ -23,7 +23,7 @@ const ThemeToggle: React.FC = () => {
     <button
       type="button"
       onClick={() => setIsDark(!isDark)}
-      className="fixed top-4 right-4 z-50 p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+      className="fixed top-4 right-4 z-[60] p-2.5 rounded-full bg-zinc-200/80 dark:bg-zinc-800/80 backdrop-blur-sm hover:bg-zinc-300 dark:hover:bg-zinc-700 shadow-md transition-colors"
       aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
     >
       {isDark ? (

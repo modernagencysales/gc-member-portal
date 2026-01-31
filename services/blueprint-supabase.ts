@@ -254,6 +254,8 @@ function mapBlueprintSettings(record: Record<string, unknown>): BlueprintSetting
     blueprintVideoUrl: record.blueprint_video_url as string | undefined,
     callBookedVideoUrl: record.call_booked_video_url as string | undefined,
     senjaWidgetUrl: record.senja_widget_url as string | undefined,
+    maxLogosLanding: record.max_logos_landing as number | undefined,
+    maxLogosBlueprint: record.max_logos_blueprint as number | undefined,
     createdAt: new Date(record.created_at as string),
     updatedAt: new Date(record.updated_at as string),
   };
@@ -602,6 +604,8 @@ export async function updateBlueprintSettings(
     blueprintVideoUrl: string;
     callBookedVideoUrl: string;
     senjaWidgetUrl: string;
+    maxLogosLanding: number;
+    maxLogosBlueprint: number;
   }>
 ): Promise<BlueprintSettings> {
   const updateData: Record<string, unknown> = {};
@@ -680,6 +684,12 @@ export async function updateBlueprintSettings(
   }
   if (settings.senjaWidgetUrl !== undefined) {
     updateData.senja_widget_url = settings.senjaWidgetUrl;
+  }
+  if (settings.maxLogosLanding !== undefined) {
+    updateData.max_logos_landing = settings.maxLogosLanding;
+  }
+  if (settings.maxLogosBlueprint !== undefined) {
+    updateData.max_logos_blueprint = settings.maxLogosBlueprint;
   }
 
   // Update the first settings row (upsert pattern)

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Linkedin,
@@ -11,6 +11,12 @@ import {
   DollarSign,
 } from 'lucide-react';
 import ThemeToggle from './ThemeToggle';
+import LogoBar from './LogoBar';
+import {
+  getClientLogos,
+  getBlueprintSettings,
+  ClientLogo,
+} from '../../services/blueprint-supabase';
 
 const INTAKE_API_URL = 'https://gtm-system-production.up.railway.app/api/webhooks/blueprint-form';
 
@@ -412,6 +418,15 @@ const BlueprintLandingPage: React.FC = () => {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [logos, setLogos] = useState<ClientLogo[]>([]);
+  const [maxLogosLanding, setMaxLogosLanding] = useState<number | undefined>(6);
+
+  useEffect(() => {
+    getClientLogos().then(setLogos);
+    getBlueprintSettings().then((s) => {
+      if (s) setMaxLogosLanding(s.maxLogosLanding ?? 6);
+    });
+  }, []);
 
   const handleSubmit = async (formData: FormData) => {
     const linkedinPattern = /linkedin\.com\/in\//i;
@@ -478,6 +493,7 @@ const BlueprintLandingPage: React.FC = () => {
       <NavBar />
       <Hero onSubmit={handleSubmit} isSubmitting={isSubmitting} error={error} />
       <StatsRow />
+      <LogoBar logos={logos} maxLogos={maxLogosLanding} />
       <SocialProof />
       <HowItWorks />
       <Footer />

@@ -316,6 +316,9 @@ export interface BlueprintSettings {
   blueprintVideoUrl?: string;
   callBookedVideoUrl?: string;
   senjaWidgetUrl?: string;
+  // Logo display settings
+  maxLogosLanding?: number;
+  maxLogosBlueprint?: number;
   // Timestamps
   createdAt: Date;
   updatedAt: Date;
@@ -350,6 +353,8 @@ export interface BlueprintSettingsFormData {
   blueprintVideoUrl?: string;
   callBookedVideoUrl?: string;
   senjaWidgetUrl?: string;
+  maxLogosLanding?: number;
+  maxLogosBlueprint?: number;
 }
 
 // ============================================
