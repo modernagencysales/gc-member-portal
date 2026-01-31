@@ -309,7 +309,7 @@ const BlueprintPage: React.FC = () => {
   const ctaHref = tenantBranding?.offer_cta_url || offerUrl || undefined;
   const stickyCtaText =
     tenantBranding?.offer_cta_text || (offerUrl ? 'View Your Offer' : 'Book Your Strategy Call');
-  const stickyCtaHref = tenantBranding?.offer_cta_url || offerUrl || calNewTabUrl;
+  const stickyCtaHref = tenantBranding?.offer_cta_url || offerUrl || undefined;
   const tenantColorStyles = getTenantColors(tenantBranding);
 
   // Scroll to CalEmbed handler

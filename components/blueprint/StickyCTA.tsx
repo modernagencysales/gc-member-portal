@@ -31,28 +31,36 @@ const StickyCTA: React.FC<StickyCTAProps> = ({
   const [isCalEmbedVisible, setIsCalEmbedVisible] = useState(false);
 
   useEffect(() => {
-    const calEmbedElement = calEmbedRef.current;
+    // The ref may not be attached yet on first render, so poll briefly
+    const tryObserve = () => {
+      const el = calEmbedRef.current;
+      if (!el) return null;
 
-    if (!calEmbedElement) {
-      return;
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            setIsCalEmbedVisible(entry.isIntersecting);
+          });
+        },
+        { threshold: 0 }
+      );
+
+      observer.observe(el);
+      return observer;
+    };
+
+    let observer = tryObserve();
+    let timer: ReturnType<typeof setTimeout> | null = null;
+
+    if (!observer) {
+      timer = setTimeout(() => {
+        observer = tryObserve();
+      }, 1000);
     }
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          setIsCalEmbedVisible(entry.isIntersecting);
-        });
-      },
-      {
-        threshold: 0,
-        rootMargin: '0px 0px -100px 0px',
-      }
-    );
-
-    observer.observe(calEmbedElement);
-
     return () => {
-      observer.disconnect();
+      observer?.disconnect();
+      if (timer) clearTimeout(timer);
     };
   }, [calEmbedRef]);
 
