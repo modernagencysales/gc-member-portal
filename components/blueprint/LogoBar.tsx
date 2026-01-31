@@ -22,7 +22,7 @@ const LogoBar: React.FC<LogoBarProps> = ({ logos, maxLogos }) => {
             <img
               src={logo.imageUrl}
               alt={logo.name}
-              className="h-8 sm:h-10 w-auto object-contain grayscale brightness-0 dark:brightness-0 dark:invert opacity-50 dark:opacity-60 hover:opacity-80 dark:hover:opacity-90 transition-all duration-200"
+              className="h-8 sm:h-10 w-auto object-contain grayscale opacity-70 dark:invert dark:opacity-60 hover:opacity-90 dark:hover:opacity-80 transition-all duration-200"
             />
           </div>
         ))}
