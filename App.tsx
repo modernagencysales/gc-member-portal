@@ -63,6 +63,18 @@ const AdminBlueprintsPage = lazy(() => import('./components/admin/blueprints/Adm
 const BootcampApp = lazy(() => import('./pages/bootcamp/BootcampApp'));
 const TamBuilder = lazy(() => import('./components/tam/TamBuilder'));
 
+// Lazy-loaded: Affiliate
+const ReferralLandingPage = lazy(() => import('./components/affiliate/ReferralLandingPage'));
+const AffiliateApply = lazy(() => import('./components/affiliate/AffiliateApply'));
+const AffiliateDashboard = lazy(() => import('./components/affiliate/AffiliateDashboard'));
+const AffiliateOverview = lazy(() => import('./components/affiliate/AffiliateOverview'));
+const AffiliateReferrals = lazy(() => import('./components/affiliate/AffiliateReferrals'));
+const AffiliatePayoutsPage = lazy(() => import('./components/affiliate/AffiliatePayoutsPage'));
+const AffiliateAssetsPage = lazy(() => import('./components/affiliate/AffiliateAssetsPage'));
+const AffiliateSettingsPage = lazy(() => import('./components/affiliate/AffiliateSettingsPage'));
+const AffiliateOnboard = lazy(() => import('./components/affiliate/AffiliateOnboard'));
+const AdminAffiliatesPage = lazy(() => import('./components/admin/affiliates/AdminAffiliatesPage'));
+
 /** Wrapper that resolves the bootcamp student ID for the TamBuilder route */
 const TamBuilderRoute: React.FC = () => {
   const [studentId, setStudentId] = useState<string | null>(null);
@@ -156,6 +168,7 @@ const App: React.FC = () => {
           <Route path="tools" element={<AdminToolsPage />} />
           <Route path="onboarding" element={<AdminOnboardingPage />} />
           <Route path="blueprints" element={<AdminBlueprintsPage />} />
+          <Route path="affiliates" element={<AdminAffiliatesPage />} />
         </Route>
 
         {/* Bootcamp Admin Dashboard */}
@@ -176,6 +189,20 @@ const App: React.FC = () => {
           <Route path="cohorts" element={<AdminLmsCohortsPage />} />
           <Route path="curriculum" element={<AdminLmsCurriculumPage />} />
           <Route path="curriculum/:cohortId" element={<AdminLmsCurriculumPage />} />
+        </Route>
+
+        {/* Affiliate — Public */}
+        <Route path="/refer/:slug" element={<ReferralLandingPage />} />
+        <Route path="/affiliate/apply" element={<AffiliateApply />} />
+        <Route path="/affiliate/onboard" element={<AffiliateOnboard />} />
+
+        {/* Affiliate — Dashboard */}
+        <Route path="/affiliate/dashboard" element={<AffiliateDashboard />}>
+          <Route index element={<AffiliateOverview />} />
+          <Route path="referrals" element={<AffiliateReferrals />} />
+          <Route path="payouts" element={<AffiliatePayoutsPage />} />
+          <Route path="assets" element={<AffiliateAssetsPage />} />
+          <Route path="settings" element={<AffiliateSettingsPage />} />
         </Route>
 
         {/* Bootcamp LMS - /bootcamp path */}

@@ -322,6 +322,54 @@ serve(async (req) => {
           }
 
           console.log(`Payment received for student ${student.id}`);
+
+          // --- Affiliate Referral Tracking ---
+          // Check if this student was referred by an affiliate
+          const { data: referral } = await supabase
+            .from('referrals')
+            .select('id, affiliate_id, total_price, amount_paid, status')
+            .eq('bootcamp_student_id', student.id)
+            .in('status', ['enrolled', 'paying'])
+            .maybeSingle();
+
+          if (referral) {
+            const newAmountPaid = (referral.amount_paid || 0) + (invoice.amount_paid || 0) / 100;
+            const newStatus = newAmountPaid >= referral.total_price ? 'paid_in_full' : 'paying';
+
+            await supabase
+              .from('referrals')
+              .update({
+                amount_paid: newAmountPaid,
+                status: newStatus,
+                ...(newStatus === 'paid_in_full'
+                  ? { paid_in_full_at: new Date().toISOString() }
+                  : {}),
+              })
+              .eq('id', referral.id);
+
+            console.log(
+              `Updated referral ${referral.id}: $${newAmountPaid} paid, status: ${newStatus}`
+            );
+
+            // Trigger payout if paid in full
+            if (newStatus === 'paid_in_full') {
+              try {
+                const payoutUrl = `${Deno.env.get('SUPABASE_URL')}/functions/v1/process-affiliate-payout`;
+                await fetch(payoutUrl, {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')}`,
+                  },
+                  body: JSON.stringify({ referralId: referral.id }),
+                });
+                console.log(`Triggered payout for referral ${referral.id}`);
+              } catch (payoutErr) {
+                console.error('Failed to trigger payout:', payoutErr);
+                // Non-blocking: payout can be retried manually from admin
+              }
+            }
+          }
         }
         break;
       }
