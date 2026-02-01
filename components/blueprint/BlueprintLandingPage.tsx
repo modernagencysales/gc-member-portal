@@ -103,12 +103,15 @@ const QUESTIONNAIRE_STEPS: StepConfig[] = [
   },
   {
     id: 'posting-frequency',
-    question: 'Are you currently posting on LinkedIn?',
-    type: 'binary',
+    question: 'How often do you post on LinkedIn?',
+    subtitle: 'Roughly how often are you posting?',
+    type: 'single-select',
     field: 'postingFrequency',
     options: [
-      { label: 'Yes', value: 'Yes' },
-      { label: 'No', value: 'No' },
+      { label: 'Daily', value: 'Daily' },
+      { label: 'Weekly', value: 'Weekly' },
+      { label: 'Monthly', value: 'Monthly' },
+      { label: 'Less than monthly', value: 'Less than monthly' },
     ],
   },
   {
