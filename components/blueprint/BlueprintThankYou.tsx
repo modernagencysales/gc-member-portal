@@ -97,6 +97,9 @@ const BlueprintThankYou: React.FC = () => {
 
       {/* CalEmbed — wider container so month view doesn't collapse to mobile */}
       <div className="max-w-5xl mx-auto px-4 pb-12 sm:pb-16">
+        <h2 className="text-2xl sm:text-3xl font-bold text-zinc-900 dark:text-zinc-100 text-center mb-6">
+          Book Your Free Walkthrough Now
+        </h2>
         <CalEmbed ref={calEmbedRef} calLink={CAL_BOOKING_LINK} />
       </div>
 
