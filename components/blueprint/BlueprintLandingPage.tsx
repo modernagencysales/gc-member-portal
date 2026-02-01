@@ -6,7 +6,6 @@ import {
   CheckCircle,
   Sparkles,
   FileText,
-  User,
   ArrowUp,
   ArrowLeft,
   ChevronRight,
@@ -254,7 +253,7 @@ const NavBar: React.FC = () => (
 );
 
 // ============================================
-// Hero Section (simplified: email + name only)
+// Hero Section (email-only opt-in)
 // ============================================
 
 interface HeroProps {
@@ -270,97 +269,63 @@ const Hero: React.FC<HeroProps> = ({ formData, setFormData, onContinue }) => {
   };
 
   return (
-    <section className="bg-white dark:bg-zinc-950 py-6 sm:py-10">
+    <section className="bg-gradient-to-b from-violet-50/50 to-white dark:from-zinc-950 dark:to-zinc-950 py-12 sm:py-16 lg:py-20">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         {/* Trust Badge */}
-        <div className="flex justify-center mb-4">
-          <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-violet-50 dark:bg-violet-500/10 border border-violet-200 dark:border-violet-500/20 text-xs sm:text-sm font-medium text-violet-700 dark:text-violet-300">
+        <div className="flex justify-center mb-6">
+          <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white dark:bg-violet-500/10 border border-violet-200 dark:border-violet-500/20 text-xs sm:text-sm font-medium text-violet-700 dark:text-violet-300 shadow-sm">
             <Sparkles className="w-3.5 h-3.5" />
-            Powered by AI — analyzing 300+ LinkedIn profiles
+            AI-powered — 300+ blueprints delivered
           </span>
         </div>
 
         {/* Headline */}
-        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-zinc-900 dark:text-zinc-100 text-center leading-tight mb-3 max-w-4xl mx-auto">
-          We&apos;ll Rewrite Your Entire LinkedIn Presence — For Free
+        <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-zinc-900 dark:text-zinc-100 text-center leading-[1.1] tracking-tight mb-4 max-w-4xl mx-auto">
+          Your LinkedIn Is Leaving
+          <span className="text-violet-600 dark:text-violet-400"> Revenue </span>
+          on the Table
         </h1>
 
         {/* Subtitle */}
-        <p className="text-base sm:text-lg text-zinc-600 dark:text-zinc-400 text-center max-w-2xl mx-auto mb-6 leading-relaxed">
-          Get a personalized blueprint with a complete profile rewrite, 60-day content calendar, 3
-          custom lead magnets, and a full authority audit. $3,000+ in value, delivered in 15
-          minutes.
+        <p className="text-lg sm:text-xl text-zinc-600 dark:text-zinc-400 text-center max-w-2xl mx-auto mb-8 leading-relaxed">
+          Get a free personalized blueprint: profile rewrite, 60-day content calendar, 3 lead
+          magnets, and a full authority audit.
         </p>
 
-        {/* Opt-In Form Card */}
-        <div className="max-w-md mx-auto">
-          <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-xl dark:shadow-none p-5 sm:p-6">
-            <form onSubmit={handleSubmit} className="space-y-3">
-              {/* First Name */}
-              <div>
-                <label
-                  htmlFor="fullName"
-                  className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1"
-                >
-                  Your First Name
-                </label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
-                  <input
-                    id="fullName"
-                    type="text"
-                    required
-                    placeholder="John"
-                    value={formData.fullName}
-                    onChange={(e) => setFormData((prev) => ({ ...prev, fullName: e.target.value }))}
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl text-sm border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-colors"
-                  />
-                </div>
-              </div>
-
-              {/* Email */}
-              <div>
-                <label
-                  htmlFor="email"
-                  className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1"
-                >
-                  Your Email
-                </label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
-                  <input
-                    id="email"
-                    type="email"
-                    required
-                    placeholder="you@company.com"
-                    value={formData.email}
-                    onChange={(e) => setFormData((prev) => ({ ...prev, email: e.target.value }))}
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl text-sm border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-colors"
-                  />
-                </div>
-              </div>
-
-              {/* Submit Button */}
-              <button
-                type="submit"
-                className="w-full py-3 rounded-xl text-base font-semibold bg-violet-500 hover:bg-violet-600 text-white transition-colors shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40"
-              >
-                Get My Free Blueprint
-              </button>
-            </form>
-
-            {/* Micro Proof Points */}
-            <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 mt-4 text-xs text-zinc-500 dark:text-zinc-400">
-              <span className="flex items-center gap-1">
-                <CheckCircle className="w-3 h-3 text-green-500" /> Free personalized report
-              </span>
-              <span className="flex items-center gap-1">
-                <CheckCircle className="w-3 h-3 text-green-500" /> 5-minute read
-              </span>
-              <span className="flex items-center gap-1">
-                <CheckCircle className="w-3 h-3 text-green-500" /> Actionable fixes
-              </span>
+        {/* Opt-In */}
+        <div className="max-w-lg mx-auto">
+          <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3">
+            <div className="relative flex-1">
+              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-400" />
+              <input
+                id="email"
+                type="email"
+                required
+                placeholder="Enter your email"
+                value={formData.email}
+                onChange={(e) => setFormData((prev) => ({ ...prev, email: e.target.value }))}
+                className="w-full pl-12 pr-4 py-3.5 rounded-xl text-base border-2 border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:border-violet-500 dark:focus:border-violet-500 transition-colors shadow-sm"
+              />
             </div>
+            <button
+              type="submit"
+              className="px-8 py-3.5 rounded-xl text-base font-semibold bg-violet-600 hover:bg-violet-700 text-white transition-all shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40 whitespace-nowrap"
+            >
+              Get My Free Blueprint
+            </button>
+          </form>
+
+          {/* Proof Points */}
+          <div className="flex flex-wrap justify-center gap-x-5 gap-y-1.5 mt-5 text-sm text-zinc-500 dark:text-zinc-400">
+            <span className="flex items-center gap-1.5">
+              <CheckCircle className="w-4 h-4 text-green-500" /> Free forever
+            </span>
+            <span className="flex items-center gap-1.5">
+              <CheckCircle className="w-4 h-4 text-green-500" /> $3,000+ value
+            </span>
+            <span className="flex items-center gap-1.5">
+              <CheckCircle className="w-4 h-4 text-green-500" /> No credit card
+            </span>
           </div>
         </div>
       </div>
@@ -783,7 +748,6 @@ const BlueprintLandingPage: React.FC = () => {
           setFormData((prev) => ({
             ...prev,
             email: parsed.email || prev.email,
-            fullName: parsed.fullName || prev.fullName,
           }));
           if (parsed.phase === 'questionnaire') {
             setPhase('questionnaire');
@@ -825,7 +789,6 @@ const BlueprintLandingPage: React.FC = () => {
         SESSION_KEY,
         JSON.stringify({
           email: formData.email,
-          fullName: formData.fullName,
           phase: 'questionnaire',
           timestamp: Date.now(),
         })
