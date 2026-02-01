@@ -147,10 +147,15 @@ ALTER TABLE referrals ENABLE ROW LEVEL SECURITY;
 ALTER TABLE affiliate_payouts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE affiliate_assets ENABLE ROW LEVEL SECURITY;
 
--- Public can read active affiliates (for landing pages)
-CREATE POLICY "Public can read active affiliates"
+-- Public can read active/pending affiliates (landing pages + duplicate check)
+CREATE POLICY "Public can read affiliates"
   ON affiliates FOR SELECT
-  USING (status = 'active');
+  USING (status IN ('active', 'pending'));
+
+-- Public can submit affiliate applications
+CREATE POLICY "Anon can submit affiliate applications"
+  ON affiliates FOR INSERT
+  WITH CHECK (status = 'pending');
 
 -- Anon can read visible assets
 CREATE POLICY "Anon can read visible assets"

@@ -10,20 +10,20 @@ test.describe('Affiliate Application', () => {
     await page.waitForLoadState('networkidle');
 
     await expect(page.getByRole('heading')).toContainText(/affiliate/i);
-    await expect(page.getByLabel(/name/i)).toBeVisible();
-    await expect(page.getByLabel(/email/i)).toBeVisible();
+    await expect(page.getByPlaceholder('John Smith')).toBeVisible();
+    await expect(page.getByPlaceholder('you@company.com').first()).toBeVisible();
   });
 
   test('can fill out and submit application form', async ({ page }) => {
     await page.goto('/affiliate/apply');
     await page.waitForLoadState('networkidle');
 
-    await page.getByLabel(/name/i).fill('Test Affiliate');
-    await page.getByLabel(/email/i).fill('test-e2e@example.com');
-    await page.getByLabel(/company/i).fill('Test Corp');
+    await page.getByPlaceholder('John Smith').fill('Test Affiliate');
+    await page.getByPlaceholder('you@company.com').first().fill('test-e2e@example.com');
+    await page.getByPlaceholder('Acme Inc.').fill('Test Corp');
 
-    // Fill optional bio/notes field if present
-    const bioField = page.getByLabel(/bio|notes|about|message/i);
+    // Fill optional bio field if present
+    const bioField = page.getByPlaceholder(/brief intro|about/i);
     if ((await bioField.count()) > 0) {
       await bioField.first().fill('I have a large audience interested in growth tools.');
     }
@@ -41,24 +41,23 @@ test.describe('Affiliate Application', () => {
     await page.goto('/affiliate/apply');
     await page.waitForLoadState('networkidle');
 
-    // Submit without filling anything
-    await page.getByRole('button', { name: /submit|apply/i }).click();
+    // The submit button should be disabled when form is empty
+    const submitBtn = page.getByRole('button', { name: /submit|apply/i });
+    const isDisabled = await submitBtn.isDisabled();
 
-    // Should show validation errors, required field indicators, or native validation
-    // Check for either custom error messages or HTML5 validation via :invalid pseudo-class
-    const hasCustomErrors = await page.getByText(/required|please|invalid|enter/i).count();
-    const nameInput = page.getByLabel(/name/i);
-    const emailInput = page.getByLabel(/email/i);
-
-    if (hasCustomErrors > 0) {
-      // Custom validation messages are visible
-      await expect(page.getByText(/required|please|invalid|enter/i).first()).toBeVisible();
+    if (isDisabled) {
+      // Button is disabled — validation prevents submission
+      expect(isDisabled).toBeTruthy();
     } else {
-      // Fallback: at least one required field should still be empty / form should not navigate away
-      await expect(nameInput).toBeVisible();
-      await expect(emailInput).toBeVisible();
-      // URL should still be the apply page (form did not submit)
-      expect(page.url()).toContain('/affiliate/apply');
+      // Click submit and check for validation errors
+      await submitBtn.click();
+      const hasCustomErrors = await page.getByText(/required|please|invalid|enter/i).count();
+      if (hasCustomErrors > 0) {
+        await expect(page.getByText(/required|please|invalid|enter/i).first()).toBeVisible();
+      } else {
+        // Form did not navigate away
+        expect(page.url()).toContain('/affiliate/apply');
+      }
     }
   });
 });
@@ -72,7 +71,6 @@ test.describe('Referral Landing Page', () => {
     await page.goto('/refer/nonexistent-slug-12345');
     await page.waitForLoadState('networkidle');
 
-    // Should show error/not-found state, a redirect, or a fallback message
     const notFoundText = page.getByText(/not found|invalid|expired|error|no affiliate/i);
     const hasNotFound = (await notFoundText.count()) > 0;
     const redirectedAway = !page.url().includes('/refer/nonexistent-slug-12345');
@@ -84,10 +82,7 @@ test.describe('Referral Landing Page', () => {
     const response = await page.goto('/refer/test');
     await page.waitForLoadState('networkidle');
 
-    // Page should load without crashing (2xx or 3xx)
     expect(response?.status()).toBeLessThan(500);
-
-    // The root React container should render
     await page.waitForSelector('#root:not(:empty)', { timeout: 15_000 });
   });
 });
@@ -101,14 +96,14 @@ test.describe('Affiliate Dashboard - Auth', () => {
     await page.goto('/affiliate/dashboard');
     await page.waitForLoadState('networkidle');
 
-    // Should show login form, a redirect to login, or an email input for auth
-    const emailInput = page.getByLabel(/email/i);
+    // Should show affiliate login form with email placeholder
+    const emailInput = page.getByPlaceholder(/you@company\.com|email/i);
     const loginRedirected = page.url().includes('/login') || page.url().includes('/sign-in');
 
     if (loginRedirected) {
       expect(page.url()).toMatch(/login|sign-in/i);
     } else {
-      await expect(emailInput).toBeVisible({ timeout: 10_000 });
+      await expect(emailInput.first()).toBeVisible({ timeout: 10_000 });
     }
   });
 
@@ -116,10 +111,10 @@ test.describe('Affiliate Dashboard - Auth', () => {
     await page.goto('/affiliate/dashboard');
     await page.waitForLoadState('networkidle');
 
-    const emailInput = page.getByLabel(/email/i);
-    await expect(emailInput).toBeVisible({ timeout: 10_000 });
+    const emailInput = page.getByPlaceholder(/you@company\.com|email/i);
+    await expect(emailInput.first()).toBeVisible({ timeout: 10_000 });
 
-    const loginButton = page.getByRole('button', { name: /log in|sign in|continue/i });
+    const loginButton = page.getByRole('button', { name: /sign in|log in|continue/i });
     await expect(loginButton).toBeVisible();
   });
 });
