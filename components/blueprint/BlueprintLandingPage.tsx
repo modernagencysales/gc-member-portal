@@ -234,7 +234,7 @@ const NavBar: React.FC = () => (
       <span className="text-lg font-bold text-zinc-900 dark:text-zinc-100">
         Modern Agency Sales
       </span>
-      <div className="flex items-center gap-4 sm:gap-6">
+      <div className="flex items-center gap-3 sm:gap-5">
         <Link
           to="/case-studies"
           className="text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
@@ -247,6 +247,7 @@ const NavBar: React.FC = () => (
         >
           Login
         </Link>
+        <ThemeToggle inline />
       </div>
     </div>
   </nav>
@@ -881,7 +882,6 @@ const BlueprintLandingPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-white dark:bg-zinc-950">
       <style>{animationStyles}</style>
-      <ThemeToggle />
 
       {phase === 'landing' ? (
         <>
