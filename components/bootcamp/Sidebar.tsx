@@ -39,6 +39,15 @@ interface SidebarProps {
   aiTools?: AITool[];
   onOpenSettings?: () => void;
   hasBlueprint?: boolean;
+  grantedTools?: Array<{
+    toolId: string;
+    toolSlug: string;
+    toolName: string;
+    creditsRemaining: number;
+    creditsTotal: number;
+  }> | null;
+  grantedWeekIds?: string[] | null;
+  onRedeemCode?: () => void;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
