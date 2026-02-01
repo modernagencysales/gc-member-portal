@@ -1,15 +1,15 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import {
   Linkedin,
   Mail,
-  Briefcase,
   CheckCircle,
   Sparkles,
   FileText,
   User,
-  DollarSign,
   ArrowUp,
+  ArrowLeft,
+  ChevronRight,
 } from 'lucide-react';
 import ThemeToggle from './ThemeToggle';
 import LogoBar from './LogoBar';
@@ -19,27 +19,156 @@ import {
   ClientLogo,
 } from '../../services/blueprint-supabase';
 
-const INTAKE_API_URL = 'https://gtm-system-production.up.railway.app/api/webhooks/blueprint-form';
+const INTAKE_API_URL =
+  import.meta.env.VITE_GTM_SYSTEM_URL ||
+  'https://gtm-system-production.up.railway.app/api/webhooks/blueprint-form';
+
+const SESSION_KEY = 'blueprint_partial';
+const SESSION_MAX_AGE = 30 * 60 * 1000; // 30 minutes
 
 // ============================================
 // Types
 // ============================================
 
 interface FormData {
-  linkedinUrl: string;
-  fullName: string;
   email: string;
+  fullName: string;
+  linkedinUrl: string;
   businessType: string;
+  linkedinChallenge: string;
+  postingFrequency: string;
+  linkedinHelpArea: string;
+  hasFunnel: string;
+  learningInvestment: string;
   monthlyIncome: string;
 }
+
+type Phase = 'landing' | 'questionnaire';
+
+// ============================================
+// Questionnaire Step Config
+// ============================================
+
+interface StepOption {
+  label: string;
+  value: string;
+}
+
+interface StepConfig {
+  id: string;
+  question: string;
+  subtitle?: string;
+  type: 'text' | 'textarea' | 'single-select' | 'binary';
+  field: keyof FormData;
+  options?: StepOption[];
+  placeholder?: string;
+  validation?: (value: string) => string | null;
+}
+
+const QUESTIONNAIRE_STEPS: StepConfig[] = [
+  {
+    id: 'linkedin-url',
+    question: "What's your LinkedIn profile URL?",
+    subtitle:
+      'This is the only thing we need to generate your blueprint. Everything else helps us make it better.',
+    type: 'text',
+    field: 'linkedinUrl',
+    placeholder: 'https://linkedin.com/in/your-profile',
+    validation: (v) =>
+      /linkedin\.com\/in\//i.test(v)
+        ? null
+        : 'Please enter a valid LinkedIn URL (e.g. https://linkedin.com/in/your-name)',
+  },
+  {
+    id: 'business-type',
+    question: 'What type of business do you run?',
+    type: 'single-select',
+    field: 'businessType',
+    options: [
+      { label: 'Agency', value: 'Agency' },
+      { label: 'Consulting', value: 'Consulting' },
+      { label: 'Coaching', value: 'Coaching' },
+      { label: 'SaaS', value: 'SaaS' },
+      { label: 'Freelance', value: 'Freelance' },
+      { label: 'Other', value: 'Other' },
+    ],
+  },
+  {
+    id: 'linkedin-challenge',
+    question: "What's your biggest LinkedIn challenge right now?",
+    subtitle: 'Be specific — this helps us tailor your blueprint.',
+    type: 'textarea',
+    field: 'linkedinChallenge',
+    placeholder: 'e.g. I post regularly but get no inbound leads...',
+  },
+  {
+    id: 'posting-frequency',
+    question: 'Are you currently posting on LinkedIn?',
+    type: 'binary',
+    field: 'postingFrequency',
+    options: [
+      { label: 'Yes', value: 'Yes' },
+      { label: 'No', value: 'No' },
+    ],
+  },
+  {
+    id: 'help-area',
+    question: 'What do you need the most help with?',
+    type: 'single-select',
+    field: 'linkedinHelpArea',
+    options: [
+      { label: 'Profile optimization', value: 'Profile optimization' },
+      { label: 'Content strategy', value: 'Content strategy' },
+      { label: 'Lead generation', value: 'Lead generation' },
+      { label: 'Building authority', value: 'Building authority' },
+      { label: 'All of the above', value: 'All of the above' },
+    ],
+  },
+  {
+    id: 'has-funnel',
+    question: 'Do you have a content-to-funnel system?',
+    subtitle: 'A system that turns LinkedIn content into booked calls or sales.',
+    type: 'binary',
+    field: 'hasFunnel',
+    options: [
+      { label: 'Yes', value: 'Yes' },
+      { label: 'No', value: 'No' },
+    ],
+  },
+  {
+    id: 'learning-investment',
+    question: 'How much are you willing to invest in leveling up your LinkedIn?',
+    type: 'single-select',
+    field: 'learningInvestment',
+    options: [
+      { label: 'Just free resources', value: 'Free resources only' },
+      { label: 'Under $500', value: 'Under $500' },
+      { label: '$500 - $2,000', value: '$500-$2000' },
+      { label: '$2,000+', value: '$2000+' },
+    ],
+  },
+  {
+    id: 'monthly-revenue',
+    question: "What's your current monthly revenue?",
+    subtitle: 'This helps us calibrate recommendations to your stage.',
+    type: 'single-select',
+    field: 'monthlyIncome',
+    options: [
+      { label: 'Under $5k', value: 'Under $5k' },
+      { label: '$5k - $10k', value: '$5k-$10k' },
+      { label: '$10k - $30k', value: '$10k-$30k' },
+      { label: '$30k - $50k', value: '$30k-$50k' },
+      { label: '$50k - $100k', value: '$50k-$100k' },
+      { label: '$100k+', value: '$100k+' },
+    ],
+  },
+];
+
+const LETTER_PREFIXES = ['A', 'B', 'C', 'D', 'E', 'F'];
 
 // ============================================
 // Constants
 // ============================================
-
-const BUSINESS_TYPES = ['Agency', 'Consulting', 'Coaching', 'SaaS', 'Freelance', 'Other'];
-
-const REVENUE_RANGES = ['Under $5k', '$5k-$10k', '$10k-$30k', '$30k-$50k', '$50k-$100k', '$100k+'];
 
 const STATS = [
   { value: '300+', label: 'Blueprints Delivered' },
@@ -72,6 +201,28 @@ const STEPS = [
 ];
 
 // ============================================
+// CSS Animations
+// ============================================
+
+const animationStyles = `
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(40px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-40px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.animate-slide-in-right { animation: slideInRight 0.4s ease-out both; }
+.animate-slide-in-left { animation: slideInLeft 0.4s ease-out both; }
+.animate-fade-in { animation: fadeIn 0.2s ease-out both; }
+`;
+
+// ============================================
 // Nav Bar
 // ============================================
 
@@ -100,27 +251,19 @@ const NavBar: React.FC = () => (
 );
 
 // ============================================
-// Hero Section
+// Hero Section (simplified: email + name only)
 // ============================================
 
 interface HeroProps {
-  onSubmit: (data: FormData) => Promise<void>;
-  isSubmitting: boolean;
-  error: string | null;
+  formData: FormData;
+  setFormData: React.Dispatch<React.SetStateAction<FormData>>;
+  onContinue: () => void;
 }
 
-const Hero: React.FC<HeroProps> = ({ onSubmit, isSubmitting, error }) => {
-  const [formData, setFormData] = useState<FormData>({
-    linkedinUrl: '',
-    fullName: '',
-    email: '',
-    businessType: '',
-    monthlyIncome: '',
-  });
-
-  const handleSubmit = async (e: React.FormEvent) => {
+const Hero: React.FC<HeroProps> = ({ formData, setFormData, onContinue }) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    await onSubmit(formData);
+    onContinue();
   };
 
   return (
@@ -150,37 +293,13 @@ const Hero: React.FC<HeroProps> = ({ onSubmit, isSubmitting, error }) => {
         <div className="max-w-md mx-auto">
           <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-xl dark:shadow-none p-5 sm:p-6">
             <form onSubmit={handleSubmit} className="space-y-3">
-              {/* LinkedIn URL */}
-              <div>
-                <label
-                  htmlFor="linkedinUrl"
-                  className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1"
-                >
-                  Your LinkedIn URL
-                </label>
-                <div className="relative">
-                  <Linkedin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
-                  <input
-                    id="linkedinUrl"
-                    type="url"
-                    required
-                    placeholder="https://linkedin.com/in/your-profile"
-                    value={formData.linkedinUrl}
-                    onChange={(e) =>
-                      setFormData((prev) => ({ ...prev, linkedinUrl: e.target.value }))
-                    }
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl text-sm border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-colors"
-                  />
-                </div>
-              </div>
-
-              {/* Full Name */}
+              {/* First Name */}
               <div>
                 <label
                   htmlFor="fullName"
                   className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1"
                 >
-                  Your Full Name
+                  Your First Name
                 </label>
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
@@ -188,7 +307,7 @@ const Hero: React.FC<HeroProps> = ({ onSubmit, isSubmitting, error }) => {
                     id="fullName"
                     type="text"
                     required
-                    placeholder="John Doe"
+                    placeholder="John"
                     value={formData.fullName}
                     onChange={(e) => setFormData((prev) => ({ ...prev, fullName: e.target.value }))}
                     className="w-full pl-10 pr-4 py-2.5 rounded-xl text-sm border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-colors"
@@ -218,74 +337,12 @@ const Hero: React.FC<HeroProps> = ({ onSubmit, isSubmitting, error }) => {
                 </div>
               </div>
 
-              {/* Business Type */}
-              <div>
-                <label
-                  htmlFor="businessType"
-                  className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1"
-                >
-                  Your Business Type
-                </label>
-                <div className="relative">
-                  <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
-                  <select
-                    id="businessType"
-                    required
-                    value={formData.businessType}
-                    onChange={(e) =>
-                      setFormData((prev) => ({ ...prev, businessType: e.target.value }))
-                    }
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl text-sm border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-colors appearance-none"
-                  >
-                    <option value="">Select your business type</option>
-                    {BUSINESS_TYPES.map((type) => (
-                      <option key={type} value={type}>
-                        {type}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              {/* Monthly Revenue */}
-              <div>
-                <label
-                  htmlFor="monthlyIncome"
-                  className="block text-xs font-medium text-zinc-700 dark:text-zinc-300 mb-1"
-                >
-                  Monthly Revenue
-                </label>
-                <div className="relative">
-                  <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
-                  <select
-                    id="monthlyIncome"
-                    required
-                    value={formData.monthlyIncome}
-                    onChange={(e) =>
-                      setFormData((prev) => ({ ...prev, monthlyIncome: e.target.value }))
-                    }
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl text-sm border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent transition-colors appearance-none"
-                  >
-                    <option value="">Select your revenue range</option>
-                    {REVENUE_RANGES.map((range) => (
-                      <option key={range} value={range}>
-                        {range}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              {/* Error */}
-              {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
-
               {/* Submit Button */}
               <button
                 type="submit"
-                disabled={isSubmitting}
-                className="w-full py-3 rounded-xl text-base font-semibold bg-violet-500 hover:bg-violet-600 disabled:bg-violet-400 text-white transition-colors shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40"
+                className="w-full py-3 rounded-xl text-base font-semibold bg-violet-500 hover:bg-violet-600 text-white transition-colors shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40"
               >
-                {isSubmitting ? 'Creating Your Blueprint...' : 'Get My Free Blueprint'}
+                Get My Free Blueprint
               </button>
             </form>
 
@@ -305,6 +362,271 @@ const Hero: React.FC<HeroProps> = ({ onSubmit, isSubmitting, error }) => {
         </div>
       </div>
     </section>
+  );
+};
+
+// ============================================
+// Blueprint Questionnaire
+// ============================================
+
+interface QuestionnaireProps {
+  formData: FormData;
+  setFormData: React.Dispatch<React.SetStateAction<FormData>>;
+  onComplete: () => void;
+  isSubmitting: boolean;
+  error: string | null;
+}
+
+const BlueprintQuestionnaire: React.FC<QuestionnaireProps> = ({
+  formData,
+  setFormData,
+  onComplete,
+  isSubmitting,
+  error,
+}) => {
+  const [currentStep, setCurrentStep] = useState(0);
+  const [direction, setDirection] = useState<'forward' | 'backward'>('forward');
+  const [stepError, setStepError] = useState<string | null>(null);
+  const [autoAdvanceTimer, setAutoAdvanceTimer] = useState<ReturnType<typeof setTimeout> | null>(
+    null
+  );
+  const inputRef = useRef<HTMLInputElement | HTMLTextAreaElement>(null);
+  const totalSteps = QUESTIONNAIRE_STEPS.length;
+  const step = QUESTIONNAIRE_STEPS[currentStep];
+  const value = formData[step.field];
+
+  // Auto-focus input on step change
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      inputRef.current?.focus();
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [currentStep]);
+
+  // Cleanup auto-advance timer
+  useEffect(() => {
+    return () => {
+      if (autoAdvanceTimer) clearTimeout(autoAdvanceTimer);
+    };
+  }, [autoAdvanceTimer]);
+
+  const validateAndAdvance = useCallback(() => {
+    if (step.validation) {
+      const err = step.validation(value);
+      if (err) {
+        setStepError(err);
+        return;
+      }
+    }
+    if (!value.trim() && step.type !== 'textarea') {
+      setStepError('Please provide an answer to continue.');
+      return;
+    }
+    setStepError(null);
+
+    if (currentStep < totalSteps - 1) {
+      setDirection('forward');
+      setCurrentStep((s) => s + 1);
+    } else {
+      onComplete();
+    }
+  }, [step, value, currentStep, totalSteps, onComplete]);
+
+  const goBack = useCallback(() => {
+    if (currentStep > 0) {
+      setStepError(null);
+      setDirection('backward');
+      setCurrentStep((s) => s - 1);
+    }
+  }, [currentStep]);
+
+  // Keyboard navigation
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Enter' && step.type !== 'textarea') {
+        e.preventDefault();
+        validateAndAdvance();
+      }
+      if (e.key === 'Enter' && step.type === 'textarea' && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        validateAndAdvance();
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [step.type, validateAndAdvance]);
+
+  const handleOptionSelect = (optValue: string) => {
+    setFormData((prev) => ({ ...prev, [step.field]: optValue }));
+    setStepError(null);
+    // Auto-advance after brief delay
+    const timer = setTimeout(() => {
+      if (currentStep < totalSteps - 1) {
+        setDirection('forward');
+        setCurrentStep((s) => s + 1);
+      } else {
+        onComplete();
+      }
+    }, 300);
+    setAutoAdvanceTimer(timer);
+  };
+
+  const progressPercent = ((currentStep + 1) / totalSteps) * 100;
+  const animClass = direction === 'forward' ? 'animate-slide-in-right' : 'animate-slide-in-left';
+  const isLastStep = currentStep === totalSteps - 1;
+
+  return (
+    <div className="fixed inset-0 z-50 bg-white dark:bg-zinc-950 flex flex-col animate-fade-in">
+      {/* Top bar */}
+      <div className="flex-shrink-0 px-4 sm:px-6 pt-4 pb-2">
+        <div className="max-w-2xl mx-auto flex items-center gap-3">
+          <button
+            onClick={goBack}
+            disabled={currentStep === 0}
+            className="p-2 rounded-lg text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            aria-label="Go back"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </button>
+          <div className="flex-1 h-2 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-violet-500 rounded-full transition-all duration-500 ease-out"
+              style={{ width: `${progressPercent}%` }}
+            />
+          </div>
+          <span className="text-xs font-medium text-zinc-400 dark:text-zinc-500 tabular-nums whitespace-nowrap">
+            {currentStep + 1} / {totalSteps}
+          </span>
+        </div>
+      </div>
+
+      {/* Center content */}
+      <div className="flex-1 flex items-center justify-center px-4 sm:px-6 overflow-y-auto">
+        <div key={currentStep} className={`w-full max-w-xl ${animClass}`}>
+          <h2 className="text-2xl sm:text-3xl font-bold text-zinc-900 dark:text-zinc-100 mb-2">
+            {step.question}
+          </h2>
+          {step.subtitle && (
+            <p className="text-base text-zinc-500 dark:text-zinc-400 mb-6">{step.subtitle}</p>
+          )}
+          {!step.subtitle && <div className="mb-6" />}
+
+          {/* Text input */}
+          {step.type === 'text' && (
+            <div>
+              <input
+                ref={inputRef as React.RefObject<HTMLInputElement>}
+                type="text"
+                value={value}
+                onChange={(e) => {
+                  setFormData((prev) => ({ ...prev, [step.field]: e.target.value }));
+                  setStepError(null);
+                }}
+                placeholder={step.placeholder}
+                className="w-full px-4 py-3.5 rounded-xl text-lg border-2 border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:border-violet-500 dark:focus:border-violet-500 transition-colors"
+              />
+            </div>
+          )}
+
+          {/* Textarea */}
+          {step.type === 'textarea' && (
+            <div>
+              <textarea
+                ref={inputRef as React.RefObject<HTMLTextAreaElement>}
+                value={value}
+                onChange={(e) => {
+                  setFormData((prev) => ({ ...prev, [step.field]: e.target.value }));
+                  setStepError(null);
+                }}
+                placeholder={step.placeholder}
+                rows={4}
+                className="w-full px-4 py-3.5 rounded-xl text-lg border-2 border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:border-violet-500 dark:focus:border-violet-500 transition-colors resize-none"
+              />
+            </div>
+          )}
+
+          {/* Single select cards */}
+          {step.type === 'single-select' && step.options && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {step.options.map((opt, i) => {
+                const isSelected = value === opt.value;
+                return (
+                  <button
+                    key={opt.value}
+                    onClick={() => handleOptionSelect(opt.value)}
+                    className={`flex items-center gap-3 px-4 py-3.5 rounded-xl border-2 text-left transition-all duration-150 ${
+                      isSelected
+                        ? 'border-violet-500 bg-violet-50 dark:bg-violet-500/10 text-violet-700 dark:text-violet-300'
+                        : 'border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 hover:border-zinc-300 dark:hover:border-zinc-600'
+                    }`}
+                  >
+                    <span
+                      className={`flex-shrink-0 w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold ${
+                        isSelected
+                          ? 'bg-violet-500 text-white'
+                          : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400'
+                      }`}
+                    >
+                      {LETTER_PREFIXES[i] || String.fromCharCode(65 + i)}
+                    </span>
+                    <span className="text-base font-medium">{opt.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Binary (yes/no) */}
+          {step.type === 'binary' && step.options && (
+            <div className="flex gap-4">
+              {step.options.map((opt) => {
+                const isSelected = value === opt.value;
+                return (
+                  <button
+                    key={opt.value}
+                    onClick={() => handleOptionSelect(opt.value)}
+                    className={`flex-1 py-4 rounded-xl border-2 text-center text-lg font-semibold transition-all duration-150 ${
+                      isSelected
+                        ? 'border-violet-500 bg-violet-50 dark:bg-violet-500/10 text-violet-700 dark:text-violet-300'
+                        : 'border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 hover:border-zinc-300 dark:hover:border-zinc-600'
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Error */}
+          {stepError && <p className="mt-3 text-sm text-red-600 dark:text-red-400">{stepError}</p>}
+          {error && <p className="mt-3 text-sm text-red-600 dark:text-red-400">{error}</p>}
+        </div>
+      </div>
+
+      {/* Bottom bar */}
+      <div className="flex-shrink-0 px-4 sm:px-6 pb-6 pt-2">
+        <div className="max-w-xl mx-auto">
+          {(step.type === 'text' || step.type === 'textarea') && (
+            <button
+              onClick={isLastStep && step.type !== 'textarea' ? onComplete : validateAndAdvance}
+              disabled={isSubmitting}
+              className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-3 rounded-xl text-base font-semibold bg-violet-500 hover:bg-violet-600 disabled:bg-violet-400 text-white transition-colors shadow-lg shadow-violet-500/25"
+            >
+              {isSubmitting ? 'Submitting...' : isLastStep ? 'Get My Blueprint' : 'Continue'}
+              {!isSubmitting && <ChevronRight className="w-4 h-4" />}
+            </button>
+          )}
+          <p className="mt-3 text-xs text-zinc-400 dark:text-zinc-500 text-center">
+            {step.type === 'textarea'
+              ? 'Press Ctrl+Enter to continue'
+              : step.type === 'text'
+                ? 'Press Enter to continue'
+                : ''}
+          </p>
+        </div>
+      </div>
+    </div>
   );
 };
 
@@ -416,12 +738,50 @@ const Footer: React.FC = () => (
 
 const BlueprintLandingPage: React.FC = () => {
   const navigate = useNavigate();
+  const [phase, setPhase] = useState<Phase>('landing');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [logos, setLogos] = useState<ClientLogo[]>([]);
   const [maxLogosLanding, setMaxLogosLanding] = useState<number | undefined>(6);
   const [showStickyCta, setShowStickyCta] = useState(false);
   const heroRef = useRef<HTMLDivElement>(null);
+
+  const [formData, setFormData] = useState<FormData>({
+    email: '',
+    fullName: '',
+    linkedinUrl: '',
+    businessType: '',
+    linkedinChallenge: '',
+    postingFrequency: '',
+    linkedinHelpArea: '',
+    hasFunnel: '',
+    learningInvestment: '',
+    monthlyIncome: '',
+  });
+
+  // Restore partial data from sessionStorage on mount
+  useEffect(() => {
+    try {
+      const stored = sessionStorage.getItem(SESSION_KEY);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (parsed.timestamp && Date.now() - parsed.timestamp < SESSION_MAX_AGE) {
+          setFormData((prev) => ({
+            ...prev,
+            email: parsed.email || prev.email,
+            fullName: parsed.fullName || prev.fullName,
+          }));
+          if (parsed.phase === 'questionnaire') {
+            setPhase('questionnaire');
+          }
+        } else {
+          sessionStorage.removeItem(SESSION_KEY);
+        }
+      }
+    } catch {
+      // ignore parse errors
+    }
+  }, []);
 
   useEffect(() => {
     getClientLogos().then(setLogos);
@@ -430,8 +790,9 @@ const BlueprintLandingPage: React.FC = () => {
     });
   }, []);
 
-  // Show sticky CTA once hero scrolls out of view
+  // Show sticky CTA once hero scrolls out of view (only in landing phase)
   useEffect(() => {
+    if (phase !== 'landing') return;
     const el = heroRef.current;
     if (!el) return;
 
@@ -441,17 +802,27 @@ const BlueprintLandingPage: React.FC = () => {
     );
     observer.observe(el);
     return () => observer.disconnect();
-  }, []);
+  }, [phase]);
 
-  const handleSubmit = async (formData: FormData) => {
-    const linkedinPattern = /linkedin\.com\/in\//i;
-    if (!linkedinPattern.test(formData.linkedinUrl)) {
-      setError(
-        'Please enter a valid LinkedIn profile URL (e.g., https://linkedin.com/in/your-name)'
+  const handleContinueToQuestionnaire = () => {
+    // Save partial data to sessionStorage
+    try {
+      sessionStorage.setItem(
+        SESSION_KEY,
+        JSON.stringify({
+          email: formData.email,
+          fullName: formData.fullName,
+          phase: 'questionnaire',
+          timestamp: Date.now(),
+        })
       );
-      return;
+    } catch {
+      // ignore storage errors
     }
+    setPhase('questionnaire');
+  };
 
+  const handleQuestionnaireComplete = async () => {
     setIsSubmitting(true);
     setError(null);
 
@@ -471,6 +842,11 @@ const BlueprintLandingPage: React.FC = () => {
           email: formData.email,
           business_type: formData.businessType,
           monthly_income: formData.monthlyIncome,
+          linkedin_challenge: formData.linkedinChallenge,
+          posting_frequency: formData.postingFrequency,
+          linkedin_help_area: formData.linkedinHelpArea,
+          has_funnel: formData.hasFunnel,
+          learning_investment: formData.learningInvestment,
           send_email: true,
           source_url: window.location.href,
           lead_magnet_source: 'blueprint-landing',
@@ -480,11 +856,12 @@ const BlueprintLandingPage: React.FC = () => {
       const data = await response.json();
 
       if (response.ok) {
+        sessionStorage.removeItem(SESSION_KEY);
         navigate('/blueprint/thank-you', {
           state: { prospectId: data.prospect_id, reportUrl: data.report_url },
         });
       } else if (response.status === 409) {
-        // Duplicate — still send them to thank-you
+        sessionStorage.removeItem(SESSION_KEY);
         navigate('/blueprint/thank-you', {
           state: {
             prospectId: data.existing_prospect_id,
@@ -504,44 +881,62 @@ const BlueprintLandingPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-white dark:bg-zinc-950">
+      <style>{animationStyles}</style>
       <ThemeToggle />
-      <NavBar />
-      <div ref={heroRef}>
-        <Hero onSubmit={handleSubmit} isSubmitting={isSubmitting} error={error} />
-      </div>
-      <StatsRow />
-      <SocialProof logos={logos} maxLogos={maxLogosLanding} />
-      <HowItWorks />
-      <Footer />
 
-      {/* Sticky CTA — appears after scrolling past the form */}
-      <div
-        className={`
-          fixed bottom-0 left-0 right-0 z-50
-          bg-white/95 dark:bg-zinc-900/95 backdrop-blur-sm
-          border-t border-zinc-200 dark:border-zinc-800 shadow-[0_-2px_10px_rgba(0,0,0,0.05)] dark:shadow-none
-          transform transition-all duration-300 ease-in-out
-          ${showStickyCta ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'}
-        `}
-      >
-        <div className="max-w-4xl mx-auto px-4 py-3 sm:py-4">
-          <div className="flex items-center justify-between gap-4">
-            <div className="hidden sm:block text-sm text-zinc-500 dark:text-zinc-400">
-              <span className="inline-flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-                Free personalized blueprint — $3,000+ value
-              </span>
-            </div>
-            <button
-              onClick={() => heroRef.current?.scrollIntoView({ behavior: 'smooth' })}
-              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold bg-violet-600 hover:bg-violet-700 text-white transition-colors shadow-lg shadow-violet-500/25 ml-auto"
-            >
-              <ArrowUp className="w-4 h-4" />
-              Get Your Blueprint Now
-            </button>
+      {phase === 'landing' ? (
+        <>
+          <NavBar />
+          <div ref={heroRef}>
+            <Hero
+              formData={formData}
+              setFormData={setFormData}
+              onContinue={handleContinueToQuestionnaire}
+            />
           </div>
-        </div>
-      </div>
+          <StatsRow />
+          <SocialProof logos={logos} maxLogos={maxLogosLanding} />
+          <HowItWorks />
+          <Footer />
+
+          {/* Sticky CTA — appears after scrolling past the form */}
+          <div
+            className={`
+              fixed bottom-0 left-0 right-0 z-50
+              bg-white/95 dark:bg-zinc-900/95 backdrop-blur-sm
+              border-t border-zinc-200 dark:border-zinc-800 shadow-[0_-2px_10px_rgba(0,0,0,0.05)] dark:shadow-none
+              transform transition-all duration-300 ease-in-out
+              ${showStickyCta ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'}
+            `}
+          >
+            <div className="max-w-4xl mx-auto px-4 py-3 sm:py-4">
+              <div className="flex items-center justify-between gap-4">
+                <div className="hidden sm:block text-sm text-zinc-500 dark:text-zinc-400">
+                  <span className="inline-flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                    Free personalized blueprint — $3,000+ value
+                  </span>
+                </div>
+                <button
+                  onClick={() => heroRef.current?.scrollIntoView({ behavior: 'smooth' })}
+                  className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold bg-violet-600 hover:bg-violet-700 text-white transition-colors shadow-lg shadow-violet-500/25 ml-auto"
+                >
+                  <ArrowUp className="w-4 h-4" />
+                  Get Your Blueprint Now
+                </button>
+              </div>
+            </div>
+          </div>
+        </>
+      ) : (
+        <BlueprintQuestionnaire
+          formData={formData}
+          setFormData={setFormData}
+          onComplete={handleQuestionnaireComplete}
+          isSubmitting={isSubmitting}
+          error={error}
+        />
+      )}
     </div>
   );
 };
