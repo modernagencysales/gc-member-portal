@@ -841,27 +841,44 @@ const BlueprintLandingPage: React.FC = () => {
         headers['x-webhook-secret'] = webhookSecret;
       }
 
+      const payload = {
+        linkedin_url: finalData.linkedinUrl,
+        full_name: finalData.fullName,
+        email: finalData.email,
+        business_type: finalData.businessType,
+        monthly_income: finalData.monthlyIncome,
+        linkedin_challenge: finalData.linkedinChallenge,
+        posting_frequency: finalData.postingFrequency,
+        linkedin_help_area: finalData.linkedinHelpArea,
+        has_funnel: finalData.hasFunnel,
+        learning_investment: finalData.learningInvestment,
+        send_email: true,
+        source_url: window.location.href,
+        lead_magnet_source: 'blueprint-landing',
+      };
+
+      console.log('[Blueprint] Submitting to:', INTAKE_API_URL);
+      console.log('[Blueprint] Payload:', payload);
+
       const response = await fetch(INTAKE_API_URL, {
         method: 'POST',
         headers,
-        body: JSON.stringify({
-          linkedin_url: finalData.linkedinUrl,
-          full_name: finalData.fullName,
-          email: finalData.email,
-          business_type: finalData.businessType,
-          monthly_income: finalData.monthlyIncome,
-          linkedin_challenge: finalData.linkedinChallenge,
-          posting_frequency: finalData.postingFrequency,
-          linkedin_help_area: finalData.linkedinHelpArea,
-          has_funnel: finalData.hasFunnel,
-          learning_investment: finalData.learningInvestment,
-          send_email: true,
-          source_url: window.location.href,
-          lead_magnet_source: 'blueprint-landing',
-        }),
+        body: JSON.stringify(payload),
       });
 
-      const data = await response.json();
+      console.log('[Blueprint] Response status:', response.status);
+
+      let data;
+      try {
+        data = await response.json();
+      } catch {
+        const text = await response.text().catch(() => '(no body)');
+        console.error('[Blueprint] Non-JSON response:', response.status, text);
+        setError(`Server error (${response.status}). Please try again.`);
+        return;
+      }
+
+      console.log('[Blueprint] Response data:', data);
 
       if (response.ok) {
         sessionStorage.removeItem(SESSION_KEY);
@@ -877,11 +894,16 @@ const BlueprintLandingPage: React.FC = () => {
           },
         });
       } else {
-        setError(data.error || data.message || 'Something went wrong. Please try again.');
+        console.error('[Blueprint] Error response:', response.status, data);
+        setError(
+          data.error ||
+            data.message ||
+            `Something went wrong (${response.status}). Please try again.`
+        );
       }
     } catch (err) {
-      console.error('Failed to submit prospect:', err);
-      setError('Something went wrong. Please try again.');
+      console.error('[Blueprint] Network/fetch error:', err);
+      setError('Something went wrong. Please check your connection and try again.');
     } finally {
       setIsSubmitting(false);
     }
