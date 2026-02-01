@@ -207,8 +207,8 @@ describe('affiliate-supabase service', () => {
     it('inserts and returns mapped affiliate', async () => {
       const returnedRecord = {
         ...sampleAffiliateRecord,
-        status: 'pending',
-        commission_amount: 0,
+        status: 'active',
+        commission_amount: 500,
         slug: 'john-doe',
         code: 'JOHNDOE',
       };
@@ -231,15 +231,15 @@ describe('affiliate-supabase service', () => {
           company: 'Doe Inc',
           bio: 'A test applicant',
           application_note: 'Please accept me',
-          status: 'pending',
-          commission_amount: 0,
+          status: 'active',
+          commission_amount: 500,
         })
       );
       expect(chain.select).toHaveBeenCalled();
       expect(chain.single).toHaveBeenCalled();
 
       expect(result).toBeDefined();
-      expect(result.status).toBe('pending');
+      expect(result.status).toBe('active');
     });
 
     it('generates slug from name (lowercase, hyphenated)', async () => {

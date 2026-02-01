@@ -67,7 +67,7 @@ describe('AffiliateApply', () => {
       id: 'aff-1',
       name: 'Jane Doe',
       email: 'jane@example.com',
-      status: 'pending',
+      status: 'active',
     });
 
     render(<AffiliateApply />);
@@ -82,7 +82,7 @@ describe('AffiliateApply', () => {
     await user.click(submitButton);
 
     await waitFor(() => {
-      expect(screen.getByText('Application Received')).toBeInTheDocument();
+      expect(screen.getByText("You're In!")).toBeInTheDocument();
     });
 
     expect(mockSubmit).toHaveBeenCalledWith({
@@ -101,7 +101,7 @@ describe('AffiliateApply', () => {
       id: 'aff-existing',
       email: 'existing@example.com',
       name: 'Existing User',
-      status: 'pending',
+      status: 'active',
     });
 
     render(<AffiliateApply />);
@@ -112,7 +112,7 @@ describe('AffiliateApply', () => {
     // Wait for the debounced email check to fire (500ms delay in component)
     await waitFor(
       () => {
-        expect(screen.getByText(/you've already applied/i)).toBeInTheDocument();
+        expect(screen.getByText(/you already have an affiliate account/i)).toBeInTheDocument();
       },
       { timeout: 2000 }
     );

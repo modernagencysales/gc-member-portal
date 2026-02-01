@@ -178,8 +178,8 @@ export async function submitAffiliateApplication(
     bootcamp_student_id: data.bootcampStudentId || null,
     slug,
     code,
-    status: 'pending',
-    commission_amount: 0,
+    status: 'active',
+    commission_amount: 500,
   };
 
   const { data: result, error } = await supabase

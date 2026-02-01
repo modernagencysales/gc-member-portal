@@ -155,7 +155,7 @@ CREATE POLICY "Public can read affiliates"
 -- Public can submit affiliate applications
 CREATE POLICY "Anon can submit affiliate applications"
   ON affiliates FOR INSERT
-  WITH CHECK (status = 'pending');
+  WITH CHECK (status IN ('pending', 'active'));
 
 -- Anon can read visible assets
 CREATE POLICY "Anon can read visible assets"

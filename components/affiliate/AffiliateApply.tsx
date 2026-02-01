@@ -74,18 +74,16 @@ const AffiliateApply: React.FC = () => {
               <CheckCircle size={32} />
             </div>
           </div>
-          <h1 className="text-2xl font-semibold text-zinc-900 dark:text-white mb-2">
-            Application Received
-          </h1>
+          <h1 className="text-2xl font-semibold text-zinc-900 dark:text-white mb-2">You're In!</h1>
           <p className="text-zinc-500 dark:text-zinc-400 text-sm mb-6">
-            We'll review your application and get back to you soon. You'll receive an email once
-            approved.
+            Your affiliate account is active. Log in to your dashboard to grab your referral link
+            and start earning $500 per referral.
           </p>
           <button
-            onClick={() => navigate('/')}
-            className="text-sm text-violet-500 hover:text-violet-400 font-medium transition-colors"
+            onClick={() => navigate('/affiliate/dashboard')}
+            className="inline-flex items-center gap-2 bg-violet-500 hover:bg-violet-600 text-white py-2.5 px-5 rounded-lg text-sm font-medium transition-all"
           >
-            Back to Home
+            Go to Dashboard <ArrowRight size={16} />
           </button>
         </div>
       </div>
@@ -121,7 +119,13 @@ const AffiliateApply: React.FC = () => {
         {alreadyApplied && (
           <div className="mb-6 p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
             <p className="text-xs text-amber-600 dark:text-amber-400 font-medium">
-              You've already applied. Check your email for updates.
+              You already have an affiliate account.{' '}
+              <button
+                onClick={() => navigate('/affiliate/dashboard')}
+                className="underline hover:text-amber-500"
+              >
+                Go to Dashboard
+              </button>
             </p>
           </div>
         )}

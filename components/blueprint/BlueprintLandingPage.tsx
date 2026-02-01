@@ -836,6 +836,10 @@ const BlueprintLandingPage: React.FC = () => {
         send_email: true,
         source_url: window.location.href,
         lead_magnet_source: 'blueprint-landing',
+        referral_code: (() => {
+          const match = document.cookie.match(/(?:^|; )gtm_ref=([^;]*)/);
+          return match ? decodeURIComponent(match[1]) : undefined;
+        })(),
       };
 
       console.log('[Blueprint] Submitting to:', INTAKE_API_URL);

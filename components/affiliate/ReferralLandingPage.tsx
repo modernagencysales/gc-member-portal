@@ -57,7 +57,7 @@ const ReferralLandingPage: React.FC = () => {
   }
 
   const handleCTA = () => {
-    navigate(`/bootcamp/register?ref=${affiliate.code}`);
+    navigate('/blueprint');
   };
 
   const benefits = [
