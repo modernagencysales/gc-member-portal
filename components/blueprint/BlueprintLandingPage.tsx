@@ -376,6 +376,7 @@ interface QuestionnaireProps {
   formData: FormData;
   setFormData: React.Dispatch<React.SetStateAction<FormData>>;
   onComplete: (finalData: FormData) => void;
+  onExit: () => void;
   isSubmitting: boolean;
   error: string | null;
 }
@@ -384,6 +385,7 @@ const BlueprintQuestionnaire: React.FC<QuestionnaireProps> = ({
   formData,
   setFormData,
   onComplete,
+  onExit,
   isSubmitting,
   error,
 }) => {
@@ -446,6 +448,10 @@ const BlueprintQuestionnaire: React.FC<QuestionnaireProps> = ({
   // Keyboard navigation
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onExit();
+        return;
+      }
       if (e.key === 'Enter' && step.type !== 'textarea') {
         e.preventDefault();
         validateAndAdvance();
@@ -457,7 +463,7 @@ const BlueprintQuestionnaire: React.FC<QuestionnaireProps> = ({
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [step.type, validateAndAdvance]);
+  }, [step.type, validateAndAdvance, onExit]);
 
   const handleOptionSelect = (optValue: string) => {
     const updated = { ...formData, [step.field]: optValue };
@@ -963,6 +969,7 @@ const BlueprintLandingPage: React.FC = () => {
           formData={formData}
           setFormData={setFormData}
           onComplete={handleQuestionnaireComplete}
+          onExit={() => setPhase('landing')}
           isSubmitting={isSubmitting}
           error={error}
         />
