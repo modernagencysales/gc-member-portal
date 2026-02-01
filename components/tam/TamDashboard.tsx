@@ -202,9 +202,9 @@ const TamDashboard: React.FC<TamDashboardProps> = ({ projectId, onOpenChat }) =>
       case 'disqualified':
         return 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400';
       case 'pending':
-        return 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400';
+        return 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400';
       default:
-        return 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400';
+        return 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400';
     }
   };
 
@@ -219,16 +219,16 @@ const TamDashboard: React.FC<TamDashboardProps> = ({ projectId, onOpenChat }) =>
       case 'not_found':
         return 'bg-red-500';
       default:
-        return 'bg-slate-300 dark:bg-slate-600';
+        return 'bg-zinc-300 dark:bg-zinc-600';
     }
   };
 
   const getLinkedInActivityDot = (linkedinActive: boolean | null, lastPostDate: string | null) => {
     if (!linkedinActive && linkedinActive !== false) {
-      return { color: 'bg-slate-300 dark:bg-slate-600', label: 'Unknown' };
+      return { color: 'bg-zinc-300 dark:bg-zinc-600', label: 'Unknown' };
     }
     if (!lastPostDate) {
-      return { color: 'bg-slate-300 dark:bg-slate-600', label: 'No activity' };
+      return { color: 'bg-zinc-300 dark:bg-zinc-600', label: 'No activity' };
     }
 
     const daysSincePost = Math.floor(
@@ -239,7 +239,7 @@ const TamDashboard: React.FC<TamDashboardProps> = ({ projectId, onOpenChat }) =>
     } else if (daysSincePost < 90) {
       return { color: 'bg-yellow-500', label: `${daysSincePost}d ago` };
     } else {
-      return { color: 'bg-slate-400 dark:bg-slate-600', label: `${daysSincePost}d ago` };
+      return { color: 'bg-zinc-400 dark:bg-zinc-600', label: `${daysSincePost}d ago` };
     }
   };
 
@@ -249,14 +249,14 @@ const TamDashboard: React.FC<TamDashboardProps> = ({ projectId, onOpenChat }) =>
       {stats && <TamStatsBar stats={stats} />}
 
       {/* Filter Bar */}
-      <div className="flex flex-wrap gap-3 items-center rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4">
-        <Filter className="w-4 h-4 text-slate-400" />
+      <div className="flex flex-wrap gap-3 items-center rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4">
+        <Filter className="w-4 h-4 text-zinc-400" />
 
         {/* Qualification Status Filter */}
         <select
           value={filters.qualificationStatus}
           onChange={(e) => setFilters({ ...filters, qualificationStatus: e.target.value })}
-          className="px-3 py-1.5 text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+          className="px-3 py-1.5 text-sm rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white"
         >
           <option value="all">All Statuses</option>
           <option value="qualified">Qualified</option>
@@ -268,7 +268,7 @@ const TamDashboard: React.FC<TamDashboardProps> = ({ projectId, onOpenChat }) =>
         <select
           value={filters.emailStatus}
           onChange={(e) => setFilters({ ...filters, emailStatus: e.target.value })}
-          className="px-3 py-1.5 text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+          className="px-3 py-1.5 text-sm rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white"
         >
           <option value="all">All Email Statuses</option>
           <option value="verified">Verified</option>
@@ -281,7 +281,7 @@ const TamDashboard: React.FC<TamDashboardProps> = ({ projectId, onOpenChat }) =>
         <select
           value={filters.linkedinStatus}
           onChange={(e) => setFilters({ ...filters, linkedinStatus: e.target.value })}
-          className="px-3 py-1.5 text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+          className="px-3 py-1.5 text-sm rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white"
         >
           <option value="all">All LinkedIn</option>
           <option value="active">Active</option>
@@ -292,7 +292,7 @@ const TamDashboard: React.FC<TamDashboardProps> = ({ projectId, onOpenChat }) =>
         <select
           value={filters.source}
           onChange={(e) => setFilters({ ...filters, source: e.target.value })}
-          className="px-3 py-1.5 text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white"
+          className="px-3 py-1.5 text-sm rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white"
         >
           <option value="all">All Sources</option>
           {sources.map((source) => (
@@ -304,13 +304,13 @@ const TamDashboard: React.FC<TamDashboardProps> = ({ projectId, onOpenChat }) =>
       </div>
 
       {/* Segment Tabs */}
-      <div className="flex gap-6 border-b border-slate-200 dark:border-slate-800">
+      <div className="flex gap-6 border-b border-zinc-200 dark:border-zinc-800">
         <button
           onClick={() => setActiveSegment('all')}
           className={`pb-2 px-1 text-sm font-medium border-b-2 transition-colors ${
             activeSegment === 'all'
-              ? 'border-sky-500 text-sky-600 dark:text-sky-400'
-              : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
+              ? 'border-violet-500 text-violet-600 dark:text-violet-400'
+              : 'border-transparent text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300'
           }`}
         >
           All
@@ -319,8 +319,8 @@ const TamDashboard: React.FC<TamDashboardProps> = ({ projectId, onOpenChat }) =>
           onClick={() => setActiveSegment('linkedin_active')}
           className={`pb-2 px-1 text-sm font-medium border-b-2 transition-colors ${
             activeSegment === 'linkedin_active'
-              ? 'border-sky-500 text-sky-600 dark:text-sky-400'
-              : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
+              ? 'border-violet-500 text-violet-600 dark:text-violet-400'
+              : 'border-transparent text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300'
           }`}
         >
           LinkedIn Active
@@ -329,8 +329,8 @@ const TamDashboard: React.FC<TamDashboardProps> = ({ projectId, onOpenChat }) =>
           onClick={() => setActiveSegment('email_only')}
           className={`pb-2 px-1 text-sm font-medium border-b-2 transition-colors ${
             activeSegment === 'email_only'
-              ? 'border-sky-500 text-sky-600 dark:text-sky-400'
-              : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
+              ? 'border-violet-500 text-violet-600 dark:text-violet-400'
+              : 'border-transparent text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300'
           }`}
         >
           Email Only
@@ -339,8 +339,8 @@ const TamDashboard: React.FC<TamDashboardProps> = ({ projectId, onOpenChat }) =>
           onClick={() => setActiveSegment('needs_review')}
           className={`pb-2 px-1 text-sm font-medium border-b-2 transition-colors ${
             activeSegment === 'needs_review'
-              ? 'border-sky-500 text-sky-600 dark:text-sky-400'
-              : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300'
+              ? 'border-violet-500 text-violet-600 dark:text-violet-400'
+              : 'border-transparent text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300'
           }`}
         >
           Needs Review
@@ -348,11 +348,11 @@ const TamDashboard: React.FC<TamDashboardProps> = ({ projectId, onOpenChat }) =>
       </div>
 
       {/* Company Table */}
-      <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden">
+      <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
+              <tr className="border-b border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-800/50">
                 <th className="w-10 px-4 py-3">
                   <input
                     type="checkbox"
@@ -361,31 +361,31 @@ const TamDashboard: React.FC<TamDashboardProps> = ({ projectId, onOpenChat }) =>
                       selectedContactIds.size === allFilteredContacts.length
                     }
                     onChange={selectAllContacts}
-                    className="rounded border-slate-300 dark:border-slate-600"
+                    className="rounded border-zinc-300 dark:border-zinc-600"
                   />
                 </th>
                 <th className="w-10 px-4 py-3"></th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide">
+                <th className="px-4 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">
                   Company
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide">
+                <th className="px-4 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">
                   Industry
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide">
+                <th className="px-4 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">
                   Employees
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide">
+                <th className="px-4 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">
                   Location
                 </th>
-                <th className="px-4 py-3 text-center text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide">
+                <th className="px-4 py-3 text-center text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">
                   Contacts
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide">
+                <th className="px-4 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">
                   Status
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
+            <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
               {filteredCompanies.map((company) => {
                 const companyContacts = contactsByCompany.get(company.id) || [];
                 const isExpanded = expandedCompanyIds.has(company.id);
@@ -393,12 +393,12 @@ const TamDashboard: React.FC<TamDashboardProps> = ({ projectId, onOpenChat }) =>
                 return (
                   <React.Fragment key={company.id}>
                     {/* Company Row */}
-                    <tr className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                    <tr className="hover:bg-zinc-50 dark:hover:bg-zinc-800/50">
                       <td className="px-4 py-3"></td>
                       <td className="px-4 py-3">
                         <button
                           onClick={() => toggleCompany(company.id)}
-                          className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                          className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
                         >
                           {isExpanded ? (
                             <ChevronDown className="w-4 h-4" />
@@ -408,25 +408,25 @@ const TamDashboard: React.FC<TamDashboardProps> = ({ projectId, onOpenChat }) =>
                         </button>
                       </td>
                       <td className="px-4 py-3">
-                        <div className="font-medium text-slate-900 dark:text-white">
+                        <div className="font-medium text-zinc-900 dark:text-white">
                           {company.name}
                         </div>
                         {company.domain && (
-                          <div className="text-xs text-slate-500 dark:text-slate-400">
+                          <div className="text-xs text-zinc-500 dark:text-zinc-400">
                             {company.domain}
                           </div>
                         )}
                       </td>
-                      <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">
+                      <td className="px-4 py-3 text-sm text-zinc-600 dark:text-zinc-400">
                         {company.industry || '-'}
                       </td>
-                      <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">
+                      <td className="px-4 py-3 text-sm text-zinc-600 dark:text-zinc-400">
                         {company.employeeCount ? company.employeeCount.toLocaleString() : '-'}
                       </td>
-                      <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">
+                      <td className="px-4 py-3 text-sm text-zinc-600 dark:text-zinc-400">
                         {company.location || '-'}
                       </td>
-                      <td className="px-4 py-3 text-center text-sm text-slate-600 dark:text-slate-400">
+                      <td className="px-4 py-3 text-center text-sm text-zinc-600 dark:text-zinc-400">
                         {companyContacts.length}
                       </td>
                       <td className="px-4 py-3">
@@ -451,23 +451,23 @@ const TamDashboard: React.FC<TamDashboardProps> = ({ projectId, onOpenChat }) =>
                         return (
                           <tr
                             key={contact.id}
-                            className="bg-slate-50/50 dark:bg-slate-800/20 hover:bg-slate-100 dark:hover:bg-slate-800/40"
+                            className="bg-zinc-50/50 dark:bg-zinc-800/20 hover:bg-zinc-100 dark:hover:bg-zinc-800/40"
                           >
                             <td className="px-4 py-2">
                               <input
                                 type="checkbox"
                                 checked={selectedContactIds.has(contact.id)}
                                 onChange={() => toggleContact(contact.id)}
-                                className="rounded border-slate-300 dark:border-slate-600"
+                                className="rounded border-zinc-300 dark:border-zinc-600"
                               />
                             </td>
                             <td className="px-4 py-2"></td>
                             <td className="px-4 py-2" colSpan={2}>
                               <div className="pl-8">
-                                <div className="text-sm font-medium text-slate-900 dark:text-white">
+                                <div className="text-sm font-medium text-zinc-900 dark:text-white">
                                   {contact.firstName} {contact.lastName}
                                 </div>
-                                <div className="text-xs text-slate-500 dark:text-slate-400">
+                                <div className="text-xs text-zinc-500 dark:text-zinc-400">
                                   {contact.title || 'No title'}
                                 </div>
                               </div>
@@ -480,12 +480,12 @@ const TamDashboard: React.FC<TamDashboardProps> = ({ projectId, onOpenChat }) =>
                                       contact.emailStatus
                                     )}`}
                                   ></span>
-                                  <span className="text-sm text-slate-600 dark:text-slate-400">
+                                  <span className="text-sm text-zinc-600 dark:text-zinc-400">
                                     {contact.email}
                                   </span>
                                 </div>
                               ) : (
-                                <span className="text-sm text-slate-400 dark:text-slate-500">
+                                <span className="text-sm text-zinc-400 dark:text-zinc-500">
                                   No email
                                 </span>
                               )}
@@ -495,13 +495,13 @@ const TamDashboard: React.FC<TamDashboardProps> = ({ projectId, onOpenChat }) =>
                                 <span
                                   className={`w-2 h-2 rounded-full ${linkedinActivity.color}`}
                                 ></span>
-                                <span className="text-xs text-slate-500 dark:text-slate-400">
+                                <span className="text-xs text-zinc-500 dark:text-zinc-400">
                                   {linkedinActivity.label}
                                 </span>
                               </div>
                             </td>
                             <td className="px-4 py-2">
-                              <span className="text-sm text-slate-600 dark:text-slate-400">
+                              <span className="text-sm text-zinc-600 dark:text-zinc-400">
                                 {contact.phone || '-'}
                               </span>
                             </td>
@@ -517,21 +517,21 @@ const TamDashboard: React.FC<TamDashboardProps> = ({ projectId, onOpenChat }) =>
 
         {filteredCompanies.length === 0 && (
           <div className="p-8 text-center">
-            <p className="text-sm text-slate-600 dark:text-slate-400">No companies found</p>
+            <p className="text-sm text-zinc-600 dark:text-zinc-400">No companies found</p>
           </div>
         )}
       </div>
 
       {/* Bulk Actions Bar */}
       {selectedContactIds.size > 0 && (
-        <div className="fixed bottom-20 left-1/2 transform -translate-x-1/2 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-lg px-6 py-3">
+        <div className="fixed bottom-20 left-1/2 transform -tranzinc-x-1/2 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shadow-lg px-6 py-3">
           <div className="flex items-center gap-4">
-            <span className="text-sm text-slate-600 dark:text-slate-400">
+            <span className="text-sm text-zinc-600 dark:text-zinc-400">
               {selectedContactIds.size} contact{selectedContactIds.size !== 1 ? 's' : ''} selected
             </span>
             <button
               onClick={exportToCsv}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-sky-500 text-white hover:bg-sky-600 text-sm font-medium"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-violet-500 text-white hover:bg-violet-600 text-sm font-medium"
             >
               <Download className="w-4 h-4" />
               Export CSV
@@ -543,7 +543,7 @@ const TamDashboard: React.FC<TamDashboardProps> = ({ projectId, onOpenChat }) =>
       {/* Floating Chat Button */}
       <button
         onClick={onOpenChat}
-        className="fixed bottom-6 right-6 w-14 h-14 rounded-full bg-sky-500 text-white shadow-lg hover:bg-sky-600 flex items-center justify-center transition-colors"
+        className="fixed bottom-6 right-6 w-14 h-14 rounded-full bg-violet-500 text-white shadow-lg hover:bg-violet-600 flex items-center justify-center transition-colors"
         title="Open chat"
       >
         <MessageSquare className="w-6 h-6" />

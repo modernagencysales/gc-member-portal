@@ -123,8 +123,8 @@ const TamBuilder: React.FC<TamBuilderProps> = ({ userId }) => {
     return (
       <div className="flex items-center justify-center h-96">
         <div className="flex flex-col items-center gap-3">
-          <Loader2 className="w-8 h-8 text-sky-500 animate-spin" />
-          <p className="text-sm text-slate-500 dark:text-slate-400">Loading your projects...</p>
+          <Loader2 className="w-8 h-8 text-violet-500 animate-spin" />
+          <p className="text-sm text-zinc-500 dark:text-zinc-400">Loading your projects...</p>
         </div>
       </div>
     );
@@ -134,7 +134,7 @@ const TamBuilder: React.FC<TamBuilderProps> = ({ userId }) => {
     <div className="h-full flex flex-col">
       {/* Header with tab navigation (shown in chat/dashboard phases) */}
       {phase !== 'wizard' && activeProjectId && (
-        <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-6 py-3">
+        <div className="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-6 py-3">
           <div className="flex items-center gap-1">
             <button
               onClick={() => {
@@ -143,8 +143,8 @@ const TamBuilder: React.FC<TamBuilderProps> = ({ userId }) => {
               }}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 phase === 'chat' && activeTab === 'strategy'
-                  ? 'bg-sky-100 dark:bg-sky-900/30 text-sky-700 dark:text-sky-300'
-                  : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                  ? 'bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300'
+                  : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800'
               }`}
             >
               <MessageSquare className="w-4 h-4" />
@@ -157,8 +157,8 @@ const TamBuilder: React.FC<TamBuilderProps> = ({ userId }) => {
               }}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 phase === 'dashboard' && activeTab === 'list'
-                  ? 'bg-sky-100 dark:bg-sky-900/30 text-sky-700 dark:text-sky-300'
-                  : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                  ? 'bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300'
+                  : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800'
               }`}
             >
               <List className="w-4 h-4" />
@@ -168,16 +168,16 @@ const TamBuilder: React.FC<TamBuilderProps> = ({ userId }) => {
 
           <div className="flex items-center gap-3">
             {activeProject && (
-              <span className="text-xs text-slate-500 dark:text-slate-400">
+              <span className="text-xs text-zinc-500 dark:text-zinc-400">
                 {activeProject.name}
-                <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
+                <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400">
                   {activeProject.status}
                 </span>
               </span>
             )}
             <button
               onClick={handleNewProject}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
             >
               <Plus className="w-4 h-4" />
               New Project
@@ -192,10 +192,10 @@ const TamBuilder: React.FC<TamBuilderProps> = ({ userId }) => {
         {phase === 'wizard' && (
           <div className="p-6">
             <div className="mb-6 text-center">
-              <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-2">
+              <h1 className="text-3xl font-bold text-zinc-900 dark:text-white mb-2">
                 Build Your Target Market
               </h1>
-              <p className="text-slate-600 dark:text-slate-400">
+              <p className="text-zinc-600 dark:text-zinc-400">
                 Define your ideal customer profile and we will build a qualified prospect list
               </p>
             </div>

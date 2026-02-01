@@ -188,10 +188,10 @@ const IcpWizard: React.FC<IcpWizardProps> = ({ onComplete }) => {
             <div
               className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold text-sm transition-colors ${
                 step === currentStep
-                  ? 'bg-sky-500 text-white'
+                  ? 'bg-violet-500 text-white'
                   : step < currentStep
-                    ? 'bg-sky-100 dark:bg-sky-900/50 text-sky-600 dark:text-sky-400'
-                    : 'bg-slate-200 dark:bg-slate-800 text-slate-400'
+                    ? 'bg-violet-100 dark:bg-violet-900/50 text-violet-600 dark:text-violet-400'
+                    : 'bg-zinc-200 dark:bg-zinc-800 text-zinc-400'
               }`}
             >
               {step < currentStep ? <Check className="w-5 h-5" /> : step}
@@ -199,7 +199,7 @@ const IcpWizard: React.FC<IcpWizardProps> = ({ onComplete }) => {
             {step < 4 && (
               <div
                 className={`h-0.5 w-12 transition-colors ${
-                  step < currentStep ? 'bg-sky-500' : 'bg-slate-200 dark:bg-slate-800'
+                  step < currentStep ? 'bg-violet-500' : 'bg-zinc-200 dark:bg-zinc-800'
                 }`}
               />
             )}
@@ -208,22 +208,22 @@ const IcpWizard: React.FC<IcpWizardProps> = ({ onComplete }) => {
       </div>
 
       {/* Main Card */}
-      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-8">
+      <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 p-8">
         {/* Step 1: Business Model */}
         {currentStep === 1 && (
           <div className="space-y-6">
             <div>
-              <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
+              <h2 className="text-2xl font-bold text-zinc-900 dark:text-white mb-2">
                 Business Model
               </h2>
-              <p className="text-slate-600 dark:text-slate-400">
+              <p className="text-zinc-600 dark:text-zinc-400">
                 Tell us about your business so we can find the right customers
               </p>
             </div>
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">
+                <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-3">
                   What type of business do you run?
                 </label>
                 <div className="space-y-2">
@@ -232,8 +232,8 @@ const IcpWizard: React.FC<IcpWizardProps> = ({ onComplete }) => {
                       key={model}
                       className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${
                         formData.businessModel === model
-                          ? 'border-sky-500 bg-sky-50 dark:bg-sky-900/20'
-                          : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
+                          ? 'border-violet-500 bg-violet-50 dark:bg-violet-900/20'
+                          : 'border-zinc-200 dark:border-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600'
                       }`}
                     >
                       <input
@@ -247,9 +247,9 @@ const IcpWizard: React.FC<IcpWizardProps> = ({ onComplete }) => {
                             businessModel: e.target.value as BusinessModelType,
                           })
                         }
-                        className="w-5 h-5 text-sky-500"
+                        className="w-5 h-5 text-violet-500"
                       />
-                      <span className="text-slate-900 dark:text-white font-medium">
+                      <span className="text-zinc-900 dark:text-white font-medium">
                         {BUSINESS_MODEL_LABELS[model]}
                       </span>
                     </label>
@@ -259,7 +259,7 @@ const IcpWizard: React.FC<IcpWizardProps> = ({ onComplete }) => {
 
               {formData.businessModel === 'other' && (
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                  <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
                     Please specify your business model
                   </label>
                   <input
@@ -268,21 +268,21 @@ const IcpWizard: React.FC<IcpWizardProps> = ({ onComplete }) => {
                     onChange={(e) =>
                       setFormData({ ...formData, businessModelOther: e.target.value })
                     }
-                    className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    className="w-full px-4 py-3 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-violet-500"
                     placeholder="e.g., Marketplace platform"
                   />
                 </div>
               )}
 
               <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
                   What do YOU sell them?
                 </label>
                 <input
                   type="text"
                   value={formData.whatYouSell || ''}
                   onChange={(e) => setFormData({ ...formData, whatYouSell: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-sky-500"
+                  className="w-full px-4 py-3 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-violet-500"
                   placeholder="e.g., Marketing automation software"
                 />
               </div>
@@ -292,7 +292,7 @@ const IcpWizard: React.FC<IcpWizardProps> = ({ onComplete }) => {
               <button
                 onClick={handleNext}
                 disabled={!isStep1Valid}
-                className="flex items-center gap-2 px-6 py-3 rounded-xl bg-sky-500 hover:bg-sky-600 text-white font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center gap-2 px-6 py-3 rounded-xl bg-violet-500 hover:bg-violet-600 text-white font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Next
                 <ChevronRight className="w-5 h-5" />
@@ -305,17 +305,17 @@ const IcpWizard: React.FC<IcpWizardProps> = ({ onComplete }) => {
         {currentStep === 2 && (
           <div className="space-y-6">
             <div>
-              <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
+              <h2 className="text-2xl font-bold text-zinc-900 dark:text-white mb-2">
                 Company Filters
               </h2>
-              <p className="text-slate-600 dark:text-slate-400">
+              <p className="text-zinc-600 dark:text-zinc-400">
                 Define the characteristics of your ideal customer companies
               </p>
             </div>
 
             <div className="space-y-6">
               <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">
+                <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-3">
                   Employee Size (select all that apply)
                 </label>
                 <div className="flex flex-wrap gap-2">
@@ -326,8 +326,8 @@ const IcpWizard: React.FC<IcpWizardProps> = ({ onComplete }) => {
                       onClick={() => toggleEmployeeSize(size)}
                       className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                         formData.employeeSizeRanges?.includes(size)
-                          ? 'bg-sky-100 dark:bg-sky-900/50 text-sky-700 dark:text-sky-300 border-2 border-sky-500'
-                          : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-2 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
+                          ? 'bg-violet-100 dark:bg-violet-900/50 text-violet-700 dark:text-violet-300 border-2 border-violet-500'
+                          : 'bg-white dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border-2 border-zinc-200 dark:border-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600'
                       }`}
                     >
                       {size}
@@ -337,7 +337,7 @@ const IcpWizard: React.FC<IcpWizardProps> = ({ onComplete }) => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">
+                <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-3">
                   Geography
                 </label>
                 <div className="space-y-2">
@@ -346,8 +346,8 @@ const IcpWizard: React.FC<IcpWizardProps> = ({ onComplete }) => {
                       key={geo}
                       className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${
                         formData.geography === geo
-                          ? 'border-sky-500 bg-sky-50 dark:bg-sky-900/20'
-                          : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
+                          ? 'border-violet-500 bg-violet-50 dark:bg-violet-900/20'
+                          : 'border-zinc-200 dark:border-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600'
                       }`}
                     >
                       <input
@@ -364,9 +364,9 @@ const IcpWizard: React.FC<IcpWizardProps> = ({ onComplete }) => {
                               | 'global',
                           })
                         }
-                        className="w-5 h-5 text-sky-500"
+                        className="w-5 h-5 text-violet-500"
                       />
-                      <span className="text-slate-900 dark:text-white font-medium">
+                      <span className="text-zinc-900 dark:text-white font-medium">
                         {geo === 'us_only'
                           ? 'US Only'
                           : geo === 'specific_countries'
@@ -380,14 +380,14 @@ const IcpWizard: React.FC<IcpWizardProps> = ({ onComplete }) => {
 
               {formData.geography === 'specific_countries' && (
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                  <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
                     Country names (comma-separated)
                   </label>
                   <input
                     type="text"
                     value={countriesInput}
                     onChange={(e) => setCountriesInput(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    className="w-full px-4 py-3 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-violet-500"
                     placeholder="e.g., United States, Canada, United Kingdom"
                   />
                 </div>
@@ -401,23 +401,23 @@ const IcpWizard: React.FC<IcpWizardProps> = ({ onComplete }) => {
                     onChange={(e) =>
                       setFormData({ ...formData, usEmployeeFilter: e.target.checked })
                     }
-                    className="w-5 h-5 rounded border-slate-300 dark:border-slate-600 text-sky-500 focus:ring-sky-500"
+                    className="w-5 h-5 rounded border-zinc-300 dark:border-zinc-600 text-violet-500 focus:ring-violet-500"
                   />
-                  <span className="text-sm text-slate-700 dark:text-slate-300">
+                  <span className="text-sm text-zinc-700 dark:text-zinc-300">
                     Filter for US-based employees (75%+ in US)
                   </span>
                 </label>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
                   Industry keywords (comma-separated)
                 </label>
                 <input
                   type="text"
                   value={industryInput}
                   onChange={(e) => setIndustryInput(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-sky-500"
+                  className="w-full px-4 py-3 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-violet-500"
                   placeholder="e.g., SaaS, Technology, Marketing"
                 />
               </div>
@@ -426,7 +426,7 @@ const IcpWizard: React.FC<IcpWizardProps> = ({ onComplete }) => {
             <div className="flex justify-between pt-4">
               <button
                 onClick={handleBack}
-                className="flex items-center gap-2 px-6 py-3 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-medium transition-colors"
+                className="flex items-center gap-2 px-6 py-3 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 font-medium transition-colors"
               >
                 <ChevronLeft className="w-5 h-5" />
                 Back
@@ -434,7 +434,7 @@ const IcpWizard: React.FC<IcpWizardProps> = ({ onComplete }) => {
               <button
                 onClick={handleNext}
                 disabled={!isStep2Valid}
-                className="flex items-center gap-2 px-6 py-3 rounded-xl bg-sky-500 hover:bg-sky-600 text-white font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center gap-2 px-6 py-3 rounded-xl bg-violet-500 hover:bg-violet-600 text-white font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Next
                 <ChevronRight className="w-5 h-5" />
@@ -447,17 +447,17 @@ const IcpWizard: React.FC<IcpWizardProps> = ({ onComplete }) => {
         {currentStep === 3 && (
           <div className="space-y-6">
             <div>
-              <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
+              <h2 className="text-2xl font-bold text-zinc-900 dark:text-white mb-2">
                 Contact Targeting
               </h2>
-              <p className="text-slate-600 dark:text-slate-400">
+              <p className="text-zinc-600 dark:text-zinc-400">
                 Specify the types of contacts you want to reach
               </p>
             </div>
 
             <div className="space-y-6">
               <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">
+                <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-3">
                   Target Titles (select or add custom)
                 </label>
                 <div className="flex flex-wrap gap-2 mb-3">
@@ -468,8 +468,8 @@ const IcpWizard: React.FC<IcpWizardProps> = ({ onComplete }) => {
                       onClick={() => toggleTitle(title)}
                       className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                         formData.targetTitles?.includes(title)
-                          ? 'bg-sky-100 dark:bg-sky-900/50 text-sky-700 dark:text-sky-300 border-2 border-sky-500'
-                          : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-2 border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
+                          ? 'bg-violet-100 dark:bg-violet-900/50 text-violet-700 dark:text-violet-300 border-2 border-violet-500'
+                          : 'bg-white dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 border-2 border-zinc-200 dark:border-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600'
                       }`}
                     >
                       {title}
@@ -480,7 +480,7 @@ const IcpWizard: React.FC<IcpWizardProps> = ({ onComplete }) => {
                 {/* Custom titles display */}
                 {formData.targetTitles && formData.targetTitles.length > 0 && (
                   <div className="mb-3">
-                    <p className="text-xs text-slate-500 dark:text-slate-400 mb-2">
+                    <p className="text-xs text-zinc-500 dark:text-zinc-400 mb-2">
                       Selected titles:
                     </p>
                     <div className="flex flex-wrap gap-2">
@@ -489,12 +489,12 @@ const IcpWizard: React.FC<IcpWizardProps> = ({ onComplete }) => {
                         .map((title) => (
                           <div
                             key={title}
-                            className="flex items-center gap-1 px-3 py-1 rounded-full text-sm bg-sky-100 dark:bg-sky-900/50 text-sky-700 dark:text-sky-300 border border-sky-500"
+                            className="flex items-center gap-1 px-3 py-1 rounded-full text-sm bg-violet-100 dark:bg-violet-900/50 text-violet-700 dark:text-violet-300 border border-violet-500"
                           >
                             <span>{title}</span>
                             <button
                               onClick={() => removeTitle(title)}
-                              className="hover:text-sky-900 dark:hover:text-sky-100"
+                              className="hover:text-violet-900 dark:hover:text-violet-100"
                             >
                               <X className="w-3 h-3" />
                             </button>
@@ -515,13 +515,13 @@ const IcpWizard: React.FC<IcpWizardProps> = ({ onComplete }) => {
                         addCustomTitle();
                       }
                     }}
-                    className="flex-1 px-4 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    className="flex-1 px-4 py-2 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-violet-500"
                     placeholder="Add custom title and press Enter"
                   />
                   <button
                     type="button"
                     onClick={addCustomTitle}
-                    className="px-4 py-2 rounded-xl bg-sky-500 hover:bg-sky-600 text-white font-medium transition-colors"
+                    className="px-4 py-2 rounded-xl bg-violet-500 hover:bg-violet-600 text-white font-medium transition-colors"
                   >
                     Add
                   </button>
@@ -529,7 +529,7 @@ const IcpWizard: React.FC<IcpWizardProps> = ({ onComplete }) => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">
+                <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-3">
                   Seniority Preference
                 </label>
                 <div className="space-y-2">
@@ -539,16 +539,16 @@ const IcpWizard: React.FC<IcpWizardProps> = ({ onComplete }) => {
                         type="checkbox"
                         checked={formData.seniorityPreference?.includes(level) || false}
                         onChange={() => toggleSeniority(level)}
-                        className="w-5 h-5 rounded border-slate-300 dark:border-slate-600 text-sky-500 focus:ring-sky-500"
+                        className="w-5 h-5 rounded border-zinc-300 dark:border-zinc-600 text-violet-500 focus:ring-violet-500"
                       />
-                      <span className="text-slate-700 dark:text-slate-300">{level}</span>
+                      <span className="text-zinc-700 dark:text-zinc-300">{level}</span>
                     </label>
                   ))}
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
                   Contacts per company
                 </label>
                 <input
@@ -559,7 +559,7 @@ const IcpWizard: React.FC<IcpWizardProps> = ({ onComplete }) => {
                   onChange={(e) =>
                     setFormData({ ...formData, contactsPerCompany: parseInt(e.target.value) || 1 })
                   }
-                  className="w-32 px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-sky-500"
+                  className="w-32 px-4 py-3 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-violet-500"
                 />
               </div>
             </div>
@@ -567,14 +567,14 @@ const IcpWizard: React.FC<IcpWizardProps> = ({ onComplete }) => {
             <div className="flex justify-between pt-4">
               <button
                 onClick={handleBack}
-                className="flex items-center gap-2 px-6 py-3 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-medium transition-colors"
+                className="flex items-center gap-2 px-6 py-3 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 font-medium transition-colors"
               >
                 <ChevronLeft className="w-5 h-5" />
                 Back
               </button>
               <button
                 onClick={handleNext}
-                className="flex items-center gap-2 px-6 py-3 rounded-xl bg-sky-500 hover:bg-sky-600 text-white font-medium transition-colors"
+                className="flex items-center gap-2 px-6 py-3 rounded-xl bg-violet-500 hover:bg-violet-600 text-white font-medium transition-colors"
               >
                 Next
                 <ChevronRight className="w-5 h-5" />
@@ -587,21 +587,19 @@ const IcpWizard: React.FC<IcpWizardProps> = ({ onComplete }) => {
         {currentStep === 4 && (
           <div className="space-y-6">
             <div>
-              <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
+              <h2 className="text-2xl font-bold text-zinc-900 dark:text-white mb-2">
                 Review & Launch
               </h2>
-              <p className="text-slate-600 dark:text-slate-400">
+              <p className="text-zinc-600 dark:text-zinc-400">
                 Review your ideal customer profile before we start building your list
               </p>
             </div>
 
             <div className="space-y-4">
               {/* Business Model Summary */}
-              <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700">
-                <h3 className="font-semibold text-slate-900 dark:text-white mb-2">
-                  Business Model
-                </h3>
-                <div className="space-y-1 text-sm text-slate-600 dark:text-slate-400">
+              <div className="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700">
+                <h3 className="font-semibold text-zinc-900 dark:text-white mb-2">Business Model</h3>
+                <div className="space-y-1 text-sm text-zinc-600 dark:text-zinc-400">
                   <p>
                     <span className="font-medium">Type:</span>{' '}
                     {formData.businessModel ? BUSINESS_MODEL_LABELS[formData.businessModel] : ''}
@@ -614,11 +612,11 @@ const IcpWizard: React.FC<IcpWizardProps> = ({ onComplete }) => {
               </div>
 
               {/* Company Filters Summary */}
-              <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700">
-                <h3 className="font-semibold text-slate-900 dark:text-white mb-2">
+              <div className="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700">
+                <h3 className="font-semibold text-zinc-900 dark:text-white mb-2">
                   Company Filters
                 </h3>
-                <div className="space-y-1 text-sm text-slate-600 dark:text-slate-400">
+                <div className="space-y-1 text-sm text-zinc-600 dark:text-zinc-400">
                   <p>
                     <span className="font-medium">Employee Size:</span>{' '}
                     {formData.employeeSizeRanges?.join(', ') || 'Not specified'}
@@ -645,11 +643,11 @@ const IcpWizard: React.FC<IcpWizardProps> = ({ onComplete }) => {
               </div>
 
               {/* Contact Targeting Summary */}
-              <div className="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700">
-                <h3 className="font-semibold text-slate-900 dark:text-white mb-2">
+              <div className="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700">
+                <h3 className="font-semibold text-zinc-900 dark:text-white mb-2">
                   Contact Targeting
                 </h3>
-                <div className="space-y-1 text-sm text-slate-600 dark:text-slate-400">
+                <div className="space-y-1 text-sm text-zinc-600 dark:text-zinc-400">
                   <p>
                     <span className="font-medium">Target Titles:</span>{' '}
                     {formData.targetTitles && formData.targetTitles.length > 0
@@ -671,14 +669,14 @@ const IcpWizard: React.FC<IcpWizardProps> = ({ onComplete }) => {
 
               {/* Special Criteria */}
               <div>
-                <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
+                <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
                   Anything else the AI should know about your ideal customer?
                 </label>
                 <textarea
                   value={formData.specialCriteria || ''}
                   onChange={(e) => setFormData({ ...formData, specialCriteria: e.target.value })}
                   rows={4}
-                  className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-sky-500 resize-none"
+                  className="w-full px-4 py-3 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-violet-500 resize-none"
                   placeholder="Any additional criteria, requirements, or notes..."
                 />
               </div>
@@ -687,14 +685,14 @@ const IcpWizard: React.FC<IcpWizardProps> = ({ onComplete }) => {
             <div className="flex justify-between pt-4">
               <button
                 onClick={handleBack}
-                className="flex items-center gap-2 px-6 py-3 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-medium transition-colors"
+                className="flex items-center gap-2 px-6 py-3 rounded-xl bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-300 font-medium transition-colors"
               >
                 <ChevronLeft className="w-5 h-5" />
                 Back
               </button>
               <button
                 onClick={handleSubmit}
-                className="flex items-center gap-2 px-6 py-3 rounded-xl bg-sky-500 hover:bg-sky-600 text-white font-medium transition-colors"
+                className="flex items-center gap-2 px-6 py-3 rounded-xl bg-violet-500 hover:bg-violet-600 text-white font-medium transition-colors"
               >
                 Start Building
                 <Check className="w-5 h-5" />
