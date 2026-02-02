@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { CheckCircle, ArrowRight, Sparkles } from 'lucide-react';
+import { CheckCircle, ArrowRight, Sparkles, ChevronDown } from 'lucide-react';
 import ThemeToggle from './ThemeToggle';
-import { OFFERS } from './offer-data';
+import { OFFERS, type OfferData } from './offer-data';
 
 const foundations = OFFERS.foundations;
 const engineering = OFFERS.engineering;
@@ -66,8 +66,8 @@ const Hero: React.FC = () => (
       </h1>
 
       <p className="text-lg sm:text-xl text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto mb-10 leading-relaxed">
-        Whether you&apos;re just getting started or ready to scale, we have a program that fits
-        where you are right now.
+        Answer two quick questions and we&apos;ll show you the right program for where you are right
+        now.
       </p>
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-8 max-w-3xl mx-auto">
@@ -87,15 +87,22 @@ const Hero: React.FC = () => (
 );
 
 // ============================================
-// Self-Selection Guide
+// Quiz
 // ============================================
 
-interface DiagnosticQuestion {
-  question: string;
-  options: { label: string; answer: 'foundations' | 'engineering' }[];
+type ProgramKey = 'foundations' | 'engineering';
+
+interface QuizOption {
+  label: string;
+  answer: ProgramKey;
 }
 
-const DIAGNOSTIC_QUESTIONS: DiagnosticQuestion[] = [
+interface QuizQuestion {
+  question: string;
+  options: QuizOption[];
+}
+
+const QUIZ_QUESTIONS: QuizQuestion[] = [
   {
     question: "What's your main goal right now?",
     options: [
@@ -124,101 +131,160 @@ const DIAGNOSTIC_QUESTIONS: DiagnosticQuestion[] = [
   },
 ];
 
-const PROGRAM_LABELS: Record<'foundations' | 'engineering', string> = {
-  foundations: 'Foundations',
-  engineering: 'Engineering',
-};
-
-const SelfSelectionGuide: React.FC = () => (
-  <section className="bg-zinc-50 dark:bg-zinc-900/50 py-16 sm:py-20">
-    <div className="max-w-4xl mx-auto px-4 sm:px-6">
-      <h2 className="text-3xl sm:text-4xl font-bold text-zinc-900 dark:text-zinc-100 text-center mb-4">
-        Which Path Fits You?
-      </h2>
-      <p className="text-zinc-600 dark:text-zinc-400 text-center max-w-2xl mx-auto mb-12">
-        Two quick questions to help you pick the right program.
-      </p>
-
-      <div className="space-y-8">
-        {DIAGNOSTIC_QUESTIONS.map((dq) => (
-          <div key={dq.question}>
-            <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mb-4">
-              {dq.question}
-            </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {dq.options.map((opt) => (
-                <div
-                  key={opt.label}
-                  className={`p-4 rounded-xl border-2 ${
-                    opt.answer === 'engineering'
-                      ? 'border-violet-200 dark:border-violet-500/30 bg-violet-50/50 dark:bg-violet-500/5'
-                      : 'border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900'
-                  }`}
-                >
-                  <p className="text-sm text-zinc-700 dark:text-zinc-300 mb-2">{opt.label}</p>
-                  <span
-                    className={`inline-block text-xs font-semibold px-2 py-0.5 rounded-full ${
-                      opt.answer === 'engineering'
-                        ? 'bg-violet-100 dark:bg-violet-500/20 text-violet-700 dark:text-violet-300'
-                        : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400'
-                    }`}
-                  >
-                    {PROGRAM_LABELS[opt.answer]}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  </section>
-);
-
-// ============================================
-// Program Cards
-// ============================================
-
-interface ProgramCardProps {
-  offer: typeof foundations;
-  labelTag: string;
-  isForYouItems: string[];
-  isPremium?: boolean;
+interface QuizProps {
+  onResult: (result: ProgramKey) => void;
 }
 
-const ProgramCard: React.FC<ProgramCardProps> = ({ offer, labelTag, isForYouItems, isPremium }) => (
-  <div
-    className={`rounded-2xl border-2 p-6 sm:p-8 flex flex-col ${
-      isPremium
-        ? 'border-violet-400 dark:border-violet-500/50 bg-white dark:bg-zinc-900'
-        : 'border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900'
-    }`}
-  >
-    <span
-      className={`inline-block self-start text-xs font-semibold px-3 py-1 rounded-full mb-4 ${
-        isPremium
-          ? 'bg-violet-100 dark:bg-violet-500/20 text-violet-700 dark:text-violet-300'
-          : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400'
-      }`}
-    >
-      {labelTag}
-    </span>
+const Quiz: React.FC<QuizProps> = ({ onResult }) => {
+  const [step, setStep] = useState(0);
+  const [answers, setAnswers] = useState<ProgramKey[]>([]);
 
-    <h3 className="text-xl sm:text-2xl font-bold text-zinc-900 dark:text-zinc-100 mb-1">
-      {offer.name}
-    </h3>
-    <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-2">{offer.tagline}</p>
-    <p className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mb-6">{offer.price}</p>
+  const handleSelect = (answer: ProgramKey) => {
+    const next = [...answers, answer];
+    setAnswers(next);
+
+    if (step < QUIZ_QUESTIONS.length - 1) {
+      setStep(step + 1);
+    } else {
+      // Tally: if any answer is "engineering", recommend engineering
+      const result = next.includes('engineering') ? 'engineering' : 'foundations';
+      onResult(result);
+    }
+  };
+
+  const q = QUIZ_QUESTIONS[step];
+
+  return (
+    <section className="bg-zinc-50 dark:bg-zinc-900/50 py-16 sm:py-20">
+      <div className="max-w-xl mx-auto px-4 sm:px-6 text-center">
+        <p className="text-xs font-semibold uppercase tracking-wider text-violet-600 dark:text-violet-400 mb-2">
+          Question {step + 1} of {QUIZ_QUESTIONS.length}
+        </p>
+        <h2 className="text-2xl sm:text-3xl font-bold text-zinc-900 dark:text-zinc-100 mb-8">
+          {q.question}
+        </h2>
+
+        <div className="space-y-4">
+          {q.options.map((opt) => (
+            <button
+              key={opt.label}
+              onClick={() => handleSelect(opt.answer)}
+              className="w-full text-left p-5 rounded-xl border-2 border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 hover:border-violet-400 dark:hover:border-violet-500/50 transition-colors"
+            >
+              <span className="text-base font-medium text-zinc-800 dark:text-zinc-200">
+                {opt.label}
+              </span>
+            </button>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+// ============================================
+// Recommendation Result
+// ============================================
+
+interface RecommendationProps {
+  recommended: ProgramKey;
+  onReset: () => void;
+}
+
+const Recommendation: React.FC<RecommendationProps> = ({ recommended, onReset }) => {
+  const offer = OFFERS[recommended];
+  const altKey: ProgramKey = recommended === 'foundations' ? 'engineering' : 'foundations';
+  const altOffer = OFFERS[altKey];
+  const [showCompare, setShowCompare] = useState(false);
+  const resultRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, []);
+
+  return (
+    <>
+      {/* Recommended program */}
+      <section ref={resultRef} className="bg-zinc-50 dark:bg-zinc-900/50 py-16 sm:py-20">
+        <div className="max-w-2xl mx-auto px-4 sm:px-6">
+          <div className="text-center mb-8">
+            <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-green-50 dark:bg-green-500/10 border border-green-200 dark:border-green-500/20 text-xs sm:text-sm font-medium text-green-700 dark:text-green-300 mb-4">
+              <CheckCircle className="w-3.5 h-3.5" />
+              Your Recommended Program
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-bold text-zinc-900 dark:text-zinc-100">
+              {offer.name}
+            </h2>
+            <p className="text-zinc-600 dark:text-zinc-400 mt-2">{offer.tagline}</p>
+          </div>
+
+          <ProgramDetail offer={offer} />
+
+          <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link
+              to={`/offer/${offer.id}`}
+              className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl text-base font-semibold bg-violet-600 hover:bg-violet-700 text-white transition-colors shadow-lg shadow-violet-500/25"
+            >
+              Learn More About {offer.name} <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+
+          {/* Secondary actions */}
+          <div className="mt-6 flex flex-col items-center gap-3 text-sm">
+            <button
+              onClick={() => setShowCompare((v) => !v)}
+              className="inline-flex items-center gap-1.5 text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200 transition-colors"
+            >
+              <ChevronDown
+                className={`w-4 h-4 transition-transform ${showCompare ? 'rotate-180' : ''}`}
+              />
+              {showCompare ? 'Hide comparison' : `Compare with ${altOffer.name}`}
+            </button>
+            <button
+              onClick={onReset}
+              className="text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors"
+            >
+              Retake quiz
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Comparison (hidden by default) */}
+      {showCompare && (
+        <section className="bg-white dark:bg-zinc-950 py-16 sm:py-20">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6">
+            <h3 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 text-center mb-10">
+              Side-by-Side Comparison
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <CompareCard offer={offer} label="Recommended for You" isRecommended />
+              <CompareCard offer={altOffer} label="Also Available" />
+            </div>
+          </div>
+        </section>
+      )}
+    </>
+  );
+};
+
+// ============================================
+// Program Detail (single card for recommendation)
+// ============================================
+
+const ProgramDetail: React.FC<{ offer: OfferData }> = ({ offer }) => (
+  <div className="rounded-2xl border-2 border-violet-400 dark:border-violet-500/50 bg-white dark:bg-zinc-900 p-6 sm:p-8">
+    <p className="text-3xl font-bold text-zinc-900 dark:text-zinc-100 mb-6">{offer.price}</p>
 
     <div className="mb-6">
       <h4 className="text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-3">
         What You Get
       </h4>
-      <ul className="space-y-2">
+      <ul className="space-y-2.5">
         {offer.solutionBullets.map((bullet) => (
           <li
             key={bullet}
-            className="flex items-start gap-2 text-sm text-zinc-700 dark:text-zinc-300"
+            className="flex items-start gap-2.5 text-sm text-zinc-700 dark:text-zinc-300"
           >
             <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
             <span>{bullet}</span>
@@ -227,15 +293,15 @@ const ProgramCard: React.FC<ProgramCardProps> = ({ offer, labelTag, isForYouItem
       </ul>
     </div>
 
-    <div className="mb-6">
+    <div>
       <h4 className="text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-3">
         This Is For You If
       </h4>
-      <ul className="space-y-2">
-        {isForYouItems.map((item) => (
+      <ul className="space-y-2.5">
+        {offer.isForYou.slice(0, 4).map((item) => (
           <li
             key={item}
-            className="flex items-start gap-2 text-sm text-zinc-700 dark:text-zinc-300"
+            className="flex items-start gap-2.5 text-sm text-zinc-700 dark:text-zinc-300"
           >
             <ArrowRight className="w-4 h-4 text-violet-500 mt-0.5 flex-shrink-0" />
             <span>{item}</span>
@@ -243,12 +309,52 @@ const ProgramCard: React.FC<ProgramCardProps> = ({ offer, labelTag, isForYouItem
         ))}
       </ul>
     </div>
+  </div>
+);
+
+// ============================================
+// Compare Card (compact, for side-by-side)
+// ============================================
+
+const CompareCard: React.FC<{
+  offer: OfferData;
+  label: string;
+  isRecommended?: boolean;
+}> = ({ offer, label, isRecommended }) => (
+  <div
+    className={`rounded-2xl border-2 p-6 flex flex-col ${
+      isRecommended
+        ? 'border-violet-400 dark:border-violet-500/50 bg-white dark:bg-zinc-900'
+        : 'border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900'
+    }`}
+  >
+    <span
+      className={`inline-block self-start text-xs font-semibold px-3 py-1 rounded-full mb-3 ${
+        isRecommended
+          ? 'bg-violet-100 dark:bg-violet-500/20 text-violet-700 dark:text-violet-300'
+          : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400'
+      }`}
+    >
+      {label}
+    </span>
+    <h4 className="text-lg font-bold text-zinc-900 dark:text-zinc-100 mb-1">{offer.name}</h4>
+    <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-1">{offer.tagline}</p>
+    <p className="text-xl font-bold text-zinc-900 dark:text-zinc-100 mb-4">{offer.price}</p>
+
+    <ul className="space-y-2 mb-6">
+      {offer.solutionBullets.map((b) => (
+        <li key={b} className="flex items-start gap-2 text-sm text-zinc-700 dark:text-zinc-300">
+          <CheckCircle className="w-3.5 h-3.5 text-green-500 mt-0.5 flex-shrink-0" />
+          <span>{b}</span>
+        </li>
+      ))}
+    </ul>
 
     <div className="mt-auto">
       <Link
         to={`/offer/${offer.id}`}
-        className={`inline-flex items-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold transition-colors ${
-          isPremium
+        className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors ${
+          isRecommended
             ? 'bg-violet-600 hover:bg-violet-700 text-white shadow-lg shadow-violet-500/25'
             : 'bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-900'
         }`}
@@ -257,147 +363,6 @@ const ProgramCard: React.FC<ProgramCardProps> = ({ offer, labelTag, isForYouItem
       </Link>
     </div>
   </div>
-);
-
-const ProgramCards: React.FC = () => (
-  <section className="bg-white dark:bg-zinc-950 py-16 sm:py-20">
-    <div className="max-w-5xl mx-auto px-4 sm:px-6">
-      <h2 className="text-3xl sm:text-4xl font-bold text-zinc-900 dark:text-zinc-100 text-center mb-4">
-        Two Programs. One Goal.
-      </h2>
-      <p className="text-zinc-600 dark:text-zinc-400 text-center max-w-2xl mx-auto mb-12">
-        Both programs give you a complete system. Pick the one that matches your stage.
-      </p>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
-        <ProgramCard
-          offer={foundations}
-          labelTag="For Beginners"
-          isForYouItems={foundations.isForYou.slice(0, 4)}
-        />
-        <ProgramCard
-          offer={engineering}
-          labelTag="For Scaling"
-          isForYouItems={engineering.isForYou.slice(0, 4)}
-          isPremium
-        />
-      </div>
-    </div>
-  </section>
-);
-
-// ============================================
-// Comparison Table
-// ============================================
-
-interface ComparisonRow {
-  label: string;
-  foundations: string;
-  engineering: string;
-}
-
-const COMPARISON_ROWS: ComparisonRow[] = [
-  {
-    label: 'Best For',
-    foundations: 'Getting started with LinkedIn lead gen',
-    engineering: 'Scaling an existing business with multi-channel outbound',
-  },
-  {
-    label: 'Price',
-    foundations: foundations.price,
-    engineering: engineering.price,
-  },
-  {
-    label: 'Format',
-    foundations: '4x 90-min live sessions + async support',
-    engineering: '4x 90-min live sessions + async support',
-  },
-  {
-    label: 'What You Build',
-    foundations: 'Profile, outreach, content system, lead magnet, daily routine',
-    engineering:
-      'Lead magnet funnel, enriched lists, cold email + LinkedIn automation, LinkedIn ads',
-  },
-  {
-    label: 'Tooling Cost',
-    foundations: '~$15-50/month (Linked Helper only)',
-    engineering: '~$300-500/month (Clay, Smartlead, HeyReach, LinkedIn Ads)',
-  },
-  {
-    label: 'Prerequisite',
-    foundations: 'None — we start from scratch',
-    engineering: 'Validated offer + $10k+/mo revenue recommended',
-  },
-];
-
-const ComparisonTable: React.FC = () => (
-  <section className="bg-zinc-50 dark:bg-zinc-900/50 py-16 sm:py-20">
-    <div className="max-w-5xl mx-auto px-4 sm:px-6">
-      <h2 className="text-3xl sm:text-4xl font-bold text-zinc-900 dark:text-zinc-100 text-center mb-12">
-        Quick Comparison
-      </h2>
-
-      {/* Desktop table */}
-      <div className="hidden md:block overflow-x-auto">
-        <table className="w-full text-left border-collapse">
-          <thead>
-            <tr className="border-b-2 border-zinc-200 dark:border-zinc-700">
-              <th className="py-3 pr-4 text-sm font-semibold text-zinc-500 dark:text-zinc-400 w-1/4" />
-              <th className="py-3 px-4 text-sm font-semibold text-zinc-900 dark:text-zinc-100 w-[37.5%]">
-                {foundations.name}
-              </th>
-              <th className="py-3 pl-4 text-sm font-semibold text-violet-600 dark:text-violet-400 w-[37.5%]">
-                {engineering.name}
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {COMPARISON_ROWS.map((row) => (
-              <tr key={row.label} className="border-b border-zinc-200 dark:border-zinc-800">
-                <td className="py-3 pr-4 text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                  {row.label}
-                </td>
-                <td className="py-3 px-4 text-sm text-zinc-600 dark:text-zinc-400">
-                  {row.foundations}
-                </td>
-                <td className="py-3 pl-4 text-sm text-zinc-600 dark:text-zinc-400">
-                  {row.engineering}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Mobile stacked cards */}
-      <div className="md:hidden space-y-4">
-        {COMPARISON_ROWS.map((row) => (
-          <div
-            key={row.label}
-            className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 p-4"
-          >
-            <h4 className="text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-3">
-              {row.label}
-            </h4>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <span className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1">
-                  Foundations
-                </span>
-                <span className="text-sm text-zinc-600 dark:text-zinc-400">{row.foundations}</span>
-              </div>
-              <div>
-                <span className="block text-xs font-semibold text-violet-600 dark:text-violet-400 mb-1">
-                  Engineering
-                </span>
-                <span className="text-sm text-zinc-600 dark:text-zinc-400">{row.engineering}</span>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  </section>
 );
 
 // ============================================
@@ -458,16 +423,27 @@ const Footer: React.FC = () => (
 // ProgramsPage
 // ============================================
 
-const ProgramsPage: React.FC = () => (
-  <div className="min-h-screen bg-white dark:bg-zinc-950">
-    <NavBar />
-    <Hero />
-    <SelfSelectionGuide />
-    <ProgramCards />
-    <ComparisonTable />
-    <FallbackCTA />
-    <Footer />
-  </div>
-);
+const ProgramsPage: React.FC = () => {
+  const [result, setResult] = useState<ProgramKey | null>(null);
+
+  const handleReset = () => {
+    setResult(null);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  return (
+    <div className="min-h-screen bg-white dark:bg-zinc-950">
+      <NavBar />
+      <Hero />
+      {result === null ? (
+        <Quiz onResult={setResult} />
+      ) : (
+        <Recommendation recommended={result} onReset={handleReset} />
+      )}
+      <FallbackCTA />
+      <Footer />
+    </div>
+  );
+};
 
 export default ProgramsPage;
