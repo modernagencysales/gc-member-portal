@@ -236,6 +236,12 @@ const NavBar: React.FC = () => (
       </span>
       <div className="flex items-center gap-3 sm:gap-5">
         <Link
+          to="/programs"
+          className="text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
+        >
+          What We Do
+        </Link>
+        <Link
           to="/case-studies"
           className="text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
         >

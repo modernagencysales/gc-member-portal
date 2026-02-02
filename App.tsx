@@ -10,6 +10,7 @@ const BlueprintThankYou = lazy(() => import('./components/blueprint/BlueprintTha
 const CallBookedThankYou = lazy(() => import('./components/blueprint/CallBookedThankYou'));
 const GenericOfferPage = lazy(() => import('./components/blueprint/GenericOfferPage'));
 const CaseStudiesPage = lazy(() => import('./components/blueprint/CaseStudiesPage'));
+const ProgramsPage = lazy(() => import('./components/blueprint/ProgramsPage'));
 
 // Lazy-loaded: GC Portal
 const GCLogin = lazy(() => import('./components/gc/GCLogin'));
@@ -215,6 +216,9 @@ const App: React.FC = () => {
         <Route path="/blueprint/call-booked" element={<CallBookedThankYou />} />
         <Route path="/blueprint/:slug" element={<BlueprintPage />} />
         <Route path="/blueprint/:slug/offer" element={<OfferPage />} />
+
+        {/* Programs / What We Do */}
+        <Route path="/programs" element={<ProgramsPage />} />
 
         {/* Case Studies */}
         <Route path="/case-studies" element={<CaseStudiesPage />} />
