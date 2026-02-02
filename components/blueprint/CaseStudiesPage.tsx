@@ -223,6 +223,7 @@ const NavBar: React.FC = () => (
       <div className="flex items-center gap-4 sm:gap-6">
         <Link
           to="/blueprint"
+          onClick={() => window.scrollTo(0, 0)}
           className="text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
         >
           Get Your Blueprint
@@ -386,6 +387,7 @@ const CTASection: React.FC = () => (
       </p>
       <Link
         to="/blueprint"
+        onClick={() => window.scrollTo(0, 0)}
         className="inline-flex items-center gap-2 px-8 py-4 rounded-xl text-lg font-semibold bg-white text-violet-700 hover:bg-violet-50 transition-colors shadow-lg"
       >
         Get Your Blueprint Now
@@ -456,6 +458,7 @@ const CaseStudiesPage: React.FC = () => (
           </div>
           <Link
             to="/blueprint"
+            onClick={() => window.scrollTo(0, 0)}
             className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold bg-violet-600 hover:bg-violet-700 text-white transition-colors shadow-lg shadow-violet-500/25"
           >
             <FileText className="w-4 h-4" />
