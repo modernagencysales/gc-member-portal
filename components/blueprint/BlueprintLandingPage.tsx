@@ -242,6 +242,12 @@ const NavBar: React.FC = () => (
           Case Studies
         </Link>
         <Link
+          to="/affiliate/apply"
+          className="text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
+        >
+          Affiliates
+        </Link>
+        <Link
           to="/login"
           className="text-sm font-medium text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:hover:text-violet-300 transition-colors"
         >
