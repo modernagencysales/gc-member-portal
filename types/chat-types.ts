@@ -120,6 +120,15 @@ export interface ChatStreamChunk {
 }
 
 // ============================================
+// Student Tool Credits
+// ============================================
+
+export interface StudentToolCredits {
+  toolSlug: string;
+  creditsRemaining: number;
+}
+
+// ============================================
 // Conversation with Messages (for history)
 // ============================================
 

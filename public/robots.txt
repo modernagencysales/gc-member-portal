@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Allow: /blueprint
+Allow: /case-studies
+Disallow: /admin
+Disallow: /portal
+Disallow: /bootcamp
+Disallow: /login
+
+Sitemap: https://modernagencysales.com/sitemap.xml

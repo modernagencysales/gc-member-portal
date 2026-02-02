@@ -243,7 +243,7 @@ export async function fetchCourseData(
       });
 
     return {
-      title: 'GTM OS',
+      title: 'Modern Agency Sales',
       weeks,
       cohort: targetCohort,
     };

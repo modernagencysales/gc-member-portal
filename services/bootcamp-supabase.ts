@@ -18,6 +18,7 @@ import {
   BootcampSurveyFormData,
   BootcampCohort,
   BootcampInviteCode,
+  ToolGrant,
 } from '../types/bootcamp-types';
 
 // ============================================
@@ -826,7 +827,14 @@ export async function fetchInviteCodesByCohort(cohortId: string): Promise<Bootca
 
 export async function createInviteCode(
   cohortId: string,
-  options?: { maxUses?: number; expiresAt?: Date; customCode?: string }
+  options?: {
+    maxUses?: number;
+    expiresAt?: Date;
+    customCode?: string;
+    accessLevel?: string;
+    toolGrants?: ToolGrant[];
+    contentGrants?: string[];
+  }
 ): Promise<BootcampInviteCode> {
   const code = options?.customCode?.toUpperCase() || generateInviteCode();
 
@@ -838,6 +846,11 @@ export async function createInviteCode(
 
   if (options?.maxUses !== undefined) insertData.max_uses = options.maxUses;
   if (options?.expiresAt !== undefined) insertData.expires_at = options.expiresAt.toISOString();
+  if (options?.accessLevel) insertData.access_level = options.accessLevel;
+  if (options?.toolGrants && options.toolGrants.length > 0)
+    insertData.tool_grants = options.toolGrants;
+  if (options?.contentGrants && options.contentGrants.length > 0)
+    insertData.content_grants = options.contentGrants;
 
   const { data, error } = await supabase
     .from('bootcamp_invite_codes')
@@ -958,6 +971,10 @@ function mapBootcampInviteCode(record: Record<string, unknown>): BootcampInviteC
     useCount: (record.use_count as number) || 0,
     status: (record.status as BootcampInviteCode['status']) || 'Active',
     expiresAt: record.expires_at ? new Date(record.expires_at as string) : undefined,
+    grantedAccessLevel:
+      (record.access_level as BootcampInviteCode['grantedAccessLevel']) || 'Full Access',
+    toolGrants: record.tool_grants as ToolGrant[] | null | undefined,
+    contentGrants: record.content_grants as string[] | null | undefined,
     createdAt: new Date(record.created_at as string),
   };
 }
@@ -1050,15 +1067,29 @@ export async function registerBootcampStudent(
     throw new Error('Cohort not found');
   }
 
-  // 4. Create student with status 'Onboarding'
+  // 4. Create student with access level from invite code
+  const accessLevel = validCode.grantedAccessLevel || 'Full Access';
   const student = await createBootcampStudent({
     email,
     cohort: cohort.name,
     status: 'Onboarding',
-    accessLevel: 'Full Access',
+    accessLevel,
   });
 
-  // 5. Try to link student to prospect (graceful - don't fail registration if this fails)
+  // 5. Grant tool credits if code specifies them
+  if (validCode.toolGrants && validCode.toolGrants.length > 0) {
+    await grantToolCredits(student.id, validCode.toolGrants, validCode.code);
+  }
+
+  // 6. Grant content access if code specifies it
+  if (validCode.contentGrants && validCode.contentGrants.length > 0) {
+    await grantContentAccess(student.id, validCode.contentGrants, validCode.code);
+  }
+
+  // 7. Record redeemed code
+  await recordRedeemedCode(student.id, validCode.code);
+
+  // 8. Try to link student to prospect (graceful - don't fail registration if this fails)
   try {
     const prospectId = await findProspectByEmail(email);
     if (prospectId) {
@@ -1079,8 +1110,223 @@ export async function registerBootcampStudent(
     console.error('Failed to link bootcamp student to prospect (non-fatal):', error);
   }
 
-  // 6. Increment invite code usage
+  // 9. Increment invite code usage
   await incrementInviteCodeUsage(validCode.id);
 
   return student;
+}
+
+// ============================================
+// Lead Magnet Grant Helpers
+// ============================================
+
+async function grantToolCredits(
+  studentId: string,
+  toolGrants: ToolGrant[],
+  code: string
+): Promise<void> {
+  for (const grant of toolGrants) {
+    // Look up tool by slug
+    const { data: tool } = await supabase
+      .from('ai_tools')
+      .select('id')
+      .eq('slug', grant.toolSlug)
+      .maybeSingle();
+
+    if (!tool) {
+      console.warn(`Tool not found for slug: ${grant.toolSlug}`);
+      continue;
+    }
+
+    const { error } = await supabase.from('student_tool_credits').upsert(
+      {
+        student_id: studentId,
+        tool_id: tool.id,
+        credits_total: grant.credits,
+        credits_used: 0,
+        granted_by_code: code,
+      },
+      { onConflict: 'student_id,tool_id,granted_by_code' }
+    );
+
+    if (error) {
+      console.error(`Failed to grant tool credits for ${grant.toolSlug}:`, error);
+    }
+  }
+}
+
+async function grantContentAccess(
+  studentId: string,
+  weekIds: string[],
+  code: string
+): Promise<void> {
+  for (const weekId of weekIds) {
+    const { error } = await supabase.from('student_content_grants').upsert(
+      {
+        student_id: studentId,
+        week_id: weekId,
+        granted_by_code: code,
+      },
+      { onConflict: 'student_id,week_id' }
+    );
+
+    if (error) {
+      console.error(`Failed to grant content access for ${weekId}:`, error);
+    }
+  }
+}
+
+async function recordRedeemedCode(studentId: string, code: string): Promise<void> {
+  const { error } = await supabase.from('student_redeemed_codes').upsert(
+    {
+      student_id: studentId,
+      code: code.toUpperCase(),
+    },
+    { onConflict: 'student_id,code' }
+  );
+
+  if (error) {
+    console.error('Failed to record redeemed code:', error);
+  }
+}
+
+// ============================================
+// Code Redemption (for logged-in users)
+// ============================================
+
+export interface RedeemResult {
+  toolsUnlocked: string[];
+  weeksUnlocked: string[];
+  accessUpgraded: boolean;
+}
+
+export async function redeemCode(studentId: string, code: string): Promise<RedeemResult> {
+  // 1. Validate code
+  const validCode = await validateInviteCode(code);
+  if (!validCode) {
+    throw new Error('Invalid or expired invite code');
+  }
+
+  // 2. Check if already redeemed
+  const { data: existing } = await supabase
+    .from('student_redeemed_codes')
+    .select('id')
+    .eq('student_id', studentId)
+    .eq('code', code.toUpperCase())
+    .maybeSingle();
+
+  if (existing) {
+    throw new Error('Code already redeemed');
+  }
+
+  const result: RedeemResult = {
+    toolsUnlocked: [],
+    weeksUnlocked: [],
+    accessUpgraded: false,
+  };
+
+  // 3. Grant tool credits
+  if (validCode.toolGrants && validCode.toolGrants.length > 0) {
+    await grantToolCredits(studentId, validCode.toolGrants, validCode.code);
+    result.toolsUnlocked = validCode.toolGrants.map((g) => g.toolSlug);
+  }
+
+  // 4. Grant content access
+  if (validCode.contentGrants && validCode.contentGrants.length > 0) {
+    await grantContentAccess(studentId, validCode.contentGrants, validCode.code);
+    result.weeksUnlocked = validCode.contentGrants;
+  }
+
+  // 5. Upgrade access level if Full Access code
+  if (validCode.grantedAccessLevel === 'Full Access') {
+    await updateBootcampStudent(studentId, { accessLevel: 'Full Access' });
+    result.accessUpgraded = true;
+  }
+
+  // 6. Record redemption
+  await recordRedeemedCode(studentId, validCode.code);
+
+  // 7. Increment code usage
+  await incrementInviteCodeUsage(validCode.id);
+
+  return result;
+}
+
+// ============================================
+// Student Grants Query
+// ============================================
+
+export interface StudentGrants {
+  tools: Array<{
+    toolId: string;
+    toolSlug: string;
+    toolName: string;
+    creditsRemaining: number;
+    creditsTotal: number;
+  }>;
+  weekIds: string[];
+}
+
+export async function getStudentGrants(studentId: string): Promise<StudentGrants> {
+  // Fetch tool credits with tool info
+  const { data: credits } = await supabase
+    .from('student_tool_credits')
+    .select(
+      `
+      tool_id,
+      credits_total,
+      credits_used,
+      ai_tools (slug, name)
+    `
+    )
+    .eq('student_id', studentId);
+
+  // Aggregate credits per tool
+  const toolMap = new Map<
+    string,
+    {
+      toolId: string;
+      toolSlug: string;
+      toolName: string;
+      creditsTotal: number;
+      creditsUsed: number;
+    }
+  >();
+
+  (credits || []).forEach((row) => {
+    const toolData = row.ai_tools as unknown as Record<string, unknown> | null;
+    const toolId = row.tool_id as string;
+    const existing = toolMap.get(toolId);
+
+    if (existing) {
+      existing.creditsTotal += (row.credits_total as number) || 0;
+      existing.creditsUsed += (row.credits_used as number) || 0;
+    } else {
+      toolMap.set(toolId, {
+        toolId,
+        toolSlug: (toolData?.slug as string) || '',
+        toolName: (toolData?.name as string) || '',
+        creditsTotal: (row.credits_total as number) || 0,
+        creditsUsed: (row.credits_used as number) || 0,
+      });
+    }
+  });
+
+  const tools = Array.from(toolMap.values()).map((t) => ({
+    toolId: t.toolId,
+    toolSlug: t.toolSlug,
+    toolName: t.toolName,
+    creditsRemaining: t.creditsTotal - t.creditsUsed,
+    creditsTotal: t.creditsTotal,
+  }));
+
+  // Fetch content grants
+  const { data: contentGrants } = await supabase
+    .from('student_content_grants')
+    .select('week_id')
+    .eq('student_id', studentId);
+
+  const weekIds = (contentGrants || []).map((row) => row.week_id as string);
+
+  return { tools, weekIds };
 }

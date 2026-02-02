@@ -8,9 +8,15 @@ const ALLOWED_ORIGINS = [
   'http://localhost:3000',
 ];
 
+function isAllowedOrigin(origin: string): boolean {
+  if (ALLOWED_ORIGINS.includes(origin)) return true;
+  if (origin.endsWith('.vercel.app')) return true;
+  return false;
+}
+
 function getCorsHeaders(req: Request) {
   const origin = req.headers.get('origin') || '';
-  const allowedOrigin = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  const allowedOrigin = isAllowedOrigin(origin) ? origin : ALLOWED_ORIGINS[0];
   return {
     'Access-Control-Allow-Origin': allowedOrigin,
     'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -413,7 +419,46 @@ serve(async (req) => {
       }
     }
 
-    // 6. Call Claude API with streaming
+    // 6. Credit check for Lead Magnet users
+    let creditsRemaining: number | null = null;
+
+    const { data: studentRecord } = await supabase
+      .from('bootcamp_students')
+      .select('access_level, subscription_status')
+      .eq('id', studentId)
+      .maybeSingle();
+
+    const accessLevel = studentRecord?.access_level || 'Full Access';
+    const subscriptionActive = studentRecord?.subscription_status === 'active';
+
+    if (accessLevel === 'Lead Magnet' && !subscriptionActive) {
+      const { data: creditResult, error: creditError } = await supabase.rpc(
+        'decrement_tool_credit',
+        { p_student_id: studentId, p_tool_id: tool.id }
+      );
+
+      if (creditError) {
+        console.error('Credit check failed:', creditError);
+        throw new Error('Credit check failed');
+      }
+
+      if (creditResult === -1) {
+        return new Response(
+          JSON.stringify({
+            error: 'No credits remaining',
+            code: 'CREDITS_EXHAUSTED',
+          }),
+          {
+            status: 403,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          }
+        );
+      }
+
+      creditsRemaining = creditResult as number;
+    }
+
+    // 7. Call Claude API with streaming
     const messages = [...history, { role: 'user' as const, content: message }];
 
     const claudeResponse = await fetch('https://api.anthropic.com/v1/messages', {
@@ -478,15 +523,15 @@ serve(async (req) => {
                   output_tokens: outputTokens,
                 });
 
-                controller.enqueue(
-                  encoder.encode(
-                    `data: ${JSON.stringify({
-                      type: 'done',
-                      conversationId: actualConversationId,
-                      usage: { inputTokens, outputTokens },
-                    })}\n\n`
-                  )
-                );
+                const donePayload: Record<string, unknown> = {
+                  type: 'done',
+                  conversationId: actualConversationId,
+                  usage: { inputTokens, outputTokens },
+                };
+                if (creditsRemaining !== null) {
+                  donePayload.creditsRemaining = creditsRemaining;
+                }
+                controller.enqueue(encoder.encode(`data: ${JSON.stringify(donePayload)}\n\n`));
               } else if (parsed.type === 'error') {
                 controller.enqueue(
                   encoder.encode(

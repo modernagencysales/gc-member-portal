@@ -330,6 +330,25 @@ export async function fetchConversationWithMessages(
   return { ...conversation, messages };
 }
 
+// ============================================
+// Tool Credits
+// ============================================
+
+export async function getCreditsForTool(studentId: string, toolId: string): Promise<number> {
+  const { data } = await supabase
+    .from('student_tool_credits')
+    .select('credits_total, credits_used')
+    .eq('student_id', studentId)
+    .eq('tool_id', toolId);
+
+  if (!data || data.length === 0) return 0;
+
+  return data.reduce(
+    (sum, row) => sum + ((row.credits_total as number) || 0) - ((row.credits_used as number) || 0),
+    0
+  );
+}
+
 export async function getOrCreateConversation(
   studentId: string,
   toolId: string

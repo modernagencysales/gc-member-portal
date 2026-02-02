@@ -8,7 +8,7 @@ export interface User {
   email: string;
   name?: string; // Changed: Optional field
   cohort: string;
-  status: 'Full Access' | 'Curriculum Only';
+  status: 'Full Access' | 'Curriculum Only' | 'Lead Magnet';
 }
 
 export interface Lesson {

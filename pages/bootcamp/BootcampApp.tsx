@@ -8,6 +8,7 @@ import {
   saveBootcampStudentSurvey,
   fetchAllBootcampSettings,
   completeStudentOnboarding,
+  redeemCode,
 } from '../../services/bootcamp-supabase';
 import Sidebar from '../../components/bootcamp/Sidebar';
 import LessonView from '../../components/bootcamp/LessonView';
@@ -23,8 +24,10 @@ import {
 } from '../../components/bootcamp/onboarding';
 import { useSubscription } from '../../hooks/useSubscription';
 import { useActiveAITools } from '../../hooks/useChatHistory';
+import { useStudentGrants } from '../../hooks/useStudentGrants';
 import SubscriptionBanner from '../../components/bootcamp/SubscriptionBanner';
 import SubscriptionModal from '../../components/bootcamp/SubscriptionModal';
+import RedeemCodeModal from '../../components/bootcamp/RedeemCodeModal';
 import { StudentSettingsModal } from '../../components/bootcamp/settings';
 import { CourseData, Lesson, User } from '../../types';
 import {
@@ -79,6 +82,15 @@ const BootcampApp: React.FC = () => {
 
   // Settings modal state
   const [showSettingsModal, setShowSettingsModal] = useState(false);
+
+  // Redeem code modal state
+  const [showRedeemModal, setShowRedeemModal] = useState(false);
+
+  // Student grants for Lead Magnet users
+  const { grantedTools, grantedWeekIds, refetchGrants } = useStudentGrants(
+    bootcampStudent?.id,
+    user?.status || 'Full Access'
+  );
 
   // Legacy progress state
   const [completedItems, setCompletedItems] = useState<Set<string>>(new Set<string>());
@@ -254,6 +266,38 @@ const BootcampApp: React.FC = () => {
 
     loadUserData(newUser);
   };
+
+  // Auto-redeem code from URL when logged in
+  useEffect(() => {
+    const autoRedeem = async () => {
+      if (!bootcampStudent || !inviteCodeFromUrl) return;
+
+      try {
+        const result = await redeemCode(bootcampStudent.id, inviteCodeFromUrl);
+        // Refresh grants after successful redeem
+        refetchGrants();
+
+        // Update user access level if upgraded
+        if (result.accessUpgraded && user) {
+          const updatedUser: User = { ...user, status: 'Full Access' };
+          setUser(updatedUser);
+          localStorage.setItem('lms_user_obj', JSON.stringify(updatedUser));
+
+          const student = await verifyBootcampStudent(user.email);
+          if (student) setBootcampStudent(student);
+        }
+
+        // Clear the code param from URL
+        setSearchParams({});
+      } catch {
+        // Silently ignore (already redeemed or invalid)
+        setSearchParams({});
+      }
+    };
+
+    autoRedeem();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bootcampStudent?.id, inviteCodeFromUrl]);
 
   const handleShowRegister = () => {
     setShowRegister(true);
@@ -451,7 +495,9 @@ const BootcampApp: React.FC = () => {
 
       <div className="flex flex-1 overflow-hidden">
         <div className="md:hidden fixed top-0 left-0 right-0 h-14 bg-white dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800 z-40 flex items-center px-4 justify-between">
-          <span className="font-semibold text-sm text-zinc-800 dark:text-zinc-200">GTM OS</span>
+          <span className="font-semibold text-sm text-zinc-800 dark:text-zinc-200">
+            Modern Agency Sales
+          </span>
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="p-2 text-zinc-900 dark:text-zinc-100"
@@ -461,7 +507,14 @@ const BootcampApp: React.FC = () => {
         </div>
 
         <Sidebar
-          data={courseData}
+          data={
+            user?.status === 'Lead Magnet' && grantedWeekIds
+              ? {
+                  ...courseData,
+                  weeks: courseData.weeks.filter((w) => grantedWeekIds.includes(w.id)),
+                }
+              : courseData
+          }
           currentLessonId={currentLesson.id}
           onSelectLesson={setCurrentLesson}
           isOpen={mobileMenuOpen}
@@ -473,6 +526,9 @@ const BootcampApp: React.FC = () => {
           aiTools={aiTools}
           onOpenSettings={bootcampStudent ? () => setShowSettingsModal(true) : undefined}
           hasBlueprint={!!bootcampStudent?.prospectId}
+          grantedTools={grantedTools}
+          grantedWeekIds={grantedWeekIds}
+          onRedeemCode={user?.status === 'Lead Magnet' ? () => setShowRedeemModal(true) : undefined}
         />
 
         <main className="flex-1 h-full overflow-y-auto pt-14 md:pt-0 bg-white dark:bg-zinc-950 transition-colors duration-300">
@@ -523,6 +579,16 @@ const BootcampApp: React.FC = () => {
           isOpen={showSettingsModal}
           onClose={() => setShowSettingsModal(false)}
           onUpdate={handleStudentUpdate}
+        />
+      )}
+
+      {/* Redeem Code Modal */}
+      {bootcampStudent && (
+        <RedeemCodeModal
+          isOpen={showRedeemModal}
+          onClose={() => setShowRedeemModal(false)}
+          studentId={bootcampStudent.id}
+          onSuccess={() => refetchGrants()}
         />
       )}
     </div>

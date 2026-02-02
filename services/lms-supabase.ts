@@ -956,7 +956,7 @@ export async function fetchStudentCurriculumAsLegacy(
   // If no curriculum found, return empty data
   if (!curriculum) {
     return {
-      title: 'GTM OS',
+      title: 'Modern Agency Sales',
       weeks: [],
       cohort: cohortName,
     };
@@ -1009,7 +1009,7 @@ export async function fetchStudentCurriculumAsLegacy(
   });
 
   return {
-    title: 'GTM OS',
+    title: 'Modern Agency Sales',
     weeks,
     cohort: curriculum.cohort.name,
   };

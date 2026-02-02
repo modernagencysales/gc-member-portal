@@ -1,19 +1,8 @@
 import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
 export default defineConfig({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   plugins: [react() as any],
-  resolve: {
-    alias: {
-      // Alias @google/genai to mock for tests
-      '@google/genai': path.resolve(__dirname, '__mocks__/@google/genai.ts'),
-    },
-  },
   test: {
     environment: 'jsdom',
     globals: true,

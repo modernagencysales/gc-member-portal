@@ -1,87 +1,5 @@
-import { GoogleGenAI } from '@google/genai';
+import { supabase } from '../lib/supabaseClient';
 
-// Initialize Gemini Client
-// Always use a named parameter and obtain API key directly from process.env.API_KEY.
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY || '' });
-
-/**
- * Simulates fetching a transcript from YouTube.
- *
- * Since we cannot fetch actual YouTube captions client-side without a backend proxy,
- * this function uses a hybrid approach for the demo:
- * 1. Returns a hardcoded transcript for the specific demo video.
- * 2. Uses GenAI to "hallucinate" a realistic transcript for any other video title.
- *    This ensures the "Summarize" feature works impressively for ANY video in the prototype.
- */
-export async function getYouTubeTranscript(
-  videoId: string,
-  videoTitle: string = 'Video Lesson'
-): Promise<string> {
-  // Simulate network delay
-  await new Promise((resolve) => setTimeout(resolve, 800));
-
-  // 1. Hardcoded Mock for the specific Demo Video (Course Kickoff)
-  // ID from constants.ts: aqz-KE-bpKQ
-  if (videoId === 'aqz-KE-bpKQ') {
-    return `
-      Welcome everyone to the LinkedIn Bootcamp. I'm so excited to have you all here.
-      In this course, we are going to dive deep into automation using Clay.
-      First, we'll start with the fundamentals. It's crucial you understand how to set up your sources.
-      A lot of people jump straight to enrichment, but if your data source isn't clean, your results won't be either.
-      We will be using webhooks extensively. This allows us to trigger workflows from other apps.
-      Make sure you have your Clay account set up by the end of this week.
-      Also, the community is your biggest asset. Please join the Slack channel.
-      The link is in the dashboard. Introduce yourself, find a study buddy.
-      We've seen that students who engage in the community are 3x more likely to complete the course.
-      For this week's homework, you need to configure your first webhook source and pass the quiz.
-      Don't worry if it feels overwhelming at first. The interface can be dense.
-      Just focus on the navigation lesson we provided.
-      Next week, we'll get into the fun stuff: OpenAI integration and writing AI prompts to personalize messages.
-      But for now, get those foundations solid. 
-      If you have issues, post in the #help-desk channel on Slack.
-      Let's get started!
-    `;
-  }
-
-  // 2. AI-Generated Transcript for all other videos
-  // This allows the demo to feel "real" for any video the user clicks on.
-  try {
-    if (!process.env.API_KEY) throw new Error('No API Key');
-
-    // Use gemini-3-flash-preview for basic text tasks
-    const model = 'gemini-3-flash-preview';
-    const prompt = `
-      Act as a transcript generator.
-      Generate a realistic, spoken-word transcript for an educational video titled "${videoTitle}".
-      The context is a professional course about LinkedIn Automation, Sales, and Data Enrichment.
-      The transcript should be about 300-400 words.
-      Include:
-      - An enthusiastic introduction.
-      - 3 main teaching points relevant to the title "${videoTitle}".
-      - A summary conclusion.
-      Do not include timestamps or speaker labels, just the raw spoken text.
-    `;
-
-    const response = await ai.models.generateContent({
-      model: model,
-      contents: prompt,
-    });
-
-    // Access the .text property directly
-    return response.text || `[Transcript auto-generation failed for: ${videoTitle}]`;
-  } catch (error) {
-    console.warn('Mock transcript generation failed:', error);
-    return `
-      In this video lesson titled "${videoTitle}", the instructor covers the core concepts of the topic.
-      They demonstrate how to configure the necessary tools and discuss best practices for implementation.
-      Please watch the video to understand the full workflow and specific settings required.
-    `;
-  }
-}
-
-/**
- * Uses Gemini to summarize the transcript.
- */
 /**
  * ICP Generation result structure
  */
@@ -99,120 +17,80 @@ export interface ICPSuggestion {
 }
 
 /**
- * Uses Gemini to generate ICP suggestions based on company info and industry
+ * Uses Claude (via Supabase edge function) to generate ICP suggestions
  */
 export async function generateICPSuggestions(
   companyName: string,
   website?: string,
   existingData?: Partial<ICPSuggestion>
 ): Promise<ICPSuggestion> {
-  try {
-    if (!process.env.API_KEY) {
-      throw new Error('API_KEY not configured');
-    }
+  const { data, error } = await supabase.functions.invoke('generate-icp', {
+    body: { companyName, website, existingData },
+  });
 
-    const model = 'gemini-3-flash-preview';
-
-    const existingContext = existingData
-      ? `
-        The user has already provided some information:
-        - Target Description: ${existingData.targetDescription || 'Not provided'}
-        - Verticals: ${existingData.verticals || 'Not provided'}
-        - Offer: ${existingData.offer || 'Not provided'}
-
-        Use this to inform and enhance your suggestions.
-      `
-      : '';
-
-    const prompt = `
-      You are an expert B2B sales strategist helping define an Ideal Customer Profile (ICP).
-
-      Company: ${companyName}
-      ${website ? `Website: ${website}` : ''}
-      ${existingContext}
-
-      Generate a comprehensive ICP profile. Return a JSON object with these exact keys:
-      - targetDescription: A 2-3 sentence description of the ideal customer
-      - verticals: Comma-separated list of 3-5 target industries/verticals
-      - companySize: Employee count range and/or revenue range
-      - jobTitles: Comma-separated list of 4-6 decision-maker titles
-      - geography: Target geographic regions
-      - painPoints: 3-4 specific pain points the ideal customer faces (bullet points)
-      - offer: A compelling one-sentence value proposition
-      - differentiator: 2-3 key differentiators that set this company apart
-      - socialProof: Suggested types of social proof to collect (case studies, metrics, etc.)
-      - commonObjections: 3-4 likely objections and brief handling strategies
-
-      Make the suggestions specific, actionable, and tailored to B2B outbound sales.
-      Return ONLY valid JSON, no markdown or explanation.
-    `;
-
-    const response = await ai.models.generateContent({
-      model: model,
-      contents: prompt,
-    });
-
-    const text = response.text || '{}';
-
-    // Parse the JSON response
-    const cleanedText = text
-      .replace(/```json\n?/g, '')
-      .replace(/```\n?/g, '')
-      .trim();
-    const parsed = JSON.parse(cleanedText);
-
-    return {
-      targetDescription: parsed.targetDescription || '',
-      verticals: parsed.verticals || '',
-      companySize: parsed.companySize || '',
-      jobTitles: parsed.jobTitles || '',
-      geography: parsed.geography || '',
-      painPoints: parsed.painPoints || '',
-      offer: parsed.offer || '',
-      differentiator: parsed.differentiator || '',
-      socialProof: parsed.socialProof || '',
-      commonObjections: parsed.commonObjections || '',
-    };
-  } catch (error) {
+  if (error) {
     console.error('ICP Generation Failed:', error);
     throw new Error('Unable to generate ICP suggestions. Please try again.');
   }
+
+  return {
+    targetDescription: data.targetDescription || '',
+    verticals: data.verticals || '',
+    companySize: data.companySize || '',
+    jobTitles: data.jobTitles || '',
+    geography: data.geography || '',
+    painPoints: data.painPoints || '',
+    offer: data.offer || '',
+    differentiator: data.differentiator || '',
+    socialProof: data.socialProof || '',
+    commonObjections: data.commonObjections || '',
+  };
 }
 
+/**
+ * Returns a hardcoded transcript for the demo video,
+ * or a placeholder for any other video.
+ */
+export async function getYouTubeTranscript(
+  videoId: string,
+  videoTitle: string = 'Video Lesson'
+): Promise<string> {
+  await new Promise((resolve) => setTimeout(resolve, 800));
+
+  if (videoId === 'aqz-KE-bpKQ') {
+    return `
+      Welcome everyone to the LinkedIn Bootcamp. I'm so excited to have you all here.
+      In this course, we are going to dive deep into automation using Clay.
+      First, we'll start with the fundamentals. It's crucial you understand how to set up your sources.
+      A lot of people jump straight to enrichment, but if your data source isn't clean, your results won't be either.
+      We will be using webhooks extensively. This allows us to trigger workflows from other apps.
+      Make sure you have your Clay account set up by the end of this week.
+      Also, the community is your biggest asset. Please join the Slack channel.
+      The link is in the dashboard. Introduce yourself, find a study buddy.
+      We've seen that students who engage in the community are 3x more likely to complete the course.
+      For this week's homework, you need to configure your first webhook source and pass the quiz.
+      Don't worry if it feels overwhelming at first. The interface can be dense.
+      Just focus on the navigation lesson we provided.
+      Next week, we'll get into the fun stuff: OpenAI integration and writing AI prompts to personalize messages.
+      But for now, get those foundations solid.
+      If you have issues, post in the #help-desk channel on Slack.
+      Let's get started!
+    `;
+  }
+
+  return `
+    In this video lesson titled "${videoTitle}", the instructor covers the core concepts of the topic.
+    They demonstrate how to configure the necessary tools and discuss best practices for implementation.
+    Please watch the video to understand the full workflow and specific settings required.
+  `;
+}
+
+/**
+ * Returns a placeholder summary (transcript summarization removed with Gemini).
+ */
 export async function summarizeLesson(
   lessonTitle: string,
-  transcriptText: string
+  _transcriptText: string
 ): Promise<string> {
-  try {
-    if (!process.env.API_KEY) {
-      throw new Error('API_KEY not configured');
-    }
-
-    // Use gemini-3-flash-preview for basic text tasks
-    const model = 'gemini-3-flash-preview';
-    const prompt = `
-      You are an expert educational assistant. 
-      Analyze the following video transcript for the lesson titled "${lessonTitle}".
-      
-      Please provide:
-      1. A 2-sentence executive summary of the content.
-      2. A list of 3-5 key takeaways or action items.
-      
-      Format the output with Markdown. Use bolding for emphasis.
-      
-      Transcript:
-      ${transcriptText}
-    `;
-
-    const response = await ai.models.generateContent({
-      model: model,
-      contents: prompt,
-    });
-
-    // Use the .text property directly (do not call as a method)
-    return response.text || 'Could not generate summary.';
-  } catch (error) {
-    console.error('Gemini Summarization Failed:', error);
-    return 'Unable to generate summary at this time. Please ensure the API Key is configured correctly.';
-  }
+  return `**Summary for "${lessonTitle}"**\n\nPlease watch the video for a complete overview of this lesson's content.`;
 }

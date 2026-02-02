@@ -27,6 +27,7 @@ import {
   BootcampSurveyFormData,
   BootcampCohort,
   BootcampInviteCode,
+  ToolGrant,
 } from '../types/bootcamp-types';
 
 // ============================================
@@ -283,7 +284,14 @@ export function useCreateInviteCodeMutation() {
       options,
     }: {
       cohortId: string;
-      options?: { maxUses?: number; expiresAt?: Date };
+      options?: {
+        maxUses?: number;
+        expiresAt?: Date;
+        customCode?: string;
+        accessLevel?: string;
+        toolGrants?: ToolGrant[];
+        contentGrants?: string[];
+      };
     }) => createInviteCode(cohortId, options),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.bootcampInviteCodes() });

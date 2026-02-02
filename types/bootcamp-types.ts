@@ -7,7 +7,7 @@
 // Bootcamp Student
 // ============================================
 export type BootcampStudentStatus = 'Onboarding' | 'Active' | 'Completed' | 'Paused' | 'Churned';
-export type BootcampAccessLevel = 'Full Access' | 'Curriculum Only';
+export type BootcampAccessLevel = 'Full Access' | 'Curriculum Only' | 'Lead Magnet';
 
 export type SubscriptionStatus = 'none' | 'active' | 'canceled' | 'past_due';
 
@@ -213,6 +213,11 @@ export interface BootcampCohort {
 // ============================================
 export type BootcampInviteCodeStatus = 'Active' | 'Disabled';
 
+export interface ToolGrant {
+  toolSlug: string;
+  credits: number;
+}
+
 export interface BootcampInviteCode {
   id: string;
   code: string;
@@ -222,6 +227,9 @@ export interface BootcampInviteCode {
   useCount: number;
   status: BootcampInviteCodeStatus;
   expiresAt?: Date;
+  grantedAccessLevel?: BootcampAccessLevel;
+  toolGrants?: ToolGrant[] | null;
+  contentGrants?: string[] | null;
   createdAt: Date;
 }
 
