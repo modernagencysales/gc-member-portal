@@ -118,7 +118,7 @@ const Login: React.FC<LoginProps> = ({ onLogin, onRegisterClick }) => {
 
         <div className="mt-10 pt-8 border-t border-zinc-200 dark:border-zinc-800 text-center">
           <p className="text-xs text-zinc-400 dark:text-zinc-500">
-            Training Portal • &copy; 2024 GTM OS
+            Training Portal • &copy; {new Date().getFullYear()} Modern Agency Sales
           </p>
         </div>
       </div>

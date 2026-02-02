@@ -231,7 +231,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             <div className="w-8 h-8 bg-violet-500 rounded-lg flex items-center justify-center text-white shrink-0">
               <Terminal size={16} />
             </div>
-            <h1 className="font-semibold text-sm">GTM OS</h1>
+            <h1 className="font-semibold text-sm">Modern Agency Sales</h1>
           </div>
 
           <div className="bg-zinc-50 dark:bg-zinc-800/50 rounded-lg p-3 border border-zinc-200 dark:border-zinc-800">
