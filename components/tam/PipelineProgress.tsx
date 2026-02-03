@@ -122,8 +122,18 @@ const PipelineProgress: React.FC<PipelineProgressProps> = ({ steps, error }) => 
 
 function formatResultSummary(step: string, summary: Record<string, unknown>): string {
   switch (step) {
-    case 'source_companies':
-      return `Found ${summary.companiesFound || 0} companies via ${summary.source || 'search'}`;
+    case 'source_companies': {
+      const total = summary.companiesFound || 0;
+      const parts: string[] = [];
+      if (summary.prospeoCount) parts.push(`${summary.prospeoCount} from Prospeo`);
+      if (summary.discolikeCount) parts.push(`${summary.discolikeCount} from Discolike`);
+      if (summary.blitzapiCount) parts.push(`${summary.blitzapiCount} from BlitzAPI`);
+      if (summary.failed) parts.push(`${summary.failed} failed to insert`);
+      if (parts.length > 0) {
+        return `Found ${total} companies (${parts.join(', ')})`;
+      }
+      return `Found ${total} companies via ${summary.source || 'search'}`;
+    }
     case 'qualify':
       return `${summary.qualified || 0} qualified, ${summary.disqualified || 0} disqualified out of ${summary.total || 0}`;
     case 'find_contacts':

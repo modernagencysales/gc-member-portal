@@ -29,8 +29,8 @@ const PIPELINE_STEPS: { step: PipelineStep; label: string }[] = [
   { step: 'find_contacts', label: 'Find Contacts' },
 ];
 
-// Max polling attempts before timing out (3s * 200 = 10 minutes)
-const MAX_POLL_ATTEMPTS = 200;
+// Max polling attempts before timing out (3s * 600 = 30 minutes)
+const MAX_POLL_ATTEMPTS = 600;
 // Max consecutive polling errors before giving up
 const MAX_CONSECUTIVE_ERRORS = 10;
 

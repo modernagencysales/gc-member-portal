@@ -1,6 +1,6 @@
-import React from 'react';
-import { ChevronLeft, Check, Loader2 } from 'lucide-react';
-import { IcpProfile, BusinessModelType } from '../../../types/tam-types';
+import React, { useState } from 'react';
+import { ChevronLeft, Check, Loader2, Settings2 } from 'lucide-react';
+import { IcpProfile, BusinessModelType, SourcingLimits } from '../../../types/tam-types';
 
 const BUSINESS_MODEL_LABELS: Record<BusinessModelType, string> = {
   b2b_saas: 'B2B SaaS / Software',
@@ -115,6 +115,12 @@ const WizardStep4Review: React.FC<WizardStep4Props> = ({
           </div>
         </div>
 
+        {/* Sourcing Volume */}
+        <SourcingLimitsPanel
+          limits={formData.sourcingLimits || {}}
+          onChange={(limits) => setFormData({ ...formData, sourcingLimits: limits })}
+        />
+
         {/* Special Criteria */}
         <div>
           <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
@@ -163,6 +169,118 @@ const WizardStep4Review: React.FC<WizardStep4Props> = ({
           )}
         </button>
       </div>
+    </div>
+  );
+};
+
+// ---- Sourcing Limits Panel (collapsible) ----
+
+const LIMIT_FIELDS: {
+  key: keyof SourcingLimits;
+  label: string;
+  defaultValue: number;
+  hint: string;
+  perPageSize: number;
+}[] = [
+  {
+    key: 'prospeoMaxPages',
+    label: 'Prospeo pages',
+    defaultValue: 40,
+    hint: '25 companies/page',
+    perPageSize: 25,
+  },
+  {
+    key: 'discolikeMaxKeywords',
+    label: 'Discolike keywords',
+    defaultValue: 10,
+    hint: 'search terms to expand',
+    perPageSize: 0,
+  },
+  {
+    key: 'discolikeMaxRecordsPerKeyword',
+    label: 'Discolike records/keyword',
+    defaultValue: 2000,
+    hint: 'companies per keyword',
+    perPageSize: 0,
+  },
+  {
+    key: 'blitzApiMaxPages',
+    label: 'BlitzAPI pages',
+    defaultValue: 20,
+    hint: '100 companies/page',
+    perPageSize: 100,
+  },
+];
+
+function estimateCompanies(limits: Partial<SourcingLimits>): string {
+  const prospeo = (limits.prospeoMaxPages || 40) * 25;
+  const discolike =
+    (limits.discolikeMaxKeywords || 10) * (limits.discolikeMaxRecordsPerKeyword || 2000);
+  const blitz = (limits.blitzApiMaxPages || 20) * 100;
+  const total = prospeo + discolike + blitz;
+  return `~${total.toLocaleString()} max (before dedup)`;
+}
+
+const SourcingLimitsPanel: React.FC<{
+  limits: Partial<SourcingLimits>;
+  onChange: (limits: Partial<SourcingLimits>) => void;
+}> = ({ limits, onChange }) => {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div className="rounded-xl border border-zinc-200 dark:border-zinc-700 overflow-hidden">
+      <button
+        type="button"
+        onClick={() => setOpen(!open)}
+        className="w-full flex items-center justify-between p-4 bg-zinc-50 dark:bg-zinc-800/50 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors text-left"
+      >
+        <div className="flex items-center gap-2">
+          <Settings2 className="w-4 h-4 text-zinc-500" />
+          <h3 className="font-semibold text-zinc-900 dark:text-white text-sm">Sourcing Volume</h3>
+          <span className="text-xs text-zinc-500 dark:text-zinc-400">
+            {estimateCompanies(limits)}
+          </span>
+        </div>
+        <span className="text-xs text-violet-500 font-medium">{open ? 'Hide' : 'Customize'}</span>
+      </button>
+
+      {open && (
+        <div className="p-4 space-y-3 border-t border-zinc-200 dark:border-zinc-700">
+          <p className="text-xs text-zinc-500 dark:text-zinc-400">
+            Adjust how many leads each source pulls. Higher values = more companies but longer run
+            time.
+          </p>
+          {LIMIT_FIELDS.map(({ key, label, defaultValue, hint, perPageSize }) => {
+            const value = limits[key] ?? defaultValue;
+            const estimated = perPageSize
+              ? ` (~${(value * perPageSize).toLocaleString()} companies)`
+              : '';
+            return (
+              <div key={key} className="flex items-center gap-3">
+                <label className="text-sm text-zinc-700 dark:text-zinc-300 w-48 shrink-0">
+                  {label}
+                </label>
+                <input
+                  type="number"
+                  min={1}
+                  value={value}
+                  onChange={(e) => {
+                    const v = parseInt(e.target.value, 10);
+                    if (!isNaN(v) && v > 0) {
+                      onChange({ ...limits, [key]: v });
+                    }
+                  }}
+                  className="w-24 px-3 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
+                />
+                <span className="text-xs text-zinc-400 dark:text-zinc-500">
+                  {hint}
+                  {estimated}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };

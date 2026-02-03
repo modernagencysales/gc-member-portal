@@ -46,6 +46,7 @@ function mapTamCompany(record: Record<string, unknown>): TamCompany {
       (record.qualification_status as TamCompany['qualificationStatus']) || 'pending',
     qualificationReason: record.qualification_reason as string | null,
     usEmployeePct: record.us_employee_pct as number | null,
+    digitalFootprintScore: record.digital_footprint_score as number | null,
     segmentTags: record.segment_tags as Record<string, string> | null,
     rawData: record.raw_data as Record<string, unknown> | null,
     createdAt: record.created_at as string,
@@ -192,6 +193,7 @@ export async function insertTamCompanies(
     qualification_status: company.qualificationStatus || 'pending',
     qualification_reason: company.qualificationReason || null,
     us_employee_pct: company.usEmployeePct || null,
+    digital_footprint_score: company.digitalFootprintScore || null,
     segment_tags: company.segmentTags || null,
     raw_data: company.rawData || null,
   }));
@@ -220,6 +222,8 @@ export async function updateTamCompany(
   if (updates.qualificationReason !== undefined)
     updateData.qualification_reason = updates.qualificationReason;
   if (updates.usEmployeePct !== undefined) updateData.us_employee_pct = updates.usEmployeePct;
+  if (updates.digitalFootprintScore !== undefined)
+    updateData.digital_footprint_score = updates.digitalFootprintScore;
   if (updates.segmentTags !== undefined) updateData.segment_tags = updates.segmentTags;
   if (updates.rawData !== undefined) updateData.raw_data = updates.rawData;
 

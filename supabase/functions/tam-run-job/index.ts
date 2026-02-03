@@ -39,8 +39,100 @@ function prospeoHeaders(apiKey: string) {
 }
 
 // ============================================
-// BlitzAPI helpers (direct API — https://docs.blitz-api.ai)
-// Kept for future use when BLITZ_API_KEY is available
+// Domain normalization
+// ============================================
+
+function normalizeDomain(raw: string | null | undefined): string | null {
+  if (!raw) return null;
+  let d = raw.trim().toLowerCase();
+  // Strip protocol
+  d = d.replace(/^https?:\/\//, '');
+  // Strip www.
+  d = d.replace(/^www\./, '');
+  // Strip trailing slash / path
+  d = d.split('/')[0];
+  // Strip port
+  d = d.split(':')[0];
+  return d || null;
+}
+
+// ============================================
+// Normalized company shape (shared across all sources)
+// ============================================
+
+interface SourcedCompany {
+  name: string;
+  domain: string | null;
+  linkedin_url: string | null;
+  industry: string | null;
+  employee_count: number | null;
+  location: string | null;
+  description: string | null;
+  digital_footprint_score: number | null;
+  source: string;
+  raw: Record<string, unknown>;
+}
+
+// ============================================
+// Discolike API helpers (https://discolike.com/api)
+// ============================================
+
+const DISCOLIKE_BASE = 'https://api.discolike.com';
+
+async function discolikeGet(
+  apiKey: string,
+  path: string,
+  params: Record<string, string | number> = {}
+): Promise<any> {
+  const url = new URL(`${DISCOLIKE_BASE}${path}`);
+  for (const [key, value] of Object.entries(params)) {
+    url.searchParams.set(key, String(value));
+  }
+  const response = await fetch(url.toString(), {
+    headers: { Authorization: `Bearer ${apiKey}`, Accept: 'application/json' },
+  });
+  if (!response.ok) {
+    throw new Error(`Discolike ${path} failed: ${response.status} ${response.statusText}`);
+  }
+  return response.json();
+}
+
+async function discolikeBizData(
+  apiKey: string,
+  domain: string
+): Promise<{
+  keywords: string[];
+  industry_groups: string[];
+  description: string;
+  score: number;
+}> {
+  const data = await discolikeGet(apiKey, '/v1/bizdata', { domain });
+  return {
+    keywords: data.keywords || [],
+    industry_groups: data.industry_groups || [],
+    description: data.description || '',
+    score: data.score || 0,
+  };
+}
+
+async function discolikeDiscover(
+  apiKey: string,
+  keyword: string,
+  country: string,
+  maxRecords: number
+): Promise<any[]> {
+  const data = await discolikeGet(apiKey, '/v1/discover', {
+    keyword,
+    country,
+    max_records: maxRecords,
+    min_score: 50,
+  });
+  return data.results || data.companies || [];
+}
+
+// ============================================
+// BlitzAPI helpers (will activate when BLITZ_API_KEY is set)
+// https://docs.blitz-api.ai
 // ============================================
 
 const BLITZAPI_BASE = 'https://api.blitz-api.ai/v2';
@@ -50,6 +142,64 @@ function blitzApiHeaders(apiKey: string) {
     'Content-Type': 'application/json',
     'x-api-key': apiKey,
   };
+}
+
+async function blitzApiSearch(
+  apiKey: string,
+  filters: Record<string, any>,
+  page: number
+): Promise<any> {
+  const response = await fetch(`${BLITZAPI_BASE}/company/search`, {
+    method: 'POST',
+    headers: blitzApiHeaders(apiKey),
+    body: JSON.stringify({ ...filters, page, per_page: 100 }),
+  });
+  if (!response.ok) {
+    throw new Error(`BlitzAPI search failed: ${response.status} ${response.statusText}`);
+  }
+  return response.json();
+}
+
+function buildBlitzApiFilters(icpProfile: any): Record<string, any> {
+  const filters: Record<string, any> = {};
+
+  if (icpProfile.industryKeywords?.length) {
+    filters.industries = icpProfile.industryKeywords;
+  }
+
+  if (icpProfile.employeeSizeRanges?.length) {
+    const rangeMap: Record<string, [number, number]> = {
+      '1-10': [1, 10],
+      '11-50': [11, 50],
+      '51-200': [51, 200],
+      '201-1000': [201, 1000],
+      '1000+': [1001, 100000],
+    };
+    const mins: number[] = [];
+    const maxs: number[] = [];
+    for (const r of icpProfile.employeeSizeRanges) {
+      const mapped = rangeMap[r];
+      if (mapped) {
+        mins.push(mapped[0]);
+        maxs.push(mapped[1]);
+      }
+    }
+    if (mins.length) {
+      filters.employee_count_min = Math.min(...mins);
+      filters.employee_count_max = Math.max(...maxs);
+    }
+  }
+
+  if (icpProfile.geography === 'us_only') {
+    filters.countries = ['US'];
+  } else if (
+    icpProfile.geography === 'specific_countries' &&
+    icpProfile.specificCountries?.length
+  ) {
+    filters.countries = icpProfile.specificCountries;
+  }
+
+  return filters;
 }
 
 // ============================================
@@ -144,122 +294,343 @@ function buildProspeoPersonFilters(icpProfile: any, companyDomains: string[]): R
 }
 
 // ============================================
-// Source Companies (Prospeo search-company)
+// Source Companies — multi-source pipeline
 // ============================================
 
-async function handleSourceCompanies(supabase: any, job: any, project: any) {
-  const prospeoKey = Deno.env.get('PROSPEO_API_KEY');
-  if (!prospeoKey) throw new Error('PROSPEO_API_KEY not configured');
+const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-  const icpProfile = project?.icp_profile || {};
+// Progress callback — source reports 0-1 fraction, orchestrator scales to global %
+type ProgressFn = (fraction: number) => Promise<void>;
+
+function progressFn(supabase: any, jobId: string, start: number, end: number): ProgressFn {
+  return (fraction) =>
+    supabase
+      .from('tam_job_queue')
+      .update({
+        progress: start + Math.round(fraction * (end - start)),
+      })
+      .eq('id', jobId);
+}
+
+// Normalize domain, dedup against shared set, push if new
+function addCompany(out: SourcedCompany[], seen: Set<string>, c: SourcedCompany): void {
+  if (!c.name) return;
+  const d = normalizeDomain(c.domain);
+  if (d) {
+    if (seen.has(d)) return;
+    seen.add(d);
+  }
+  out.push({ ...c, domain: d });
+}
+
+// Fetch one Prospeo page with up to 3 rate-limit retries. Returns null when exhausted.
+async function fetchProspeoPage(apiKey: string, filters: any, page: number): Promise<any | null> {
+  for (let retry = 0; retry < 3; retry++) {
+    const resp = await fetch(`${PROSPEO_BASE}/search-company`, {
+      method: 'POST',
+      headers: prospeoHeaders(apiKey),
+      body: JSON.stringify({ filters, page }),
+    });
+    const data = await resp.json();
+    if (data.error_code === 'NO_RESULTS') return null;
+    if (data.error_code === 'RATE_LIMITED') {
+      await delay(2000 * (retry + 1));
+      continue;
+    }
+    if (data.error) throw new Error(`Prospeo: ${data.error_code} — ${data.filter_error || ''}`);
+    return data;
+  }
+  return null;
+}
+
+// Fetch one BlitzAPI page with up to 3 rate-limit retries. Returns null when exhausted.
+async function fetchBlitzApiPage(apiKey: string, filters: any, page: number): Promise<any | null> {
+  for (let retry = 0; retry < 3; retry++) {
+    const data = await blitzApiSearch(apiKey, filters, page);
+    if (data.error === 'no_results' || data.error === 'NO_RESULTS') return null;
+    if (data.error === 'rate_limited' || data.status === 429) {
+      await delay(2000 * (retry + 1));
+      continue;
+    }
+    if (data.error) throw new Error(`BlitzAPI: ${data.error}`);
+    return data;
+  }
+  return null;
+}
+
+// Batch-insert with error tracking
+async function batchInsertCompanies(
+  supabase: any,
+  projectId: string,
+  companies: SourcedCompany[],
+  progress: ProgressFn
+): Promise<{ inserted: number; failed: number }> {
+  let inserted = 0;
+  let failed = 0;
+
+  for (let i = 0; i < companies.length; i += 100) {
+    const batch = companies.slice(i, i + 100);
+    const { error } = await supabase.from('tam_companies').insert(
+      batch.map((c) => ({
+        project_id: projectId,
+        name: c.name,
+        domain: c.domain,
+        linkedin_url: c.linkedin_url,
+        source: c.source,
+        industry: c.industry,
+        employee_count: c.employee_count,
+        location: c.location,
+        description: c.description,
+        digital_footprint_score: c.digital_footprint_score,
+        qualification_status: 'pending',
+        raw_data: c.raw,
+      }))
+    );
+    if (error) {
+      console.error(`Insert error (offset ${i}): ${error.message}`);
+      failed += batch.length;
+    } else {
+      inserted += batch.length;
+    }
+    await progress((i + batch.length) / companies.length);
+  }
+
+  return { inserted, failed };
+}
+
+// ---- Source: Prospeo ----
+
+async function sourceFromProspeo(
+  apiKey: string,
+  icpProfile: any,
+  seen: Set<string>,
+  progress: ProgressFn
+): Promise<SourcedCompany[]> {
   const filters = buildProspeoCompanyFilters(icpProfile);
 
-  // Need at least one include filter for Prospeo
   if (Object.keys(filters).length === 0) {
-    // Default: search by business model keyword as industry
-    const modelKeywords: Record<string, string[]> = {
+    const fallback: Record<string, string[]> = {
       b2b_saas: ['Software', 'Information Technology'],
       ecommerce_dtc: ['Retail', 'E-commerce'],
       amazon_sellers: ['Retail', 'E-commerce'],
       local_service: ['Professional Services'],
       agencies: ['Marketing & Advertising', 'Professional Services'],
     };
-    const keywords = modelKeywords[icpProfile.businessModel] || ['Software'];
-    filters.company_industry = { include: keywords };
+    filters.company_industry = { include: fallback[icpProfile.businessModel] || ['Software'] };
   }
 
-  let companies: any[] = [];
-  const maxPages = 4; // Up to 100 companies (25 per page)
+  const companies: SourcedCompany[] = [];
+  const maxPages = icpProfile.sourcingLimits?.prospeoMaxPages || 40;
 
   for (let page = 1; page <= maxPages; page++) {
     try {
-      const response = await fetch(`${PROSPEO_BASE}/search-company`, {
-        method: 'POST',
-        headers: prospeoHeaders(prospeoKey),
-        body: JSON.stringify({ filters, page }),
-      });
+      const data = await fetchProspeoPage(apiKey, filters, page);
+      if (!data) return companies;
 
-      const data = await response.json();
-
-      if (data.error) {
-        if (data.error_code === 'NO_RESULTS') break;
-        if (data.error_code === 'RATE_LIMITED') {
-          await new Promise((r) => setTimeout(r, 2000));
-          continue;
-        }
-        throw new Error(`Prospeo error: ${data.error_code} — ${data.filter_error || ''}`);
+      for (const r of data.results || []) {
+        const co = r.company || {};
+        addCompany(companies, seen, {
+          name: co.name || null,
+          domain: co.domain || co.website || null,
+          linkedin_url: co.linkedin_url || null,
+          industry: co.industry || null,
+          employee_count: co.employee_count || null,
+          location:
+            [co.location?.city, co.location?.state, co.location?.country]
+              .filter(Boolean)
+              .join(', ') || null,
+          description: co.description || co.description_seo || null,
+          digital_footprint_score: null,
+          source: 'prospeo',
+          raw: co,
+        });
       }
 
-      const pageCompanies = (data.results || []).map((r: any) => ({
-        name: r.company?.name || null,
-        domain: r.company?.domain || r.company?.website || null,
-        linkedin_url: r.company?.linkedin_url || null,
-        industry: r.company?.industry || null,
-        employee_count: r.company?.employee_count || null,
-        location:
-          [r.company?.location?.city, r.company?.location?.state, r.company?.location?.country]
-            .filter(Boolean)
-            .join(', ') || null,
-        description: r.company?.description || r.company?.description_seo || null,
-        raw: r.company,
-      }));
-
-      companies.push(...pageCompanies);
-
-      // Stop if we got fewer than a full page
-      const totalPages = data.pagination?.total_page || 1;
-      if (page >= totalPages) break;
-
-      // Rate limit between pages
-      await new Promise((r) => setTimeout(r, 300));
+      const results = data.results || [];
+      if (results.length < 25 || page >= (data.pagination?.total_page || 1)) return companies;
+      await delay(300);
+      await progress(page / maxPages);
     } catch (err) {
-      if (page === 1) throw err; // Fail on first page error
-      break; // Stop paginating on subsequent errors
+      if (page === 1) throw err;
+      return companies;
     }
+  }
+  return companies;
+}
 
-    const progress = Math.round((page / maxPages) * 50);
-    await supabase.from('tam_job_queue').update({ progress }).eq('id', job.id);
+// ---- Source: Discolike ----
+
+async function sourceFromDiscolike(
+  apiKey: string,
+  icpProfile: any,
+  seen: Set<string>,
+  progress: ProgressFn
+): Promise<SourcedCompany[]> {
+  const companies: SourcedCompany[] = [];
+  const limits = icpProfile.sourcingLimits || {};
+  const maxKeywords = limits.discolikeMaxKeywords || 10;
+  const maxRecords = limits.discolikeMaxRecordsPerKeyword || 2000;
+
+  // BizData: extract keywords from seed domains
+  const seedDomains = (icpProfile.seedCompanyDomains || []).slice(0, 10);
+  const keywordCounts = new Map<string, number>();
+
+  for (let i = 0; i < seedDomains.length; i++) {
+    try {
+      const biz = await discolikeBizData(apiKey, seedDomains[i]);
+      for (const kw of biz.keywords)
+        keywordCounts.set(kw.toLowerCase(), (keywordCounts.get(kw.toLowerCase()) || 0) + 1);
+    } catch {
+      /* skip */
+    }
+    await delay(500);
+    await progress(((i + 1) / seedDomains.length) * 0.25);
   }
 
-  // Deduplicate by domain
+  // Merge seed keywords (by frequency) with ICP industry keywords
+  const kwSet = new Set<string>();
+  const sorted = [...keywordCounts.entries()].sort((a, b) => b[1] - a[1]);
+  for (const [kw] of sorted) kwSet.add(kw);
+  for (const kw of icpProfile.industryKeywords || []) kwSet.add(kw.toLowerCase());
+  const keywords = [...kwSet].slice(0, maxKeywords);
+
+  if (keywords.length === 0) return companies;
+
+  // Country filter
+  let country = '';
+  if (icpProfile.geography === 'us_only') country = 'US';
+  else if (icpProfile.geography === 'specific_countries' && icpProfile.specificCountries?.length) {
+    country = icpProfile.specificCountries[0];
+  }
+
+  // Discover for each keyword
+  for (let i = 0; i < keywords.length; i++) {
+    try {
+      const results = await discolikeDiscover(apiKey, keywords[i], country, maxRecords);
+      for (const r of results) {
+        addCompany(companies, seen, {
+          name: r.name || r.company_name || r.domain || '',
+          domain: r.domain || r.website || null,
+          linkedin_url: null,
+          industry: r.industry || r.category || null,
+          employee_count: r.employees || r.employee_count || null,
+          location: r.address || r.location || r.country || null,
+          description: r.description || null,
+          digital_footprint_score: r.score || r.digital_footprint_score || null,
+          source: 'discolike',
+          raw: r,
+        });
+      }
+    } catch {
+      /* skip */
+    }
+    await delay(500);
+    await progress(0.25 + ((i + 1) / keywords.length) * 0.75);
+  }
+
+  return companies;
+}
+
+// ---- Source: BlitzAPI (activates when BLITZ_API_KEY is set) ----
+
+async function sourceFromBlitzApi(
+  apiKey: string,
+  icpProfile: any,
+  seen: Set<string>,
+  progress: ProgressFn
+): Promise<SourcedCompany[]> {
+  const companies: SourcedCompany[] = [];
+  const filters = buildBlitzApiFilters(icpProfile);
+  if (Object.keys(filters).length === 0) return companies;
+
+  const maxPages = icpProfile.sourcingLimits?.blitzApiMaxPages || 20;
+
+  for (let page = 1; page <= maxPages; page++) {
+    try {
+      const data = await fetchBlitzApiPage(apiKey, filters, page);
+      if (!data) return companies;
+
+      const results = data.results || data.companies || [];
+      for (const r of results) {
+        addCompany(companies, seen, {
+          name: r.name || r.company_name || r.domain || '',
+          domain: r.domain || r.website || null,
+          linkedin_url: r.linkedin_url || r.linkedin || null,
+          industry: r.industry || r.category || null,
+          employee_count: r.employee_count || r.employees || null,
+          location:
+            [r.city, r.state, r.country].filter(Boolean).join(', ') ||
+            r.location ||
+            r.address ||
+            null,
+          description: r.description || r.tagline || null,
+          digital_footprint_score: null,
+          source: 'blitzapi',
+          raw: r,
+        });
+      }
+
+      if (
+        results.length < 100 ||
+        page >= (data.total_pages || data.pagination?.total_pages || maxPages)
+      )
+        return companies;
+      await delay(300);
+      await progress(page / maxPages);
+    } catch (err) {
+      if (page === 1) throw err;
+      return companies;
+    }
+  }
+  return companies;
+}
+
+// ---- Main orchestrator ----
+
+async function handleSourceCompanies(supabase: any, job: any, project: any) {
+  const prospeoKey = Deno.env.get('PROSPEO_API_KEY');
+  if (!prospeoKey) throw new Error('PROSPEO_API_KEY not configured');
+
+  const discolikeKey = Deno.env.get('DISCOLIKE_API_KEY');
+  const blitzKey = Deno.env.get('BLITZ_API_KEY');
+  const icpProfile = project?.icp_profile || {};
   const seen = new Set<string>();
-  companies = companies.filter((c: any) => {
-    if (!c.name) return false;
-    if (c.domain && seen.has(c.domain)) return false;
-    if (c.domain) seen.add(c.domain);
-    return true;
-  });
+  const pg = (start: number, end: number) => progressFn(supabase, job.id, start, end);
 
-  // Insert companies into database
-  if (companies.length > 0) {
-    const insertData = companies.map((c: any) => ({
-      project_id: job.project_id,
-      name: c.name,
-      domain: c.domain || null,
-      linkedin_url: c.linkedin_url || null,
-      source: 'prospeo',
-      industry: c.industry || null,
-      employee_count: c.employee_count || null,
-      location: c.location || null,
-      description: c.description || null,
-      qualification_status: 'pending',
-      raw_data: c.raw || c,
-    }));
+  // Fixed progress ranges: Prospeo 0-30, Discolike 30-60, BlitzAPI 60-90, Insert 90-100
+  const prospeoCompanies = await sourceFromProspeo(prospeoKey, icpProfile, seen, pg(0, 30));
+  const discolikeCompanies = discolikeKey
+    ? await sourceFromDiscolike(discolikeKey, icpProfile, seen, pg(30, 60))
+    : [];
+  const blitzCompanies = blitzKey
+    ? await sourceFromBlitzApi(blitzKey, icpProfile, seen, pg(60, 90))
+    : [];
 
-    const batchSize = 100;
-    for (let i = 0; i < insertData.length; i += batchSize) {
-      const batch = insertData.slice(i, i + batchSize);
-      await supabase.from('tam_companies').insert(batch);
+  // Insert all (already deduped via shared `seen` set)
+  const allCompanies = [...prospeoCompanies, ...discolikeCompanies, ...blitzCompanies];
+  const { inserted, failed } = await batchInsertCompanies(
+    supabase,
+    job.project_id,
+    allCompanies,
+    pg(90, 100)
+  );
 
-      const progress = 50 + Math.round(((i + batch.length) / insertData.length) * 50);
-      await supabase.from('tam_job_queue').update({ progress }).eq('id', job.id);
-    }
-  }
-
-  // Update project status
   await supabase.from('tam_projects').update({ status: 'sourcing' }).eq('id', job.project_id);
 
-  return { companiesFound: companies.length, source: 'prospeo' };
+  // Count per source
+  const counts: Record<string, number> = {};
+  for (const c of allCompanies) counts[c.source] = (counts[c.source] || 0) + 1;
+  const sources = Object.keys(counts).filter((k) => counts[k] > 0);
+
+  return {
+    companiesFound: allCompanies.length,
+    inserted,
+    failed,
+    prospeoCount: counts.prospeo || 0,
+    discolikeCount: counts.discolike || 0,
+    blitzapiCount: counts.blitzapi || 0,
+    source: sources.join('+') || 'none',
+  };
 }
 
 // ============================================

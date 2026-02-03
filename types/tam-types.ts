@@ -50,6 +50,19 @@ export interface IcpProfile {
   contactsPerCompany: number;
   specialCriteria?: string;
   seedCompanyDomains?: string[];
+  sourcingLimits?: SourcingLimits;
+}
+
+/** Per-source caps — all optional, edge function uses defaults when omitted */
+export interface SourcingLimits {
+  /** Prospeo max pages (25 results/page). Default: 40 → ~1,000 companies */
+  prospeoMaxPages?: number;
+  /** Discolike max records per keyword. Default: 2000 */
+  discolikeMaxRecordsPerKeyword?: number;
+  /** Discolike max keywords to search. Default: 10 */
+  discolikeMaxKeywords?: number;
+  /** BlitzAPI max pages (100 results/page). Default: 20 → ~2,000 companies. Set to 200 for ~20k */
+  blitzApiMaxPages?: number;
 }
 
 export interface SourcingStrategy {
@@ -87,6 +100,7 @@ export interface TamCompany {
   qualificationStatus: TamQualificationStatus;
   qualificationReason: string | null;
   usEmployeePct: number | null;
+  digitalFootprintScore: number | null;
   segmentTags: Record<string, string> | null;
   rawData: Record<string, unknown> | null;
   createdAt: string;
