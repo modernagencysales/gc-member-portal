@@ -12,25 +12,30 @@ import { queryKeys } from '../../lib/queryClient';
 // ============================================
 
 /**
- * Convert YouTube watch URLs to embed format
+ * Convert YouTube watch URLs to embed format with clean player settings
  * Handles: youtube.com/watch?v=ID, youtu.be/ID, and already-embed URLs
  */
 function toEmbedUrl(url: string): string {
   if (!url) return url;
 
-  // Already an embed URL
-  if (url.includes('/embed/')) return url;
+  // YouTube clean player params: no title, no related videos, minimal branding
+  const ytParams = 'modestbranding=1&rel=0&showinfo=0&iv_load_policy=3';
+
+  // Already an embed URL - add params if not present
+  if (url.includes('youtube.com/embed/')) {
+    return url.includes('?') ? url : `${url}?${ytParams}`;
+  }
 
   // youtube.com/watch?v=VIDEO_ID
   const watchMatch = url.match(/youtube\.com\/watch\?v=([^&]+)/);
   if (watchMatch) {
-    return `https://www.youtube.com/embed/${watchMatch[1]}`;
+    return `https://www.youtube.com/embed/${watchMatch[1]}?${ytParams}`;
   }
 
   // youtu.be/VIDEO_ID
   const shortMatch = url.match(/youtu\.be\/([^?]+)/);
   if (shortMatch) {
-    return `https://www.youtube.com/embed/${shortMatch[1]}`;
+    return `https://www.youtube.com/embed/${shortMatch[1]}?${ytParams}`;
   }
 
   // Loom, Vimeo, or other URLs - return as-is

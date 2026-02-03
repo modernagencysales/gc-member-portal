@@ -43,15 +43,18 @@ import { useTenantBranding, getTenantColors } from '../../services/tenant-brandi
 // ============================================
 
 /**
- * Convert YouTube watch URLs to embed format
+ * Convert YouTube watch URLs to embed format with clean player settings
  */
 function toEmbedUrl(url: string): string {
   if (!url) return url;
-  if (url.includes('/embed/')) return url;
+  const ytParams = 'modestbranding=1&rel=0&showinfo=0&iv_load_policy=3';
+  if (url.includes('youtube.com/embed/')) {
+    return url.includes('?') ? url : `${url}?${ytParams}`;
+  }
   const watchMatch = url.match(/youtube\.com\/watch\?v=([^&]+)/);
-  if (watchMatch) return `https://www.youtube.com/embed/${watchMatch[1]}`;
+  if (watchMatch) return `https://www.youtube.com/embed/${watchMatch[1]}?${ytParams}`;
   const shortMatch = url.match(/youtu\.be\/([^?]+)/);
-  if (shortMatch) return `https://www.youtube.com/embed/${shortMatch[1]}`;
+  if (shortMatch) return `https://www.youtube.com/embed/${shortMatch[1]}?${ytParams}`;
   return url;
 }
 
