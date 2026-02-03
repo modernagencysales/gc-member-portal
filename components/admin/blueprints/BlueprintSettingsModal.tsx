@@ -30,6 +30,9 @@ interface FormData {
   spotsRemainingEngineering: string;
   blueprintVideoUrl: string;
   callBookedVideoUrl: string;
+  thankYouVideoUrl: string;
+  foundationsOfferVideoUrl: string;
+  engineeringOfferVideoUrl: string;
   senjaWidgetUrl: string;
   maxLogosLanding: string;
   maxLogosBlueprint: string;
@@ -48,6 +51,9 @@ const BlueprintSettingsModal: React.FC<BlueprintSettingsModalProps> = ({ isOpen,
     spotsRemainingEngineering: '',
     blueprintVideoUrl: '',
     callBookedVideoUrl: '',
+    thankYouVideoUrl: '',
+    foundationsOfferVideoUrl: '',
+    engineeringOfferVideoUrl: '',
     senjaWidgetUrl: '',
     maxLogosLanding: '',
     maxLogosBlueprint: '',
@@ -75,6 +81,9 @@ const BlueprintSettingsModal: React.FC<BlueprintSettingsModalProps> = ({ isOpen,
         spotsRemainingEngineering: settings.spotsRemainingEngineering?.toString() || '',
         blueprintVideoUrl: settings.blueprintVideoUrl || '',
         callBookedVideoUrl: settings.callBookedVideoUrl || '',
+        thankYouVideoUrl: settings.thankYouVideoUrl || '',
+        foundationsOfferVideoUrl: settings.foundationsOfferVideoUrl || '',
+        engineeringOfferVideoUrl: settings.engineeringOfferVideoUrl || '',
         senjaWidgetUrl: settings.senjaWidgetUrl || '',
         maxLogosLanding: settings.maxLogosLanding?.toString() || '',
         maxLogosBlueprint: settings.maxLogosBlueprint?.toString() || '',
@@ -114,6 +123,9 @@ const BlueprintSettingsModal: React.FC<BlueprintSettingsModalProps> = ({ isOpen,
         : undefined,
       blueprintVideoUrl: formData.blueprintVideoUrl || undefined,
       callBookedVideoUrl: formData.callBookedVideoUrl || undefined,
+      thankYouVideoUrl: formData.thankYouVideoUrl || undefined,
+      foundationsOfferVideoUrl: formData.foundationsOfferVideoUrl || undefined,
+      engineeringOfferVideoUrl: formData.engineeringOfferVideoUrl || undefined,
       senjaWidgetUrl: formData.senjaWidgetUrl || undefined,
       maxLogosLanding: formData.maxLogosLanding
         ? parseInt(formData.maxLogosLanding, 10)
@@ -348,6 +360,21 @@ const BlueprintSettingsModal: React.FC<BlueprintSettingsModalProps> = ({ isOpen,
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-zinc-200 mb-1.5">
+                    Thank You Page Video URL
+                  </label>
+                  <input
+                    type="url"
+                    value={formData.thankYouVideoUrl}
+                    onChange={(e) => handleChange('thankYouVideoUrl', e.target.value)}
+                    placeholder="https://www.loom.com/embed/..."
+                    className="w-full px-4 py-2.5 rounded-lg border bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500 focus:ring-2 focus:ring-violet-500 focus:border-transparent"
+                  />
+                  <p className="text-xs text-zinc-500 mt-1">
+                    Video shown after Blueprint form submission
+                  </p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-zinc-200 mb-1.5">
                     Call Booked Video URL
                   </label>
                   <input
@@ -359,6 +386,36 @@ const BlueprintSettingsModal: React.FC<BlueprintSettingsModalProps> = ({ isOpen,
                   />
                   <p className="text-xs text-zinc-500 mt-1">
                     Video shown on the call-booked thank-you page
+                  </p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-zinc-200 mb-1.5">
+                    Foundations Offer Video URL
+                  </label>
+                  <input
+                    type="url"
+                    value={formData.foundationsOfferVideoUrl}
+                    onChange={(e) => handleChange('foundationsOfferVideoUrl', e.target.value)}
+                    placeholder="https://www.loom.com/embed/..."
+                    className="w-full px-4 py-2.5 rounded-lg border bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500 focus:ring-2 focus:ring-violet-500 focus:border-transparent"
+                  />
+                  <p className="text-xs text-zinc-500 mt-1">
+                    Video shown on the Foundations offer page
+                  </p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-zinc-200 mb-1.5">
+                    Engineering Offer Video URL
+                  </label>
+                  <input
+                    type="url"
+                    value={formData.engineeringOfferVideoUrl}
+                    onChange={(e) => handleChange('engineeringOfferVideoUrl', e.target.value)}
+                    placeholder="https://www.loom.com/embed/..."
+                    className="w-full px-4 py-2.5 rounded-lg border bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500 focus:ring-2 focus:ring-violet-500 focus:border-transparent"
+                  />
+                  <p className="text-xs text-zinc-500 mt-1">
+                    Video shown on the Engineering offer page
                   </p>
                 </div>
                 <div>

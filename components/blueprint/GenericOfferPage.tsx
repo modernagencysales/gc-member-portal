@@ -118,6 +118,12 @@ const GenericOfferPage: React.FC = () => {
   const getPaymentUrl = (type: 'foundations' | 'engineering') =>
     type === 'foundations' ? foundationsPaymentUrl : engineeringPaymentUrl;
 
+  // Video URLs
+  const offerVideoUrl =
+    offerType === 'foundations'
+      ? settings?.foundationsOfferVideoUrl
+      : settings?.engineeringOfferVideoUrl;
+
   // Cohort info
   const cohortDate = getNextCohortDate(offerType, settings, offer);
   const cohortDateStr = formatCohortDate(cohortDate);
@@ -158,6 +164,24 @@ const GenericOfferPage: React.FC = () => {
 
           <CTASection paymentUrl={getPaymentUrl(offerType)} offer={offer} variant="primary" />
         </section>
+
+        {/* ===== OFFER VIDEO ===== */}
+        {offerVideoUrl && (
+          <section className="mb-16">
+            <div
+              className="relative w-full rounded-xl overflow-hidden border border-zinc-200 dark:border-zinc-800"
+              style={{ paddingBottom: '56.25%' }}
+            >
+              <iframe
+                src={offerVideoUrl}
+                title="Offer video"
+                className="absolute inset-0 w-full h-full"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            </div>
+          </section>
+        )}
 
         <div className="space-y-16 sm:space-y-20">
           {/* ===== TESTIMONIAL #1 ===== */}

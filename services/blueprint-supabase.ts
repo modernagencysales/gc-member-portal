@@ -253,6 +253,9 @@ function mapBlueprintSettings(record: Record<string, unknown>): BlueprintSetting
     spotsRemainingEngineering: record.spots_remaining_engineering as number | undefined,
     blueprintVideoUrl: record.blueprint_video_url as string | undefined,
     callBookedVideoUrl: record.call_booked_video_url as string | undefined,
+    thankYouVideoUrl: record.thank_you_video_url as string | undefined,
+    foundationsOfferVideoUrl: record.foundations_offer_video_url as string | undefined,
+    engineeringOfferVideoUrl: record.engineering_offer_video_url as string | undefined,
     senjaWidgetUrl: record.senja_widget_url as string | undefined,
     maxLogosLanding: record.max_logos_landing as number | undefined,
     maxLogosBlueprint: record.max_logos_blueprint as number | undefined,
@@ -603,6 +606,9 @@ export async function updateBlueprintSettings(
     spotsRemainingEngineering: number;
     blueprintVideoUrl: string;
     callBookedVideoUrl: string;
+    thankYouVideoUrl: string;
+    foundationsOfferVideoUrl: string;
+    engineeringOfferVideoUrl: string;
     senjaWidgetUrl: string;
     maxLogosLanding: number;
     maxLogosBlueprint: number;
@@ -681,6 +687,15 @@ export async function updateBlueprintSettings(
   }
   if (settings.callBookedVideoUrl !== undefined) {
     updateData.call_booked_video_url = settings.callBookedVideoUrl;
+  }
+  if (settings.thankYouVideoUrl !== undefined) {
+    updateData.thank_you_video_url = settings.thankYouVideoUrl;
+  }
+  if (settings.foundationsOfferVideoUrl !== undefined) {
+    updateData.foundations_offer_video_url = settings.foundationsOfferVideoUrl;
+  }
+  if (settings.engineeringOfferVideoUrl !== undefined) {
+    updateData.engineering_offer_video_url = settings.engineeringOfferVideoUrl;
   }
   if (settings.senjaWidgetUrl !== undefined) {
     updateData.senja_widget_url = settings.senjaWidgetUrl;

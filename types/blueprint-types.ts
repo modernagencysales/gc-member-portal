@@ -315,6 +315,9 @@ export interface BlueprintSettings {
   // Embed settings
   blueprintVideoUrl?: string;
   callBookedVideoUrl?: string;
+  thankYouVideoUrl?: string;
+  foundationsOfferVideoUrl?: string;
+  engineeringOfferVideoUrl?: string;
   senjaWidgetUrl?: string;
   // Logo display settings
   maxLogosLanding?: number;
@@ -352,6 +355,9 @@ export interface BlueprintSettingsFormData {
   spotsRemainingEngineering?: number;
   blueprintVideoUrl?: string;
   callBookedVideoUrl?: string;
+  thankYouVideoUrl?: string;
+  foundationsOfferVideoUrl?: string;
+  engineeringOfferVideoUrl?: string;
   senjaWidgetUrl?: string;
   maxLogosLanding?: number;
   maxLogosBlueprint?: number;

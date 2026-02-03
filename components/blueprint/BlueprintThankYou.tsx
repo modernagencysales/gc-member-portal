@@ -1,8 +1,11 @@
 import React, { useRef } from 'react';
 import { useLocation } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import { CheckCircle, BarChart3, AlertTriangle, User, Lightbulb, Calendar } from 'lucide-react';
 import ThemeToggle from './ThemeToggle';
 import CalEmbed from './CalEmbed';
+import { getBlueprintSettings } from '../../services/blueprint-supabase';
+import { queryKeys } from '../../lib/queryClient';
 
 // ============================================
 // Constants
@@ -32,6 +35,11 @@ const BlueprintThankYou: React.FC = () => {
   const showBooking = state?.monthlyIncome !== 'Not generating revenue yet';
   const calEmbedRef = useRef<HTMLDivElement>(null);
 
+  const { data: settings } = useQuery({
+    queryKey: queryKeys.blueprintSettings(),
+    queryFn: getBlueprintSettings,
+  });
+
   const scrollToCalEmbed = () => {
     calEmbedRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
@@ -55,7 +63,23 @@ const BlueprintThankYou: React.FC = () => {
           </p>
         </div>
 
-        {/* Video Embed — add a videoUrl here when ready */}
+        {/* Video Embed */}
+        {settings?.thankYouVideoUrl && (
+          <section className="mb-12">
+            <div
+              className="relative w-full rounded-xl overflow-hidden border border-zinc-200 dark:border-zinc-800"
+              style={{ paddingBottom: '56.25%' }}
+            >
+              <iframe
+                src={settings.thankYouVideoUrl}
+                title="Thank you video"
+                className="absolute inset-0 w-full h-full"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            </div>
+          </section>
+        )}
 
         {/* Book a Call CTA */}
         {showBooking && (
