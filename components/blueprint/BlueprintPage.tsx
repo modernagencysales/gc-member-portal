@@ -360,7 +360,33 @@ const BlueprintPage: React.FC = () => {
           />
         </ScrollReveal>
 
-        {/* 2. ValueStack — what's in your blueprint */}
+        {/* 2. Video walkthrough — moved above ValueStack */}
+        {settings?.blueprintVideoUrl && (
+          <ScrollReveal delay={50}>
+            <section className="space-y-4">
+              <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">
+                Watch: Your Scorecard Explained
+              </h2>
+              <p className="text-zinc-600 dark:text-zinc-400">
+                A quick walkthrough of what your scores mean and what to do next.
+              </p>
+              <div
+                className="relative w-full rounded-xl overflow-hidden border border-zinc-200 dark:border-zinc-800"
+                style={{ paddingBottom: '56.25%' }}
+              >
+                <iframe
+                  src={toEmbedUrl(settings.blueprintVideoUrl)}
+                  title="Blueprint scorecard walkthrough"
+                  className="absolute inset-0 w-full h-full"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              </div>
+            </section>
+          </ScrollReveal>
+        )}
+
+        {/* 3. ValueStack — what's in your blueprint */}
         <ScrollReveal delay={100}>
           <ValueStack />
         </ScrollReveal>
@@ -385,33 +411,7 @@ const BlueprintPage: React.FC = () => {
           <ScoreRadar prospect={prospect} />
         </ScrollReveal>
 
-        {/* 5. Video walkthrough */}
-        {settings?.blueprintVideoUrl && (
-          <ScrollReveal delay={100}>
-            <section className="space-y-4">
-              <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">
-                Watch: Your Scorecard Explained
-              </h2>
-              <p className="text-zinc-600 dark:text-zinc-400">
-                A quick walkthrough of what your scores mean and what to do next.
-              </p>
-              <div
-                className="relative w-full rounded-xl overflow-hidden border border-zinc-200 dark:border-zinc-800"
-                style={{ paddingBottom: '56.25%' }}
-              >
-                <iframe
-                  src={toEmbedUrl(settings.blueprintVideoUrl)}
-                  title="Blueprint scorecard walkthrough"
-                  className="absolute inset-0 w-full h-full"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                />
-              </div>
-            </section>
-          </ScrollReveal>
-        )}
-
-        {/* 6. AnalysisSection — with score-based intro */}
+        {/* 5. AnalysisSection — with score-based intro */}
         <ScrollReveal delay={150}>
           <AnalysisSection prospect={prospect} introParagraph={introParagraph} />
         </ScrollReveal>
