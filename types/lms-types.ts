@@ -34,6 +34,19 @@ export const LMS_CONTENT_TYPE_LABELS: Record<LmsContentType, string> = {
 // Core Types
 // ============================================
 
+export interface CohortOnboardingConfig {
+  enabled: boolean;
+  welcomeVideoUrl?: string;
+  welcomeMessage?: string;
+  surveyEnabled?: boolean;
+  surveyQuestions?: string[];
+  calcomEnabled?: boolean;
+  calcomBookingUrl?: string;
+  calcomQualifyField?: string;
+  calcomQualifyValues?: string[];
+  steps: string[];
+}
+
 export interface LmsCohort {
   id: string;
   name: string;
@@ -41,6 +54,12 @@ export interface LmsCohort {
   status: LmsCohortStatus;
   startDate?: Date;
   endDate?: Date;
+  sidebarLabel?: string;
+  icon?: string;
+  sortOrder: number;
+  productType?: string;
+  thrivecartProductId?: string;
+  onboardingConfig?: CohortOnboardingConfig;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -175,6 +194,12 @@ export interface LmsCohortFormData {
   status: LmsCohortStatus;
   startDate?: string;
   endDate?: string;
+  sidebarLabel?: string;
+  icon?: string;
+  sortOrder?: number;
+  productType?: string;
+  thrivecartProductId?: string;
+  onboardingConfig?: CohortOnboardingConfig;
 }
 
 export interface LmsWeekFormData {

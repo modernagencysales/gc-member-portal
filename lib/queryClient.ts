@@ -111,6 +111,7 @@ export const queryKeys = {
     ['lms', 'progress', 'lesson', studentId, lessonId] as const,
   lmsActionItemProgress: (studentId: string, itemId: string) =>
     ['lms', 'progress', 'actionItem', studentId, itemId] as const,
+  lmsStudentEnrollments: (studentId: string) => ['lms', 'enrollments', studentId] as const,
 
   // Blueprint
   blueprintProspect: (slug: string) => ['blueprint', 'prospect', slug] as const,

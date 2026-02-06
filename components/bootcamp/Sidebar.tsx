@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { CourseData, Lesson, User } from '../../types';
 import { AITool } from '../../types/chat-types';
+import { StudentEnrollment } from '../../types/bootcamp-types';
 import {
   ChevronDown,
   ChevronRight,
@@ -23,6 +24,8 @@ import {
   FileText,
   Target,
   Users,
+  LayoutDashboard,
+  BookOpen,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import type { FunnelAccessState } from '../../hooks/useFunnelAccess';
@@ -52,6 +55,11 @@ interface SidebarProps {
   onRedeemCode?: () => void;
   funnelAccess?: FunnelAccessState;
   calcomUrl?: string;
+  // Multi-course props
+  enrollments?: StudentEnrollment[];
+  activeCourseId?: string | null;
+  onSelectCourse?: (courseId: string | null) => void;
+  showDashboard?: boolean;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
@@ -71,6 +79,10 @@ const Sidebar: React.FC<SidebarProps> = ({
   onRedeemCode,
   funnelAccess,
   calcomUrl,
+  enrollments = [],
+  activeCourseId,
+  onSelectCourse,
+  showDashboard = false,
 }) => {
   const { logout } = useAuth();
 
@@ -266,6 +278,61 @@ const Sidebar: React.FC<SidebarProps> = ({
         </div>
 
         <div className="flex-1 overflow-y-auto p-3 space-y-6 scrollbar-hide">
+          {/* Multi-course navigation */}
+          {enrollments.length > 1 && onSelectCourse && (
+            <div className="space-y-1">
+              <button
+                onClick={() => onSelectCourse(null)}
+                className={`flex items-center gap-2.5 w-full p-2 rounded-lg text-xs font-medium transition-all ${
+                  showDashboard
+                    ? 'bg-violet-500/10 text-violet-600 dark:text-violet-400'
+                    : 'text-zinc-700 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800'
+                }`}
+              >
+                <LayoutDashboard
+                  size={14}
+                  className={showDashboard ? 'text-violet-500' : 'text-zinc-400'}
+                />
+                Dashboard
+              </button>
+
+              <div className="h-px bg-zinc-200 dark:bg-zinc-800 my-1" />
+
+              {enrollments.map((enrollment) => {
+                const isActive = activeCourseId === enrollment.cohortId && !showDashboard;
+                const label = enrollment.cohort.sidebarLabel || enrollment.cohort.name;
+                const icon = enrollment.cohort.icon;
+
+                return (
+                  <button
+                    key={enrollment.cohortId}
+                    onClick={() => onSelectCourse(enrollment.cohortId)}
+                    className={`flex items-center gap-2.5 w-full p-2 rounded-lg text-xs font-medium transition-all ${
+                      isActive
+                        ? 'bg-violet-500/10 text-violet-600 dark:text-violet-400'
+                        : 'text-zinc-700 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800'
+                    }`}
+                  >
+                    {icon ? (
+                      <span className="text-sm leading-none">{icon}</span>
+                    ) : (
+                      <BookOpen
+                        size={14}
+                        className={isActive ? 'text-violet-500' : 'text-zinc-400'}
+                      />
+                    )}
+                    <span className="truncate">{label}</span>
+                    {enrollment.onboardingCompletedAt && (
+                      <CheckCircle2 size={10} className="ml-auto text-green-500 shrink-0" />
+                    )}
+                  </button>
+                );
+              })}
+
+              <div className="h-px bg-zinc-200 dark:bg-zinc-800 my-1" />
+            </div>
+          )}
+
           {hasFullAccess ? (
             <div className="space-y-3">
               <button

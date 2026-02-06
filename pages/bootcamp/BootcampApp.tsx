@@ -2,7 +2,10 @@ import React, { useState, useEffect, useCallback, lazy, Suspense } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSearchParams } from 'react-router-dom';
 import { fetchCourseData } from '../../services/airtable';
-import { fetchStudentCurriculumAsLegacy } from '../../services/lms-supabase';
+import {
+  fetchStudentCurriculumAsLegacy,
+  completeEnrollmentOnboarding,
+} from '../../services/lms-supabase';
 import {
   verifyBootcampStudent,
   saveBootcampStudentSurvey,
@@ -15,6 +18,8 @@ import LessonView from '../../components/bootcamp/LessonView';
 import MyPosts from '../../components/bootcamp/MyPosts';
 import Login from '../../components/bootcamp/Login';
 import Register from '../../components/bootcamp/Register';
+import CourseDashboard from '../../components/bootcamp/CourseDashboard';
+import CourseOnboarding from '../../components/bootcamp/CourseOnboarding';
 import {
   OnboardingLayout,
   OnboardingWelcome,
@@ -26,6 +31,7 @@ import { useSubscription } from '../../hooks/useSubscription';
 import { useFunnelAccess } from '../../hooks/useFunnelAccess';
 import { useActiveAITools } from '../../hooks/useChatHistory';
 import { useStudentGrants } from '../../hooks/useStudentGrants';
+import { useEnrollments } from '../../hooks/useEnrollments';
 import SubscriptionBanner from '../../components/bootcamp/SubscriptionBanner';
 import SubscriptionModal from '../../components/bootcamp/SubscriptionModal';
 import {
@@ -108,6 +114,20 @@ const BootcampApp: React.FC = () => {
     user?.status || 'Full Access'
   );
 
+  // Multi-course enrollment state
+  const {
+    enrollments,
+    isLoading: enrollmentsLoading,
+    activeCourseId,
+    setActiveCourseId,
+    activeEnrollment,
+    needsOnboarding: checkEnrollmentOnboarding,
+    refetch: refetchEnrollments,
+  } = useEnrollments(bootcampStudent?.id || null);
+
+  // Dashboard view state (null activeCourseId = show dashboard)
+  const [showDashboard, setShowDashboard] = useState(false);
+
   // Legacy progress state
   const [completedItems, setCompletedItems] = useState<Set<string>>(new Set<string>());
   const [proofOfWork, setProofOfWork] = useState<Record<string, string>>({});
@@ -172,7 +192,7 @@ const BootcampApp: React.FC = () => {
     return `lms_progress_v2_${domain}`;
   };
 
-  const loadUserData = async (activeUser: User) => {
+  const loadUserData = async (activeUser: User, cohortNameOverride?: string) => {
     setLoading(true);
 
     const storageKey = getStorageKey(activeUser.email);
@@ -195,12 +215,14 @@ const BootcampApp: React.FC = () => {
       setSubmittedWeeks({});
     }
 
+    const cohortName = cohortNameOverride || activeUser.cohort;
+
     // Try new Supabase LMS first, fall back to Airtable if no content
-    let data = await fetchStudentCurriculumAsLegacy(activeUser.cohort, activeUser.email);
+    let data = await fetchStudentCurriculumAsLegacy(cohortName, activeUser.email);
 
     // If Supabase LMS has no weeks, fall back to Airtable
     if (!data.weeks.length) {
-      data = await fetchCourseData(activeUser.cohort, activeUser.email);
+      data = await fetchCourseData(cohortName, activeUser.email);
     }
 
     setCourseData(data);
@@ -210,6 +232,14 @@ const BootcampApp: React.FC = () => {
     }
     setLoading(false);
   };
+
+  // Reload curriculum when active enrollment changes
+  useEffect(() => {
+    if (!user || !activeEnrollment || showDashboard) return;
+    // Load curriculum for the selected enrollment's cohort
+    loadUserData(user, activeEnrollment.cohort.name);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeEnrollment?.cohortId, showDashboard]);
 
   useEffect(() => {
     if (isDarkMode) document.documentElement.classList.add('dark');
@@ -390,6 +420,23 @@ const BootcampApp: React.FC = () => {
     return Math.min(progress, 100);
   };
 
+  // Handle course selection from sidebar
+  const handleSelectCourse = (courseId: string | null) => {
+    if (courseId === null) {
+      setShowDashboard(true);
+    } else {
+      setShowDashboard(false);
+      setActiveCourseId(courseId);
+    }
+  };
+
+  // Handle per-enrollment onboarding completion
+  const handleCourseOnboardingComplete = async () => {
+    if (!bootcampStudent || !activeCourseId) return;
+    await completeEnrollmentOnboarding(bootcampStudent.id, activeCourseId);
+    refetchEnrollments();
+  };
+
   // Handle student update from settings (e.g., Blueprint connection)
   const handleStudentUpdate = async () => {
     if (user) {
@@ -490,6 +537,30 @@ const BootcampApp: React.FC = () => {
     );
   }
 
+  // Per-enrollment onboarding for active course
+  if (
+    activeEnrollment &&
+    checkEnrollmentOnboarding(activeEnrollment.cohortId) &&
+    activeEnrollment.cohort.onboardingConfig &&
+    !showDashboard
+  ) {
+    return (
+      <CourseOnboarding
+        cohortName={activeEnrollment.cohort.sidebarLabel || activeEnrollment.cohort.name}
+        config={activeEnrollment.cohort.onboardingConfig}
+        studentName={bootcampStudent?.name}
+        studentEmail={bootcampStudent?.email}
+        onComplete={handleCourseOnboardingComplete}
+        onSaveSurvey={(data, complete) => {
+          if (bootcampStudent) {
+            surveyMutation.mutate({ data, complete });
+          }
+        }}
+        isSurveyLoading={surveyMutation.isPending}
+      />
+    );
+  }
+
   // Funnel Access lockout - full-page takeover when expired
   const calcomUrl = import.meta.env.VITE_CALCOM_BOOKING_URL || '';
   if (funnelAccess.isExpired) {
@@ -544,7 +615,10 @@ const BootcampApp: React.FC = () => {
               : courseData
           }
           currentLessonId={currentLesson.id}
-          onSelectLesson={setCurrentLesson}
+          onSelectLesson={(lesson) => {
+            setShowDashboard(false);
+            setCurrentLesson(lesson);
+          }}
           isOpen={mobileMenuOpen}
           onCloseMobile={() => setMobileMenuOpen(false)}
           completedItems={completedItems}
@@ -563,74 +637,90 @@ const BootcampApp: React.FC = () => {
           }
           funnelAccess={funnelAccess.isFunnelAccess ? funnelAccess : undefined}
           calcomUrl={calcomUrl}
+          enrollments={enrollments}
+          activeCourseId={activeCourseId}
+          onSelectCourse={handleSelectCourse}
+          showDashboard={showDashboard}
         />
 
         <main className="flex-1 h-full overflow-y-auto pt-14 md:pt-0 bg-white dark:bg-zinc-950 transition-colors duration-300">
-          <div className="p-6 md:p-10 lg:p-14">
-            {/* Funnel Access nudge banners */}
-            {funnelAccess.nudgeTier === 'urgent' && (
-              <FunnelNudgeUrgent
-                userEmail={bootcampStudent?.email}
-                calcomUrl={calcomUrl}
-                daysRemaining={funnelAccess.daysRemaining}
+          {showDashboard && enrollments.length > 1 ? (
+            <div className="p-6 md:p-10 lg:p-14">
+              <CourseDashboard
+                enrollments={enrollments}
+                onSelectCourse={(courseId) => {
+                  setShowDashboard(false);
+                  setActiveCourseId(courseId);
+                }}
               />
-            )}
-            {funnelAccess.nudgeTier === 'persistent' && (
-              <FunnelNudgeBanner
-                userEmail={bootcampStudent?.email}
-                calcomUrl={calcomUrl}
-                daysRemaining={funnelAccess.daysRemaining}
-              />
-            )}
+            </div>
+          ) : (
+            <div className="p-6 md:p-10 lg:p-14">
+              {/* Funnel Access nudge banners */}
+              {funnelAccess.nudgeTier === 'urgent' && (
+                <FunnelNudgeUrgent
+                  userEmail={bootcampStudent?.email}
+                  calcomUrl={calcomUrl}
+                  daysRemaining={funnelAccess.daysRemaining}
+                />
+              )}
+              {funnelAccess.nudgeTier === 'persistent' && (
+                <FunnelNudgeBanner
+                  userEmail={bootcampStudent?.email}
+                  calcomUrl={calcomUrl}
+                  daysRemaining={funnelAccess.daysRemaining}
+                />
+              )}
 
-            {/* Non-funnel subscription banner */}
-            {!funnelAccess.isFunnelAccess && accessState === 'expiring' && !dismissedBanner && (
-              <SubscriptionBanner
-                daysRemaining={daysRemaining || 0}
-                onSubscribe={() => setShowSubscriptionModal(true)}
-                onDismiss={() => setDismissedBanner(true)}
-              />
-            )}
-            {currentLesson.id === 'virtual:tam-builder' ? (
-              <Suspense
-                fallback={
-                  <div className="flex items-center justify-center h-96">
-                    <div className="w-8 h-8 border-2 border-zinc-300 dark:border-zinc-700 border-t-violet-500 rounded-full animate-spin" />
-                  </div>
-                }
-              >
-                <TamBuilder userId={bootcampStudent?.id || ''} />
-              </Suspense>
-            ) : currentLesson.id === 'virtual:connection-qualifier' ? (
-              <Suspense
-                fallback={
-                  <div className="flex items-center justify-center h-96">
-                    <div className="w-8 h-8 border-2 border-zinc-300 dark:border-zinc-700 border-t-violet-500 rounded-full animate-spin" />
-                  </div>
-                }
-              >
-                <ConnectionQualifier userId={bootcampStudent?.id || ''} />
-              </Suspense>
-            ) : currentLesson.id === 'virtual:my-posts' ? (
-              <MyPosts prospectId={bootcampStudent?.prospectId} />
-            ) : (
-              <LessonView
-                lesson={currentLesson}
-                currentWeek={currentWeek}
-                completedItems={completedItems}
-                proofOfWork={proofOfWork}
-                taskNotes={taskNotes}
-                onToggleItem={toggleActionItem}
-                onUpdateProof={updateProofOfWork}
-                onUpdateNote={updateTaskNote}
-                isWeekSubmitted={currentWeek ? submittedWeeks[currentWeek.id] : false}
-                onWeekSubmit={handleWeekSubmit}
-                onSelectLesson={setCurrentLesson}
-                studentId={bootcampStudent?.id}
-                bootcampStudent={bootcampStudent}
-              />
-            )}
-          </div>
+              {/* Non-funnel subscription banner */}
+              {!funnelAccess.isFunnelAccess && accessState === 'expiring' && !dismissedBanner && (
+                <SubscriptionBanner
+                  daysRemaining={daysRemaining || 0}
+                  onSubscribe={() => setShowSubscriptionModal(true)}
+                  onDismiss={() => setDismissedBanner(true)}
+                />
+              )}
+              {currentLesson.id === 'virtual:tam-builder' ? (
+                <Suspense
+                  fallback={
+                    <div className="flex items-center justify-center h-96">
+                      <div className="w-8 h-8 border-2 border-zinc-300 dark:border-zinc-700 border-t-violet-500 rounded-full animate-spin" />
+                    </div>
+                  }
+                >
+                  <TamBuilder userId={bootcampStudent?.id || ''} />
+                </Suspense>
+              ) : currentLesson.id === 'virtual:connection-qualifier' ? (
+                <Suspense
+                  fallback={
+                    <div className="flex items-center justify-center h-96">
+                      <div className="w-8 h-8 border-2 border-zinc-300 dark:border-zinc-700 border-t-violet-500 rounded-full animate-spin" />
+                    </div>
+                  }
+                >
+                  <ConnectionQualifier userId={bootcampStudent?.id || ''} />
+                </Suspense>
+              ) : currentLesson.id === 'virtual:my-posts' ? (
+                <MyPosts prospectId={bootcampStudent?.prospectId} />
+              ) : (
+                <LessonView
+                  lesson={currentLesson}
+                  currentWeek={currentWeek}
+                  completedItems={completedItems}
+                  proofOfWork={proofOfWork}
+                  taskNotes={taskNotes}
+                  onToggleItem={toggleActionItem}
+                  onUpdateProof={updateProofOfWork}
+                  onUpdateNote={updateTaskNote}
+                  isWeekSubmitted={currentWeek ? submittedWeeks[currentWeek.id] : false}
+                  onWeekSubmit={handleWeekSubmit}
+                  onSelectLesson={setCurrentLesson}
+                  studentId={bootcampStudent?.id}
+                  bootcampStudent={bootcampStudent}
+                />
+              )}
+            </div>
+          )}
         </main>
       </div>
 

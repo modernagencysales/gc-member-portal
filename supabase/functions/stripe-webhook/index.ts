@@ -16,6 +16,56 @@ const stripe = new Stripe(stripeSecretKey, {
 const MEMBERS_COHORT_ID = '00000000-0000-0000-0000-000000000002';
 
 /**
+ * Look up a cohort by its ThriveCart product ID.
+ * Returns the cohort_id if found, null otherwise.
+ */
+async function lookupCohortByProductId(
+  supabase: ReturnType<typeof createClient>,
+  productId: string
+): Promise<string | null> {
+  const { data, error } = await supabase
+    .from('lms_cohorts')
+    .select('id')
+    .eq('thrivecart_product_id', productId)
+    .single();
+
+  if (error || !data) return null;
+  return data.id;
+}
+
+/**
+ * Enroll a student in a cohort via student_cohorts (idempotent upsert).
+ */
+async function enrollInCohort(
+  supabase: ReturnType<typeof createClient>,
+  studentId: string,
+  cohortId: string,
+  opts: {
+    role?: string;
+    accessLevel?: string;
+    enrollmentSource?: string;
+    enrollmentMetadata?: Record<string, unknown>;
+  } = {}
+): Promise<void> {
+  const { error } = await supabase.from('student_cohorts').upsert(
+    {
+      student_id: studentId,
+      cohort_id: cohortId,
+      role: opts.role || 'student',
+      access_level: opts.accessLevel || 'Full Access',
+      enrollment_source: opts.enrollmentSource,
+      enrollment_metadata: opts.enrollmentMetadata || {},
+      joined_at: new Date().toISOString(),
+    },
+    { onConflict: 'student_id,cohort_id' }
+  );
+
+  if (error) {
+    console.error('Failed to enroll student in cohort:', error);
+  }
+}
+
+/**
  * Look up a prospect by email (case-insensitive) and link it to the bootcamp student.
  * This is non-blocking: if the lookup or update fails, the error is logged
  * but the caller continues normally.
@@ -188,6 +238,100 @@ serve(async (req) => {
           }
         }
 
+        // If this is a ThriveCart course purchase with a product_id, map to cohort
+        const isThrivecartCourse =
+          session.metadata?.source === 'thrivecart' &&
+          session.metadata?.product_id &&
+          session.metadata?.product_type !== 'funnel_access';
+
+        if (!studentId && isThrivecartCourse) {
+          const productId = session.metadata!.product_id!;
+          const courseEmail = session.customer_details?.email || session.customer_email;
+
+          if (!courseEmail) {
+            console.error('No email in ThriveCart course session');
+            break;
+          }
+
+          // Look up cohort by product ID
+          const cohortId = await lookupCohortByProductId(supabase, productId);
+          if (!cohortId) {
+            console.error(`No cohort found for ThriveCart product_id: ${productId}`);
+            break;
+          }
+
+          const courseName = session.customer_details?.name || '';
+          const durationDays = session.metadata?.access_duration_days
+            ? parseInt(session.metadata.access_duration_days, 10)
+            : undefined;
+
+          // Find or create student
+          const { data: existingStudent } = await supabase
+            .from('bootcamp_students')
+            .select('id')
+            .ilike('email', courseEmail)
+            .maybeSingle();
+
+          if (existingStudent) {
+            studentId = existingStudent.id;
+          } else {
+            const { data: newStudent, error: createErr } = await supabase
+              .from('bootcamp_students')
+              .insert({
+                email: courseEmail,
+                full_name: courseName,
+                access_level: 'Full Access',
+                enrollment_source: 'thrivecart_course',
+                enrollment_metadata: {
+                  stripe_session_id: session.id,
+                  product_id: productId,
+                  enrolled_at: new Date().toISOString(),
+                },
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+              })
+              .select('id')
+              .single();
+
+            if (createErr) {
+              console.error('Failed to create student for course purchase:', createErr);
+              break;
+            }
+            studentId = newStudent.id;
+            await linkProspectToStudent(supabase, studentId!, courseEmail);
+          }
+
+          // Enroll in the cohort
+          await enrollInCohort(supabase, studentId!, cohortId, {
+            role: 'student',
+            accessLevel: 'Full Access',
+            enrollmentSource: 'thrivecart_course',
+            enrollmentMetadata: {
+              stripe_session_id: session.id,
+              product_id: productId,
+              ...(durationDays ? { access_duration_days: durationDays } : {}),
+            },
+          });
+
+          // Log subscription event
+          await supabase.from('subscription_events').insert({
+            student_id: studentId,
+            event_type: 'created',
+            stripe_event_id: event.id,
+            metadata: {
+              session_id: session.id,
+              source: 'thrivecart_course',
+              product_id: productId,
+              cohort_id: cohortId,
+            },
+          });
+
+          console.log(
+            `ThriveCart course enrollment complete: student ${studentId} → cohort ${cohortId}`
+          );
+          break;
+        }
+
         // If this is a ThriveCart funnel access purchase, handle separately
         const isThrivecartFunnel =
           session.metadata?.source === 'thrivecart' &&
@@ -350,18 +494,19 @@ serve(async (req) => {
           throw new Error(`Failed to update student: ${updateError.message}`);
         }
 
-        // Add to Members cohort
-        const { error: cohortError } = await supabase.from('student_cohorts').upsert({
-          student_id: studentId,
-          cohort_id: MEMBERS_COHORT_ID,
-          role: 'member',
-          joined_at: new Date().toISOString(),
-        });
-
-        if (cohortError) {
-          console.error('Failed to add student to Members cohort:', cohortError);
-          // Don't throw - student is subscribed, just missing cohort access
+        // Add to cohort — use product_id mapping if available, fall back to Members cohort
+        let enrollCohortId = MEMBERS_COHORT_ID;
+        if (session.metadata?.product_id) {
+          const mappedCohort = await lookupCohortByProductId(supabase, session.metadata.product_id);
+          if (mappedCohort) {
+            enrollCohortId = mappedCohort;
+          }
         }
+
+        await enrollInCohort(supabase, studentId, enrollCohortId, {
+          role: 'member',
+          enrollmentSource: isCalcomSource ? 'calcom_booking' : 'stripe_subscription',
+        });
 
         // Log event
         const eventMetadata: Record<string, unknown> = { session_id: session.id };

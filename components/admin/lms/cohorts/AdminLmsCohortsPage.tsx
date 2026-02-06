@@ -215,6 +215,7 @@ const AdminLmsCohortsPage: React.FC = () => {
               <tr>
                 <th className="px-4 py-3 text-left">Cohort</th>
                 <th className="px-4 py-3 text-left">Description</th>
+                <th className="px-4 py-3 text-center">Type</th>
                 <th className="px-4 py-3 text-center">Dates</th>
                 <th className="px-4 py-3 text-center">Status</th>
                 <th className="px-4 py-3 text-right">Actions</th>
@@ -224,7 +225,7 @@ const AdminLmsCohortsPage: React.FC = () => {
               {filteredCohorts.length === 0 ? (
                 <tr>
                   <td
-                    colSpan={5}
+                    colSpan={6}
                     className={`px-4 py-8 text-center ${
                       isDarkMode ? 'text-slate-400' : 'text-slate-500'
                     }`}
@@ -239,10 +240,24 @@ const AdminLmsCohortsPage: React.FC = () => {
                     className={`${isDarkMode ? 'hover:bg-slate-800/50' : 'hover:bg-slate-50'}`}
                   >
                     <td className="px-4 py-3">
-                      <p className="font-medium">{cohort.name}</p>
-                      <p className={`text-xs ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>
-                        Created {cohort.createdAt.toLocaleDateString()}
-                      </p>
+                      <div className="flex items-center gap-2">
+                        {cohort.icon && <span className="text-lg">{cohort.icon}</span>}
+                        <div>
+                          <p className="font-medium">{cohort.name}</p>
+                          {cohort.sidebarLabel && cohort.sidebarLabel !== cohort.name && (
+                            <p
+                              className={`text-xs ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}
+                            >
+                              Sidebar: {cohort.sidebarLabel}
+                            </p>
+                          )}
+                          <p
+                            className={`text-xs ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}
+                          >
+                            Created {cohort.createdAt.toLocaleDateString()}
+                          </p>
+                        </div>
+                      </div>
                     </td>
                     <td className="px-4 py-3">
                       <p
@@ -250,6 +265,22 @@ const AdminLmsCohortsPage: React.FC = () => {
                       >
                         {cohort.description || '-'}
                       </p>
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      <span
+                        className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+                          isDarkMode ? 'bg-slate-800 text-slate-400' : 'bg-slate-100 text-slate-600'
+                        }`}
+                      >
+                        {cohort.productType || 'course'}
+                      </span>
+                      {cohort.thrivecartProductId && (
+                        <p
+                          className={`text-xs mt-0.5 ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}
+                        >
+                          {cohort.thrivecartProductId}
+                        </p>
+                      )}
                     </td>
                     <td className="px-4 py-3 text-center">
                       {cohort.startDate || cohort.endDate ? (

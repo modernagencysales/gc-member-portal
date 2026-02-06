@@ -23,7 +23,9 @@ import {
   LmsActionItemFormData,
   LmsCredentialsData,
   LmsContentType,
+  CohortOnboardingConfig,
 } from '../types/lms-types';
+import { StudentEnrollment } from '../types/bootcamp-types';
 
 // ============================================
 // Cohorts
@@ -73,13 +75,21 @@ export async function fetchLmsCohortByName(name: string): Promise<LmsCohort | nu
 }
 
 export async function createLmsCohort(cohort: LmsCohortFormData): Promise<LmsCohort> {
-  const insertData = {
+  const insertData: Record<string, unknown> = {
     name: cohort.name,
     description: cohort.description,
     status: cohort.status || 'Active',
     start_date: cohort.startDate,
     end_date: cohort.endDate,
   };
+
+  if (cohort.sidebarLabel !== undefined) insertData.sidebar_label = cohort.sidebarLabel;
+  if (cohort.icon !== undefined) insertData.icon = cohort.icon;
+  if (cohort.sortOrder !== undefined) insertData.sort_order = cohort.sortOrder;
+  if (cohort.productType !== undefined) insertData.product_type = cohort.productType;
+  if (cohort.thrivecartProductId !== undefined)
+    insertData.thrivecart_product_id = cohort.thrivecartProductId;
+  if (cohort.onboardingConfig !== undefined) insertData.onboarding_config = cohort.onboardingConfig;
 
   const { data, error } = await supabase.from('lms_cohorts').insert(insertData).select().single();
 
@@ -98,6 +108,14 @@ export async function updateLmsCohort(
   if (updates.status !== undefined) updateData.status = updates.status;
   if (updates.startDate !== undefined) updateData.start_date = updates.startDate;
   if (updates.endDate !== undefined) updateData.end_date = updates.endDate;
+  if (updates.sidebarLabel !== undefined) updateData.sidebar_label = updates.sidebarLabel;
+  if (updates.icon !== undefined) updateData.icon = updates.icon;
+  if (updates.sortOrder !== undefined) updateData.sort_order = updates.sortOrder;
+  if (updates.productType !== undefined) updateData.product_type = updates.productType;
+  if (updates.thrivecartProductId !== undefined)
+    updateData.thrivecart_product_id = updates.thrivecartProductId;
+  if (updates.onboardingConfig !== undefined)
+    updateData.onboarding_config = updates.onboardingConfig;
 
   const { data, error } = await supabase
     .from('lms_cohorts')
@@ -139,6 +157,12 @@ function mapLmsCohort(record: Record<string, unknown>): LmsCohort {
     status: (record.status as LmsCohort['status']) || 'Active',
     startDate: record.start_date ? new Date(record.start_date as string) : undefined,
     endDate: record.end_date ? new Date(record.end_date as string) : undefined,
+    sidebarLabel: record.sidebar_label as string | undefined,
+    icon: record.icon as string | undefined,
+    sortOrder: (record.sort_order as number) || 0,
+    productType: record.product_type as string | undefined,
+    thrivecartProductId: record.thrivecart_product_id as string | undefined,
+    onboardingConfig: record.onboarding_config as CohortOnboardingConfig | undefined,
     createdAt: new Date(record.created_at as string),
     updatedAt: new Date(record.updated_at as string),
   };
@@ -782,6 +806,91 @@ function mapLmsActionItemProgress(record: Record<string, unknown>): LmsActionIte
     notes: record.notes as string | undefined,
     createdAt: new Date(record.created_at as string),
   };
+}
+
+// ============================================
+// Student Enrollments
+// ============================================
+
+export async function fetchStudentEnrollments(studentId: string): Promise<StudentEnrollment[]> {
+  const { data, error } = await supabase
+    .from('student_cohorts')
+    .select('*, lms_cohorts(*)')
+    .eq('student_id', studentId);
+
+  if (error) throw new Error(error.message);
+  if (!data) return [];
+
+  return data
+    .filter(
+      (row) => row.lms_cohorts && (row.lms_cohorts as Record<string, unknown>).status === 'Active'
+    )
+    .map((row) => ({
+      studentId: row.student_id as string,
+      cohortId: row.cohort_id as string,
+      role: row.role as StudentEnrollment['role'],
+      joinedAt: new Date(row.joined_at as string),
+      accessLevel: row.access_level as string | undefined,
+      onboardingCompletedAt: row.onboarding_completed_at
+        ? new Date(row.onboarding_completed_at as string)
+        : undefined,
+      accessExpiresAt: row.access_expires_at
+        ? new Date(row.access_expires_at as string)
+        : undefined,
+      enrollmentSource: row.enrollment_source as string | undefined,
+      cohort: mapLmsCohort(row.lms_cohorts as Record<string, unknown>),
+    }))
+    .sort((a, b) => a.cohort.sortOrder - b.cohort.sortOrder);
+}
+
+export async function enrollStudentInCohort(
+  studentId: string,
+  cohortId: string,
+  opts: {
+    role?: string;
+    accessLevel?: string;
+    enrollmentSource?: string;
+    enrollmentMetadata?: Record<string, unknown>;
+  } = {}
+): Promise<void> {
+  const { error } = await supabase.from('student_cohorts').upsert(
+    {
+      student_id: studentId,
+      cohort_id: cohortId,
+      role: opts.role || 'student',
+      access_level: opts.accessLevel || 'Full Access',
+      enrollment_source: opts.enrollmentSource,
+      enrollment_metadata: opts.enrollmentMetadata || {},
+      joined_at: new Date().toISOString(),
+    },
+    { onConflict: 'student_id,cohort_id' }
+  );
+
+  if (error) throw new Error(error.message);
+}
+
+export async function completeEnrollmentOnboarding(
+  studentId: string,
+  cohortId: string
+): Promise<void> {
+  const { error } = await supabase
+    .from('student_cohorts')
+    .update({ onboarding_completed_at: new Date().toISOString() })
+    .eq('student_id', studentId)
+    .eq('cohort_id', cohortId);
+
+  if (error) throw new Error(error.message);
+}
+
+export async function fetchCohortByProductId(productId: string): Promise<LmsCohort | null> {
+  const { data, error } = await supabase
+    .from('lms_cohorts')
+    .select('*')
+    .eq('thrivecart_product_id', productId)
+    .single();
+
+  if (error || !data) return null;
+  return mapLmsCohort(data);
 }
 
 // ============================================

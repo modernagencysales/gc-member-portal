@@ -22,6 +22,14 @@ export interface StudentCohort {
   cohortId: string;
   role: StudentCohortRole;
   joinedAt: Date;
+  accessLevel?: string;
+  onboardingCompletedAt?: Date;
+  accessExpiresAt?: Date;
+  enrollmentSource?: string;
+}
+
+export interface StudentEnrollment extends StudentCohort {
+  cohort: import('../types/lms-types').LmsCohort;
 }
 
 export interface SubscriptionEvent {
