@@ -37,7 +37,8 @@ import {
 import WeekEditor from './WeekEditor';
 import LmsContentItemModal from './LmsContentItemModal';
 import InlineAddInput from './InlineAddInput';
-import { ArrowLeft, ChevronDown, AlertCircle } from 'lucide-react';
+import { ArrowLeft, ChevronDown, AlertCircle, Upload } from 'lucide-react';
+import CsvImportModal from './CsvImportModal';
 
 const AdminLmsCurriculumPage: React.FC = () => {
   const { isDarkMode } = useTheme();
@@ -51,6 +52,7 @@ const AdminLmsCurriculumPage: React.FC = () => {
     weekId: string;
     contentType: 'credentials' | 'ai_tool';
   } | null>(null);
+  const [showCsvImport, setShowCsvImport] = useState(false);
 
   // Drag and drop sensors
   const sensors = useSensors(
@@ -208,6 +210,17 @@ const AdminLmsCurriculumPage: React.FC = () => {
             {curriculum.weeks.reduce((acc, w) => acc + w.lessons.length, 0)} lessons
           </p>
         </div>
+        <button
+          onClick={() => setShowCsvImport(true)}
+          className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm border ${
+            isDarkMode
+              ? 'border-zinc-700 hover:bg-zinc-800 text-zinc-300'
+              : 'border-zinc-300 hover:bg-zinc-50 text-zinc-700'
+          }`}
+        >
+          <Upload className="w-4 h-4" />
+          Import CSV
+        </button>
       </div>
 
       {/* Weeks */}
@@ -341,6 +354,14 @@ const AdminLmsCurriculumPage: React.FC = () => {
           </div>
         </SortableContext>
       </DndContext>
+
+      {/* CSV Import Modal */}
+      <CsvImportModal
+        isOpen={showCsvImport}
+        onClose={() => setShowCsvImport(false)}
+        cohortId={cohortId}
+        existingWeekCount={curriculum.weeks.length}
+      />
 
       {/* Content Modal for credentials/AI tool */}
       {contentModal && (

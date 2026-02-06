@@ -49,6 +49,9 @@ export default [
         MediaQueryListEvent: 'readonly',
 
         // Web APIs
+        File: 'readonly',
+        FileReader: 'readonly',
+        Blob: 'readonly',
         FormData: 'readonly',
         URL: 'readonly',
         URLSearchParams: 'readonly',
