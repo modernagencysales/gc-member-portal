@@ -20,6 +20,7 @@ import {
   BootcampInviteCode,
   ToolGrant,
   FunnelToolPresets,
+  CallGrantConfig,
 } from '../types/bootcamp-types';
 
 // ============================================
@@ -1367,4 +1368,43 @@ export async function saveFunnelToolPresets(presets: FunnelToolPresets): Promise
   });
 
   if (error) throw new Error(`Failed to save funnel tool presets: ${error.message}`);
+}
+
+// ============================================
+// Call Grant Config
+// ============================================
+
+const DEFAULT_CALL_GRANT_CONFIG: CallGrantConfig = {
+  enabled: false,
+  creditsPerTool: 10,
+  toolSlugs: [],
+  accessLevel: 'Lead Magnet',
+};
+
+export async function fetchCallGrantConfig(): Promise<CallGrantConfig> {
+  try {
+    const { data, error } = await supabase
+      .from('bootcamp_settings')
+      .select('value')
+      .eq('key', 'call_grant_config')
+      .single();
+
+    if (error || !data) {
+      return DEFAULT_CALL_GRANT_CONFIG;
+    }
+
+    return { ...DEFAULT_CALL_GRANT_CONFIG, ...(data.value as Partial<CallGrantConfig>) };
+  } catch {
+    return DEFAULT_CALL_GRANT_CONFIG;
+  }
+}
+
+export async function saveCallGrantConfig(config: CallGrantConfig): Promise<void> {
+  const { error } = await supabase.from('bootcamp_settings').upsert({
+    key: 'call_grant_config',
+    value: config,
+    description: 'Auto-grant AI tool credits when prospects attend calls',
+  });
+
+  if (error) throw new Error(`Failed to save call grant config: ${error.message}`);
 }

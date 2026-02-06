@@ -267,6 +267,16 @@ export interface OnboardingFlowState {
 }
 
 // ============================================
+// Call Grant Config
+// ============================================
+export interface CallGrantConfig {
+  enabled: boolean;
+  creditsPerTool: number;
+  toolSlugs: string[];
+  accessLevel: BootcampAccessLevel;
+}
+
+// ============================================
 // Funnel Access Tool Presets
 // ============================================
 export interface FunnelToolPreset {

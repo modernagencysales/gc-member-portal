@@ -7,6 +7,7 @@ import { useUpdateBootcampSettingMutation } from '../../../../hooks/useBootcampA
 import { BootcampSettings } from '../../../../types/bootcamp-types';
 import { Settings, Video, Sparkles, Info, Save, Bot } from 'lucide-react';
 import FunnelToolPresetsEditor from './FunnelToolPresetsEditor';
+import CallGrantConfigEditor from './CallGrantConfigEditor';
 
 const AdminBootcampSettingsPage: React.FC = () => {
   const { isDarkMode } = useTheme();
@@ -309,6 +310,9 @@ const AdminBootcampSettingsPage: React.FC = () => {
             </div>
           </div>
         </div>
+
+        {/* Call Attendance Grants */}
+        <CallGrantConfigEditor />
 
         {/* Funnel Access Tool Presets */}
         <FunnelToolPresetsEditor />
