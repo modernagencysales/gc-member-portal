@@ -19,6 +19,7 @@ import {
   BootcampCohort,
   BootcampInviteCode,
   ToolGrant,
+  FunnelToolPresets,
 } from '../types/bootcamp-types';
 
 // ============================================
@@ -178,6 +179,9 @@ function mapBootcampStudent(record: Record<string, unknown>): BootcampStudent {
     stripeCustomerId: record.stripe_customer_id as string | undefined,
     notes: record.notes as string | undefined,
     prospectId: record.prospect_id as string | undefined,
+    accessExpiresAt: record.access_expires_at
+      ? new Date(record.access_expires_at as string)
+      : undefined,
     createdAt: new Date(record.created_at as string),
     updatedAt: new Date(record.updated_at as string),
   };
@@ -1329,4 +1333,38 @@ export async function getStudentGrants(studentId: string): Promise<StudentGrants
   const weekIds = (contentGrants || []).map((row) => row.week_id as string);
 
   return { tools, weekIds };
+}
+
+// ============================================
+// Funnel Tool Presets
+// ============================================
+
+export async function fetchFunnelToolPresets(): Promise<FunnelToolPresets> {
+  try {
+    const { data, error } = await supabase
+      .from('bootcamp_settings')
+      .select('value')
+      .eq('key', 'funnel_tool_presets')
+      .single();
+
+    if (error || !data) {
+      console.error('Failed to fetch funnel tool presets:', error);
+      return {};
+    }
+
+    return data.value as FunnelToolPresets;
+  } catch (error) {
+    console.error('Failed to fetch funnel tool presets:', error);
+    return {};
+  }
+}
+
+export async function saveFunnelToolPresets(presets: FunnelToolPresets): Promise<void> {
+  const { error } = await supabase.from('bootcamp_settings').upsert({
+    key: 'funnel_tool_presets',
+    value: presets,
+    description: 'Tool preset configurations for Funnel Access users',
+  });
+
+  if (error) throw new Error(`Failed to save funnel tool presets: ${error.message}`);
 }

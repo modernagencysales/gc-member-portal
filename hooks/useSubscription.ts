@@ -10,6 +10,8 @@ interface UseSubscriptionResult {
   canUseAiTools: boolean;
   isReadOnly: boolean;
   accessExpiresAt: Date | null;
+  percentElapsed: number | null;
+  isFunnelAccess: boolean;
 }
 
 export function useSubscription(
@@ -25,6 +27,8 @@ export function useSubscription(
         canUseAiTools: false,
         isReadOnly: true,
         accessExpiresAt: null,
+        percentElapsed: null,
+        isFunnelAccess: false,
       };
     }
 
@@ -36,6 +40,58 @@ export function useSubscription(
         canUseAiTools: true,
         isReadOnly: false,
         accessExpiresAt: null,
+        percentElapsed: null,
+        isFunnelAccess: false,
+      };
+    }
+
+    // Funnel Access: use access_expires_at directly
+    if (student.accessLevel === 'Funnel Access' && student.accessExpiresAt) {
+      const now = new Date();
+      const expiresAt = new Date(student.accessExpiresAt);
+      const daysRemaining = Math.ceil((expiresAt.getTime() - now.getTime()) / 86400000);
+
+      // Calculate percent elapsed based on creation date
+      const createdAt = new Date(student.createdAt);
+      const totalDuration = expiresAt.getTime() - createdAt.getTime();
+      const elapsed = now.getTime() - createdAt.getTime();
+      const percentElapsed =
+        totalDuration > 0
+          ? Math.min(100, Math.max(0, Math.round((elapsed / totalDuration) * 100)))
+          : 100;
+
+      if (daysRemaining <= 0) {
+        return {
+          accessState: 'expired' as AccessState,
+          daysRemaining: 0,
+          canUseAiTools: false,
+          isReadOnly: true,
+          accessExpiresAt: expiresAt,
+          percentElapsed: 100,
+          isFunnelAccess: true,
+        };
+      }
+
+      if (daysRemaining <= 7) {
+        return {
+          accessState: 'expiring' as AccessState,
+          daysRemaining,
+          canUseAiTools: true,
+          isReadOnly: false,
+          accessExpiresAt: expiresAt,
+          percentElapsed,
+          isFunnelAccess: true,
+        };
+      }
+
+      return {
+        accessState: 'active' as AccessState,
+        daysRemaining,
+        canUseAiTools: true,
+        isReadOnly: false,
+        accessExpiresAt: expiresAt,
+        percentElapsed,
+        isFunnelAccess: true,
       };
     }
 
@@ -50,6 +106,8 @@ export function useSubscription(
         canUseAiTools: true,
         isReadOnly: false,
         accessExpiresAt: null,
+        percentElapsed: null,
+        isFunnelAccess: false,
       };
     }
 
@@ -68,6 +126,8 @@ export function useSubscription(
         canUseAiTools: false,
         isReadOnly: true,
         accessExpiresAt,
+        percentElapsed: null,
+        isFunnelAccess: false,
       };
     }
 
@@ -79,6 +139,8 @@ export function useSubscription(
         canUseAiTools: true,
         isReadOnly: false,
         accessExpiresAt,
+        percentElapsed: null,
+        isFunnelAccess: false,
       };
     }
 
@@ -89,6 +151,8 @@ export function useSubscription(
       canUseAiTools: true,
       isReadOnly: false,
       accessExpiresAt,
+      percentElapsed: null,
+      isFunnelAccess: false,
     };
   }, [student, cohort]);
 }

@@ -188,6 +188,146 @@ serve(async (req) => {
           }
         }
 
+        // If this is a ThriveCart funnel access purchase, handle separately
+        const isThrivecartFunnel =
+          session.metadata?.source === 'thrivecart' &&
+          session.metadata?.product_type === 'funnel_access';
+
+        if (!studentId && isThrivecartFunnel) {
+          const funnelEmail = session.customer_details?.email || session.customer_email;
+
+          if (!funnelEmail) {
+            console.error('No email in ThriveCart funnel session');
+            break;
+          }
+
+          const funnelName = session.customer_details?.name || '';
+          const durationDays = parseInt(session.metadata?.access_duration_days || '30', 10);
+          const toolPreset = session.metadata?.tool_preset || 'default';
+
+          // Idempotency: check for existing student
+          const { data: existingFunnelStudent } = await supabase
+            .from('bootcamp_students')
+            .select('id, access_level')
+            .ilike('email', funnelEmail)
+            .maybeSingle();
+
+          if (existingFunnelStudent) {
+            console.log(
+              `Existing student found for funnel email ${funnelEmail}: ${existingFunnelStudent.id}`
+            );
+
+            // If already has higher access, don't downgrade
+            if (existingFunnelStudent.access_level === 'Full Access') {
+              console.log('Student already has Full Access, skipping funnel downgrade');
+              break;
+            }
+
+            // Update expiry for existing Funnel Access student
+            const expiresAt = new Date();
+            expiresAt.setDate(expiresAt.getDate() + durationDays);
+            await supabase
+              .from('bootcamp_students')
+              .update({
+                access_level: 'Funnel Access',
+                access_expires_at: expiresAt.toISOString(),
+                updated_at: new Date().toISOString(),
+              })
+              .eq('id', existingFunnelStudent.id);
+
+            studentId = existingFunnelStudent.id;
+          } else {
+            // Create new Funnel Access student
+            const expiresAt = new Date();
+            expiresAt.setDate(expiresAt.getDate() + durationDays);
+
+            const { data: newFunnelStudent, error: createError } = await supabase
+              .from('bootcamp_students')
+              .insert({
+                email: funnelEmail,
+                full_name: funnelName,
+                access_level: 'Funnel Access',
+                access_expires_at: expiresAt.toISOString(),
+                enrollment_source: 'thrivecart_funnel',
+                enrollment_metadata: {
+                  stripe_session_id: session.id,
+                  access_duration_days: durationDays,
+                  tool_preset: toolPreset,
+                  enrolled_at: new Date().toISOString(),
+                },
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+              })
+              .select('id')
+              .single();
+
+            if (createError) {
+              console.error('Failed to create funnel access student:', createError);
+              break;
+            }
+
+            studentId = newFunnelStudent.id;
+            console.log(
+              `Created Funnel Access student ${studentId} for ${funnelEmail} (${durationDays} days)`
+            );
+          }
+
+          // Grant tools from preset
+          try {
+            const { data: presetSetting } = await supabase
+              .from('bootcamp_settings')
+              .select('value')
+              .eq('key', 'funnel_tool_presets')
+              .single();
+
+            const presets = presetSetting?.value as Record<string, { toolSlugs?: string[] }> | null;
+            const preset = presets?.[toolPreset] || presets?.['default'];
+            const toolSlugs = preset?.toolSlugs || [];
+
+            if (toolSlugs.length > 0) {
+              // Lookup tool IDs by slug
+              const { data: tools } = await supabase
+                .from('ai_tools')
+                .select('id, slug')
+                .in('slug', toolSlugs);
+
+              if (tools && tools.length > 0) {
+                const creditGrants = tools.map((t) => ({
+                  student_id: studentId!,
+                  tool_id: t.id,
+                  credits_total: 999999, // Effectively unlimited during access window
+                  credits_used: 0,
+                  source: 'funnel_access',
+                }));
+
+                await supabase.from('student_tool_credits').insert(creditGrants);
+                console.log(`Granted ${tools.length} tools to funnel student ${studentId}`);
+              }
+            }
+          } catch (presetErr) {
+            console.error('Failed to grant funnel tool presets (non-blocking):', presetErr);
+          }
+
+          // Non-blocking: link Blueprint prospect
+          await linkProspectToStudent(supabase, studentId!, funnelEmail);
+
+          // Log subscription event
+          await supabase.from('subscription_events').insert({
+            student_id: studentId,
+            event_type: 'created',
+            stripe_event_id: event.id,
+            metadata: {
+              session_id: session.id,
+              source: 'thrivecart_funnel',
+              access_duration_days: durationDays,
+              tool_preset: toolPreset,
+            },
+          });
+
+          console.log(`Funnel access enrollment complete for student ${studentId}`);
+          break;
+        }
+
         if (!studentId) {
           console.error('No student_id in session metadata and not a Cal.com booking');
           break;

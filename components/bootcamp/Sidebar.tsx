@@ -25,6 +25,8 @@ import {
   Users,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import type { FunnelAccessState } from '../../hooks/useFunnelAccess';
+import { FunnelNudgeSubtle } from './funnel-access';
 
 interface SidebarProps {
   data: CourseData;
@@ -48,6 +50,8 @@ interface SidebarProps {
   }> | null;
   grantedWeekIds?: string[] | null;
   onRedeemCode?: () => void;
+  funnelAccess?: FunnelAccessState;
+  calcomUrl?: string;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
@@ -63,6 +67,10 @@ const Sidebar: React.FC<SidebarProps> = ({
   aiTools = [],
   onOpenSettings,
   hasBlueprint = false,
+  grantedTools,
+  onRedeemCode,
+  funnelAccess,
+  calcomUrl,
 }) => {
   const { logout } = useAuth();
 
@@ -76,7 +84,8 @@ const Sidebar: React.FC<SidebarProps> = ({
   const [showResourcesSection, setShowResourcesSection] = useState(true);
   const [showCurriculumSection, setShowCurriculumSection] = useState(true);
 
-  const hasFullAccess = user?.status === 'Full Access';
+  const isFunnelAccess = user?.status === 'Funnel Access';
+  const hasFullAccess = user?.status === 'Full Access' || isFunnelAccess;
   const userDomain = user?.email.split('@')[1] || '';
 
   const toggleWeek = (weekId: string) => {
@@ -332,6 +341,26 @@ const Sidebar: React.FC<SidebarProps> = ({
                     </div>
                   </button>
 
+                  {/* Funnel Access subtle nudge */}
+                  {funnelAccess?.nudgeTier === 'subtle' && (
+                    <FunnelNudgeSubtle
+                      userEmail={user?.email}
+                      calcomUrl={calcomUrl}
+                      daysRemaining={funnelAccess.daysRemaining}
+                    />
+                  )}
+
+                  {/* Redeem Code for Funnel Access users */}
+                  {isFunnelAccess && onRedeemCode && (
+                    <button
+                      onClick={onRedeemCode}
+                      className="flex items-center gap-2 w-full p-2 rounded-lg text-xs font-medium text-violet-600 dark:text-violet-400 hover:bg-violet-50 dark:hover:bg-violet-900/20 transition-colors"
+                    >
+                      <Key size={12} />
+                      Redeem Code
+                    </button>
+                  )}
+
                   {/* AI Tools - from database (global) + curriculum-embedded */}
                   {(aiTools.length > 0 || toolGroups.gpts.length > 0) && (
                     <div className="space-y-0.5">
@@ -351,7 +380,10 @@ const Sidebar: React.FC<SidebarProps> = ({
                       </button>
                       {isGroupExpanded('gpts') && (
                         <div className="ml-4 border-l border-zinc-200 dark:border-zinc-800 pl-1.5">
-                          {aiTools.map(renderAIToolItem)}
+                          {(isFunnelAccess && grantedTools
+                            ? aiTools.filter((t) => grantedTools.some((g) => g.toolSlug === t.slug))
+                            : aiTools
+                          ).map(renderAIToolItem)}
                           {toolGroups.gpts.map(renderToolItem)}
                           <button
                             onClick={() => {

@@ -7,7 +7,11 @@
 // Bootcamp Student
 // ============================================
 export type BootcampStudentStatus = 'Onboarding' | 'Active' | 'Completed' | 'Paused' | 'Churned';
-export type BootcampAccessLevel = 'Full Access' | 'Curriculum Only' | 'Lead Magnet';
+export type BootcampAccessLevel =
+  | 'Full Access'
+  | 'Curriculum Only'
+  | 'Lead Magnet'
+  | 'Funnel Access';
 
 export type SubscriptionStatus = 'none' | 'active' | 'canceled' | 'past_due';
 
@@ -53,6 +57,8 @@ export interface BootcampStudent {
   notes?: string;
   /** Link to prospect record for Blueprint access */
   prospectId?: string;
+  /** Time-limited access expiry for Funnel Access users */
+  accessExpiresAt?: Date;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -250,6 +256,19 @@ export interface OnboardingFlowState {
   completedSteps: OnboardingStep[];
   surveyData: BootcampSurveyFormData;
   surveyStep: number; // 1, 2, or 3
+}
+
+// ============================================
+// Funnel Access Tool Presets
+// ============================================
+export interface FunnelToolPreset {
+  name: string;
+  toolSlugs: string[];
+  description?: string;
+}
+
+export interface FunnelToolPresets {
+  [presetKey: string]: FunnelToolPreset;
 }
 
 // ============================================

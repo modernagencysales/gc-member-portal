@@ -6,6 +6,7 @@ import { useTheme } from '../../../../context/ThemeContext';
 import { useUpdateBootcampSettingMutation } from '../../../../hooks/useBootcampAdminMutations';
 import { BootcampSettings } from '../../../../types/bootcamp-types';
 import { Settings, Video, Sparkles, Info, Save, Bot } from 'lucide-react';
+import FunnelToolPresetsEditor from './FunnelToolPresetsEditor';
 
 const AdminBootcampSettingsPage: React.FC = () => {
   const { isDarkMode } = useTheme();
@@ -308,6 +309,9 @@ const AdminBootcampSettingsPage: React.FC = () => {
             </div>
           </div>
         </div>
+
+        {/* Funnel Access Tool Presets */}
+        <FunnelToolPresetsEditor />
 
         {/* Manual Tracking Info */}
         <div

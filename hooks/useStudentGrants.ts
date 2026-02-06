@@ -2,18 +2,30 @@ import { useQuery } from '@tanstack/react-query';
 import { getStudentGrants, StudentGrants } from '../services/bootcamp-supabase';
 
 export function useStudentGrants(studentId: string | undefined, accessLevel: string) {
+  const needsGrants = accessLevel === 'Lead Magnet' || accessLevel === 'Funnel Access';
+
   const { data, isLoading, refetch } = useQuery<StudentGrants>({
     queryKey: ['studentGrants', studentId],
     queryFn: () => getStudentGrants(studentId!),
-    enabled: !!studentId && accessLevel === 'Lead Magnet',
+    enabled: !!studentId && needsGrants,
   });
 
-  // Full Access users get null (meaning "everything")
-  if (accessLevel !== 'Lead Magnet') {
+  // Full Access / Curriculum Only users get null (meaning "everything")
+  if (!needsGrants) {
     return {
       grantedTools: null,
       grantedWeekIds: null,
       isLoading: false,
+      refetchGrants: refetch,
+    };
+  }
+
+  // Funnel Access users see all curriculum (no week filtering) but have filtered tools
+  if (accessLevel === 'Funnel Access') {
+    return {
+      grantedTools: data?.tools ?? [],
+      grantedWeekIds: null, // See all curriculum
+      isLoading,
       refetchGrants: refetch,
     };
   }

@@ -23,10 +23,18 @@ import {
   OnboardingComplete,
 } from '../../components/bootcamp/onboarding';
 import { useSubscription } from '../../hooks/useSubscription';
+import { useFunnelAccess } from '../../hooks/useFunnelAccess';
 import { useActiveAITools } from '../../hooks/useChatHistory';
 import { useStudentGrants } from '../../hooks/useStudentGrants';
 import SubscriptionBanner from '../../components/bootcamp/SubscriptionBanner';
 import SubscriptionModal from '../../components/bootcamp/SubscriptionModal';
+import {
+  FunnelAccessExpiredScreen,
+  FunnelNudgeBanner,
+  FunnelNudgeUrgent,
+  FunnelNudgeStickyBar,
+  FunnelNudgeModal,
+} from '../../components/bootcamp/funnel-access';
 import RedeemCodeModal from '../../components/bootcamp/RedeemCodeModal';
 import { StudentSettingsModal } from '../../components/bootcamp/settings';
 import { CourseData, Lesson, User } from '../../types';
@@ -81,6 +89,9 @@ const BootcampApp: React.FC = () => {
 
   // Subscription access state - pass null for cohort until we fetch it (gives unlimited access)
   const { accessState, daysRemaining } = useSubscription(bootcampStudent, null);
+
+  // Funnel Access nudge state
+  const funnelAccess = useFunnelAccess(bootcampStudent);
 
   // Fetch AI tools for Resources section (global, all cohorts)
   const { data: aiTools } = useActiveAITools();
@@ -479,6 +490,18 @@ const BootcampApp: React.FC = () => {
     );
   }
 
+  // Funnel Access lockout - full-page takeover when expired
+  const calcomUrl = import.meta.env.VITE_CALCOM_BOOKING_URL || '';
+  if (funnelAccess.isExpired) {
+    return (
+      <FunnelAccessExpiredScreen
+        userEmail={bootcampStudent?.email}
+        calcomUrl={calcomUrl}
+        studentName={bootcampStudent?.name}
+      />
+    );
+  }
+
   // Curriculum loading
   if (!courseData || !currentLesson) return <div className="p-8">Syncing content...</div>;
 
@@ -533,12 +556,35 @@ const BootcampApp: React.FC = () => {
           hasBlueprint={!!bootcampStudent?.prospectId}
           grantedTools={grantedTools}
           grantedWeekIds={grantedWeekIds}
-          onRedeemCode={user?.status === 'Lead Magnet' ? () => setShowRedeemModal(true) : undefined}
+          onRedeemCode={
+            user?.status === 'Lead Magnet' || user?.status === 'Funnel Access'
+              ? () => setShowRedeemModal(true)
+              : undefined
+          }
+          funnelAccess={funnelAccess.isFunnelAccess ? funnelAccess : undefined}
+          calcomUrl={calcomUrl}
         />
 
         <main className="flex-1 h-full overflow-y-auto pt-14 md:pt-0 bg-white dark:bg-zinc-950 transition-colors duration-300">
           <div className="p-6 md:p-10 lg:p-14">
-            {accessState === 'expiring' && !dismissedBanner && (
+            {/* Funnel Access nudge banners */}
+            {funnelAccess.nudgeTier === 'urgent' && (
+              <FunnelNudgeUrgent
+                userEmail={bootcampStudent?.email}
+                calcomUrl={calcomUrl}
+                daysRemaining={funnelAccess.daysRemaining}
+              />
+            )}
+            {funnelAccess.nudgeTier === 'persistent' && (
+              <FunnelNudgeBanner
+                userEmail={bootcampStudent?.email}
+                calcomUrl={calcomUrl}
+                daysRemaining={funnelAccess.daysRemaining}
+              />
+            )}
+
+            {/* Non-funnel subscription banner */}
+            {!funnelAccess.isFunnelAccess && accessState === 'expiring' && !dismissedBanner && (
               <SubscriptionBanner
                 daysRemaining={daysRemaining || 0}
                 onSubscribe={() => setShowSubscriptionModal(true)}
@@ -588,7 +634,26 @@ const BootcampApp: React.FC = () => {
         </main>
       </div>
 
-      {bootcampStudent && (
+      {/* Funnel Access sticky bar (persistent + urgent tiers) */}
+      {(funnelAccess.nudgeTier === 'persistent' || funnelAccess.nudgeTier === 'urgent') && (
+        <FunnelNudgeStickyBar
+          userEmail={bootcampStudent?.email}
+          calcomUrl={calcomUrl}
+          daysRemaining={funnelAccess.daysRemaining}
+          isUrgent={funnelAccess.nudgeTier === 'urgent'}
+        />
+      )}
+
+      {/* Funnel Access urgent modal (once per session) */}
+      {funnelAccess.nudgeTier === 'urgent' && (
+        <FunnelNudgeModal
+          userEmail={bootcampStudent?.email}
+          calcomUrl={calcomUrl}
+          daysRemaining={funnelAccess.daysRemaining}
+        />
+      )}
+
+      {bootcampStudent && !funnelAccess.isFunnelAccess && (
         <SubscriptionModal
           isOpen={showSubscriptionModal || accessState === 'expired'}
           onClose={() => setShowSubscriptionModal(false)}

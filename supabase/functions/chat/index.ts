@@ -418,6 +418,31 @@ serve(async (req) => {
     const accessLevel = studentRecord?.access_level || 'Full Access';
     const subscriptionActive = studentRecord?.subscription_status === 'active';
 
+    // Funnel Access expiry check
+    if (accessLevel === 'Funnel Access') {
+      const { data: funnelStudent } = await supabase
+        .from('bootcamp_students')
+        .select('access_expires_at')
+        .eq('id', studentId)
+        .maybeSingle();
+
+      if (funnelStudent?.access_expires_at) {
+        const expiresAt = new Date(funnelStudent.access_expires_at);
+        if (expiresAt.getTime() < Date.now()) {
+          return new Response(
+            JSON.stringify({
+              error: 'Your access has expired',
+              code: 'ACCESS_EXPIRED',
+            }),
+            {
+              status: 403,
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            }
+          );
+        }
+      }
+    }
+
     if (accessLevel === 'Lead Magnet' && !subscriptionActive) {
       const { data: creditResult, error: creditError } = await supabase.rpc(
         'decrement_tool_credit',
