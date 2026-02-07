@@ -22,7 +22,7 @@ const CohortModal: React.FC<CohortModalProps> = ({
   const [formData, setFormData] = useState({
     name: '',
     description: '',
-    status: 'Active' as 'Active' | 'Archived',
+    status: 'Active' as 'Active' | 'Archived' | 'Draft',
   });
 
   useEffect(() => {

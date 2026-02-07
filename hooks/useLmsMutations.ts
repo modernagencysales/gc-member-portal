@@ -90,11 +90,13 @@ export function useDuplicateLmsCohortMutation() {
       sourceCohortId,
       newName,
       newDescription,
+      newStatus,
     }: {
       sourceCohortId: string;
       newName: string;
       newDescription?: string;
-    }) => duplicateLmsCohort(sourceCohortId, newName, newDescription),
+      newStatus?: string;
+    }) => duplicateLmsCohort(sourceCohortId, newName, newDescription, newStatus),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.lmsCohorts() });
       queryClient.invalidateQueries({ queryKey: queryKeys.lmsActiveCohorts() });

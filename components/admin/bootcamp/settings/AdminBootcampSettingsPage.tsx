@@ -8,6 +8,7 @@ import { BootcampSettings } from '../../../../types/bootcamp-types';
 import { Settings, Video, Sparkles, Info, Save, Bot } from 'lucide-react';
 import FunnelToolPresetsEditor from './FunnelToolPresetsEditor';
 import CallGrantConfigEditor from './CallGrantConfigEditor';
+import EnrollmentConfigEditor from './EnrollmentConfigEditor';
 
 const AdminBootcampSettingsPage: React.FC = () => {
   const { isDarkMode } = useTheme();
@@ -310,6 +311,9 @@ const AdminBootcampSettingsPage: React.FC = () => {
             </div>
           </div>
         </div>
+
+        {/* Enrollment Config */}
+        <EnrollmentConfigEditor />
 
         {/* Call Attendance Grants */}
         <CallGrantConfigEditor />

@@ -212,7 +212,7 @@ export interface BootcampAutomationResult {
 // ============================================
 // Cohorts
 // ============================================
-export type BootcampCohortStatus = 'Active' | 'Archived';
+export type BootcampCohortStatus = 'Active' | 'Archived' | 'Draft';
 
 export interface BootcampCohort {
   id: string;
@@ -369,3 +369,20 @@ export const TOOLS_OPTIONS = [
   'None',
   'Other',
 ];
+
+// ============================================
+// Enrollment Config (cohort rotation)
+// ============================================
+export interface ProductEnrollmentConfig {
+  name: string;
+  activeCohortId: string;
+  activeCohortName: string;
+  activeInviteCode: string;
+  activeInviteCodeId: string;
+}
+
+export interface EnrollmentConfig {
+  products: Record<string, ProductEnrollmentConfig>;
+  lastRotatedAt?: string;
+  lastRotatedBy?: string;
+}

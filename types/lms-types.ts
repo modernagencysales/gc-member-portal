@@ -7,7 +7,7 @@
 // Enums and Constants
 // ============================================
 
-export type LmsCohortStatus = 'Active' | 'Archived';
+export type LmsCohortStatus = 'Active' | 'Archived' | 'Draft';
 
 export type LmsContentType =
   | 'video' // Grain, YouTube, Loom, Vimeo, etc.

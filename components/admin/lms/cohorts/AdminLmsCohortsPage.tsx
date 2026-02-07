@@ -24,6 +24,7 @@ import {
   Copy,
   BookOpen,
   Calendar,
+  FileEdit,
 } from 'lucide-react';
 
 const AdminLmsCohortsPage: React.FC = () => {
@@ -32,6 +33,7 @@ const AdminLmsCohortsPage: React.FC = () => {
 
   // State
   const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState<'All' | 'Active' | 'Draft' | 'Archived'>('All');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCohort, setEditingCohort] = useState<LmsCohort | null>(null);
   const [deletingCohort, setDeletingCohort] = useState<LmsCohort | null>(null);
@@ -58,6 +60,7 @@ const AdminLmsCohortsPage: React.FC = () => {
     if (!cohorts) return [];
 
     return cohorts.filter((cohort) => {
+      if (statusFilter !== 'All' && cohort.status !== statusFilter) return false;
       const searchLower = searchQuery.toLowerCase();
       return (
         !searchQuery ||
@@ -65,14 +68,15 @@ const AdminLmsCohortsPage: React.FC = () => {
         cohort.description?.toLowerCase().includes(searchLower)
       );
     });
-  }, [cohorts, searchQuery]);
+  }, [cohorts, searchQuery, statusFilter]);
 
   // Stats
   const stats = useMemo(() => {
-    if (!cohorts) return { total: 0, active: 0, archived: 0 };
+    if (!cohorts) return { total: 0, active: 0, draft: 0, archived: 0 };
     return {
       total: cohorts.length,
       active: cohorts.filter((c) => c.status === 'Active').length,
+      draft: cohorts.filter((c) => c.status === 'Draft').length,
       archived: cohorts.filter((c) => c.status === 'Archived').length,
     };
   }, [cohorts]);
@@ -106,9 +110,10 @@ const AdminLmsCohortsPage: React.FC = () => {
   };
 
   const handleToggleStatus = async (cohort: LmsCohort) => {
+    const nextStatus = cohort.status === 'Active' ? 'Archived' : 'Active';
     await updateMutation.mutateAsync({
       cohortId: cohort.id,
-      updates: { status: cohort.status === 'Active' ? 'Archived' : 'Active' },
+      updates: { status: nextStatus },
     });
   };
 
@@ -156,10 +161,11 @@ const AdminLmsCohortsPage: React.FC = () => {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-4 gap-4">
         {[
           { label: 'Total Cohorts', value: stats.total, color: 'violet' },
           { label: 'Active', value: stats.active, color: 'green' },
+          { label: 'Draft', value: stats.draft, color: 'amber' },
           { label: 'Archived', value: stats.archived, color: 'slate' },
         ].map((stat) => (
           <div
@@ -173,6 +179,25 @@ const AdminLmsCohortsPage: React.FC = () => {
             </p>
             <p className="text-2xl font-bold mt-1">{stat.value}</p>
           </div>
+        ))}
+      </div>
+
+      {/* Status Filter Tabs */}
+      <div className="flex gap-1">
+        {(['All', 'Active', 'Draft', 'Archived'] as const).map((status) => (
+          <button
+            key={status}
+            onClick={() => setStatusFilter(status)}
+            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+              statusFilter === status
+                ? 'bg-violet-600 text-white'
+                : isDarkMode
+                  ? 'text-slate-400 hover:bg-slate-800'
+                  : 'text-slate-600 hover:bg-slate-100'
+            }`}
+          >
+            {status}
+          </button>
         ))}
       </div>
 
@@ -304,11 +329,15 @@ const AdminLmsCohortsPage: React.FC = () => {
                         className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
                           cohort.status === 'Active'
                             ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
-                            : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400'
+                            : cohort.status === 'Draft'
+                              ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400'
+                              : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400'
                         }`}
                       >
                         {cohort.status === 'Active' ? (
                           <CheckCircle className="w-3 h-3" />
+                        ) : cohort.status === 'Draft' ? (
+                          <FileEdit className="w-3 h-3" />
                         ) : (
                           <Archive className="w-3 h-3" />
                         )}
@@ -345,7 +374,7 @@ const AdminLmsCohortsPage: React.FC = () => {
                           {cohort.status === 'Active' ? (
                             <Archive className="w-4 h-4" />
                           ) : (
-                            <CheckCircle className="w-4 h-4" />
+                            <CheckCircle className="w-4 h-4 text-green-500" />
                           )}
                         </button>
                         <button
