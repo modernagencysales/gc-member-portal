@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import {
   Linkedin,
   Mail,
+  Phone,
   CheckCircle,
   Sparkles,
   FileText,
@@ -33,6 +34,8 @@ interface FormData {
   email: string;
   fullName: string;
   linkedinUrl: string;
+  phone: string;
+  timezone: string;
   businessType: string;
   linkedinChallenge: string;
   postingFrequency: string;
@@ -61,6 +64,7 @@ interface StepConfig {
   field: keyof FormData;
   options?: StepOption[];
   placeholder?: string;
+  required?: boolean; // defaults to true
   validation?: (value: string) => string | null;
 }
 
@@ -77,6 +81,16 @@ const QUESTIONNAIRE_STEPS: StepConfig[] = [
       /linkedin\.com\/in\//i.test(v)
         ? null
         : 'Please enter a valid LinkedIn URL (e.g. https://linkedin.com/in/your-name)',
+  },
+  {
+    id: 'phone',
+    question: "What's the best number to reach you?",
+    subtitle:
+      'Optional — so we can follow up with a quick call if your blueprint reveals big opportunities.',
+    type: 'text',
+    field: 'phone',
+    placeholder: '+1 (555) 123-4567',
+    required: false,
   },
   {
     id: 'business-type',
@@ -394,14 +408,15 @@ const BlueprintQuestionnaire: React.FC<QuestionnaireProps> = ({
   }, [autoAdvanceTimer]);
 
   const validateAndAdvance = useCallback(() => {
-    if (step.validation) {
+    const isOptional = step.required === false;
+    if (step.validation && value.trim()) {
       const err = step.validation(value);
       if (err) {
         setStepError(err);
         return;
       }
     }
-    if (!value.trim() && step.type !== 'textarea') {
+    if (!value.trim() && step.type !== 'textarea' && !isOptional) {
       setStepError('Please provide an answer to continue.');
       return;
     }
@@ -750,6 +765,8 @@ const BlueprintLandingPage: React.FC = () => {
     email: '',
     fullName: '',
     linkedinUrl: '',
+    phone: '',
+    timezone: '',
     businessType: '',
     linkedinChallenge: '',
     postingFrequency: '',
@@ -758,6 +775,16 @@ const BlueprintLandingPage: React.FC = () => {
     learningInvestment: '',
     monthlyIncome: '',
   });
+
+  // Auto-detect timezone on mount
+  useEffect(() => {
+    try {
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      if (tz) setFormData((prev) => ({ ...prev, timezone: tz }));
+    } catch {
+      // ignore — timezone will be empty
+    }
+  }, []);
 
   // Restore email from sessionStorage on mount (only on actual page refresh, not fresh navigation)
   useEffect(() => {
@@ -839,6 +866,8 @@ const BlueprintLandingPage: React.FC = () => {
         linkedin_url: finalData.linkedinUrl,
         full_name: finalData.fullName,
         email: finalData.email,
+        phone: finalData.phone || undefined,
+        timezone: finalData.timezone || undefined,
         business_type: finalData.businessType,
         monthly_income: finalData.monthlyIncome,
         linkedin_challenge: finalData.linkedinChallenge,
