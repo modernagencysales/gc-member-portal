@@ -23,7 +23,7 @@ const POST_COLUMNS =
   'id, prospect_id, template_id, name, post_content, first_sentence, post_ready, to_fix, action_items, number, created_at';
 
 const BLUEPRINT_SETTINGS_COLUMNS =
-  'id, sticky_cta_enabled, foundations_payment_url, engineering_payment_url, cal_booking_link, show_bootcamp_offer, show_gc_offer, show_dfy_offer, bootcamp_offer_title, bootcamp_offer_description, bootcamp_offer_cta, gc_offer_title, gc_offer_description, gc_offer_cta, dfy_offer_title, dfy_offer_description, dfy_offer_cta, dfy_offer_url, default_offer_unlocked, next_cohort_date_foundations, next_cohort_date_engineering, spots_remaining_foundations, spots_remaining_engineering, blueprint_video_url, call_booked_video_url, thank_you_video_url, foundations_offer_video_url, engineering_offer_video_url, senja_widget_url, max_logos_landing, max_logos_blueprint, created_at, updated_at';
+  'id, sticky_cta_enabled, foundations_payment_url, engineering_payment_url, cal_booking_link, show_bootcamp_offer, show_gc_offer, show_dfy_offer, bootcamp_offer_title, bootcamp_offer_description, bootcamp_offer_cta, gc_offer_title, gc_offer_description, gc_offer_cta, dfy_offer_title, dfy_offer_description, dfy_offer_cta, dfy_offer_url, default_offer_unlocked, blueprint_video_url, call_booked_video_url, thank_you_video_url, foundations_offer_video_url, engineering_offer_video_url, senja_widget_url, max_logos_landing, max_logos_blueprint, created_at, updated_at';
 
 const CONTENT_BLOCK_COLUMNS =
   'id, block_type, title, content, image_url, cta_text, cta_url, sort_order, is_visible, target_offer, created_at, updated_at';
