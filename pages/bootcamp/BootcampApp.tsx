@@ -56,6 +56,9 @@ const TamBuilder = lazy(() => import('../../components/tam/TamBuilder'));
 const ConnectionQualifier = lazy(
   () => import('../../components/bootcamp/connection-qualifier/ConnectionQualifier')
 );
+const InfrastructurePage = lazy(
+  () => import('../../components/bootcamp/infrastructure/InfrastructurePage')
+);
 
 const BootcampApp: React.FC = () => {
   const queryClient = useQueryClient();
@@ -699,6 +702,16 @@ const BootcampApp: React.FC = () => {
                   }
                 >
                   <ConnectionQualifier userId={bootcampStudent?.id || ''} />
+                </Suspense>
+              ) : currentLesson.id === 'virtual:infrastructure-manager' ? (
+                <Suspense
+                  fallback={
+                    <div className="flex items-center justify-center h-96">
+                      <div className="w-8 h-8 border-2 border-zinc-300 dark:border-zinc-700 border-t-violet-500 rounded-full animate-spin" />
+                    </div>
+                  }
+                >
+                  <InfrastructurePage userId={bootcampStudent?.id || ''} />
                 </Suspense>
               ) : currentLesson.id === 'virtual:my-posts' ? (
                 <MyPosts prospectId={bootcampStudent?.prospectId} />

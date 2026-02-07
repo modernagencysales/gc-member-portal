@@ -26,6 +26,7 @@ import {
   Users,
   LayoutDashboard,
   BookOpen,
+  Server,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import type { FunnelAccessState } from '../../hooks/useFunnelAccess';
@@ -91,7 +92,12 @@ const Sidebar: React.FC<SidebarProps> = ({
     window.location.reload();
   };
   const [expandedWeeks, setExpandedWeeks] = useState<string[]>(data.weeks.map((w) => w.id));
-  const [expandedGroups, setExpandedGroups] = useState<string[]>(['gpts', 'tables', 'logins']);
+  const [expandedGroups, setExpandedGroups] = useState<string[]>([
+    'gpts',
+    'tables',
+    'logins',
+    'infrastructure',
+  ]);
 
   const [showResourcesSection, setShowResourcesSection] = useState(true);
   const [showCurriculumSection, setShowCurriculumSection] = useState(true);
@@ -508,6 +514,54 @@ const Sidebar: React.FC<SidebarProps> = ({
                       )}
                     </div>
                   )}
+
+                  {/* GTM Infrastructure */}
+                  <div className="space-y-0.5">
+                    <button
+                      onClick={() => toggleGroup('infrastructure')}
+                      className="w-full flex items-center justify-between p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-400 transition-colors"
+                    >
+                      <div className="flex items-center gap-2.5 text-xs font-medium">
+                        <Server size={12} className="text-emerald-500" />
+                        <span>GTM Infrastructure</span>
+                      </div>
+                      {isGroupExpanded('infrastructure') ? (
+                        <ChevronDown size={12} />
+                      ) : (
+                        <ChevronRight size={12} />
+                      )}
+                    </button>
+                    {isGroupExpanded('infrastructure') && (
+                      <div className="ml-4 border-l border-zinc-200 dark:border-zinc-800 pl-1.5">
+                        <button
+                          onClick={() => {
+                            onSelectLesson({
+                              id: 'virtual:infrastructure-manager',
+                              title: 'Setup & Dashboard',
+                              embedUrl: 'virtual:infrastructure-manager',
+                            });
+                            onCloseMobile();
+                          }}
+                          className={`flex items-center w-full py-1.5 px-3 rounded-lg text-[11px] transition-all ${
+                            currentLessonId === 'virtual:infrastructure-manager'
+                              ? 'bg-violet-500/10 text-violet-600 dark:text-violet-400 font-medium'
+                              : 'text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100'
+                          }`}
+                        >
+                          <span
+                            className={`mr-2.5 shrink-0 ${
+                              currentLessonId === 'virtual:infrastructure-manager'
+                                ? 'text-violet-500'
+                                : 'text-zinc-400 dark:text-zinc-600'
+                            }`}
+                          >
+                            <Server size={14} />
+                          </span>
+                          <span className="truncate">Setup & Dashboard</span>
+                        </button>
+                      </div>
+                    )}
+                  </div>
 
                   {/* Clay Tables - from curriculum */}
                   {toolGroups.tables.length > 0 && (

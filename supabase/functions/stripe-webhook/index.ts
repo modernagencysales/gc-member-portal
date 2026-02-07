@@ -472,6 +472,76 @@ serve(async (req) => {
           break;
         }
 
+        // Handle infrastructure provisioning checkout
+        const isInfrastructure = session.metadata?.type === 'infrastructure';
+        if (isInfrastructure) {
+          const provisionId = session.metadata?.provision_id;
+          if (!provisionId) {
+            console.error('Infrastructure checkout missing provision_id in metadata');
+            break;
+          }
+
+          // Update provision record with Stripe details and set status to provisioning
+          const { error: infraUpdateError } = await supabase
+            .from('infra_provisions')
+            .update({
+              status: 'provisioning',
+              stripe_subscription_id: session.subscription as string,
+              stripe_customer_id: session.customer as string,
+              updated_at: new Date().toISOString(),
+            })
+            .eq('id', provisionId);
+
+          if (infraUpdateError) {
+            console.error('Failed to update infra provision:', infraUpdateError);
+            throw new Error(`Failed to update infra provision: ${infraUpdateError.message}`);
+          }
+
+          // Trigger provisioning via gtm-system API
+          const gtmSystemUrl = Deno.env.get('GTM_SYSTEM_URL') || 'https://gtmconductor.com';
+          try {
+            const triggerRes = await fetch(`${gtmSystemUrl}/api/infrastructure/provision`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'x-api-key': Deno.env.get('GTM_SYSTEM_API_KEY') || '',
+              },
+              body: JSON.stringify({
+                provisionId,
+                studentId: session.metadata?.student_id,
+              }),
+            });
+
+            if (!triggerRes.ok) {
+              const body = await triggerRes.text();
+              console.error('Failed to trigger provisioning:', triggerRes.status, body);
+              // Don't throw — provision status is already set, can be retried
+            } else {
+              console.log(`Provisioning triggered for provision ${provisionId}`);
+            }
+          } catch (triggerErr) {
+            console.error('Error triggering provisioning (non-blocking):', triggerErr);
+          }
+
+          // Log subscription event
+          if (session.metadata?.student_id) {
+            await supabase.from('subscription_events').insert({
+              student_id: session.metadata.student_id,
+              event_type: 'created',
+              stripe_event_id: event.id,
+              metadata: {
+                session_id: session.id,
+                source: 'infrastructure',
+                provision_id: provisionId,
+                tier_slug: session.metadata?.tier_slug,
+              },
+            });
+          }
+
+          console.log(`Infrastructure checkout completed for provision ${provisionId}`);
+          break;
+        }
+
         if (!studentId) {
           console.error('No student_id in session metadata and not a Cal.com booking');
           break;
