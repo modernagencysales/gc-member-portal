@@ -62,6 +62,7 @@ const AdminBlueprintsPage = lazy(() => import('./components/admin/blueprints/Adm
 
 // Lazy-loaded: Bootcamp
 const BootcampApp = lazy(() => import('./pages/bootcamp/BootcampApp'));
+const BootcampJoin = lazy(() => import('./components/bootcamp/BootcampJoin'));
 
 // Lazy-loaded: Affiliate
 const ReferralLandingPage = lazy(() => import('./components/affiliate/ReferralLandingPage'));
@@ -170,6 +171,9 @@ const App: React.FC = () => {
           <Route path="assets" element={<AffiliateAssetsPage />} />
           <Route path="settings" element={<AffiliateSettingsPage />} />
         </Route>
+
+        {/* Bootcamp Join - smart redirect to current cohort registration */}
+        <Route path="/bootcamp/join" element={<BootcampJoin />} />
 
         {/* Bootcamp LMS - /bootcamp path */}
         <Route path="/bootcamp/*" element={<BootcampApp />} />
