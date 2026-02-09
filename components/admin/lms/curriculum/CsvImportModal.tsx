@@ -54,17 +54,56 @@ Week 2: Outreach,Cold Email,video,Email Frameworks,https://www.youtube.com/watch
 Week 2: Outreach,Cold Email,slide_deck,Email Templates,https://gamma.app/docs/example,Template slide deck
 Week 2: Outreach,LinkedIn,video,LinkedIn Outreach,https://www.loom.com/share/example2,LinkedIn strategies`;
 
-function parseCsv(text: string): ParsedRow[] {
-  const lines = text
-    .split('\n')
-    .map((l) => l.trim())
-    .filter(Boolean);
-  if (lines.length < 2) return [];
+// RFC 4180-compliant CSV parser that handles multiline quoted fields
+function parseCsvRecords(text: string): string[][] {
+  const records: string[][] = [];
+  let current = '';
+  let inQuotes = false;
+  let row: string[] = [];
 
-  // Parse header
-  const header = parseCsvLine(lines[0]).map((h) => h.toLowerCase().trim());
+  for (let i = 0; i < text.length; i++) {
+    const char = text[i];
+    if (char === '"') {
+      if (inQuotes && text[i + 1] === '"') {
+        current += '"';
+        i++;
+      } else {
+        inQuotes = !inQuotes;
+      }
+    } else if (char === ',' && !inQuotes) {
+      row.push(current);
+      current = '';
+    } else if ((char === '\n' || (char === '\r' && text[i + 1] === '\n')) && !inQuotes) {
+      if (char === '\r') i++; // skip \n after \r
+      row.push(current);
+      current = '';
+      if (row.some((c) => c.trim())) records.push(row);
+      row = [];
+    } else if (char === '\r' && !inQuotes) {
+      row.push(current);
+      current = '';
+      if (row.some((c) => c.trim())) records.push(row);
+      row = [];
+    } else {
+      current += char;
+    }
+  }
+  // flush last row
+  row.push(current);
+  if (row.some((c) => c.trim())) records.push(row);
+
+  return records;
+}
+
+function parseCsv(text: string): ParsedRow[] {
+  const records = parseCsvRecords(text);
+  if (records.length < 2) return [];
+
+  // Parse header — accept common typos like "lessin" for "lesson"
+  const header = records[0].map((h) => h.toLowerCase().trim());
   const weekIdx = header.indexOf('week');
-  const lessonIdx = header.indexOf('lesson');
+  let lessonIdx = header.indexOf('lesson');
+  if (lessonIdx === -1) lessonIdx = header.indexOf('lessin');
   const typeIdx = header.indexOf('type');
   const titleIdx = header.indexOf('title');
   const urlIdx = header.indexOf('url');
@@ -75,8 +114,8 @@ function parseCsv(text: string): ParsedRow[] {
   }
 
   const rows: ParsedRow[] = [];
-  for (let i = 1; i < lines.length; i++) {
-    const cols = parseCsvLine(lines[i]);
+  for (let i = 1; i < records.length; i++) {
+    const cols = records[i];
     if (cols.length < 3) continue;
 
     rows.push({
@@ -92,39 +131,16 @@ function parseCsv(text: string): ParsedRow[] {
   return rows.filter((r) => r.week && r.lesson && r.title);
 }
 
-function parseCsvLine(line: string): string[] {
-  const result: string[] = [];
-  let current = '';
-  let inQuotes = false;
-
-  for (let i = 0; i < line.length; i++) {
-    const char = line[i];
-    if (char === '"') {
-      if (inQuotes && line[i + 1] === '"') {
-        current += '"';
-        i++;
-      } else {
-        inQuotes = !inQuotes;
-      }
-    } else if (char === ',' && !inQuotes) {
-      result.push(current);
-      current = '';
-    } else {
-      current += char;
-    }
-  }
-  result.push(current);
-  return result;
-}
-
 function buildPreview(rows: ParsedRow[]): ImportPreview {
   const weekMap = new Map<string, Map<string, ParsedRow[]>>();
 
   for (const row of rows) {
     if (!weekMap.has(row.week)) weekMap.set(row.week, new Map());
     const lessonMap = weekMap.get(row.week)!;
-    if (!lessonMap.has(row.lesson)) lessonMap.set(row.lesson, []);
-    lessonMap.get(row.lesson)!.push(row);
+    // If the lesson column is just a number, use the title as the lesson name instead
+    const lessonKey = /^\d+$/.test(row.lesson) ? row.title : row.lesson;
+    if (!lessonMap.has(lessonKey)) lessonMap.set(lessonKey, []);
+    lessonMap.get(lessonKey)!.push(row);
   }
 
   let totalLessons = 0;
@@ -133,20 +149,36 @@ function buildPreview(rows: ParsedRow[]): ImportPreview {
   const weeks = Array.from(weekMap.entries()).map(([weekTitle, lessonMap]) => {
     const lessons = Array.from(lessonMap.entries()).map(([lessonTitle, items]) => {
       totalLessons++;
-      const mappedItems = items.map((item) => {
-        totalItems++;
+      const mappedItems: {
+        title: string;
+        type: LmsContentType;
+        url: string;
+        description: string;
+      }[] = [];
+      for (const item of items) {
         const contentType: LmsContentType = item.type
           ? (item.type as LmsContentType)
           : item.url
             ? detectContentType(item.url)
             : 'text';
-        return {
+        totalItems++;
+        mappedItems.push({
           title: item.title,
           type: contentType,
           url: item.url,
-          description: item.description,
-        };
-      });
+          description: contentType !== 'text' && item.description ? '' : item.description,
+        });
+        // If a non-text item (video, etc.) has a description, create a separate text item for it
+        if (contentType !== 'text' && item.description) {
+          totalItems++;
+          mappedItems.push({
+            title: `${item.title} — Notes`,
+            type: 'text',
+            url: '',
+            description: item.description,
+          });
+        }
+      }
       return { title: lessonTitle, items: mappedItems };
     });
     return { title: weekTitle, lessons };

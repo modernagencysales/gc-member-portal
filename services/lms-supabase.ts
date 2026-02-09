@@ -870,6 +870,48 @@ export async function fetchStudentEnrollments(studentId: string): Promise<Studen
     .sort((a, b) => a.cohort.sortOrder - b.cohort.sortOrder);
 }
 
+export async function fetchAllStudentEnrollments(): Promise<
+  Map<string, { cohortId: string; cohortName: string; accessLevel?: string }[]>
+> {
+  const { data, error } = await supabase
+    .from('student_cohorts')
+    .select('student_id, cohort_id, access_level, lms_cohorts(id, name, status)');
+
+  if (error) throw new Error(error.message);
+  if (!data) return new Map();
+
+  const map = new Map<string, { cohortId: string; cohortName: string; accessLevel?: string }[]>();
+  for (const row of data) {
+    const cohort = row.lms_cohorts as unknown as {
+      id: string;
+      name: string;
+      status: string;
+    } | null;
+    if (!cohort || cohort.status !== 'Active') continue;
+    const studentId = row.student_id as string;
+    if (!map.has(studentId)) map.set(studentId, []);
+    map.get(studentId)!.push({
+      cohortId: cohort.id,
+      cohortName: cohort.name,
+      accessLevel: row.access_level as string | undefined,
+    });
+  }
+  return map;
+}
+
+export async function unenrollStudentFromCohort(
+  studentId: string,
+  cohortId: string
+): Promise<void> {
+  const { error } = await supabase
+    .from('student_cohorts')
+    .delete()
+    .eq('student_id', studentId)
+    .eq('cohort_id', cohortId);
+
+  if (error) throw new Error(error.message);
+}
+
 export async function enrollStudentInCohort(
   studentId: string,
   cohortId: string,

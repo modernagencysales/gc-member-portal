@@ -8,9 +8,10 @@ import { fetchActiveLmsCohorts } from '../../../../services/lms-supabase';
 interface StudentModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (data: Partial<BootcampStudent>) => Promise<void>;
+  onSubmit: (data: Partial<BootcampStudent>, enrolledCohortIds: string[]) => Promise<void>;
   initialData?: BootcampStudent | null;
   isLoading?: boolean;
+  initialEnrolledCohortIds?: string[];
 }
 
 const STATUS_OPTIONS: BootcampStudentStatus[] = [
@@ -27,6 +28,7 @@ const StudentModal: React.FC<StudentModalProps> = ({
   onSubmit,
   initialData,
   isLoading,
+  initialEnrolledCohortIds = [],
 }) => {
   const { isDarkMode } = useTheme();
 
@@ -46,6 +48,8 @@ const StudentModal: React.FC<StudentModalProps> = ({
     notes: '',
   });
 
+  const [selectedCohortIds, setSelectedCohortIds] = useState<Set<string>>(new Set());
+
   useEffect(() => {
     if (initialData) {
       setFormData({
@@ -57,6 +61,7 @@ const StudentModal: React.FC<StudentModalProps> = ({
         accessLevel: initialData.accessLevel,
         notes: initialData.notes || '',
       });
+      setSelectedCohortIds(new Set(initialEnrolledCohortIds));
     } else {
       setFormData({
         email: '',
@@ -67,12 +72,25 @@ const StudentModal: React.FC<StudentModalProps> = ({
         accessLevel: 'Full Access',
         notes: '',
       });
+      setSelectedCohortIds(new Set());
     }
-  }, [initialData, isOpen]);
+  }, [initialData, isOpen, initialEnrolledCohortIds]);
+
+  const toggleCohort = (cohortId: string) => {
+    setSelectedCohortIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(cohortId)) {
+        next.delete(cohortId);
+      } else {
+        next.add(cohortId);
+      }
+      return next;
+    });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await onSubmit(formData);
+    await onSubmit(formData, Array.from(selectedCohortIds));
   };
 
   if (!isOpen) return null;
@@ -152,45 +170,55 @@ const StudentModal: React.FC<StudentModalProps> = ({
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium mb-1.5">Cohort</label>
-              <select
-                value={formData.cohort}
-                onChange={(e) => setFormData({ ...formData, cohort: e.target.value })}
-                className={`w-full px-4 py-2.5 rounded-lg border ${
-                  isDarkMode
-                    ? 'bg-slate-800 border-slate-700 text-white'
-                    : 'bg-white border-slate-300 text-slate-900'
-                } focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
-              >
-                {cohorts.map((cohort) => (
-                  <option key={cohort.id} value={cohort.name}>
-                    {cohort.name}
-                  </option>
-                ))}
-              </select>
+          <div>
+            <label className="block text-sm font-medium mb-1.5">Enrolled Courses</label>
+            <div
+              className={`rounded-lg border p-3 space-y-2 max-h-40 overflow-y-auto ${
+                isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-300'
+              }`}
+            >
+              {cohorts.length === 0 ? (
+                <p className="text-sm text-slate-500">No active courses</p>
+              ) : (
+                cohorts.map((cohort) => (
+                  <label
+                    key={cohort.id}
+                    className={`flex items-center gap-2.5 p-1.5 rounded cursor-pointer ${
+                      isDarkMode ? 'hover:bg-slate-700' : 'hover:bg-slate-50'
+                    }`}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={selectedCohortIds.has(cohort.id)}
+                      onChange={() => toggleCohort(cohort.id)}
+                      className="rounded border-slate-300 dark:border-slate-600 text-blue-600 focus:ring-blue-500"
+                    />
+                    <span className="text-sm">{cohort.name}</span>
+                  </label>
+                ))
+              )}
             </div>
-            <div>
-              <label className="block text-sm font-medium mb-1.5">Status</label>
-              <select
-                value={formData.status}
-                onChange={(e) =>
-                  setFormData({ ...formData, status: e.target.value as BootcampStudentStatus })
-                }
-                className={`w-full px-4 py-2.5 rounded-lg border ${
-                  isDarkMode
-                    ? 'bg-slate-800 border-slate-700 text-white'
-                    : 'bg-white border-slate-300 text-slate-900'
-                } focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
-              >
-                {STATUS_OPTIONS.map((status) => (
-                  <option key={status} value={status}>
-                    {status}
-                  </option>
-                ))}
-              </select>
-            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-1.5">Status</label>
+            <select
+              value={formData.status}
+              onChange={(e) =>
+                setFormData({ ...formData, status: e.target.value as BootcampStudentStatus })
+              }
+              className={`w-full px-4 py-2.5 rounded-lg border ${
+                isDarkMode
+                  ? 'bg-slate-800 border-slate-700 text-white'
+                  : 'bg-white border-slate-300 text-slate-900'
+              } focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+            >
+              {STATUS_OPTIONS.map((status) => (
+                <option key={status} value={status}>
+                  {status}
+                </option>
+              ))}
+            </select>
           </div>
 
           <div>

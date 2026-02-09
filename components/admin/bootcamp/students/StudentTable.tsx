@@ -19,9 +19,16 @@ interface StudentWithProgress extends BootcampStudent {
   survey: BootcampStudentSurvey | null;
 }
 
+export interface StudentEnrollment {
+  cohortId: string;
+  cohortName: string;
+  accessLevel?: string;
+}
+
 interface StudentTableProps {
   students: StudentWithProgress[];
   selectedIds: Set<string>;
+  enrollments: Map<string, StudentEnrollment[]>;
   onToggleSelect: (id: string) => void;
   onSelectAll: () => void;
   onMarkSlackDone: (student: BootcampStudent) => void;
@@ -37,6 +44,7 @@ interface StudentTableProps {
 const StudentTable: React.FC<StudentTableProps> = ({
   students,
   selectedIds,
+  enrollments,
   onToggleSelect,
   onSelectAll,
   onMarkSlackDone,
@@ -77,7 +85,7 @@ const StudentTable: React.FC<StudentTableProps> = ({
                 Student
               </th>
               <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wide">
-                Cohort
+                Courses
               </th>
               <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wide">
                 Status
@@ -134,11 +142,23 @@ const StudentTable: React.FC<StudentTableProps> = ({
                     </div>
                   </td>
 
-                  {/* Cohort */}
+                  {/* Courses */}
                   <td className="px-4 py-3">
-                    <span className="text-sm text-slate-600 dark:text-slate-400">
-                      {student.cohort}
-                    </span>
+                    <div className="flex flex-wrap gap-1">
+                      {(enrollments.get(student.id) || []).length > 0 ? (
+                        enrollments.get(student.id)!.map((e) => (
+                          <span
+                            key={e.cohortId}
+                            className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"
+                            title={e.accessLevel || 'Full Access'}
+                          >
+                            {e.cohortName}
+                          </span>
+                        ))
+                      ) : (
+                        <span className="text-sm text-slate-400 italic">None</span>
+                      )}
+                    </div>
                   </td>
 
                   {/* Status */}

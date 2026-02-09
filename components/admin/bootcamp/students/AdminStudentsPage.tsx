@@ -1,6 +1,11 @@
 import React, { useState, useMemo, useCallback, memo } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { fetchStudentsWithProgress } from '../../../../services/bootcamp-supabase';
+import {
+  fetchAllStudentEnrollments,
+  enrollStudentInCohort,
+  unenrollStudentFromCohort,
+} from '../../../../services/lms-supabase';
 import { queryKeys } from '../../../../lib/queryClient';
 import { useTheme } from '../../../../context/ThemeContext';
 import {
@@ -37,6 +42,8 @@ const AdminStudentsPage: React.FC = () => {
   const [blueprintStudent, setBlueprintStudent] = useState<BootcampStudent | null>(null);
   const [showCsvImport, setShowCsvImport] = useState(false);
 
+  const queryClient = useQueryClient();
+
   // Queries
   const {
     data: students,
@@ -45,6 +52,11 @@ const AdminStudentsPage: React.FC = () => {
   } = useQuery({
     queryKey: queryKeys.bootcampAdminStudents(),
     queryFn: fetchStudentsWithProgress,
+  });
+
+  const { data: enrollments = new Map() } = useQuery({
+    queryKey: ['studentEnrollments'],
+    queryFn: fetchAllStudentEnrollments,
   });
 
   // Mutations
@@ -96,16 +108,42 @@ const AdminStudentsPage: React.FC = () => {
   }, []);
 
   const handleSubmit = useCallback(
-    async (data: Partial<BootcampStudent>) => {
+    async (data: Partial<BootcampStudent>, selectedCohortIds: string[]) => {
+      let studentId: string;
+
       if (editingStudent) {
         await updateMutation.mutateAsync({ studentId: editingStudent.id, updates: data });
+        studentId = editingStudent.id;
       } else {
-        await createMutation.mutateAsync(data);
+        const created = await createMutation.mutateAsync(data);
+        studentId = (created as { id: string }).id;
       }
+
+      // Sync enrollments
+      const currentEnrollments = enrollments.get(studentId) || [];
+      const currentCohortIds = currentEnrollments.map((e: { cohortId: string }) => e.cohortId);
+      const currentSet = new Set(currentCohortIds);
+      const desiredSet = new Set(selectedCohortIds);
+
+      // Enroll in newly selected cohorts
+      for (const cohortId of selectedCohortIds) {
+        if (!currentSet.has(cohortId)) {
+          await enrollStudentInCohort(studentId, cohortId);
+        }
+      }
+
+      // Unenroll from deselected cohorts
+      for (const cohortId of currentCohortIds) {
+        if (!desiredSet.has(cohortId)) {
+          await unenrollStudentFromCohort(studentId, cohortId);
+        }
+      }
+
+      queryClient.invalidateQueries({ queryKey: ['studentEnrollments'] });
       setIsModalOpen(false);
       setEditingStudent(null);
     },
-    [editingStudent, updateMutation, createMutation]
+    [editingStudent, updateMutation, createMutation, enrollments, queryClient]
   );
 
   const handleMarkSlackDone = useCallback(
@@ -305,6 +343,7 @@ const AdminStudentsPage: React.FC = () => {
         <StudentTable
           students={filteredStudents}
           selectedIds={selectedIds}
+          enrollments={enrollments}
           onToggleSelect={handleToggleSelect}
           onSelectAll={handleSelectAll}
           onMarkSlackDone={handleMarkSlackDone}
@@ -328,6 +367,13 @@ const AdminStudentsPage: React.FC = () => {
         onSubmit={handleSubmit}
         initialData={editingStudent}
         isLoading={createMutation.isPending || updateMutation.isPending}
+        initialEnrolledCohortIds={
+          editingStudent
+            ? (enrollments.get(editingStudent.id) || []).map(
+                (e: { cohortId: string }) => e.cohortId
+              )
+            : []
+        }
       />
 
       <StudentSurveyModal
