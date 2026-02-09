@@ -120,23 +120,30 @@ const AdminStudentsPage: React.FC = () => {
       }
 
       // Sync enrollments
-      const currentEnrollments = enrollments.get(studentId) || [];
-      const currentCohortIds = currentEnrollments.map((e: { cohortId: string }) => e.cohortId);
-      const currentSet = new Set(currentCohortIds);
-      const desiredSet = new Set(selectedCohortIds);
+      try {
+        const currentEnrollments = enrollments.get(studentId) || [];
+        const currentCohortIds = currentEnrollments.map((e: { cohortId: string }) => e.cohortId);
+        const currentSet = new Set(currentCohortIds);
+        const desiredSet = new Set(selectedCohortIds);
 
-      // Enroll in newly selected cohorts
-      for (const cohortId of selectedCohortIds) {
-        if (!currentSet.has(cohortId)) {
-          await enrollStudentInCohort(studentId, cohortId);
+        // Enroll in newly selected cohorts
+        for (const cohortId of selectedCohortIds) {
+          if (!currentSet.has(cohortId)) {
+            await enrollStudentInCohort(studentId, cohortId);
+          }
         }
-      }
 
-      // Unenroll from deselected cohorts
-      for (const cohortId of currentCohortIds) {
-        if (!desiredSet.has(cohortId)) {
-          await unenrollStudentFromCohort(studentId, cohortId);
+        // Unenroll from deselected cohorts
+        for (const cohortId of currentCohortIds) {
+          if (!desiredSet.has(cohortId)) {
+            await unenrollStudentFromCohort(studentId, cohortId);
+          }
         }
+      } catch (err) {
+        console.error('Failed to sync enrollments:', err);
+        window.alert(
+          `Student saved but enrollment failed: ${err instanceof Error ? err.message : 'Unknown error'}`
+        );
       }
 
       queryClient.invalidateQueries({ queryKey: ['studentEnrollments'] });
