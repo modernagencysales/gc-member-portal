@@ -233,7 +233,14 @@ const BootcampApp: React.FC = () => {
 
     setCourseData(data);
 
-    if (data.weeks.length > 0 && data.weeks[0].lessons.length > 0) {
+    // Lead Magnet users with no content grants should land on My Blueprint, not Week 1
+    if (activeUser.status === 'Lead Magnet') {
+      setCurrentLesson({
+        id: 'my-blueprint',
+        title: 'My Blueprint',
+        embedUrl: 'virtual:my-blueprint',
+      });
+    } else if (data.weeks.length > 0 && data.weeks[0].lessons.length > 0) {
       setCurrentLesson(data.weeks[0].lessons[0]);
     }
     setLoading(false);

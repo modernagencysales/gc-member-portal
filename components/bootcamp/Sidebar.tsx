@@ -9,8 +9,6 @@ import {
   CheckCircle2,
   Zap,
   ClipboardList,
-  Wrench,
-  Box,
   Terminal,
   Sparkles,
   Database,
@@ -100,11 +98,15 @@ const Sidebar: React.FC<SidebarProps> = ({
     'infrastructure',
   ]);
 
-  const [showResourcesSection, setShowResourcesSection] = useState(true);
-  const [showCurriculumSection, setShowCurriculumSection] = useState(true);
+  const courseEnrollments = useMemo(
+    () => enrollments.filter((e) => e.role !== 'resources'),
+    [enrollments]
+  );
 
   const isFunnelAccess = user?.status === 'Funnel Access';
+  const isLeadMagnet = user?.status === 'Lead Magnet';
   const hasFullAccess = user?.status === 'Full Access' || isFunnelAccess;
+  const hasGrantedTools = isLeadMagnet && grantedTools && grantedTools.length > 0;
   const userDomain = user?.email.split('@')[1] || '';
 
   const toggleWeek = (weekId: string) => {
@@ -284,36 +286,40 @@ const Sidebar: React.FC<SidebarProps> = ({
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-3 space-y-6 scrollbar-hide">
-          {/* Multi-course navigation */}
-          {enrollments.length > 1 && onSelectCourse && (
-            <div className="space-y-1">
-              <button
-                onClick={() => onSelectCourse(null)}
-                className={`flex items-center gap-2.5 w-full p-2 rounded-lg text-xs font-medium transition-all ${
-                  showDashboard
-                    ? 'bg-violet-500/10 text-violet-600 dark:text-violet-400'
-                    : 'text-zinc-700 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800'
-                }`}
-              >
-                <LayoutDashboard
-                  size={14}
-                  className={showDashboard ? 'text-violet-500' : 'text-zinc-400'}
-                />
-                Dashboard
-              </button>
+        <div className="flex-1 overflow-y-auto p-3 space-y-4 scrollbar-hide">
+          {/* Course navigation with inline curriculum */}
+          <div className="space-y-1">
+            {/* Dashboard - only if 2+ real courses */}
+            {courseEnrollments.length > 1 && onSelectCourse && (
+              <>
+                <button
+                  onClick={() => onSelectCourse(null)}
+                  className={`flex items-center gap-2.5 w-full p-2 rounded-lg text-xs font-medium transition-all ${
+                    showDashboard
+                      ? 'bg-violet-500/10 text-violet-600 dark:text-violet-400'
+                      : 'text-zinc-700 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800'
+                  }`}
+                >
+                  <LayoutDashboard
+                    size={14}
+                    className={showDashboard ? 'text-violet-500' : 'text-zinc-400'}
+                  />
+                  Dashboard
+                </button>
+                <div className="h-px bg-zinc-200 dark:bg-zinc-800 my-1" />
+              </>
+            )}
 
-              <div className="h-px bg-zinc-200 dark:bg-zinc-800 my-1" />
+            {/* Course sections */}
+            {courseEnrollments.map((enrollment) => {
+              const isActive = activeCourseId === enrollment.cohortId && !showDashboard;
+              const label = enrollment.cohort.sidebarLabel || enrollment.cohort.name;
+              const icon = enrollment.cohort.icon;
 
-              {enrollments.map((enrollment) => {
-                const isActive = activeCourseId === enrollment.cohortId && !showDashboard;
-                const label = enrollment.cohort.sidebarLabel || enrollment.cohort.name;
-                const icon = enrollment.cohort.icon;
-
-                return (
+              return (
+                <div key={enrollment.cohortId}>
                   <button
-                    key={enrollment.cohortId}
-                    onClick={() => onSelectCourse(enrollment.cohortId)}
+                    onClick={() => onSelectCourse?.(enrollment.cohortId)}
                     className={`flex items-center gap-2.5 w-full p-2 rounded-lg text-xs font-medium transition-all ${
                       isActive
                         ? 'bg-violet-500/10 text-violet-600 dark:text-violet-400'
@@ -332,336 +338,462 @@ const Sidebar: React.FC<SidebarProps> = ({
                     {enrollment.onboardingCompletedAt && (
                       <CheckCircle2 size={10} className="ml-auto text-green-500 shrink-0" />
                     )}
+                    <ChevronDown
+                      size={12}
+                      className={`shrink-0 transition-transform ${isActive ? '' : '-rotate-90'} ${enrollment.onboardingCompletedAt ? '' : 'ml-auto'}`}
+                    />
                   </button>
-                );
-              })}
 
-              <div className="h-px bg-zinc-200 dark:bg-zinc-800 my-1" />
-            </div>
-          )}
+                  {/* Inline curriculum for active course */}
+                  {isActive && (
+                    <div className="ml-3 mt-1 space-y-1 animate-slide-in">
+                      {data.weeks.map((week) => {
+                        const coreLessons = week.lessons.filter(
+                          (l) => !isToolbeltItem(l.id) && !l.title.toUpperCase().startsWith('TASK:')
+                        );
 
-          {hasFullAccess ? (
-            <div className="space-y-3">
-              <button
-                onClick={() => setShowResourcesSection(!showResourcesSection)}
-                className="w-full flex items-center justify-between px-2 text-xs font-medium text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors"
-              >
-                <div className="flex items-center gap-2">
-                  <Box size={12} /> Resources
+                        if (coreLessons.length === 0 && week.actionItems.length === 0) return null;
+
+                        return (
+                          <div key={week.id} className="mb-1">
+                            <button
+                              onClick={() => toggleWeek(week.id)}
+                              className="flex items-center justify-between w-full p-2 text-left text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:text-violet-600 dark:hover:text-violet-400"
+                            >
+                              <div className="flex items-center gap-2 truncate">
+                                {week.actionItems.length > 0 &&
+                                  completedItems.size >= week.actionItems.length && (
+                                    <CheckCircle2 size={12} className="text-green-500" />
+                                  )}
+                                <span className="truncate">{week.title}</span>
+                              </div>
+                              {isWeekExpanded(week.id) ? (
+                                <ChevronDown size={12} />
+                              ) : (
+                                <ChevronRight size={12} />
+                              )}
+                            </button>
+                            {isWeekExpanded(week.id) && (
+                              <div className="mt-1 space-y-0.5 ml-2">
+                                {coreLessons.map((lesson) => (
+                                  <button
+                                    key={lesson.id}
+                                    onClick={() => {
+                                      onSelectLesson(lesson);
+                                      onCloseMobile();
+                                    }}
+                                    className={`flex items-start w-full p-2 rounded-lg text-[11px] transition-all ${lesson.id === currentLessonId ? 'bg-violet-500/10 text-violet-600 dark:text-violet-400 font-medium' : 'text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800'}`}
+                                  >
+                                    <span className="mt-0.5 mr-2 shrink-0 opacity-70">
+                                      {getLessonIcon(lesson, lesson.id === currentLessonId)}
+                                    </span>
+                                    <span className="text-left leading-snug">
+                                      {cleanTitle(lesson.title)}
+                                    </span>
+                                  </button>
+                                ))}
+
+                                <button
+                                  onClick={() => {
+                                    onSelectLesson({
+                                      id: `${week.id}:checklist`,
+                                      title: 'Tasks',
+                                      embedUrl: 'virtual:checklist',
+                                    });
+                                    onCloseMobile();
+                                  }}
+                                  className={`flex items-center gap-2.5 w-full p-2 rounded-lg text-[11px] font-medium transition-all mt-1 ${
+                                    currentLessonId === `${week.id}:checklist`
+                                      ? 'bg-violet-500 text-white'
+                                      : 'text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800'
+                                  }`}
+                                >
+                                  <ClipboardList size={12} />
+                                  <span>Tasks</span>
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
-                {showResourcesSection ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
+              );
+            })}
+          </div>
+
+          {/* Tools divider */}
+          <div className="flex items-center gap-2 px-2">
+            <div className="flex-1 h-px bg-zinc-200 dark:bg-zinc-800" />
+            <span className="text-[10px] font-medium text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">
+              Tools
+            </span>
+            <div className="flex-1 h-px bg-zinc-200 dark:bg-zinc-800" />
+          </div>
+
+          {/* Tools section (flattened) */}
+          {hasFullAccess ? (
+            <div className="space-y-1">
+              {/* My Blueprint */}
+              <button
+                onClick={() => {
+                  onSelectLesson({
+                    id: 'my-blueprint',
+                    title: 'My Blueprint',
+                    embedUrl: 'virtual:my-blueprint',
+                  });
+                  onCloseMobile();
+                }}
+                className={`flex items-center w-full p-2 rounded-lg text-xs font-medium transition-all ${
+                  currentLessonId === 'my-blueprint'
+                    ? 'bg-violet-500/10 text-violet-600 dark:text-violet-400'
+                    : 'text-zinc-700 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800'
+                }`}
+              >
+                <div className="flex items-center gap-2.5">
+                  <Sparkles size={12} className="text-violet-500" />
+                  <span>My Blueprint</span>
+                </div>
               </button>
 
-              {showResourcesSection && (
-                <div className="space-y-1 animate-slide-in">
-                  {/* My Blueprint */}
-                  <button
-                    onClick={() => {
-                      onSelectLesson({
-                        id: 'my-blueprint',
-                        title: 'My Blueprint',
-                        embedUrl: 'virtual:my-blueprint',
-                      });
-                      onCloseMobile();
-                    }}
-                    className={`flex items-center w-full p-2 rounded-lg text-xs font-medium transition-all ${
-                      currentLessonId === 'my-blueprint'
-                        ? 'bg-violet-500/10 text-violet-600 dark:text-violet-400'
-                        : 'text-zinc-700 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800'
-                    }`}
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <Sparkles
-                        size={12}
-                        className={
-                          currentLessonId === 'my-blueprint' ? 'text-violet-500' : 'text-violet-500'
-                        }
-                      />
-                      <span>My Blueprint</span>
-                    </div>
-                  </button>
-
-                  {/* My Posts - Blueprint posts */}
-                  <button
-                    onClick={() => {
-                      onSelectLesson({
-                        id: 'virtual:my-posts',
-                        title: 'My Posts',
-                        embedUrl: 'virtual:my-posts',
-                      });
-                      onCloseMobile();
-                    }}
-                    className={`flex items-center w-full p-2 rounded-lg text-xs font-medium transition-all ${
+              {/* My Posts */}
+              <button
+                onClick={() => {
+                  onSelectLesson({
+                    id: 'virtual:my-posts',
+                    title: 'My Posts',
+                    embedUrl: 'virtual:my-posts',
+                  });
+                  onCloseMobile();
+                }}
+                className={`flex items-center w-full p-2 rounded-lg text-xs font-medium transition-all ${
+                  currentLessonId === 'virtual:my-posts'
+                    ? 'bg-violet-500/10 text-violet-600 dark:text-violet-400'
+                    : 'text-zinc-700 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800'
+                }`}
+              >
+                <div className="flex items-center gap-2.5">
+                  <FileText
+                    size={12}
+                    className={
                       currentLessonId === 'virtual:my-posts'
-                        ? 'bg-violet-500/10 text-violet-600 dark:text-violet-400'
-                        : 'text-zinc-700 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800'
-                    }`}
+                        ? 'text-violet-500'
+                        : 'text-emerald-500'
+                    }
+                  />
+                  <span>My Posts</span>
+                  {hasBlueprint && (
+                    <span className="ml-auto text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                      60
+                    </span>
+                  )}
+                </div>
+              </button>
+
+              {/* Funnel Access subtle nudge */}
+              {funnelAccess?.nudgeTier === 'subtle' && (
+                <FunnelNudgeSubtle
+                  userEmail={user?.email}
+                  calcomUrl={calcomUrl}
+                  daysRemaining={funnelAccess.daysRemaining}
+                />
+              )}
+
+              {/* Redeem Code for Funnel Access users */}
+              {isFunnelAccess && onRedeemCode && (
+                <button
+                  onClick={onRedeemCode}
+                  className="flex items-center gap-2 w-full p-2 rounded-lg text-xs font-medium text-violet-600 dark:text-violet-400 hover:bg-violet-50 dark:hover:bg-violet-900/20 transition-colors"
+                >
+                  <Key size={12} />
+                  Redeem Code
+                </button>
+              )}
+
+              {/* AI Tools */}
+              {(aiTools.length > 0 || toolGroups.gpts.length > 0) && (
+                <div className="space-y-0.5">
+                  <button
+                    onClick={() => toggleGroup('gpts')}
+                    className="w-full flex items-center justify-between p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-400 transition-colors"
                   >
-                    <div className="flex items-center gap-2.5">
-                      <FileText
-                        size={12}
-                        className={
-                          currentLessonId === 'virtual:my-posts'
-                            ? 'text-violet-500'
-                            : 'text-emerald-500'
-                        }
-                      />
-                      <span>My Posts</span>
-                      {hasBlueprint && (
-                        <span className="ml-auto text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                          60
-                        </span>
-                      )}
+                    <div className="flex items-center gap-2.5 text-xs font-medium">
+                      <Sparkles size={12} className="text-violet-500" />
+                      <span>AI Tools</span>
                     </div>
+                    {isGroupExpanded('gpts') ? (
+                      <ChevronDown size={12} />
+                    ) : (
+                      <ChevronRight size={12} />
+                    )}
                   </button>
-
-                  {/* Funnel Access subtle nudge */}
-                  {funnelAccess?.nudgeTier === 'subtle' && (
-                    <FunnelNudgeSubtle
-                      userEmail={user?.email}
-                      calcomUrl={calcomUrl}
-                      daysRemaining={funnelAccess.daysRemaining}
-                    />
-                  )}
-
-                  {/* Redeem Code for Funnel Access users */}
-                  {isFunnelAccess && onRedeemCode && (
-                    <button
-                      onClick={onRedeemCode}
-                      className="flex items-center gap-2 w-full p-2 rounded-lg text-xs font-medium text-violet-600 dark:text-violet-400 hover:bg-violet-50 dark:hover:bg-violet-900/20 transition-colors"
-                    >
-                      <Key size={12} />
-                      Redeem Code
-                    </button>
-                  )}
-
-                  {/* AI Tools - from database (global) + curriculum-embedded */}
-                  {(aiTools.length > 0 || toolGroups.gpts.length > 0) && (
-                    <div className="space-y-0.5">
+                  {isGroupExpanded('gpts') && (
+                    <div className="ml-4 border-l border-zinc-200 dark:border-zinc-800 pl-1.5">
+                      {(isFunnelAccess && grantedTools
+                        ? aiTools.filter((t) => grantedTools.some((g) => g.toolSlug === t.slug))
+                        : aiTools
+                      ).map(renderAIToolItem)}
+                      {toolGroups.gpts.map(renderToolItem)}
                       <button
-                        onClick={() => toggleGroup('gpts')}
-                        className="w-full flex items-center justify-between p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-400 transition-colors"
+                        onClick={() => {
+                          onSelectLesson({
+                            id: 'virtual:tam-builder',
+                            title: 'TAM Builder',
+                            embedUrl: 'virtual:tam-builder',
+                          });
+                          onCloseMobile();
+                        }}
+                        className={`flex items-center w-full py-1.5 px-3 rounded-lg text-[11px] transition-all ${
+                          currentLessonId === 'virtual:tam-builder'
+                            ? 'bg-violet-500/10 text-violet-600 dark:text-violet-400 font-medium'
+                            : 'text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100'
+                        }`}
                       >
-                        <div className="flex items-center gap-2.5 text-xs font-medium">
-                          <Sparkles size={12} className="text-violet-500" />
-                          <span>AI Tools</span>
-                        </div>
-                        {isGroupExpanded('gpts') ? (
-                          <ChevronDown size={12} />
-                        ) : (
-                          <ChevronRight size={12} />
-                        )}
-                      </button>
-                      {isGroupExpanded('gpts') && (
-                        <div className="ml-4 border-l border-zinc-200 dark:border-zinc-800 pl-1.5">
-                          {(isFunnelAccess && grantedTools
-                            ? aiTools.filter((t) => grantedTools.some((g) => g.toolSlug === t.slug))
-                            : aiTools
-                          ).map(renderAIToolItem)}
-                          {toolGroups.gpts.map(renderToolItem)}
-                          <button
-                            onClick={() => {
-                              onSelectLesson({
-                                id: 'virtual:tam-builder',
-                                title: 'TAM Builder',
-                                embedUrl: 'virtual:tam-builder',
-                              });
-                              onCloseMobile();
-                            }}
-                            className={`flex items-center w-full py-1.5 px-3 rounded-lg text-[11px] transition-all ${
-                              currentLessonId === 'virtual:tam-builder'
-                                ? 'bg-violet-500/10 text-violet-600 dark:text-violet-400 font-medium'
-                                : 'text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100'
-                            }`}
-                          >
-                            <span
-                              className={`mr-2.5 shrink-0 ${
-                                currentLessonId === 'virtual:tam-builder'
-                                  ? 'text-violet-500'
-                                  : 'text-zinc-400 dark:text-zinc-600'
-                              }`}
-                            >
-                              <Target size={14} />
-                            </span>
-                            <span className="truncate">TAM Builder</span>
-                          </button>
-                          <button
-                            onClick={() => {
-                              onSelectLesson({
-                                id: 'virtual:connection-qualifier',
-                                title: 'Connection Qualifier',
-                                embedUrl: 'virtual:connection-qualifier',
-                              });
-                              onCloseMobile();
-                            }}
-                            className={`flex items-center w-full py-1.5 px-3 rounded-lg text-[11px] transition-all ${
-                              currentLessonId === 'virtual:connection-qualifier'
-                                ? 'bg-violet-500/10 text-violet-600 dark:text-violet-400 font-medium'
-                                : 'text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100'
-                            }`}
-                          >
-                            <span
-                              className={`mr-2.5 shrink-0 ${
-                                currentLessonId === 'virtual:connection-qualifier'
-                                  ? 'text-violet-500'
-                                  : 'text-zinc-400 dark:text-zinc-600'
-                              }`}
-                            >
-                              <Users size={14} />
-                            </span>
-                            <span className="truncate">Connection Qualifier</span>
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                  {/* GTM Infrastructure */}
-                  <div className="space-y-0.5">
-                    <button
-                      onClick={() => toggleGroup('infrastructure')}
-                      className="w-full flex items-center justify-between p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-400 transition-colors"
-                    >
-                      <div className="flex items-center gap-2.5 text-xs font-medium">
-                        <Server size={12} className="text-emerald-500" />
-                        <span>GTM Infrastructure</span>
-                      </div>
-                      {isGroupExpanded('infrastructure') ? (
-                        <ChevronDown size={12} />
-                      ) : (
-                        <ChevronRight size={12} />
-                      )}
-                    </button>
-                    {isGroupExpanded('infrastructure') && (
-                      <div className="ml-4 border-l border-zinc-200 dark:border-zinc-800 pl-1.5">
-                        <button
-                          onClick={() => {
-                            onSelectLesson({
-                              id: 'virtual:infrastructure-manager',
-                              title: 'Setup & Dashboard',
-                              embedUrl: 'virtual:infrastructure-manager',
-                            });
-                            onCloseMobile();
-                          }}
-                          className={`flex items-center w-full py-1.5 px-3 rounded-lg text-[11px] transition-all ${
-                            currentLessonId === 'virtual:infrastructure-manager'
-                              ? 'bg-violet-500/10 text-violet-600 dark:text-violet-400 font-medium'
-                              : 'text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100'
+                        <span
+                          className={`mr-2.5 shrink-0 ${
+                            currentLessonId === 'virtual:tam-builder'
+                              ? 'text-violet-500'
+                              : 'text-zinc-400 dark:text-zinc-600'
                           }`}
                         >
-                          <span
-                            className={`mr-2.5 shrink-0 ${
-                              currentLessonId === 'virtual:infrastructure-manager'
-                                ? 'text-violet-500'
-                                : 'text-zinc-400 dark:text-zinc-600'
-                            }`}
-                          >
-                            <Server size={14} />
-                          </span>
-                          <span className="truncate">Setup & Dashboard</span>
-                        </button>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Cold Email */}
-                  <div className="space-y-0.5">
-                    <button
-                      onClick={() => toggleGroup('cold-email')}
-                      className="w-full flex items-center justify-between p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-400 transition-colors"
-                    >
-                      <div className="flex items-center gap-2.5 text-xs font-medium">
-                        <Mail size={12} className="text-orange-500" />
-                        <span>Cold Email</span>
-                      </div>
-                      {isGroupExpanded('cold-email') ? (
-                        <ChevronDown size={12} />
-                      ) : (
-                        <ChevronRight size={12} />
-                      )}
-                    </button>
-                    {isGroupExpanded('cold-email') && (
-                      <div className="ml-4 border-l border-zinc-200 dark:border-zinc-800 pl-1.5">
-                        <button
-                          onClick={() => {
-                            onSelectLesson({
-                              id: 'virtual:cold-email-recipes',
-                              title: 'Recipe Builder',
-                              embedUrl: 'virtual:cold-email-recipes',
-                            });
-                            onCloseMobile();
-                          }}
-                          className={`flex items-center w-full py-1.5 px-3 rounded-lg text-[11px] transition-all ${
-                            currentLessonId === 'virtual:cold-email-recipes'
-                              ? 'bg-violet-500/10 text-violet-600 dark:text-violet-400 font-medium'
-                              : 'text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100'
+                          <Target size={14} />
+                        </span>
+                        <span className="truncate">TAM Builder</span>
+                      </button>
+                      <button
+                        onClick={() => {
+                          onSelectLesson({
+                            id: 'virtual:connection-qualifier',
+                            title: 'Connection Qualifier',
+                            embedUrl: 'virtual:connection-qualifier',
+                          });
+                          onCloseMobile();
+                        }}
+                        className={`flex items-center w-full py-1.5 px-3 rounded-lg text-[11px] transition-all ${
+                          currentLessonId === 'virtual:connection-qualifier'
+                            ? 'bg-violet-500/10 text-violet-600 dark:text-violet-400 font-medium'
+                            : 'text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100'
+                        }`}
+                      >
+                        <span
+                          className={`mr-2.5 shrink-0 ${
+                            currentLessonId === 'virtual:connection-qualifier'
+                              ? 'text-violet-500'
+                              : 'text-zinc-400 dark:text-zinc-600'
                           }`}
                         >
-                          <span
-                            className={`mr-2.5 shrink-0 ${
-                              currentLessonId === 'virtual:cold-email-recipes'
-                                ? 'text-violet-500'
-                                : 'text-zinc-400 dark:text-zinc-600'
-                            }`}
-                          >
-                            <Mail size={14} />
-                          </span>
-                          <span className="truncate">Recipe Builder</span>
-                        </button>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Clay Tables - from curriculum */}
-                  {toolGroups.tables.length > 0 && (
-                    <div className="space-y-0.5">
-                      <button
-                        onClick={() => toggleGroup('tables')}
-                        className="w-full flex items-center justify-between p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-400 transition-colors"
-                      >
-                        <div className="flex items-center gap-2.5 text-xs font-medium">
-                          <Database size={12} className="text-blue-500" />
-                          <span>Clay Tables</span>
-                        </div>
-                        {isGroupExpanded('tables') ? (
-                          <ChevronDown size={12} />
-                        ) : (
-                          <ChevronRight size={12} />
-                        )}
+                          <Users size={14} />
+                        </span>
+                        <span className="truncate">Connection Qualifier</span>
                       </button>
-                      {isGroupExpanded('tables') && (
-                        <div className="ml-4 border-l border-zinc-200 dark:border-zinc-800 pl-1.5">
-                          {toolGroups.tables.map(renderToolItem)}
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                  {/* Access & Links - from curriculum */}
-                  {toolGroups.logins.length > 0 && (
-                    <div className="space-y-0.5">
-                      <button
-                        onClick={() => toggleGroup('logins')}
-                        className="w-full flex items-center justify-between p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-400 transition-colors"
-                      >
-                        <div className="flex items-center gap-2.5 text-xs font-medium">
-                          <Key size={12} className="text-amber-500" />
-                          <span>Access & Links</span>
-                        </div>
-                        {isGroupExpanded('logins') ? (
-                          <ChevronDown size={12} />
-                        ) : (
-                          <ChevronRight size={12} />
-                        )}
-                      </button>
-                      {isGroupExpanded('logins') && (
-                        <div className="ml-4 border-l border-zinc-200 dark:border-zinc-800 pl-1.5">
-                          {toolGroups.logins.map(renderToolItem)}
-                        </div>
-                      )}
                     </div>
                   )}
                 </div>
+              )}
+
+              {/* GTM Infrastructure */}
+              <div className="space-y-0.5">
+                <button
+                  onClick={() => toggleGroup('infrastructure')}
+                  className="w-full flex items-center justify-between p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-400 transition-colors"
+                >
+                  <div className="flex items-center gap-2.5 text-xs font-medium">
+                    <Server size={12} className="text-emerald-500" />
+                    <span>GTM Infrastructure</span>
+                  </div>
+                  {isGroupExpanded('infrastructure') ? (
+                    <ChevronDown size={12} />
+                  ) : (
+                    <ChevronRight size={12} />
+                  )}
+                </button>
+                {isGroupExpanded('infrastructure') && (
+                  <div className="ml-4 border-l border-zinc-200 dark:border-zinc-800 pl-1.5">
+                    <button
+                      onClick={() => {
+                        onSelectLesson({
+                          id: 'virtual:infrastructure-manager',
+                          title: 'Setup & Dashboard',
+                          embedUrl: 'virtual:infrastructure-manager',
+                        });
+                        onCloseMobile();
+                      }}
+                      className={`flex items-center w-full py-1.5 px-3 rounded-lg text-[11px] transition-all ${
+                        currentLessonId === 'virtual:infrastructure-manager'
+                          ? 'bg-violet-500/10 text-violet-600 dark:text-violet-400 font-medium'
+                          : 'text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100'
+                      }`}
+                    >
+                      <span
+                        className={`mr-2.5 shrink-0 ${
+                          currentLessonId === 'virtual:infrastructure-manager'
+                            ? 'text-violet-500'
+                            : 'text-zinc-400 dark:text-zinc-600'
+                        }`}
+                      >
+                        <Server size={14} />
+                      </span>
+                      <span className="truncate">Setup & Dashboard</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Cold Email */}
+              <div className="space-y-0.5">
+                <button
+                  onClick={() => toggleGroup('cold-email')}
+                  className="w-full flex items-center justify-between p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-400 transition-colors"
+                >
+                  <div className="flex items-center gap-2.5 text-xs font-medium">
+                    <Mail size={12} className="text-orange-500" />
+                    <span>Cold Email</span>
+                  </div>
+                  {isGroupExpanded('cold-email') ? (
+                    <ChevronDown size={12} />
+                  ) : (
+                    <ChevronRight size={12} />
+                  )}
+                </button>
+                {isGroupExpanded('cold-email') && (
+                  <div className="ml-4 border-l border-zinc-200 dark:border-zinc-800 pl-1.5">
+                    <button
+                      onClick={() => {
+                        onSelectLesson({
+                          id: 'virtual:cold-email-recipes',
+                          title: 'Recipe Builder',
+                          embedUrl: 'virtual:cold-email-recipes',
+                        });
+                        onCloseMobile();
+                      }}
+                      className={`flex items-center w-full py-1.5 px-3 rounded-lg text-[11px] transition-all ${
+                        currentLessonId === 'virtual:cold-email-recipes'
+                          ? 'bg-violet-500/10 text-violet-600 dark:text-violet-400 font-medium'
+                          : 'text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100'
+                      }`}
+                    >
+                      <span
+                        className={`mr-2.5 shrink-0 ${
+                          currentLessonId === 'virtual:cold-email-recipes'
+                            ? 'text-violet-500'
+                            : 'text-zinc-400 dark:text-zinc-600'
+                        }`}
+                      >
+                        <Mail size={14} />
+                      </span>
+                      <span className="truncate">Recipe Builder</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Clay Tables */}
+              {toolGroups.tables.length > 0 && (
+                <div className="space-y-0.5">
+                  <button
+                    onClick={() => toggleGroup('tables')}
+                    className="w-full flex items-center justify-between p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-400 transition-colors"
+                  >
+                    <div className="flex items-center gap-2.5 text-xs font-medium">
+                      <Database size={12} className="text-blue-500" />
+                      <span>Clay Tables</span>
+                    </div>
+                    {isGroupExpanded('tables') ? (
+                      <ChevronDown size={12} />
+                    ) : (
+                      <ChevronRight size={12} />
+                    )}
+                  </button>
+                  {isGroupExpanded('tables') && (
+                    <div className="ml-4 border-l border-zinc-200 dark:border-zinc-800 pl-1.5">
+                      {toolGroups.tables.map(renderToolItem)}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Access & Links */}
+              {toolGroups.logins.length > 0 && (
+                <div className="space-y-0.5">
+                  <button
+                    onClick={() => toggleGroup('logins')}
+                    className="w-full flex items-center justify-between p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-400 transition-colors"
+                  >
+                    <div className="flex items-center gap-2.5 text-xs font-medium">
+                      <Key size={12} className="text-amber-500" />
+                      <span>Access & Links</span>
+                    </div>
+                    {isGroupExpanded('logins') ? (
+                      <ChevronDown size={12} />
+                    ) : (
+                      <ChevronRight size={12} />
+                    )}
+                  </button>
+                  {isGroupExpanded('logins') && (
+                    <div className="ml-4 border-l border-zinc-200 dark:border-zinc-800 pl-1.5">
+                      {toolGroups.logins.map(renderToolItem)}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          ) : hasGrantedTools ? (
+            <div className="space-y-1">
+              {/* My Blueprint (Lead Magnet users) */}
+              {hasBlueprint && (
+                <button
+                  onClick={() => {
+                    onSelectLesson({
+                      id: 'my-blueprint',
+                      title: 'My Blueprint',
+                      embedUrl: 'virtual:my-blueprint',
+                    });
+                    onCloseMobile();
+                  }}
+                  className={`flex items-center w-full p-2 rounded-lg text-xs font-medium transition-all ${
+                    currentLessonId === 'my-blueprint'
+                      ? 'bg-violet-500/10 text-violet-600 dark:text-violet-400'
+                      : 'text-zinc-700 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <Sparkles size={12} className="text-violet-500" />
+                    <span>My Blueprint</span>
+                  </div>
+                </button>
+              )}
+
+              {/* Granted AI Tools */}
+              <div className="space-y-0.5">
+                <button
+                  onClick={() => toggleGroup('gpts')}
+                  className="w-full flex items-center justify-between p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-400 transition-colors"
+                >
+                  <div className="flex items-center gap-2.5 text-xs font-medium">
+                    <Sparkles size={12} className="text-violet-500" />
+                    <span>AI Tools</span>
+                  </div>
+                  {isGroupExpanded('gpts') ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
+                </button>
+                {isGroupExpanded('gpts') && (
+                  <div className="ml-4 border-l border-zinc-200 dark:border-zinc-800 pl-1.5">
+                    {aiTools
+                      .filter((t) => grantedTools!.some((g) => g.toolSlug === t.slug))
+                      .map(renderAIToolItem)}
+                  </div>
+                )}
+              </div>
+
+              {/* Redeem Code for Lead Magnet users */}
+              {onRedeemCode && (
+                <button
+                  onClick={onRedeemCode}
+                  className="flex items-center gap-2 w-full p-2 rounded-lg text-xs font-medium text-violet-600 dark:text-violet-400 hover:bg-violet-50 dark:hover:bg-violet-900/20 transition-colors"
+                >
+                  <Key size={12} />
+                  Redeem Code
+                </button>
               )}
             </div>
           ) : (
@@ -677,92 +809,6 @@ const Sidebar: React.FC<SidebarProps> = ({
               </p>
             </div>
           )}
-
-          <div className="space-y-3">
-            <button
-              onClick={() => setShowCurriculumSection(!showCurriculumSection)}
-              className="w-full flex items-center justify-between px-2 text-xs font-medium text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors"
-            >
-              <div className="flex items-center gap-2">
-                <Wrench size={12} /> Curriculum
-              </div>
-              {showCurriculumSection ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
-            </button>
-
-            {showCurriculumSection && (
-              <div className="animate-slide-in">
-                {data.weeks.map((week) => {
-                  const coreLessons = week.lessons.filter(
-                    (l) => !isToolbeltItem(l.id) && !l.title.toUpperCase().startsWith('TASK:')
-                  );
-
-                  if (coreLessons.length === 0 && week.actionItems.length === 0) return null;
-
-                  return (
-                    <div key={week.id} className="mb-2">
-                      <button
-                        onClick={() => toggleWeek(week.id)}
-                        className="flex items-center justify-between w-full p-2 text-left text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:text-violet-600 dark:hover:text-violet-400"
-                      >
-                        <div className="flex items-center gap-2 truncate">
-                          {week.actionItems.length > 0 &&
-                            completedItems.size >= week.actionItems.length && (
-                              <CheckCircle2 size={12} className="text-green-500" />
-                            )}
-                          <span className="truncate">{week.title}</span>
-                        </div>
-                        {isWeekExpanded(week.id) ? (
-                          <ChevronDown size={12} />
-                        ) : (
-                          <ChevronRight size={12} />
-                        )}
-                      </button>
-                      {isWeekExpanded(week.id) && (
-                        <div className="mt-1 space-y-0.5 ml-2">
-                          {coreLessons.map((lesson) => (
-                            <button
-                              key={lesson.id}
-                              onClick={() => {
-                                onSelectLesson(lesson);
-                                onCloseMobile();
-                              }}
-                              className={`flex items-start w-full p-2 rounded-lg text-[11px] transition-all ${lesson.id === currentLessonId ? 'bg-violet-500/10 text-violet-600 dark:text-violet-400 font-medium' : 'text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800'}`}
-                            >
-                              <span className="mt-0.5 mr-2 shrink-0 opacity-70">
-                                {getLessonIcon(lesson, lesson.id === currentLessonId)}
-                              </span>
-                              <span className="text-left leading-snug">
-                                {cleanTitle(lesson.title)}
-                              </span>
-                            </button>
-                          ))}
-
-                          <button
-                            onClick={() => {
-                              onSelectLesson({
-                                id: `${week.id}:checklist`,
-                                title: 'Tasks',
-                                embedUrl: 'virtual:checklist',
-                              });
-                              onCloseMobile();
-                            }}
-                            className={`flex items-center gap-2.5 w-full p-2 rounded-lg text-[11px] font-medium transition-all mt-1 ${
-                              currentLessonId === `${week.id}:checklist`
-                                ? 'bg-violet-500 text-white'
-                                : 'text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800'
-                            }`}
-                          >
-                            <ClipboardList size={12} />
-                            <span>Tasks</span>
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
         </div>
 
         <div className="p-4 border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex items-center justify-between gap-3">
