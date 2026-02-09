@@ -17,8 +17,8 @@ test.describe('Admin Bootcamp Management', () => {
     await mockSupabaseQuery(page, 'bootcamp_settings', []);
   });
 
-  test('student list at /admin/bootcamp/students', async ({ page }) => {
-    await navigateTo(page, '/admin/bootcamp/students');
+  test('student list at /admin/courses/students', async ({ page }) => {
+    await navigateTo(page, '/admin/courses/students');
     await waitForSPALoad(page);
 
     await expect(
@@ -29,8 +29,8 @@ test.describe('Admin Bootcamp Management', () => {
     ).toBeVisible({ timeout: 10_000 });
   });
 
-  test('survey responses at /admin/bootcamp/surveys', async ({ page }) => {
-    await navigateTo(page, '/admin/bootcamp/surveys');
+  test('survey responses at /admin/courses/surveys', async ({ page }) => {
+    await navigateTo(page, '/admin/courses/surveys');
     await waitForSPALoad(page);
 
     // Should show survey data or a table of responses
@@ -38,8 +38,8 @@ test.describe('Admin Bootcamp Management', () => {
     await expect(heading).toBeVisible();
   });
 
-  test('invite code management at /admin/bootcamp/invite-codes', async ({ page }) => {
-    await navigateTo(page, '/admin/bootcamp/invite-codes');
+  test('invite code management at /admin/courses/invite-codes', async ({ page }) => {
+    await navigateTo(page, '/admin/courses/invite-codes');
     await waitForSPALoad(page);
 
     // The existing invite code should be displayed
@@ -47,7 +47,7 @@ test.describe('Admin Bootcamp Management', () => {
   });
 
   test('create new invite code', async ({ page }) => {
-    await navigateTo(page, '/admin/bootcamp/invite-codes');
+    await navigateTo(page, '/admin/courses/invite-codes');
     await waitForSPALoad(page);
 
     // Click create/add button

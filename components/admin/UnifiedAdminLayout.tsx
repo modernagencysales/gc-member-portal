@@ -1,25 +1,33 @@
 import React, { useState } from 'react';
 import { Outlet, Navigate, useLocation } from 'react-router-dom';
-import AdminBootcampSidebar from './AdminBootcampSidebar';
-import { useTheme } from '../../../context/ThemeContext';
-import { useAuth } from '../../../context/AuthContext';
-import { isAdminEmail } from '../../../config/adminConfig';
+import UnifiedAdminSidebar from './UnifiedAdminSidebar';
+import { useTheme } from '../../context/ThemeContext';
+import { useAuth } from '../../context/AuthContext';
+import { isAdminEmail } from '../../config/adminConfig';
 import { Menu } from 'lucide-react';
 
 const routeTitles: Record<string, string> = {
-  '/admin/bootcamp': 'Bootcamp Admin',
-  '/admin/bootcamp/students': 'Student Roster',
-  '/admin/bootcamp/onboarding': 'Onboarding Checklist',
-  '/admin/bootcamp/settings': 'Bootcamp Settings',
+  '/admin': 'Admin Dashboard',
+  '/admin/courses': 'Courses Overview',
+  '/admin/courses/students': 'Student Roster',
+  '/admin/courses/curriculum': 'Curriculum Editor',
+  '/admin/courses/invite-codes': 'Invite Codes',
+  '/admin/courses/surveys': 'Survey Responses',
+  '/admin/courses/onboarding': 'Course Onboarding',
+  '/admin/courses/ai-tools': 'AI Tool Management',
+  '/admin/courses/settings': 'Course Settings',
+  '/admin/blueprints': 'Blueprint Management',
+  '/admin/gc/tools': 'GC Member Tools',
+  '/admin/gc/onboarding': 'GC Onboarding',
+  '/admin/affiliates': 'Affiliate Program',
 };
 
-const AdminBootcampLayout: React.FC = () => {
+const UnifiedAdminLayout: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { isDarkMode } = useTheme();
   const { gcMember, isAuthenticated } = useAuth();
   const location = useLocation();
 
-  // Check if user is authenticated and is an admin
   if (!isAuthenticated || !gcMember) {
     return <Navigate to="/login" replace />;
   }
@@ -28,7 +36,10 @@ const AdminBootcampLayout: React.FC = () => {
     return <Navigate to="/login" replace />;
   }
 
-  const pageTitle = routeTitles[location.pathname] || 'Bootcamp Admin';
+  // Match dynamic curriculum route
+  const pageTitle = location.pathname.startsWith('/admin/courses/curriculum/')
+    ? 'Curriculum Editor'
+    : routeTitles[location.pathname] || 'Admin';
 
   return (
     <div
@@ -36,12 +47,9 @@ const AdminBootcampLayout: React.FC = () => {
         isDarkMode ? 'bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-900'
       }`}
     >
-      {/* Sidebar */}
-      <AdminBootcampSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <UnifiedAdminSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-      {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Header */}
         <header
           className={`h-16 flex items-center justify-between px-4 md:px-6 border-b ${
             isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
@@ -60,14 +68,13 @@ const AdminBootcampLayout: React.FC = () => {
           </div>
           <div
             className={`text-xs font-medium px-2 py-1 rounded ${
-              isDarkMode ? 'bg-blue-900/30 text-blue-400' : 'bg-blue-100 text-blue-700'
+              isDarkMode ? 'bg-amber-900/30 text-amber-400' : 'bg-amber-100 text-amber-700'
             }`}
           >
-            Bootcamp Admin
+            Admin Mode
           </div>
         </header>
 
-        {/* Page Content */}
         <main
           className={`flex-1 overflow-y-auto transition-colors ${
             isDarkMode ? 'bg-slate-950' : 'bg-slate-50'
@@ -82,4 +89,4 @@ const AdminBootcampLayout: React.FC = () => {
   );
 };
 
-export default AdminBootcampLayout;
+export default UnifiedAdminLayout;

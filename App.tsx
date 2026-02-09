@@ -1,5 +1,5 @@
 import React, { Suspense, lazy } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useParams } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 
 // Lazy-loaded: Blueprint public pages
@@ -22,13 +22,10 @@ const CampaignsPage = lazy(() => import('./components/gc/campaigns/CampaignsPage
 const ICPPage = lazy(() => import('./components/gc/icp/ICPPage'));
 const ResourcesPage = lazy(() => import('./components/gc/resources/ResourcesPage'));
 
-// Lazy-loaded: Admin
-const AdminLayout = lazy(() => import('./components/admin/AdminLayout'));
+// Lazy-loaded: Admin (unified)
+const UnifiedAdminLayout = lazy(() => import('./components/admin/UnifiedAdminLayout'));
 const AdminToolsPage = lazy(() => import('./components/admin/tools/AdminToolsPage'));
 const AdminOnboardingPage = lazy(() => import('./components/admin/onboarding/AdminOnboardingPage'));
-
-// Lazy-loaded: Bootcamp Admin
-const AdminBootcampLayout = lazy(() => import('./components/admin/bootcamp/AdminBootcampLayout'));
 const AdminStudentsPage = lazy(
   () => import('./components/admin/bootcamp/students/AdminStudentsPage')
 );
@@ -47,9 +44,6 @@ const AdminAIToolsPage = lazy(
 const AdminSurveyResponsesPage = lazy(
   () => import('./components/admin/bootcamp/surveys/AdminSurveyResponsesPage')
 );
-
-// Lazy-loaded: LMS Admin
-const AdminLmsLayout = lazy(() => import('./components/admin/lms/AdminLmsLayout'));
 const AdminLmsCohortsPage = lazy(
   () => import('./components/admin/lms/cohorts/AdminLmsCohortsPage')
 );
@@ -75,6 +69,12 @@ const AffiliateAssetsPage = lazy(() => import('./components/affiliate/AffiliateA
 const AffiliateSettingsPage = lazy(() => import('./components/affiliate/AffiliateSettingsPage'));
 const AffiliateOnboard = lazy(() => import('./components/affiliate/AffiliateOnboard'));
 const AdminAffiliatesPage = lazy(() => import('./components/admin/affiliates/AdminAffiliatesPage'));
+
+// Legacy redirect helper for /admin/lms/curriculum/:cohortId → /admin/courses/curriculum/:cohortId
+const LmsCurriculumRedirect: React.FC = () => {
+  const { cohortId } = useParams<{ cohortId: string }>();
+  return <Navigate to={`/admin/courses/curriculum/${cohortId}`} replace />;
+};
 
 const App: React.FC = () => {
   const { isAuthenticated, isLoading, mode } = useAuth();
@@ -129,34 +129,65 @@ const App: React.FC = () => {
           <Route path="resources" element={<ResourcesPage />} />
         </Route>
 
-        {/* Admin Dashboard */}
-        <Route path="/admin" element={<AdminLayout />}>
-          <Route index element={<Navigate to="/admin/tools" replace />} />
-          <Route path="tools" element={<AdminToolsPage />} />
-          <Route path="onboarding" element={<AdminOnboardingPage />} />
+        {/* Unified Admin Dashboard */}
+        <Route path="/admin" element={<UnifiedAdminLayout />}>
+          <Route index element={<Navigate to="/admin/courses" replace />} />
+          {/* Courses */}
+          <Route path="courses" element={<AdminLmsCohortsPage />} />
+          <Route path="courses/students" element={<AdminStudentsPage />} />
+          <Route path="courses/curriculum" element={<AdminLmsCurriculumPage />} />
+          <Route path="courses/curriculum/:cohortId" element={<AdminLmsCurriculumPage />} />
+          <Route path="courses/invite-codes" element={<AdminBootcampInviteCodesPage />} />
+          <Route path="courses/surveys" element={<AdminSurveyResponsesPage />} />
+          <Route path="courses/onboarding" element={<AdminBootcampOnboardingPage />} />
+          <Route path="courses/ai-tools" element={<AdminAIToolsPage />} />
+          <Route path="courses/settings" element={<AdminBootcampSettingsPage />} />
+          {/* Blueprints */}
           <Route path="blueprints" element={<AdminBlueprintsPage />} />
+          {/* GC Portal */}
+          <Route path="gc/tools" element={<AdminToolsPage />} />
+          <Route path="gc/onboarding" element={<AdminOnboardingPage />} />
+          {/* Affiliates */}
           <Route path="affiliates" element={<AdminAffiliatesPage />} />
+          {/* Legacy redirects (within layout) */}
+          <Route path="tools" element={<Navigate to="/admin/gc/tools" replace />} />
+          <Route path="onboarding" element={<Navigate to="/admin/gc/onboarding" replace />} />
         </Route>
 
-        {/* Bootcamp Admin Dashboard */}
-        <Route path="/admin/bootcamp" element={<AdminBootcampLayout />}>
-          <Route index element={<Navigate to="/admin/bootcamp/students" replace />} />
-          <Route path="students" element={<AdminStudentsPage />} />
-          <Route path="surveys" element={<AdminSurveyResponsesPage />} />
-          <Route path="cohorts" element={<Navigate to="/admin/lms/cohorts" replace />} />
-          <Route path="invite-codes" element={<AdminBootcampInviteCodesPage />} />
-          <Route path="onboarding" element={<AdminBootcampOnboardingPage />} />
-          <Route path="ai-tools" element={<AdminAIToolsPage />} />
-          <Route path="settings" element={<AdminBootcampSettingsPage />} />
-        </Route>
-
-        {/* LMS Admin Dashboard */}
-        <Route path="/admin/lms" element={<AdminLmsLayout />}>
-          <Route index element={<Navigate to="/admin/lms/cohorts" replace />} />
-          <Route path="cohorts" element={<AdminLmsCohortsPage />} />
-          <Route path="curriculum" element={<AdminLmsCurriculumPage />} />
-          <Route path="curriculum/:cohortId" element={<AdminLmsCurriculumPage />} />
-        </Route>
+        {/* Legacy admin redirects (outside layout to avoid rendering it) */}
+        <Route path="/admin/bootcamp" element={<Navigate to="/admin/courses" replace />} />
+        <Route
+          path="/admin/bootcamp/students"
+          element={<Navigate to="/admin/courses/students" replace />}
+        />
+        <Route
+          path="/admin/bootcamp/surveys"
+          element={<Navigate to="/admin/courses/surveys" replace />}
+        />
+        <Route
+          path="/admin/bootcamp/invite-codes"
+          element={<Navigate to="/admin/courses/invite-codes" replace />}
+        />
+        <Route
+          path="/admin/bootcamp/onboarding"
+          element={<Navigate to="/admin/courses/onboarding" replace />}
+        />
+        <Route
+          path="/admin/bootcamp/ai-tools"
+          element={<Navigate to="/admin/courses/ai-tools" replace />}
+        />
+        <Route
+          path="/admin/bootcamp/settings"
+          element={<Navigate to="/admin/courses/settings" replace />}
+        />
+        <Route path="/admin/bootcamp/*" element={<Navigate to="/admin/courses" replace />} />
+        <Route path="/admin/lms" element={<Navigate to="/admin/courses" replace />} />
+        <Route path="/admin/lms/cohorts" element={<Navigate to="/admin/courses" replace />} />
+        <Route
+          path="/admin/lms/curriculum"
+          element={<Navigate to="/admin/courses/curriculum" replace />}
+        />
+        <Route path="/admin/lms/curriculum/:cohortId" element={<LmsCurriculumRedirect />} />
 
         {/* Affiliate — Public */}
         <Route path="/refer/:slug" element={<ReferralLandingPage />} />

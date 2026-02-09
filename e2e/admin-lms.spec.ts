@@ -24,15 +24,15 @@ test.describe('Admin LMS Management', () => {
     await mockSupabaseQuery(page, 'lms_action_item_progress', []);
   });
 
-  test('cohort list loads at /admin/lms/cohorts', async ({ page }) => {
-    await navigateTo(page, '/admin/lms/cohorts');
+  test('cohort list loads at /admin/courses (courses overview)', async ({ page }) => {
+    await navigateTo(page, '/admin/courses');
     await waitForSPALoad(page);
 
     await expect(page.getByText(lmsCohort.name).first()).toBeVisible({ timeout: 10_000 });
   });
 
   test('create new cohort form', async ({ page }) => {
-    await navigateTo(page, '/admin/lms/cohorts');
+    await navigateTo(page, '/admin/courses');
     await waitForSPALoad(page);
 
     // Click create/add button
@@ -49,9 +49,9 @@ test.describe('Admin LMS Management', () => {
     }
   });
 
-  test('curriculum editor at /admin/lms/cohorts/:id/curriculum', async ({ page }) => {
+  test('curriculum editor at /admin/courses/:id/curriculum', async ({ page }) => {
     // Navigate to the curriculum editor for the cohort
-    await navigateTo(page, `/admin/lms/curriculum/${lmsCohort.id}`);
+    await navigateTo(page, `/admin/courses/curriculum/${lmsCohort.id}`);
     await waitForSPALoad(page);
 
     // Should show week titles from the curriculum
@@ -59,7 +59,7 @@ test.describe('Admin LMS Management', () => {
   });
 
   test('add week, add lesson, add content item', async ({ page }) => {
-    await navigateTo(page, `/admin/lms/curriculum/${lmsCohort.id}`);
+    await navigateTo(page, `/admin/courses/curriculum/${lmsCohort.id}`);
     await waitForSPALoad(page);
 
     // Look for "Add Week" button
@@ -89,7 +89,7 @@ test.describe('Admin LMS Management', () => {
   });
 
   test('drag-and-drop reordering (test sort order change)', async ({ page }) => {
-    await navigateTo(page, `/admin/lms/curriculum/${lmsCohort.id}`);
+    await navigateTo(page, `/admin/courses/curriculum/${lmsCohort.id}`);
     await waitForSPALoad(page);
 
     // Find draggable items (weeks or lessons)
@@ -107,7 +107,7 @@ test.describe('Admin LMS Management', () => {
   });
 
   test('student management page loads', async ({ page }) => {
-    await navigateTo(page, '/admin/bootcamp/students');
+    await navigateTo(page, '/admin/courses/students');
     await waitForSPALoad(page);
 
     // Should show the student list

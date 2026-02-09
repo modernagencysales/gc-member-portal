@@ -88,12 +88,20 @@ src/
 | `/bootcamp/surveys` | Student surveys |
 | `/bootcamp/settings` | Account settings |
 | `/bootcamp/tam-builder` | TAM builder |
-| `/admin` | Admin home |
-| `/admin/tools` | Tool management |
-| `/admin/onboarding` | Onboarding config |
-| `/admin/blueprints` | Blueprint management |
-| `/admin/bootcamp/*` | Bootcamp admin |
-| `/admin/lms/*` | LMS content editor |
+| `/admin` | Redirects to /admin/courses |
+| `/admin/courses` | Courses overview (cohort list) |
+| `/admin/courses/students` | Student roster + CSV import |
+| `/admin/courses/curriculum` | Curriculum editor |
+| `/admin/courses/curriculum/:id` | Curriculum editor (specific cohort) |
+| `/admin/courses/invite-codes` | Invite codes |
+| `/admin/courses/surveys` | Survey responses |
+| `/admin/courses/onboarding` | Course onboarding checklist |
+| `/admin/courses/ai-tools` | AI tool management |
+| `/admin/courses/settings` | Course settings |
+| `/admin/blueprints` | Blueprint/prospect management |
+| `/admin/gc/tools` | GC member tool access |
+| `/admin/gc/onboarding` | GC onboarding checklist |
+| `/admin/affiliates` | Affiliate program |
 
 ## Database Models
 

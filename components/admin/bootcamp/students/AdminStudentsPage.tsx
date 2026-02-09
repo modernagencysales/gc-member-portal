@@ -14,7 +14,8 @@ import StudentTable from './StudentTable';
 import StudentModal from './StudentModal';
 import StudentSurveyModal from './StudentSurveyModal';
 import GenerateBlueprintModal from './GenerateBlueprintModal';
-import { Plus, Search, Filter, RefreshCw } from 'lucide-react';
+import { Plus, Search, Filter, RefreshCw, Upload } from 'lucide-react';
+import StudentCsvImportModal from './StudentCsvImportModal';
 
 interface StudentWithProgress extends BootcampStudent {
   onboardingProgress: number;
@@ -34,6 +35,7 @@ const AdminStudentsPage: React.FC = () => {
   const [slackLoadingId, setSlackLoadingId] = useState<string | undefined>();
   const [calendarLoadingId, setCalendarLoadingId] = useState<string | undefined>();
   const [blueprintStudent, setBlueprintStudent] = useState<BootcampStudent | null>(null);
+  const [showCsvImport, setShowCsvImport] = useState(false);
 
   // Queries
   const {
@@ -188,6 +190,17 @@ const AdminStudentsPage: React.FC = () => {
             <RefreshCw className="w-5 h-5" />
           </button>
           <button
+            onClick={() => setShowCsvImport(true)}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium border ${
+              isDarkMode
+                ? 'border-slate-700 hover:bg-slate-800 text-slate-300'
+                : 'border-slate-300 hover:bg-slate-50 text-slate-700'
+            }`}
+          >
+            <Upload className="w-4 h-4" />
+            Import CSV
+          </button>
+          <button
             onClick={handleAddStudent}
             className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-blue-600 text-white hover:bg-blue-700"
           >
@@ -330,6 +343,8 @@ const AdminStudentsPage: React.FC = () => {
         studentName={blueprintStudent?.name}
         studentEmail={blueprintStudent?.email || ''}
       />
+
+      <StudentCsvImportModal isOpen={showCsvImport} onClose={() => setShowCsvImport(false)} />
     </div>
   );
 };

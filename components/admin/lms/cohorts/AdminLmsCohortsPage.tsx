@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { fetchAllLmsCohorts } from '../../../../services/lms-supabase';
+import { fetchAllLmsCohorts, fetchLmsWeeksByCohort } from '../../../../services/lms-supabase';
 import { queryKeys } from '../../../../lib/queryClient';
 import { useTheme } from '../../../../context/ThemeContext';
 import {
@@ -25,7 +25,9 @@ import {
   BookOpen,
   Calendar,
   FileEdit,
+  Upload,
 } from 'lucide-react';
+import CsvImportModal from '../curriculum/CsvImportModal';
 
 const AdminLmsCohortsPage: React.FC = () => {
   const { isDarkMode } = useTheme();
@@ -38,6 +40,8 @@ const AdminLmsCohortsPage: React.FC = () => {
   const [editingCohort, setEditingCohort] = useState<LmsCohort | null>(null);
   const [deletingCohort, setDeletingCohort] = useState<LmsCohort | null>(null);
   const [duplicatingCohort, setDuplicatingCohort] = useState<LmsCohort | null>(null);
+  const [importingCohort, setImportingCohort] = useState<LmsCohort | null>(null);
+  const [importingWeekCount, setImportingWeekCount] = useState(0);
 
   // Queries
   const {
@@ -129,7 +133,7 @@ const AdminLmsCohortsPage: React.FC = () => {
   };
 
   const handleManageCurriculum = (cohort: LmsCohort) => {
-    navigate(`/admin/lms/curriculum/${cohort.id}`);
+    navigate(`/admin/courses/curriculum/${cohort.id}`);
   };
 
   return (
@@ -137,9 +141,9 @@ const AdminLmsCohortsPage: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-xl font-semibold">LMS Cohorts</h2>
+          <h2 className="text-xl font-semibold">Courses</h2>
           <p className={`text-sm mt-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
-            Manage curriculum cohorts - each cohort has independent content
+            Manage courses and cohorts
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -347,6 +351,19 @@ const AdminLmsCohortsPage: React.FC = () => {
                     <td className="px-4 py-3">
                       <div className="flex items-center justify-end gap-1">
                         <button
+                          onClick={async () => {
+                            const weeks = await fetchLmsWeeksByCohort(cohort.id);
+                            setImportingWeekCount(weeks.length);
+                            setImportingCohort(cohort);
+                          }}
+                          className={`p-2 rounded-lg ${
+                            isDarkMode ? 'hover:bg-slate-700' : 'hover:bg-slate-100'
+                          }`}
+                          title="Import CSV"
+                        >
+                          <Upload className="w-4 h-4" />
+                        </button>
+                        <button
                           onClick={() => handleManageCurriculum(cohort)}
                           className={`p-2 rounded-lg text-violet-500 ${
                             isDarkMode ? 'hover:bg-slate-700' : 'hover:bg-slate-100'
@@ -425,6 +442,16 @@ const AdminLmsCohortsPage: React.FC = () => {
         sourceCohort={duplicatingCohort}
         isLoading={duplicateMutation.isPending}
       />
+
+      {/* CSV Import Modal */}
+      {importingCohort && (
+        <CsvImportModal
+          isOpen={!!importingCohort}
+          onClose={() => setImportingCohort(null)}
+          cohortId={importingCohort.id}
+          existingWeekCount={importingWeekCount}
+        />
+      )}
 
       {/* Delete Confirmation Modal */}
       {deletingCohort && (

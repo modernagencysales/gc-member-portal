@@ -131,7 +131,7 @@ const AdminLmsCurriculumPage: React.FC = () => {
           {cohorts?.map((cohort) => (
             <button
               key={cohort.id}
-              onClick={() => navigate(`/admin/lms/curriculum/${cohort.id}`)}
+              onClick={() => navigate(`/admin/courses/curriculum/${cohort.id}`)}
               className={`p-4 rounded-lg border text-left ${
                 isDarkMode
                   ? 'border-zinc-700 hover:bg-zinc-800'
@@ -177,7 +177,7 @@ const AdminLmsCurriculumPage: React.FC = () => {
       {/* Header */}
       <div className="flex items-center gap-4 mb-6">
         <button
-          onClick={() => navigate('/admin/lms/cohorts')}
+          onClick={() => navigate('/admin/courses')}
           className={`p-2 rounded-lg ${isDarkMode ? 'hover:bg-zinc-800' : 'hover:bg-zinc-100'}`}
         >
           <ArrowLeft className="w-5 h-5" />
@@ -189,7 +189,7 @@ const AdminLmsCurriculumPage: React.FC = () => {
             <div className="relative">
               <select
                 value={cohortId}
-                onChange={(e) => navigate(`/admin/lms/curriculum/${e.target.value}`)}
+                onChange={(e) => navigate(`/admin/courses/curriculum/${e.target.value}`)}
                 className={`appearance-none pl-3 pr-8 py-1.5 rounded-lg border text-sm ${
                   isDarkMode
                     ? 'bg-zinc-800 border-zinc-700 text-white'

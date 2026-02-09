@@ -18,8 +18,8 @@ test.describe('Admin Dashboard', () => {
     await navigateTo(page, '/admin');
     await waitForSPALoad(page);
 
-    // Admin index redirects to /admin/tools
-    await expect(page).toHaveURL(/\/admin\/tools/);
+    // Admin index redirects to /admin/courses
+    await expect(page).toHaveURL(/\/admin\/courses/);
     const heading = page.getByRole('heading').first();
     await expect(heading).toBeVisible();
   });
