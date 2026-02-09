@@ -104,6 +104,45 @@ function mapTamJob(record: Record<string, unknown>): TamJob {
 // TAM Projects
 // ============================================
 
+export async function createImportProject(
+  userId: string,
+  name: string
+): Promise<{ project: TamProject; companyId: string }> {
+  // Create project with no ICP profile (import bypasses wizard)
+  const { data: projectData, error: projectError } = await supabase
+    .from('tam_projects')
+    .insert({
+      user_id: userId,
+      name,
+      status: 'enriching',
+      icp_profile: null,
+      sourcing_strategy: null,
+    })
+    .select()
+    .single();
+
+  if (projectError) throw new Error(projectError.message);
+
+  // Create a placeholder company for the imported contacts
+  const { data: companyData, error: companyError } = await supabase
+    .from('tam_companies')
+    .insert({
+      project_id: projectData.id,
+      name: 'Imported List',
+      source: 'csv_import',
+      qualification_status: 'qualified',
+    })
+    .select('id')
+    .single();
+
+  if (companyError) throw new Error(companyError.message);
+
+  return {
+    project: mapTamProject(projectData),
+    companyId: companyData.id as string,
+  };
+}
+
 export async function createTamProject(
   input: TamProjectInput & { userId: string }
 ): Promise<TamProject> {

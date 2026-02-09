@@ -13,9 +13,10 @@ import { useTamPipeline } from '../../hooks/useTamPipeline';
 import IcpWizard from './IcpWizard';
 import TamDashboard from './TamDashboard';
 import PipelineProgress from './PipelineProgress';
+import TamCsvImport from './TamCsvImport';
 import { ChatInterface } from '../chat';
 
-type Phase = 'wizard' | 'pipeline' | 'chat' | 'dashboard';
+type Phase = 'wizard' | 'pipeline' | 'chat' | 'dashboard' | 'import';
 type TabView = 'strategy' | 'pipeline' | 'list';
 
 interface TamBuilderProps {
@@ -66,9 +67,18 @@ const TamBuilder: React.FC<TamBuilderProps> = ({ userId }) => {
           }
           break;
         case 'sourcing':
-        case 'enriching':
           setPhase('chat');
           setActiveTab('strategy');
+          break;
+        case 'enriching':
+          // Imported projects have no ICP profile — show dashboard (may still be running)
+          if (!resumableProject.icpProfile) {
+            setPhase('dashboard');
+            setActiveTab('list');
+          } else {
+            setPhase('chat');
+            setActiveTab('strategy');
+          }
           break;
         case 'complete':
           setPhase('dashboard');
@@ -138,6 +148,16 @@ const TamBuilder: React.FC<TamBuilderProps> = ({ userId }) => {
     }
   };
 
+  // Handle CSV import completion
+  const handleImportComplete = (projectId: string) => {
+    setActiveProjectId(projectId);
+    queryClient.invalidateQueries({ queryKey: queryKeys.tamProjects(userId) });
+    queryClient.invalidateQueries({ queryKey: queryKeys.tamContacts(projectId) });
+    queryClient.invalidateQueries({ queryKey: queryKeys.tamStats(projectId) });
+    setPhase('dashboard');
+    setActiveTab('list');
+  };
+
   // Start a new project from scratch
   const handleNewProject = () => {
     setActiveProjectId(null);
@@ -166,23 +186,26 @@ const TamBuilder: React.FC<TamBuilderProps> = ({ userId }) => {
   return (
     <div className="h-full flex flex-col">
       {/* Header with tab navigation (shown in non-wizard phases with active project) */}
-      {phase !== 'wizard' && activeProjectId && (
+      {phase !== 'wizard' && phase !== 'import' && activeProjectId && (
         <div className="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 px-6 py-3">
           <div className="flex items-center gap-1">
-            <button
-              onClick={() => {
-                setPhase('chat');
-                setActiveTab('strategy');
-              }}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                phase === 'chat' && activeTab === 'strategy'
-                  ? 'bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300'
-                  : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800'
-              }`}
-            >
-              <MessageSquare className="w-4 h-4" />
-              Strategy
-            </button>
+            {/* Hide Strategy tab for imported projects (no ICP profile) */}
+            {activeProject?.icpProfile && (
+              <button
+                onClick={() => {
+                  setPhase('chat');
+                  setActiveTab('strategy');
+                }}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  phase === 'chat' && activeTab === 'strategy'
+                    ? 'bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300'
+                    : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800'
+                }`}
+              >
+                <MessageSquare className="w-4 h-4" />
+                Strategy
+              </button>
+            )}
             {pipeline.isRunning && (
               <button
                 onClick={() => {
@@ -254,6 +277,25 @@ const TamBuilder: React.FC<TamBuilderProps> = ({ userId }) => {
               isSubmitting={isCreating}
               error={wizardError}
             />
+
+            <div className="mt-8 text-center">
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-zinc-200 dark:border-zinc-800" />
+                </div>
+                <div className="relative flex justify-center">
+                  <span className="bg-white dark:bg-zinc-950 px-4 text-sm text-zinc-500 dark:text-zinc-400">
+                    or
+                  </span>
+                </div>
+              </div>
+              <button
+                onClick={() => setPhase('import')}
+                className="mt-4 text-sm font-medium text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:hover:text-violet-300 transition-colors"
+              >
+                Import a List (CSV) to check LinkedIn activity
+              </button>
+            </div>
           </div>
         )}
 
@@ -268,6 +310,17 @@ const TamBuilder: React.FC<TamBuilderProps> = ({ userId }) => {
         {phase === 'chat' && activeProjectId && (
           <div className="h-full">
             <ChatInterface toolSlug="tam-builder" studentId={userId} />
+          </div>
+        )}
+
+        {/* Import Phase */}
+        {phase === 'import' && (
+          <div className="p-6">
+            <TamCsvImport
+              userId={userId}
+              onComplete={handleImportComplete}
+              onBack={() => setPhase('wizard')}
+            />
           </div>
         )}
 

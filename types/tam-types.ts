@@ -9,13 +9,14 @@ export type TamCompanySource =
   | 'blitzapi'
   | 'smartscout'
   | 'discolike'
-  | 'prospeo';
+  | 'prospeo'
+  | 'csv_import';
 
 export type TamQualificationStatus = 'pending' | 'qualified' | 'disqualified';
 
 export type TamEmailStatus = 'found' | 'verified' | 'catch_all' | 'invalid' | 'not_found';
 
-export type TamContactSource = 'blitzapi' | 'apollo' | 'prospeo';
+export type TamContactSource = 'blitzapi' | 'apollo' | 'prospeo' | 'csv_import';
 
 export type TamJobType =
   | 'source_companies'
