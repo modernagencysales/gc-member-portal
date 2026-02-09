@@ -1,4 +1,4 @@
-import { Check } from 'lucide-react';
+import { Check, Globe, Mail, Linkedin } from 'lucide-react';
 import { InfraTier, ServiceProvider } from '../../../../types/infrastructure-types';
 import { useInfraTiers } from '../../../../hooks/useInfrastructure';
 
@@ -8,6 +8,31 @@ interface Props {
   serviceProvider: ServiceProvider;
   onServiceProviderChange: (provider: ServiceProvider) => void;
 }
+
+// Per-tier pricing breakdown (what's included in setup + monthly)
+const TIER_BREAKDOWN: Record<
+  string,
+  { domains: string; plusvibe: string; heyreach: string; domainSetup: string }
+> = {
+  starter: {
+    domainSetup: '~$39',
+    domains: '3 sending domains + 6 mailboxes',
+    plusvibe: 'Email warm-up & cold outreach',
+    heyreach: 'LinkedIn outreach & DM automation',
+  },
+  growth: {
+    domainSetup: '~$65',
+    domains: '5 sending domains + 10 mailboxes',
+    plusvibe: 'Email warm-up & cold outreach',
+    heyreach: 'LinkedIn outreach & DM automation',
+  },
+  scale: {
+    domainSetup: '~$91',
+    domains: '7 sending domains + 14 mailboxes',
+    plusvibe: 'Email warm-up & cold outreach',
+    heyreach: 'LinkedIn outreach & DM automation',
+  },
+};
 
 export default function TierSelection({
   selectedTier,
@@ -28,16 +53,46 @@ export default function TierSelection({
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-lg font-semibold text-zinc-900 dark:text-white">Choose Your Package</h2>
+        <h2 className="text-lg font-semibold text-zinc-900 dark:text-white">
+          Choose Your GTM Infrastructure Package
+        </h2>
         <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
-          Select your email provider and infrastructure tier.
+          Each package includes everything you need for outbound: sending domains with warmed
+          mailboxes, email outreach via PlusVibe, and LinkedIn automation via HeyReach.
         </p>
+      </div>
+
+      {/* What's included banner */}
+      <div className="grid grid-cols-3 gap-3">
+        <div className="flex items-center gap-2.5 p-3 rounded-lg bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-800">
+          <Globe size={16} className="text-emerald-500 flex-shrink-0" />
+          <div>
+            <div className="text-xs font-semibold text-zinc-900 dark:text-white">Domains</div>
+            <div className="text-[11px] text-zinc-500 dark:text-zinc-400">
+              Registered & configured
+            </div>
+          </div>
+        </div>
+        <div className="flex items-center gap-2.5 p-3 rounded-lg bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-800">
+          <Mail size={16} className="text-violet-500 flex-shrink-0" />
+          <div>
+            <div className="text-xs font-semibold text-zinc-900 dark:text-white">PlusVibe</div>
+            <div className="text-[11px] text-zinc-500 dark:text-zinc-400">Email warm-up & send</div>
+          </div>
+        </div>
+        <div className="flex items-center gap-2.5 p-3 rounded-lg bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-800">
+          <Linkedin size={16} className="text-blue-500 flex-shrink-0" />
+          <div>
+            <div className="text-xs font-semibold text-zinc-900 dark:text-white">HeyReach</div>
+            <div className="text-[11px] text-zinc-500 dark:text-zinc-400">LinkedIn outreach</div>
+          </div>
+        </div>
       </div>
 
       {/* Service Provider Toggle */}
       <div>
         <div className="text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-2">
-          Email Provider
+          Default Email Provider (can be mixed per domain later)
         </div>
         <div className="flex gap-2">
           {(['GOOGLE', 'MICROSOFT'] as const).map((provider) => (
@@ -60,6 +115,7 @@ export default function TierSelection({
         {(tiers || []).map((tier) => {
           const isSelected = selectedTier?.id === tier.id;
           const totalMailboxes = tier.domainCount * tier.mailboxesPerDomain;
+          const breakdown = TIER_BREAKDOWN[tier.slug] || TIER_BREAKDOWN.starter;
 
           return (
             <button
@@ -80,10 +136,31 @@ export default function TierSelection({
               <div className="text-base font-semibold text-zinc-900 dark:text-white">
                 {tier.name}
               </div>
-              <div className="mt-3 space-y-1 text-sm text-zinc-500 dark:text-zinc-400">
-                <div>{tier.domainCount} domains</div>
-                <div>{totalMailboxes} mailboxes</div>
-                <div>~{totalMailboxes * 30} emails/day capacity</div>
+
+              {/* What's included */}
+              <div className="mt-3 space-y-2">
+                <div className="flex items-start gap-2">
+                  <Globe size={12} className="text-emerald-500 mt-0.5 flex-shrink-0" />
+                  <span className="text-xs text-zinc-500 dark:text-zinc-400">
+                    {breakdown.domains}
+                  </span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <Mail size={12} className="text-violet-500 mt-0.5 flex-shrink-0" />
+                  <span className="text-xs text-zinc-500 dark:text-zinc-400">
+                    {breakdown.plusvibe}
+                  </span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <Linkedin size={12} className="text-blue-500 mt-0.5 flex-shrink-0" />
+                  <span className="text-xs text-zinc-500 dark:text-zinc-400">
+                    {breakdown.heyreach}
+                  </span>
+                </div>
+              </div>
+
+              <div className="mt-3 text-xs text-zinc-400 dark:text-zinc-500">
+                ~{totalMailboxes * 30} emails/day capacity
               </div>
 
               <div className="mt-4 pt-4 border-t border-zinc-200 dark:border-zinc-800">

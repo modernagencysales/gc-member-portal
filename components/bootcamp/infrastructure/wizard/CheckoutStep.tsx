@@ -1,5 +1,14 @@
 import React, { useState } from 'react';
-import { CreditCard, Check, Loader2, DollarSign, Calendar } from 'lucide-react';
+import {
+  CreditCard,
+  Check,
+  Loader2,
+  DollarSign,
+  Calendar,
+  Globe,
+  Mail,
+  Linkedin,
+} from 'lucide-react';
 import { useTheme } from '../../../../context/ThemeContext';
 import { supabase } from '../../../../lib/supabaseClient';
 import type {
@@ -117,7 +126,7 @@ const CheckoutStep: React.FC<CheckoutStepProps> = ({
       <div>
         <h2 className="text-2xl font-bold mb-2">Complete Setup</h2>
         <p className={`text-sm ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
-          Review your infrastructure package and complete payment
+          Review your GTM infrastructure package and complete payment
         </p>
       </div>
 
@@ -136,48 +145,84 @@ const CheckoutStep: React.FC<CheckoutStepProps> = ({
           <div>
             <h3 className="font-semibold">{tier.name} Package</h3>
             <p className={`text-xs ${isDarkMode ? 'text-zinc-500' : 'text-zinc-600'}`}>
-              {tier.domainCount} domains × {tier.mailboxesPerDomain} mailboxes ={' '}
-              {mailboxPreviews.length} total mailboxes
+              {tier.domainCount} domains, {mailboxPreviews.length} mailboxes, email + LinkedIn
+              outreach
             </p>
           </div>
         </div>
 
         {/* Pricing Breakdown */}
         <div className="space-y-3">
-          <div className="flex items-center justify-between pb-3 border-b border-zinc-700/50">
+          <div className="text-xs font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 mb-1">
+            One-time setup
+          </div>
+
+          <div className="flex items-center justify-between pb-2">
             <div className="flex items-center gap-2">
               <DollarSign className="w-4 h-4 text-zinc-500" />
-              <span className="text-sm">Setup fee</span>
+              <span className="text-sm">Infrastructure setup & configuration</span>
             </div>
             <span className="font-mono font-semibold">${setupFee.toFixed(2)}</span>
           </div>
 
           {totalDomainCost > 0 && (
-            <div className="flex items-center justify-between pb-3 border-b border-zinc-700/50">
+            <div className="flex items-center justify-between pb-2">
               <div className="flex items-center gap-2">
-                <DollarSign className="w-4 h-4 text-zinc-500" />
-                <span className="text-sm">Domains ({domains.length})</span>
+                <Globe className="w-4 h-4 text-emerald-500" />
+                <span className="text-sm">
+                  Domain registration ({domains.length} domain{domains.length !== 1 ? 's' : ''})
+                </span>
               </div>
               <span className="font-mono font-semibold">${totalDomainCost.toFixed(2)}</span>
             </div>
           )}
 
-          <div className="flex items-center justify-between pb-3 border-b border-zinc-700/50">
-            <div className="flex items-center gap-2">
-              <Calendar className="w-4 h-4 text-zinc-500" />
-              <span className="text-sm">Monthly subscription</span>
+          <div className={`border-t pt-3 ${isDarkMode ? 'border-zinc-700/50' : 'border-zinc-200'}`}>
+            <div className="flex items-center justify-between">
+              <span className="font-semibold">Due today</span>
+              <span className="text-xl font-bold text-violet-600">${totalOneTime.toFixed(2)}</span>
             </div>
-            <span className="font-mono font-semibold">${monthlyFee.toFixed(2)}/mo</span>
           </div>
 
-          <div className="flex items-center justify-between pt-2">
-            <span className="font-semibold">Due today</span>
-            <span className="text-xl font-bold text-violet-600">${totalOneTime.toFixed(2)}</span>
-          </div>
+          <div
+            className={`border-t pt-3 mt-3 ${isDarkMode ? 'border-zinc-700/50' : 'border-zinc-200'}`}
+          >
+            <div className="text-xs font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 mb-2">
+              Monthly subscription
+            </div>
 
-          <p className={`text-xs ${isDarkMode ? 'text-zinc-500' : 'text-zinc-600'}`}>
-            Then ${monthlyFee.toFixed(2)}/month starting next billing cycle
-          </p>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Globe className="w-3.5 h-3.5 text-emerald-500" />
+                  <span className="text-sm">Domain hosting & mailboxes</span>
+                </div>
+                <span className="text-xs text-zinc-400">included</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Mail className="w-3.5 h-3.5 text-violet-500" />
+                  <span className="text-sm">PlusVibe email warm-up & sending</span>
+                </div>
+                <span className="text-xs text-zinc-400">included</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Linkedin className="w-3.5 h-3.5 text-blue-500" />
+                  <span className="text-sm">HeyReach LinkedIn outreach</span>
+                </div>
+                <span className="text-xs text-zinc-400">included</span>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between mt-3 pt-2 border-t border-zinc-700/30">
+              <div className="flex items-center gap-2">
+                <Calendar className="w-4 h-4 text-zinc-500" />
+                <span className="font-semibold text-sm">Monthly total</span>
+              </div>
+              <span className="font-mono font-semibold">${monthlyFee.toFixed(2)}/mo</span>
+            </div>
+          </div>
         </div>
       </div>
 

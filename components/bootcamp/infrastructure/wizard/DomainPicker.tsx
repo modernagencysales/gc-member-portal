@@ -14,23 +14,6 @@ interface Props {
   defaultServiceProvider: ServiceProvider;
 }
 
-function suggestDomains(brandName: string): string[] {
-  const clean = brandName.toLowerCase().replace(/[^a-z0-9]/g, '');
-  if (!clean) return [];
-  const prefixes = ['get', 'try', 'use', 'go', 'hey', 'meet', 'with', 'join'];
-  const suffixes = ['hq', 'app', 'mail', 'team', 'co', 'now', 'pro'];
-  const tlds = ['com', 'io', 'net'];
-  const suggestions: string[] = [];
-  tlds.forEach((tld) => suggestions.push(`${clean}.${tld}`));
-  prefixes.forEach((p) => suggestions.push(`${p}${clean}.com`));
-  suffixes.forEach((s) => suggestions.push(`${clean}${s}.com`));
-  suffixes.slice(0, 4).forEach((s) => suggestions.push(`${clean}-${s}.com`));
-  prefixes
-    .slice(0, 3)
-    .forEach((p) => tlds.slice(1).forEach((tld) => suggestions.push(`${p}${clean}.${tld}`)));
-  return [...new Set(suggestions)];
-}
-
 export default function DomainPicker({
   tier,
   selectedDomains,
@@ -46,8 +29,11 @@ export default function DomainPicker({
   const maxDomains = tier.domainCount;
 
   const checkAvailability = async () => {
-    const suggestions = suggestDomains(brandName);
-    if (!suggestions.length) return;
+    const clean = brandName
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]/g, '');
+    if (!clean) return;
     setChecking(true);
     setFetchError(null);
     try {
@@ -59,7 +45,7 @@ export default function DomainPicker({
       const res = await fetch(`${gtmSystemUrl}/api/infrastructure/domains/check`, {
         method: 'POST',
         headers,
-        body: JSON.stringify({ domains: suggestions }),
+        body: JSON.stringify({ domain: `${clean}.com` }),
       });
       if (!res.ok) {
         const errData = await res.json().catch(() => ({}));
@@ -102,13 +88,16 @@ export default function DomainPicker({
     );
   };
 
+  const availableOnly = availableDomains.filter((d) => d.status === 'AVAILABLE');
+  const unavailableOnly = availableDomains.filter((d) => d.status !== 'AVAILABLE');
+
   return (
     <div className="space-y-6">
       <div>
         <h2 className="text-lg font-semibold text-zinc-900 dark:text-white">Pick Your Domains</h2>
         <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
-          Enter your brand name and we'll suggest available domains. Select {maxDomains}. You can
-          mix Google Workspace and Microsoft 365 across domains.
+          Enter your brand name and we'll find available domains. Select up to {maxDomains}. You can
+          mix Google Workspace and Microsoft 365 per domain.
         </p>
       </div>
 
@@ -195,24 +184,21 @@ export default function DomainPicker({
       )}
 
       {/* Available domains grid */}
-      {availableDomains.length > 0 && (
+      {availableOnly.length > 0 && (
         <div className="grid gap-2 sm:grid-cols-2">
-          {availableDomains.map((domain) => {
+          {availableOnly.map((domain) => {
             const isSelected = selectedDomains.some((d) => d.domainName === domain.domainName);
-            const isAvailable = domain.status === 'AVAILABLE';
             const isFull = selectedDomains.length >= maxDomains && !isSelected;
 
             return (
               <button
                 key={domain.domainName}
                 onClick={() => toggleDomain(domain)}
-                disabled={!isAvailable || isFull}
+                disabled={isFull}
                 className={`flex items-center justify-between p-3 rounded-lg border text-left text-sm transition-all ${
                   isSelected
                     ? 'border-violet-500 bg-violet-500/5 dark:bg-violet-500/10'
-                    : isAvailable
-                      ? 'border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700'
-                      : 'border-zinc-100 dark:border-zinc-900 opacity-40'
+                    : 'border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700'
                 } ${isFull && !isSelected ? 'opacity-40 cursor-not-allowed' : ''}`}
               >
                 <div className="flex items-center gap-2">
@@ -231,13 +217,17 @@ export default function DomainPicker({
                     {domain.domainName}
                   </span>
                 </div>
-                {isAvailable && (
-                  <span className="text-xs text-zinc-400">${domain.domainPrice.toFixed(2)}</span>
-                )}
-                {!isAvailable && <span className="text-xs text-red-400">Taken</span>}
+                <span className="text-xs text-zinc-400">${domain.domainPrice.toFixed(2)}</span>
               </button>
             );
           })}
+        </div>
+      )}
+
+      {/* Unavailable domains (collapsed) */}
+      {unavailableOnly.length > 0 && (
+        <div className="text-xs text-zinc-400 dark:text-zinc-600">
+          {unavailableOnly.length} domain{unavailableOnly.length !== 1 ? 's' : ''} unavailable
         </div>
       )}
     </div>
