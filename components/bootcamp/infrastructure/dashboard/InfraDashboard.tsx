@@ -141,7 +141,9 @@ export default function InfraDashboard({ emailInfra, outreachTools, userId }: Pr
               onClick={() => {
                 // Navigate to infrastructure wizard — the wizard will detect existing provisions
                 // and pre-select the missing product
-                window.location.href = '/bootcamp?lesson=virtual:infrastructure-manager&add=true';
+                window.location.href = !emailInfra
+                  ? '/bootcamp?lesson=virtual:infra-email-infra'
+                  : '/bootcamp?lesson=virtual:infra-account-setup';
               }}
               className="flex items-center gap-2 px-4 py-2 bg-violet-600 hover:bg-violet-700 text-white text-sm font-medium rounded-lg transition-colors"
             >

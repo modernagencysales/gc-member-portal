@@ -62,6 +62,9 @@ const InfrastructurePage = lazy(
 const ColdEmailRecipesPage = lazy(
   () => import('../../components/bootcamp/cold-email-recipes/ColdEmailRecipesPage')
 );
+const EmailEnrichmentPage = lazy(
+  () => import('../../components/bootcamp/email-enrichment/EmailEnrichmentPage')
+);
 
 const BootcampApp: React.FC = () => {
   const queryClient = useQueryClient();
@@ -713,7 +716,9 @@ const BootcampApp: React.FC = () => {
                 >
                   <ConnectionQualifier userId={bootcampStudent?.id || ''} />
                 </Suspense>
-              ) : currentLesson.id === 'virtual:infrastructure-manager' ? (
+              ) : currentLesson.id === 'virtual:infra-account-setup' ||
+                currentLesson.id === 'virtual:infra-email-infra' ||
+                currentLesson.id === 'virtual:infrastructure-manager' ? (
                 <Suspense
                   fallback={
                     <div className="flex items-center justify-center h-96">
@@ -721,7 +726,14 @@ const BootcampApp: React.FC = () => {
                     </div>
                   }
                 >
-                  <InfrastructurePage userId={bootcampStudent?.id || ''} />
+                  <InfrastructurePage
+                    userId={bootcampStudent?.id || ''}
+                    mode={
+                      currentLesson.id === 'virtual:infra-email-infra'
+                        ? 'email_infra'
+                        : 'account_setup'
+                    }
+                  />
                 </Suspense>
               ) : currentLesson.id === 'virtual:cold-email-recipes' ? (
                 <Suspense
@@ -733,8 +745,18 @@ const BootcampApp: React.FC = () => {
                 >
                   <ColdEmailRecipesPage userId={bootcampStudent?.id || ''} />
                 </Suspense>
+              ) : currentLesson.id === 'virtual:email-enrichment' ? (
+                <Suspense
+                  fallback={
+                    <div className="flex items-center justify-center h-96">
+                      <div className="w-8 h-8 border-2 border-zinc-300 dark:border-zinc-700 border-t-violet-500 rounded-full animate-spin" />
+                    </div>
+                  }
+                >
+                  <EmailEnrichmentPage userId={bootcampStudent?.id || ''} />
+                </Suspense>
               ) : currentLesson.id === 'virtual:my-posts' ? (
-                <MyPosts prospectId={bootcampStudent?.prospectId} />
+                <MyPosts prospectId={bootcampStudent?.prospectId} studentId={bootcampStudent?.id} />
               ) : (
                 <LessonView
                   lesson={currentLesson}

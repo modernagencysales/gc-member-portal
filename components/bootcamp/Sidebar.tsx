@@ -26,6 +26,8 @@ import {
   BookOpen,
   Server,
   Mail,
+  MessageSquare,
+  Send,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import type { FunnelAccessState } from '../../hooks/useFunnelAccess';
@@ -92,7 +94,10 @@ const Sidebar: React.FC<SidebarProps> = ({
   };
   const [expandedWeeks, setExpandedWeeks] = useState<string[]>(data.weeks.map((w) => w.id));
   const [expandedGroups, setExpandedGroups] = useState<string[]>([
-    'gpts',
+    'lead-magnet',
+    'profile-posts',
+    'outbound',
+    'linkedin',
     'tables',
     'logins',
     'infrastructure',
@@ -511,86 +516,131 @@ const Sidebar: React.FC<SidebarProps> = ({
                 </button>
               )}
 
-              {/* AI Tools */}
-              {(aiTools.length > 0 || toolGroups.gpts.length > 0) && (
+              {/* Lead Magnet */}
+              {aiTools.length > 0 && (
                 <div className="space-y-0.5">
                   <button
-                    onClick={() => toggleGroup('gpts')}
+                    onClick={() => toggleGroup('lead-magnet')}
                     className="w-full flex items-center justify-between p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-400 transition-colors"
                   >
                     <div className="flex items-center gap-2.5 text-xs font-medium">
                       <Sparkles size={12} className="text-violet-500" />
-                      <span>AI Tools</span>
+                      <span>Lead Magnet</span>
                     </div>
-                    {isGroupExpanded('gpts') ? (
+                    {isGroupExpanded('lead-magnet') ? (
                       <ChevronDown size={12} />
                     ) : (
                       <ChevronRight size={12} />
                     )}
                   </button>
-                  {isGroupExpanded('gpts') && (
+                  {isGroupExpanded('lead-magnet') && (
                     <div className="ml-4 border-l border-zinc-200 dark:border-zinc-800 pl-1.5">
                       {(isFunnelAccess && grantedTools
                         ? aiTools.filter((t) => grantedTools.some((g) => g.toolSlug === t.slug))
                         : aiTools
-                      ).map(renderAIToolItem)}
-                      {toolGroups.gpts.map(renderToolItem)}
-                      <button
-                        onClick={() => {
-                          onSelectLesson({
-                            id: 'virtual:tam-builder',
-                            title: 'TAM Builder',
-                            embedUrl: 'virtual:tam-builder',
-                          });
-                          onCloseMobile();
-                        }}
-                        className={`flex items-center w-full py-1.5 px-3 rounded-lg text-[11px] transition-all ${
-                          currentLessonId === 'virtual:tam-builder'
-                            ? 'bg-violet-500/10 text-violet-600 dark:text-violet-400 font-medium'
-                            : 'text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100'
-                        }`}
-                      >
-                        <span
-                          className={`mr-2.5 shrink-0 ${
-                            currentLessonId === 'virtual:tam-builder'
-                              ? 'text-violet-500'
-                              : 'text-zinc-400 dark:text-zinc-600'
-                          }`}
-                        >
-                          <Target size={14} />
-                        </span>
-                        <span className="truncate">TAM Builder</span>
-                      </button>
-                      <button
-                        onClick={() => {
-                          onSelectLesson({
-                            id: 'virtual:connection-qualifier',
-                            title: 'Connection Qualifier',
-                            embedUrl: 'virtual:connection-qualifier',
-                          });
-                          onCloseMobile();
-                        }}
-                        className={`flex items-center w-full py-1.5 px-3 rounded-lg text-[11px] transition-all ${
-                          currentLessonId === 'virtual:connection-qualifier'
-                            ? 'bg-violet-500/10 text-violet-600 dark:text-violet-400 font-medium'
-                            : 'text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100'
-                        }`}
-                      >
-                        <span
-                          className={`mr-2.5 shrink-0 ${
-                            currentLessonId === 'virtual:connection-qualifier'
-                              ? 'text-violet-500'
-                              : 'text-zinc-400 dark:text-zinc-600'
-                          }`}
-                        >
-                          <Users size={14} />
-                        </span>
-                        <span className="truncate">Connection Qualifier</span>
-                      </button>
+                      )
+                        .filter((t) =>
+                          [
+                            'lead-magnet-ideator',
+                            'lead-magnet-creator',
+                            'lead-magnet-post-creator',
+                            'lead-magnet-email-sequence',
+                            'thank-you-page-vsl-creator',
+                          ].includes(t.slug)
+                        )
+                        .map(renderAIToolItem)}
                     </div>
                   )}
                 </div>
               )}
+
+              {/* Profile + Posts */}
+              {aiTools.length > 0 && (
+                <div className="space-y-0.5">
+                  <button
+                    onClick={() => toggleGroup('profile-posts')}
+                    className="w-full flex items-center justify-between p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-400 transition-colors"
+                  >
+                    <div className="flex items-center gap-2.5 text-xs font-medium">
+                      <FileText size={12} className="text-blue-500" />
+                      <span>Profile + Posts</span>
+                    </div>
+                    {isGroupExpanded('profile-posts') ? (
+                      <ChevronDown size={12} />
+                    ) : (
+                      <ChevronRight size={12} />
+                    )}
+                  </button>
+                  {isGroupExpanded('profile-posts') && (
+                    <div className="ml-4 border-l border-zinc-200 dark:border-zinc-800 pl-1.5">
+                      {(isFunnelAccess && grantedTools
+                        ? aiTools.filter((t) => grantedTools.some((g) => g.toolSlug === t.slug))
+                        : aiTools
+                      )
+                        .filter((t) =>
+                          [
+                            'profile-optimizer',
+                            'transcript-post-idea-grabber',
+                            'post-generator',
+                            'post-finalizer',
+                          ].includes(t.slug)
+                        )
+                        .map(renderAIToolItem)}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* LinkedIn */}
+              <div className="space-y-0.5">
+                <button
+                  onClick={() => toggleGroup('linkedin')}
+                  className="w-full flex items-center justify-between p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-400 transition-colors"
+                >
+                  <div className="flex items-center gap-2.5 text-xs font-medium">
+                    <MessageSquare size={12} className="text-blue-500" />
+                    <span>LinkedIn</span>
+                  </div>
+                  {isGroupExpanded('linkedin') ? (
+                    <ChevronDown size={12} />
+                  ) : (
+                    <ChevronRight size={12} />
+                  )}
+                </button>
+                {isGroupExpanded('linkedin') && (
+                  <div className="ml-4 border-l border-zinc-200 dark:border-zinc-800 pl-1.5">
+                    {aiTools
+                      .filter((t) => ['dm-chat-helper'].includes(t.slug))
+                      .map(renderAIToolItem)}
+                    <button
+                      onClick={() => {
+                        onSelectLesson({
+                          id: 'virtual:connection-qualifier',
+                          title: 'Connection Qualifier',
+                          embedUrl: 'virtual:connection-qualifier',
+                        });
+                        onCloseMobile();
+                      }}
+                      className={`flex items-center w-full py-1.5 px-3 rounded-lg text-[11px] transition-all ${
+                        currentLessonId === 'virtual:connection-qualifier'
+                          ? 'bg-violet-500/10 text-violet-600 dark:text-violet-400 font-medium'
+                          : 'text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100'
+                      }`}
+                    >
+                      <span
+                        className={`mr-2.5 shrink-0 ${
+                          currentLessonId === 'virtual:connection-qualifier'
+                            ? 'text-violet-500'
+                            : 'text-zinc-400 dark:text-zinc-600'
+                        }`}
+                      >
+                        <Users size={14} />
+                      </span>
+                      <span className="truncate">Connection Qualifier</span>
+                    </button>
+                  </div>
+                )}
+              </div>
 
               {/* GTM Infrastructure */}
               <div className="space-y-0.5">
@@ -613,51 +663,106 @@ const Sidebar: React.FC<SidebarProps> = ({
                     <button
                       onClick={() => {
                         onSelectLesson({
-                          id: 'virtual:infrastructure-manager',
-                          title: 'Setup & Dashboard',
-                          embedUrl: 'virtual:infrastructure-manager',
+                          id: 'virtual:infra-account-setup',
+                          title: 'Account Setup',
+                          embedUrl: 'virtual:infra-account-setup',
                         });
                         onCloseMobile();
                       }}
                       className={`flex items-center w-full py-1.5 px-3 rounded-lg text-[11px] transition-all ${
-                        currentLessonId === 'virtual:infrastructure-manager'
+                        currentLessonId === 'virtual:infra-account-setup'
                           ? 'bg-violet-500/10 text-violet-600 dark:text-violet-400 font-medium'
                           : 'text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100'
                       }`}
                     >
                       <span
                         className={`mr-2.5 shrink-0 ${
-                          currentLessonId === 'virtual:infrastructure-manager'
+                          currentLessonId === 'virtual:infra-account-setup'
                             ? 'text-violet-500'
                             : 'text-zinc-400 dark:text-zinc-600'
                         }`}
                       >
-                        <Server size={14} />
+                        <Users size={14} />
                       </span>
-                      <span className="truncate">Setup & Dashboard</span>
+                      <span className="truncate">Account Setup</span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        onSelectLesson({
+                          id: 'virtual:infra-email-infra',
+                          title: 'Email Infra',
+                          embedUrl: 'virtual:infra-email-infra',
+                        });
+                        onCloseMobile();
+                      }}
+                      className={`flex items-center w-full py-1.5 px-3 rounded-lg text-[11px] transition-all ${
+                        currentLessonId === 'virtual:infra-email-infra'
+                          ? 'bg-violet-500/10 text-violet-600 dark:text-violet-400 font-medium'
+                          : 'text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100'
+                      }`}
+                    >
+                      <span
+                        className={`mr-2.5 shrink-0 ${
+                          currentLessonId === 'virtual:infra-email-infra'
+                            ? 'text-violet-500'
+                            : 'text-zinc-400 dark:text-zinc-600'
+                        }`}
+                      >
+                        <Mail size={14} />
+                      </span>
+                      <span className="truncate">Email Infra</span>
                     </button>
                   </div>
                 )}
               </div>
 
-              {/* Cold Email */}
+              {/* Outbound */}
               <div className="space-y-0.5">
                 <button
-                  onClick={() => toggleGroup('cold-email')}
+                  onClick={() => toggleGroup('outbound')}
                   className="w-full flex items-center justify-between p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-400 transition-colors"
                 >
                   <div className="flex items-center gap-2.5 text-xs font-medium">
-                    <Mail size={12} className="text-orange-500" />
-                    <span>Cold Email</span>
+                    <Send size={12} className="text-orange-500" />
+                    <span>Outbound</span>
                   </div>
-                  {isGroupExpanded('cold-email') ? (
+                  {isGroupExpanded('outbound') ? (
                     <ChevronDown size={12} />
                   ) : (
                     <ChevronRight size={12} />
                   )}
                 </button>
-                {isGroupExpanded('cold-email') && (
+                {isGroupExpanded('outbound') && (
                   <div className="ml-4 border-l border-zinc-200 dark:border-zinc-800 pl-1.5">
+                    {aiTools
+                      .filter((t) => ['cold-email-mastermind'].includes(t.slug))
+                      .map(renderAIToolItem)}
+                    <button
+                      onClick={() => {
+                        onSelectLesson({
+                          id: 'virtual:tam-builder',
+                          title: 'TAM Builder',
+                          embedUrl: 'virtual:tam-builder',
+                        });
+                        onCloseMobile();
+                      }}
+                      className={`flex items-center w-full py-1.5 px-3 rounded-lg text-[11px] transition-all ${
+                        currentLessonId === 'virtual:tam-builder'
+                          ? 'bg-violet-500/10 text-violet-600 dark:text-violet-400 font-medium'
+                          : 'text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100'
+                      }`}
+                    >
+                      <span
+                        className={`mr-2.5 shrink-0 ${
+                          currentLessonId === 'virtual:tam-builder'
+                            ? 'text-violet-500'
+                            : 'text-zinc-400 dark:text-zinc-600'
+                        }`}
+                      >
+                        <Target size={14} />
+                      </span>
+                      <span className="truncate">TAM Builder</span>
+                    </button>
                     <button
                       onClick={() => {
                         onSelectLesson({
@@ -683,6 +788,32 @@ const Sidebar: React.FC<SidebarProps> = ({
                         <Mail size={14} />
                       </span>
                       <span className="truncate">Recipe Builder</span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        onSelectLesson({
+                          id: 'virtual:email-enrichment',
+                          title: 'Email Enrichment',
+                          embedUrl: 'virtual:email-enrichment',
+                        });
+                        onCloseMobile();
+                      }}
+                      className={`flex items-center w-full py-1.5 px-3 rounded-lg text-[11px] transition-all ${
+                        currentLessonId === 'virtual:email-enrichment'
+                          ? 'bg-violet-500/10 text-violet-600 dark:text-violet-400 font-medium'
+                          : 'text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100'
+                      }`}
+                    >
+                      <span
+                        className={`mr-2.5 shrink-0 ${
+                          currentLessonId === 'virtual:email-enrichment'
+                            ? 'text-violet-500'
+                            : 'text-zinc-400 dark:text-zinc-600'
+                        }`}
+                      >
+                        <Mail size={14} />
+                      </span>
+                      <span className="truncate">Email Enrichment</span>
                     </button>
                   </div>
                 )}

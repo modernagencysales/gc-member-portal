@@ -74,74 +74,23 @@ const CheckoutStep: React.FC<CheckoutStepProps> = ({
     setError(null);
 
     try {
-      let emailProvisionId: string | undefined;
-      let outreachProvisionId: string | undefined;
-
-      // Create email infra provision record
-      if (hasEmailInfra && tier) {
-        const { data: emailProvision, error: emailError } = await supabase
-          .from('infra_provisions')
-          .insert({
-            student_id: userId,
-            product_type: 'email_infra',
-            tier_id: tier.id,
-            service_provider: serviceProvider,
-            status: 'pending_payment',
-            mailbox_pattern_1: pattern1,
-            mailbox_pattern_2: pattern2,
-          })
-          .select()
-          .single();
-
-        if (emailError) {
-          throw new Error(`Failed to create email provision: ${emailError.message}`);
-        }
-        emailProvisionId = emailProvision.id;
-
-        // Create domain records
-        const domainRecords = domains.map((domain) => ({
-          provision_id: emailProvision.id,
-          domain_name: domain.domainName,
-          service_provider: domain.serviceProvider || serviceProvider,
-          status: 'pending',
-        }));
-
-        const { error: domainsError } = await supabase.from('infra_domains').insert(domainRecords);
-        if (domainsError) {
-          throw new Error(`Failed to create domain records: ${domainsError.message}`);
-        }
-      }
-
-      // Create outreach provision record
-      if (hasOutreach) {
-        const { data: outreachProvision, error: outreachError } = await supabase
-          .from('infra_provisions')
-          .insert({
-            student_id: userId,
-            product_type: 'outreach_tools',
-            status: 'pending_payment',
-            service_provider: serviceProvider,
-            ...(emailProvisionId ? { linked_provision_id: emailProvisionId } : {}),
-          })
-          .select()
-          .single();
-
-        if (outreachError) {
-          throw new Error(`Failed to create outreach provision: ${outreachError.message}`);
-        }
-        outreachProvisionId = outreachProvision.id;
-      }
-
-      // Create Stripe checkout session
+      // Edge function creates provision records + Stripe checkout (uses service_role to bypass RLS)
       const { data: checkoutData, error: checkoutError } = await supabase.functions.invoke(
         'create-infra-checkout',
         {
           body: {
-            provisionId: emailProvisionId || undefined,
-            outreachProvisionId: outreachProvisionId || undefined,
             studentId: userId,
+            products: selectedProducts,
+            serviceProvider,
             tierId: tier?.id || undefined,
-            includeOutreach: hasOutreach,
+            domains: hasEmailInfra
+              ? domains.map((d) => ({
+                  domainName: d.domainName,
+                  serviceProvider: d.serviceProvider || serviceProvider,
+                }))
+              : undefined,
+            mailboxPattern1: hasEmailInfra ? pattern1 : undefined,
+            mailboxPattern2: hasEmailInfra ? pattern2 : undefined,
           },
         }
       );

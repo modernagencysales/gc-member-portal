@@ -5,9 +5,8 @@ import {
   WizardState,
   DomainAvailability,
   InfraProvision,
-  ProductType,
 } from '../../../../types/infrastructure-types';
-import ProductSelection from './ProductSelection';
+import type { InfraMode } from '../InfrastructurePage';
 import TierSelection from './TierSelection';
 import DomainPicker from './DomainPicker';
 import MailboxConfig from './MailboxConfig';
@@ -15,6 +14,7 @@ import CheckoutStep from './CheckoutStep';
 
 interface Props {
   userId: string;
+  mode?: InfraMode;
   existingProvision?: InfraProvision;
 }
 
@@ -23,10 +23,13 @@ interface StepDef {
   label: string;
 }
 
-export default function InfraWizard({ userId, existingProvision }: Props) {
+export default function InfraWizard({ userId, mode = 'account_setup', existingProvision }: Props) {
+  // Determine products based on mode
+  const products = mode === 'email_infra' ? ['email_infra'] : ['outreach_tools'];
+
   const [wizardState, setWizardState] = useState<WizardState>({
     step: 1,
-    selectedProducts: [],
+    selectedProducts: products as WizardState['selectedProducts'],
     selectedTier: null,
     selectedDomains: [],
     serviceProvider: existingProvision?.serviceProvider || 'GOOGLE',
@@ -40,28 +43,23 @@ export default function InfraWizard({ userId, existingProvision }: Props) {
     setWizardState((prev) => ({ ...prev, ...updates }));
   };
 
-  // Dynamic step definitions based on product selection
+  // Dynamic step definitions based on mode
   const steps: StepDef[] = useMemo(() => {
-    const hasEmailInfra = wizardState.selectedProducts.includes('email_infra');
-
-    const s: StepDef[] = [{ key: 'products', label: 'Products' }];
-
-    if (hasEmailInfra) {
-      s.push(
+    if (mode === 'email_infra') {
+      return [
         { key: 'tier', label: 'Package' },
         { key: 'domains', label: 'Domains' },
-        { key: 'mailboxes', label: 'Mailboxes' }
-      );
+        { key: 'mailboxes', label: 'Mailboxes' },
+        { key: 'checkout', label: 'Checkout' },
+      ];
     }
-
-    s.push({ key: 'checkout', label: 'Checkout' });
-
-    return s;
-  }, [wizardState.selectedProducts]);
+    // account_setup — just checkout (outreach tools only)
+    return [{ key: 'checkout', label: 'Checkout' }];
+  }, [mode]);
 
   const totalSteps = steps.length;
   const currentStepDef = steps[wizardState.step - 1];
-  const currentKey = currentStepDef?.key || 'products';
+  const currentKey = currentStepDef?.key || 'checkout';
 
   const nextStep = () => {
     if (wizardState.step < totalSteps) {
@@ -85,8 +83,6 @@ export default function InfraWizard({ userId, existingProvision }: Props) {
 
   const isStepValid = () => {
     switch (currentKey) {
-      case 'products':
-        return wizardState.selectedProducts.length > 0;
       case 'tier':
         return wizardState.selectedTier !== null;
       case 'domains':
@@ -112,75 +108,55 @@ export default function InfraWizard({ userId, existingProvision }: Props) {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
-      {/* Progress bar */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between">
-          {steps.map((stepDef, idx) => {
-            const stepNum = idx + 1;
-            const isCompleted = stepNum < wizardState.step;
-            const isCurrent = stepNum === wizardState.step;
+      {/* Progress bar (only if more than 1 step) */}
+      {totalSteps > 1 && (
+        <div className="mb-8">
+          <div className="flex items-center justify-between">
+            {steps.map((stepDef, idx) => {
+              const stepNum = idx + 1;
+              const isCompleted = stepNum < wizardState.step;
+              const isCurrent = stepNum === wizardState.step;
 
-            return (
-              <div key={stepDef.key} className="flex items-center flex-1 last:flex-none">
-                <div className="flex flex-col items-center">
-                  <div
-                    className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-all ${
-                      isCompleted || isCurrent
-                        ? 'bg-violet-500 text-white'
-                        : 'bg-zinc-200 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-600'
-                    }`}
-                  >
-                    {stepNum}
+              return (
+                <div key={stepDef.key} className="flex items-center flex-1 last:flex-none">
+                  <div className="flex flex-col items-center">
+                    <div
+                      className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-all ${
+                        isCompleted || isCurrent
+                          ? 'bg-violet-500 text-white'
+                          : 'bg-zinc-200 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-600'
+                      }`}
+                    >
+                      {stepNum}
+                    </div>
+                    <div
+                      className={`mt-2 text-xs font-medium ${
+                        isCompleted || isCurrent
+                          ? 'text-violet-600 dark:text-violet-400'
+                          : 'text-zinc-400 dark:text-zinc-600'
+                      }`}
+                    >
+                      {stepDef.label}
+                    </div>
                   </div>
-                  <div
-                    className={`mt-2 text-xs font-medium ${
-                      isCompleted || isCurrent
-                        ? 'text-violet-600 dark:text-violet-400'
-                        : 'text-zinc-400 dark:text-zinc-600'
-                    }`}
-                  >
-                    {stepDef.label}
-                  </div>
+                  {idx < steps.length - 1 && (
+                    <div
+                      className={`flex-1 h-0.5 mx-2 transition-all ${
+                        stepNum < wizardState.step
+                          ? 'bg-violet-500'
+                          : 'bg-zinc-200 dark:bg-zinc-800'
+                      }`}
+                    />
+                  )}
                 </div>
-                {idx < steps.length - 1 && (
-                  <div
-                    className={`flex-1 h-0.5 mx-2 transition-all ${
-                      stepNum < wizardState.step ? 'bg-violet-500' : 'bg-zinc-200 dark:bg-zinc-800'
-                    }`}
-                  />
-                )}
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Step content */}
       <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-6 mb-6">
-        {currentKey === 'products' && (
-          <ProductSelection
-            selectedProducts={wizardState.selectedProducts}
-            onSelectionChange={(products: ProductType[]) => {
-              // When products change, reset downstream state if email infra deselected
-              const hadEmail = wizardState.selectedProducts.includes('email_infra');
-              const hasEmail = products.includes('email_infra');
-
-              if (hadEmail && !hasEmail) {
-                updateState({
-                  step: 1,
-                  selectedProducts: products,
-                  selectedTier: null,
-                  selectedDomains: [],
-                  mailboxPattern1: '',
-                  mailboxPattern2: '',
-                });
-              } else {
-                updateState({ selectedProducts: products });
-              }
-            }}
-          />
-        )}
-
         {currentKey === 'tier' && (
           <TierSelection
             selectedTier={wizardState.selectedTier}
@@ -226,27 +202,29 @@ export default function InfraWizard({ userId, existingProvision }: Props) {
       </div>
 
       {/* Navigation buttons */}
-      <div className="flex items-center justify-between">
-        <button
-          onClick={prevStep}
-          disabled={wizardState.step === 1}
-          className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-        >
-          <ChevronLeft size={16} />
-          Back
-        </button>
-
-        {!isCheckoutStep && (
+      {totalSteps > 1 && (
+        <div className="flex items-center justify-between">
           <button
-            onClick={nextStep}
-            disabled={!isStepValid()}
-            className="flex items-center gap-2 px-6 py-2.5 text-sm font-medium text-white bg-violet-500 hover:bg-violet-600 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            onClick={prevStep}
+            disabled={wizardState.step === 1}
+            className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
-            Next
-            <ChevronRight size={16} />
+            <ChevronLeft size={16} />
+            Back
           </button>
-        )}
-      </div>
+
+          {!isCheckoutStep && (
+            <button
+              onClick={nextStep}
+              disabled={!isStepValid()}
+              className="flex items-center gap-2 px-6 py-2.5 text-sm font-medium text-white bg-violet-500 hover:bg-violet-600 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              Next
+              <ChevronRight size={16} />
+            </button>
+          )}
+        </div>
+      )}
     </div>
   );
 }

@@ -124,16 +124,17 @@ const PROVISION_COLUMNS = `
 `;
 
 export async function fetchProvisionsByStudentId(studentId: string): Promise<StudentProvisions> {
-  const { data, error } = await supabase
-    .from('infra_provisions')
-    .select(`${PROVISION_COLUMNS}, infra_tiers(*), infra_domains(*)`)
-    .eq('student_id', studentId);
+  // Use RPC function (SECURITY DEFINER) to bypass RLS — bootcamp login has no Supabase Auth session
+  const { data, error } = await supabase.rpc('get_student_provisions', {
+    p_student_id: studentId,
+  });
 
   if (error || !data) return { emailInfra: null, outreachTools: null };
 
+  const rows = data as Record<string, unknown>[];
   const result: StudentProvisions = { emailInfra: null, outreachTools: null };
 
-  for (const row of data) {
+  for (const row of rows) {
     const provision = mapProvision(row);
     const tier = row.infra_tiers
       ? mapTier(row.infra_tiers as unknown as Record<string, unknown>)
