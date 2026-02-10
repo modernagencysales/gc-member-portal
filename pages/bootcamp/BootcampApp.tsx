@@ -43,6 +43,7 @@ import {
 } from '../../components/bootcamp/funnel-access';
 import RedeemCodeModal from '../../components/bootcamp/RedeemCodeModal';
 import { StudentSettingsModal } from '../../components/bootcamp/settings';
+import { FeedbackWidget } from '../../components/feedback/FeedbackWidget';
 import { CourseData, Lesson, User } from '../../types';
 import {
   BootcampStudent,
@@ -826,6 +827,12 @@ const BootcampApp: React.FC = () => {
           onSuccess={() => refetchGrants()}
         />
       )}
+
+      {/* Bug Reporting Widget */}
+      <FeedbackWidget
+        userEmail={bootcampStudent?.email ?? user?.email ?? null}
+        userId={bootcampStudent?.id ?? null}
+      />
     </div>
   );
 };

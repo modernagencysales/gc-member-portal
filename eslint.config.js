@@ -38,7 +38,9 @@ export default [
         HTMLTextAreaElement: 'readonly',
         HTMLElement: 'readonly',
         HTMLDivElement: 'readonly',
+        HTMLButtonElement: 'readonly',
         HTMLIFrameElement: 'readonly',
+        Node: 'readonly',
         Element: 'readonly',
         Event: 'readonly',
         KeyboardEvent: 'readonly',
@@ -47,6 +49,9 @@ export default [
         IntersectionObserver: 'readonly',
         IntersectionObserverEntry: 'readonly',
         MediaQueryListEvent: 'readonly',
+
+        // Animation/Timing
+        requestAnimationFrame: 'readonly',
 
         // Web APIs
         File: 'readonly',
