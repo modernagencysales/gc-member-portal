@@ -172,6 +172,14 @@ npm run test:coverage    # Tests with coverage
 - Single file: `npx vitest run path/to/test.ts` or `npx playwright test --ui`.
 - MSW handlers defined for Supabase endpoints and external APIs.
 
+## Deployment
+
+- **Vercel**: Auto-deploy is broken for private org repos (needs Vercel Pro). Deploy manually:
+  ```
+  vercel --prod
+  ```
+- No background jobs or Trigger.dev tasks in this repo.
+
 ## Related Repos
 
 | Repo | Path | Purpose |
