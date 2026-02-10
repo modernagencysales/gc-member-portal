@@ -1,11 +1,13 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import {
   InfraTier,
   WizardState,
   DomainAvailability,
   InfraProvision,
+  ProductType,
 } from '../../../../types/infrastructure-types';
+import ProductSelection from './ProductSelection';
 import TierSelection from './TierSelection';
 import DomainPicker from './DomainPicker';
 import MailboxConfig from './MailboxConfig';
@@ -16,9 +18,15 @@ interface Props {
   existingProvision?: InfraProvision;
 }
 
+interface StepDef {
+  key: string;
+  label: string;
+}
+
 export default function InfraWizard({ userId, existingProvision }: Props) {
   const [wizardState, setWizardState] = useState<WizardState>({
     step: 1,
+    selectedProducts: [],
     selectedTier: null,
     selectedDomains: [],
     serviceProvider: existingProvision?.serviceProvider || 'GOOGLE',
@@ -32,8 +40,31 @@ export default function InfraWizard({ userId, existingProvision }: Props) {
     setWizardState((prev) => ({ ...prev, ...updates }));
   };
 
+  // Dynamic step definitions based on product selection
+  const steps: StepDef[] = useMemo(() => {
+    const hasEmailInfra = wizardState.selectedProducts.includes('email_infra');
+
+    const s: StepDef[] = [{ key: 'products', label: 'Products' }];
+
+    if (hasEmailInfra) {
+      s.push(
+        { key: 'tier', label: 'Package' },
+        { key: 'domains', label: 'Domains' },
+        { key: 'mailboxes', label: 'Mailboxes' }
+      );
+    }
+
+    s.push({ key: 'checkout', label: 'Checkout' });
+
+    return s;
+  }, [wizardState.selectedProducts]);
+
+  const totalSteps = steps.length;
+  const currentStepDef = steps[wizardState.step - 1];
+  const currentKey = currentStepDef?.key || 'products';
+
   const nextStep = () => {
-    if (wizardState.step < 4) {
+    if (wizardState.step < totalSteps) {
       updateState({ step: wizardState.step + 1 });
     }
   };
@@ -44,31 +75,6 @@ export default function InfraWizard({ userId, existingProvision }: Props) {
     }
   };
 
-  // Validation logic for Next button
-  const isStepValid = () => {
-    switch (wizardState.step) {
-      case 1:
-        return wizardState.selectedTier !== null;
-      case 2:
-        return (
-          wizardState.selectedTier &&
-          wizardState.selectedDomains.length === wizardState.selectedTier.domainCount
-        );
-      case 3:
-        return (
-          wizardState.mailboxPattern1.trim() !== '' &&
-          wizardState.mailboxPattern2.trim() !== '' &&
-          validatePattern(wizardState.mailboxPattern1) &&
-          validatePattern(wizardState.mailboxPattern2)
-        );
-      case 4:
-        return true; // Checkout step handles its own validation
-      default:
-        return false;
-    }
-  };
-
-  // Validate mailbox pattern (no leading/trailing special chars)
   const validatePattern = (pattern: string): boolean => {
     if (!pattern) return false;
     const firstChar = pattern[0];
@@ -77,17 +83,45 @@ export default function InfraWizard({ userId, existingProvision }: Props) {
     return !invalidChars.includes(firstChar) && !invalidChars.includes(lastChar);
   };
 
+  const isStepValid = () => {
+    switch (currentKey) {
+      case 'products':
+        return wizardState.selectedProducts.length > 0;
+      case 'tier':
+        return wizardState.selectedTier !== null;
+      case 'domains':
+        return (
+          wizardState.selectedTier &&
+          wizardState.selectedDomains.length === wizardState.selectedTier.domainCount
+        );
+      case 'mailboxes':
+        return (
+          wizardState.mailboxPattern1.trim() !== '' &&
+          wizardState.mailboxPattern2.trim() !== '' &&
+          validatePattern(wizardState.mailboxPattern1) &&
+          validatePattern(wizardState.mailboxPattern2)
+        );
+      case 'checkout':
+        return true;
+      default:
+        return false;
+    }
+  };
+
+  const isCheckoutStep = currentKey === 'checkout';
+
   return (
     <div className="max-w-4xl mx-auto px-4 py-8">
       {/* Progress bar */}
       <div className="mb-8">
         <div className="flex items-center justify-between">
-          {[1, 2, 3, 4].map((stepNum) => {
+          {steps.map((stepDef, idx) => {
+            const stepNum = idx + 1;
             const isCompleted = stepNum < wizardState.step;
             const isCurrent = stepNum === wizardState.step;
 
             return (
-              <div key={stepNum} className="flex items-center flex-1 last:flex-none">
+              <div key={stepDef.key} className="flex items-center flex-1 last:flex-none">
                 <div className="flex flex-col items-center">
                   <div
                     className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-all ${
@@ -105,13 +139,10 @@ export default function InfraWizard({ userId, existingProvision }: Props) {
                         : 'text-zinc-400 dark:text-zinc-600'
                     }`}
                   >
-                    {stepNum === 1 && 'Package'}
-                    {stepNum === 2 && 'Domains'}
-                    {stepNum === 3 && 'Mailboxes'}
-                    {stepNum === 4 && 'Checkout'}
+                    {stepDef.label}
                   </div>
                 </div>
-                {stepNum < 4 && (
+                {idx < steps.length - 1 && (
                   <div
                     className={`flex-1 h-0.5 mx-2 transition-all ${
                       stepNum < wizardState.step ? 'bg-violet-500' : 'bg-zinc-200 dark:bg-zinc-800'
@@ -126,7 +157,31 @@ export default function InfraWizard({ userId, existingProvision }: Props) {
 
       {/* Step content */}
       <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-6 mb-6">
-        {wizardState.step === 1 && (
+        {currentKey === 'products' && (
+          <ProductSelection
+            selectedProducts={wizardState.selectedProducts}
+            onSelectionChange={(products: ProductType[]) => {
+              // When products change, reset downstream state if email infra deselected
+              const hadEmail = wizardState.selectedProducts.includes('email_infra');
+              const hasEmail = products.includes('email_infra');
+
+              if (hadEmail && !hasEmail) {
+                updateState({
+                  step: 1,
+                  selectedProducts: products,
+                  selectedTier: null,
+                  selectedDomains: [],
+                  mailboxPattern1: '',
+                  mailboxPattern2: '',
+                });
+              } else {
+                updateState({ selectedProducts: products });
+              }
+            }}
+          />
+        )}
+
+        {currentKey === 'tier' && (
           <TierSelection
             selectedTier={wizardState.selectedTier}
             onSelect={(tier: InfraTier) => updateState({ selectedTier: tier })}
@@ -135,7 +190,7 @@ export default function InfraWizard({ userId, existingProvision }: Props) {
           />
         )}
 
-        {wizardState.step === 2 && wizardState.selectedTier && (
+        {currentKey === 'domains' && wizardState.selectedTier && (
           <DomainPicker
             tier={wizardState.selectedTier}
             selectedDomains={wizardState.selectedDomains}
@@ -147,7 +202,7 @@ export default function InfraWizard({ userId, existingProvision }: Props) {
           />
         )}
 
-        {wizardState.step === 3 && wizardState.selectedTier && (
+        {currentKey === 'mailboxes' && wizardState.selectedTier && (
           <MailboxConfig
             domains={wizardState.selectedDomains}
             pattern1={wizardState.mailboxPattern1}
@@ -157,9 +212,10 @@ export default function InfraWizard({ userId, existingProvision }: Props) {
           />
         )}
 
-        {wizardState.step === 4 && wizardState.selectedTier && (
+        {currentKey === 'checkout' && (
           <CheckoutStep
             userId={userId}
+            selectedProducts={wizardState.selectedProducts}
             tier={wizardState.selectedTier}
             domains={wizardState.selectedDomains}
             serviceProvider={wizardState.serviceProvider}
@@ -180,7 +236,7 @@ export default function InfraWizard({ userId, existingProvision }: Props) {
           Back
         </button>
 
-        {wizardState.step < 4 && (
+        {!isCheckoutStep && (
           <button
             onClick={nextStep}
             disabled={!isStepValid()}

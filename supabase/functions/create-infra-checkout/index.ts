@@ -23,7 +23,6 @@ function getCorsHeaders(req: Request) {
   };
 }
 
-// Validate required environment variables at startup
 const stripeSecretKey = Deno.env.get('STRIPE_SECRET_KEY');
 if (!stripeSecretKey) {
   throw new Error('STRIPE_SECRET_KEY environment variable is required');
@@ -42,19 +41,23 @@ serve(async (req) => {
   }
 
   try {
-    const { provisionId, studentId, tierId } = await req.json();
+    const { provisionId, outreachProvisionId, studentId, tierId, includeOutreach } =
+      await req.json();
 
-    if (!provisionId || !studentId || !tierId) {
+    if (!studentId) {
+      return new Response(JSON.stringify({ error: 'Missing required field: studentId' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    if (!provisionId && !outreachProvisionId) {
       return new Response(
-        JSON.stringify({ error: 'Missing required fields: provisionId, studentId, tierId' }),
-        {
-          status: 400,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        }
+        JSON.stringify({ error: 'At least one of provisionId or outreachProvisionId is required' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    // Initialize Supabase client with service role for DB access
     const supabaseUrl = Deno.env.get('SUPABASE_URL');
     const supabaseServiceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
 
@@ -67,75 +70,119 @@ serve(async (req) => {
 
     const supabase = createClient(supabaseUrl, supabaseServiceRoleKey);
 
-    // Look up the infrastructure tier to get Stripe price IDs
-    const { data: tier, error: tierError } = await supabase
-      .from('infra_tiers')
-      .select('id, slug, stripe_setup_price_id, stripe_monthly_price_id')
-      .eq('id', tierId)
-      .single();
+    // Build line items dynamically based on what's being purchased
+    const lineItems: { price: string; quantity: number }[] = [];
+    let tierSlug = '';
 
-    if (tierError || !tier) {
-      console.error('Failed to look up infra tier:', tierError);
-      return new Response(JSON.stringify({ error: 'Infrastructure tier not found' }), {
-        status: 404,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
+    // Email infra line items
+    if (provisionId && tierId) {
+      const { data: tier, error: tierError } = await supabase
+        .from('infra_tiers')
+        .select('id, slug, stripe_setup_price_id, stripe_monthly_price_id')
+        .eq('id', tierId)
+        .single();
+
+      if (tierError || !tier) {
+        return new Response(JSON.stringify({ error: 'Infrastructure tier not found' }), {
+          status: 404,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      if (!tier.stripe_setup_price_id || !tier.stripe_monthly_price_id) {
+        return new Response(
+          JSON.stringify({ error: 'Stripe prices not configured for this tier' }),
+          {
+            status: 400,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          }
+        );
+      }
+
+      tierSlug = tier.slug;
+      lineItems.push(
+        { price: tier.stripe_setup_price_id, quantity: 1 },
+        { price: tier.stripe_monthly_price_id, quantity: 1 }
+      );
     }
 
-    if (!tier.stripe_setup_price_id || !tier.stripe_monthly_price_id) {
-      return new Response(JSON.stringify({ error: 'Stripe prices not configured for this tier' }), {
+    // Outreach tools line items
+    if (outreachProvisionId || includeOutreach) {
+      const { data: outreachPricing, error: outreachError } = await supabase
+        .from('infra_outreach_pricing')
+        .select('stripe_setup_price_id, stripe_monthly_price_id')
+        .eq('is_active', true)
+        .limit(1)
+        .single();
+
+      if (outreachError || !outreachPricing) {
+        return new Response(JSON.stringify({ error: 'Outreach pricing not found' }), {
+          status: 404,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      if (!outreachPricing.stripe_monthly_price_id) {
+        return new Response(
+          JSON.stringify({ error: 'Stripe monthly price not configured for outreach tools' }),
+          {
+            status: 400,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          }
+        );
+      }
+
+      if (outreachPricing.stripe_setup_price_id) {
+        lineItems.push({ price: outreachPricing.stripe_setup_price_id, quantity: 1 });
+      }
+      lineItems.push({ price: outreachPricing.stripe_monthly_price_id, quantity: 1 });
+    }
+
+    if (lineItems.length === 0) {
+      return new Response(JSON.stringify({ error: 'No line items to checkout' }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
 
-    // Determine redirect URLs from the request origin
     const origin = req.headers.get('origin') || 'https://modernagencysales.com';
 
-    // Create Stripe Checkout Session with setup (one-time) + monthly (recurring) line items
+    const metadata = {
+      type: 'infrastructure',
+      provision_id: provisionId || '',
+      outreach_provision_id: outreachProvisionId || '',
+      student_id: studentId,
+      tier_slug: tierSlug || '',
+    };
+
     const session = await stripe.checkout.sessions.create({
       mode: 'subscription',
-      line_items: [
-        {
-          price: tier.stripe_setup_price_id,
-          quantity: 1,
-        },
-        {
-          price: tier.stripe_monthly_price_id,
-          quantity: 1,
-        },
-      ],
-      metadata: {
-        provision_id: provisionId,
-        student_id: studentId,
-        tier_slug: tier.slug,
-        type: 'infrastructure',
-      },
-      subscription_data: {
-        metadata: {
-          provision_id: provisionId,
-          student_id: studentId,
-          tier_slug: tier.slug,
-          type: 'infrastructure',
-        },
-      },
+      line_items: lineItems,
+      metadata,
+      subscription_data: { metadata },
       success_url: `${origin}/bootcamp?lesson=virtual:infrastructure-manager&provisioning=true`,
       cancel_url: `${origin}/bootcamp?lesson=virtual:infrastructure-manager`,
     });
 
-    // Update the infra_provisions record with the checkout session ID
-    const { error: updateError } = await supabase
-      .from('infra_provisions')
-      .update({
-        stripe_checkout_session_id: session.id,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', provisionId);
+    // Update provision records with checkout session ID
+    if (provisionId) {
+      await supabase
+        .from('infra_provisions')
+        .update({
+          stripe_checkout_session_id: session.id,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', provisionId);
+    }
 
-    if (updateError) {
-      console.error('Failed to update infra_provisions with session ID:', updateError);
-      // Don't fail the response -- the checkout session was already created
-      // and the student can still complete payment
+    if (outreachProvisionId) {
+      await supabase
+        .from('infra_provisions')
+        .update({
+          stripe_checkout_session_id: session.id,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', outreachProvisionId);
     }
 
     return new Response(JSON.stringify({ url: session.url }), {

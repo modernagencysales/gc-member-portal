@@ -475,26 +475,50 @@ serve(async (req) => {
         // Handle infrastructure provisioning checkout
         const isInfrastructure = session.metadata?.type === 'infrastructure';
         if (isInfrastructure) {
-          const provisionId = session.metadata?.provision_id;
-          if (!provisionId) {
-            console.error('Infrastructure checkout missing provision_id in metadata');
+          const provisionId = session.metadata?.provision_id || null;
+          const outreachProvisionId = session.metadata?.outreach_provision_id || null;
+
+          if (!provisionId && !outreachProvisionId) {
+            console.error(
+              'Infrastructure checkout missing both provision_id and outreach_provision_id'
+            );
             break;
           }
 
-          // Update provision record with Stripe details and set status to provisioning
-          const { error: infraUpdateError } = await supabase
-            .from('infra_provisions')
-            .update({
-              status: 'provisioning',
-              stripe_subscription_id: session.subscription as string,
-              stripe_customer_id: session.customer as string,
-              updated_at: new Date().toISOString(),
-            })
-            .eq('id', provisionId);
+          // Update whichever provision records exist
+          const stripeDetails = {
+            status: 'provisioning',
+            stripe_subscription_id: session.subscription as string,
+            stripe_customer_id: session.customer as string,
+            updated_at: new Date().toISOString(),
+          };
 
-          if (infraUpdateError) {
-            console.error('Failed to update infra provision:', infraUpdateError);
-            throw new Error(`Failed to update infra provision: ${infraUpdateError.message}`);
+          if (provisionId) {
+            const { error: emailUpdateError } = await supabase
+              .from('infra_provisions')
+              .update(stripeDetails)
+              .eq('id', provisionId);
+
+            if (emailUpdateError) {
+              console.error('Failed to update email infra provision:', emailUpdateError);
+              throw new Error(
+                `Failed to update email infra provision: ${emailUpdateError.message}`
+              );
+            }
+          }
+
+          if (outreachProvisionId) {
+            const { error: outreachUpdateError } = await supabase
+              .from('infra_provisions')
+              .update(stripeDetails)
+              .eq('id', outreachProvisionId);
+
+            if (outreachUpdateError) {
+              console.error('Failed to update outreach provision:', outreachUpdateError);
+              throw new Error(
+                `Failed to update outreach provision: ${outreachUpdateError.message}`
+              );
+            }
           }
 
           // Trigger provisioning via gtm-system API
@@ -507,7 +531,8 @@ serve(async (req) => {
                 'x-api-key': Deno.env.get('GTM_SYSTEM_API_KEY') || '',
               },
               body: JSON.stringify({
-                provisionId,
+                provisionId: provisionId || undefined,
+                outreachProvisionId: outreachProvisionId || undefined,
                 studentId: session.metadata?.student_id,
               }),
             });
@@ -515,9 +540,11 @@ serve(async (req) => {
             if (!triggerRes.ok) {
               const body = await triggerRes.text();
               console.error('Failed to trigger provisioning:', triggerRes.status, body);
-              // Don't throw — provision status is already set, can be retried
             } else {
-              console.log(`Provisioning triggered for provision ${provisionId}`);
+              console.log(`Provisioning triggered for provision(s)`, {
+                provisionId,
+                outreachProvisionId,
+              });
             }
           } catch (triggerErr) {
             console.error('Error triggering provisioning (non-blocking):', triggerErr);
@@ -533,12 +560,13 @@ serve(async (req) => {
                 session_id: session.id,
                 source: 'infrastructure',
                 provision_id: provisionId,
+                outreach_provision_id: outreachProvisionId,
                 tier_slug: session.metadata?.tier_slug,
               },
             });
           }
 
-          console.log(`Infrastructure checkout completed for provision ${provisionId}`);
+          console.log(`Infrastructure checkout completed`, { provisionId, outreachProvisionId });
           break;
         }
 

@@ -1,8 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
 import {
   fetchActiveTiers,
-  fetchProvisionByStudentId,
+  fetchProvisionsByStudentId,
   fetchProvisioningLog,
+  fetchOutreachPricing,
 } from '../services/infrastructure-supabase';
 
 export function useInfraTiers() {
@@ -12,12 +13,28 @@ export function useInfraTiers() {
   });
 }
 
-export function useInfraProvision(studentId: string | undefined) {
+export function useOutreachPricing() {
   return useQuery({
-    queryKey: ['infra-provision', studentId],
-    queryFn: () => fetchProvisionByStudentId(studentId!),
+    queryKey: ['infra-outreach-pricing'],
+    queryFn: fetchOutreachPricing,
+  });
+}
+
+export function useInfraProvisions(studentId: string | undefined) {
+  return useQuery({
+    queryKey: ['infra-provisions', studentId],
+    queryFn: () => fetchProvisionsByStudentId(studentId!),
     enabled: !!studentId,
   });
+}
+
+// Backwards-compatible alias
+export function useInfraProvision(studentId: string | undefined) {
+  const query = useInfraProvisions(studentId);
+  return {
+    ...query,
+    data: query.data?.emailInfra || query.data?.outreachTools || null,
+  };
 }
 
 export function useProvisioningLog(provisionId: string | undefined, isProvisioning: boolean) {
