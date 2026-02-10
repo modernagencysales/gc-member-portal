@@ -110,7 +110,7 @@ const Sidebar: React.FC<SidebarProps> = ({
 
   const isFunnelAccess = user?.status === 'Funnel Access';
   const isLeadMagnet = user?.status === 'Lead Magnet';
-  const hasFullAccess = user?.status === 'Full Access' || isFunnelAccess;
+  const isEnrolledStudent = courseEnrollments.length > 0;
   const hasGrantedTools = isLeadMagnet && grantedTools && grantedTools.length > 0;
   const userDomain = user?.email.split('@')[1] || '';
 
@@ -131,7 +131,6 @@ const Sidebar: React.FC<SidebarProps> = ({
 
   const toolGroups = useMemo(() => {
     const groups = {
-      gpts: [] as Lesson[],
       tables: [] as Lesson[],
       logins: [] as Lesson[],
     };
@@ -148,17 +147,11 @@ const Sidebar: React.FC<SidebarProps> = ({
           titleUpper.includes('LOGIN') ||
           url.startsWith('text:') ||
           url.startsWith('credentials:');
-        const isTool =
-          titleUpper.startsWith('TOOL:') ||
-          titleUpper.includes('AGENT') ||
-          titleUpper.includes('PORTAL');
 
         if (isTable) {
           groups.tables.push(l);
         } else if (isAccess) {
           groups.logins.push(l);
-        } else if (isTool) {
-          groups.gpts.push(l);
         }
       });
     });
@@ -166,9 +159,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   }, [data]);
 
   const isToolbeltItem = (lessonId: string) => {
-    return [...toolGroups.gpts, ...toolGroups.tables, ...toolGroups.logins].some(
-      (item) => item.id === lessonId
-    );
+    return [...toolGroups.tables, ...toolGroups.logins].some((item) => item.id === lessonId);
   };
 
   const totalActionItems = data.weeks.reduce((sum, w) => sum + w.actionItems.length, 0);
@@ -438,7 +429,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           </div>
 
           {/* Tools section (flattened) */}
-          {hasFullAccess ? (
+          {isEnrolledStudent ? (
             <div className="space-y-1">
               {/* My Blueprint */}
               <button
@@ -505,8 +496,8 @@ const Sidebar: React.FC<SidebarProps> = ({
                 />
               )}
 
-              {/* Redeem Code for Funnel Access users */}
-              {isFunnelAccess && onRedeemCode && (
+              {/* Redeem Code for Funnel Access / Lead Magnet users */}
+              {(isFunnelAccess || isLeadMagnet) && onRedeemCode && (
                 <button
                   onClick={onRedeemCode}
                   className="flex items-center gap-2 w-full p-2 rounded-lg text-xs font-medium text-violet-600 dark:text-violet-400 hover:bg-violet-50 dark:hover:bg-violet-900/20 transition-colors"
@@ -535,10 +526,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                   </button>
                   {isGroupExpanded('lead-magnet') && (
                     <div className="ml-4 border-l border-zinc-200 dark:border-zinc-800 pl-1.5">
-                      {(isFunnelAccess && grantedTools
-                        ? aiTools.filter((t) => grantedTools.some((g) => g.toolSlug === t.slug))
-                        : aiTools
-                      )
+                      {aiTools
                         .filter((t) =>
                           [
                             'lead-magnet-ideator',
@@ -573,10 +561,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                   </button>
                   {isGroupExpanded('profile-posts') && (
                     <div className="ml-4 border-l border-zinc-200 dark:border-zinc-800 pl-1.5">
-                      {(isFunnelAccess && grantedTools
-                        ? aiTools.filter((t) => grantedTools.some((g) => g.toolSlug === t.slug))
-                        : aiTools
-                      )
+                      {aiTools
                         .filter((t) =>
                           [
                             'profile-optimizer',
@@ -898,16 +883,20 @@ const Sidebar: React.FC<SidebarProps> = ({
               {/* Granted AI Tools */}
               <div className="space-y-0.5">
                 <button
-                  onClick={() => toggleGroup('gpts')}
+                  onClick={() => toggleGroup('lead-magnet')}
                   className="w-full flex items-center justify-between p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-400 transition-colors"
                 >
                   <div className="flex items-center gap-2.5 text-xs font-medium">
                     <Sparkles size={12} className="text-violet-500" />
                     <span>AI Tools</span>
                   </div>
-                  {isGroupExpanded('gpts') ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
+                  {isGroupExpanded('lead-magnet') ? (
+                    <ChevronDown size={12} />
+                  ) : (
+                    <ChevronRight size={12} />
+                  )}
                 </button>
-                {isGroupExpanded('gpts') && (
+                {isGroupExpanded('lead-magnet') && (
                   <div className="ml-4 border-l border-zinc-200 dark:border-zinc-800 pl-1.5">
                     {aiTools
                       .filter((t) => grantedTools!.some((g) => g.toolSlug === t.slug))
