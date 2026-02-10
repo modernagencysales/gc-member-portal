@@ -536,8 +536,8 @@ const Sidebar: React.FC<SidebarProps> = ({
                             'lead-magnet-ideator',
                             'lead-magnet-creator',
                             'lead-magnet-post-creator',
-                            'lead-magnet-email-sequence',
-                            'thank-you-page-vsl-creator',
+                            'lead-magnet-email',
+                            'ty-page-vsl',
                           ].includes(t.slug)
                         )
                         .map(renderAIToolItem)}
