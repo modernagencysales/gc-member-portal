@@ -110,7 +110,11 @@ const Sidebar: React.FC<SidebarProps> = ({
 
   const isFunnelAccess = user?.status === 'Funnel Access';
   const isLeadMagnet = user?.status === 'Lead Magnet';
-  const isEnrolledStudent = courseEnrollments.length > 0;
+  const isEnrolledStudent =
+    courseEnrollments.length > 0 ||
+    user?.status === 'Full Access' ||
+    user?.status === 'Funnel Access' ||
+    user?.status === 'Curriculum Only';
   const hasGrantedTools = isLeadMagnet && grantedTools && grantedTools.length > 0;
   const userDomain = user?.email.split('@')[1] || '';
 
