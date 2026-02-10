@@ -1,18 +1,21 @@
 import React, { useState } from 'react';
-import { Plus, Pencil, Trash2, BookOpen } from 'lucide-react';
+import { Pencil, Trash2, Sparkles, Wrench } from 'lucide-react';
 import { useRecipes, useDeleteRecipe } from '../../../../hooks/useColdEmailRecipes';
 import type { BootcampRecipe } from '../../../../types/cold-email-recipe-types';
 import RecipeEditor from './RecipeEditor';
+import EmailFirstRecipeBuilder from './EmailFirstRecipeBuilder';
 
 interface Props {
   userId: string;
 }
 
+type CreateMode = null | 'email-first' | 'manual';
+
 export default function RecipeList({ userId }: Props) {
   const { data: recipes, isLoading } = useRecipes(userId);
   const deleteRecipe = useDeleteRecipe();
   const [editingRecipe, setEditingRecipe] = useState<BootcampRecipe | null>(null);
-  const [isCreating, setIsCreating] = useState(false);
+  const [createMode, setCreateMode] = useState<CreateMode>(null);
 
   if (isLoading) {
     return (
@@ -22,14 +25,20 @@ export default function RecipeList({ userId }: Props) {
     );
   }
 
-  if (editingRecipe || isCreating) {
+  // Email-first builder
+  if (createMode === 'email-first') {
+    return <EmailFirstRecipeBuilder userId={userId} onClose={() => setCreateMode(null)} />;
+  }
+
+  // Manual recipe editor (existing)
+  if (editingRecipe || createMode === 'manual') {
     return (
       <RecipeEditor
         userId={userId}
         recipe={editingRecipe}
         onClose={() => {
           setEditingRecipe(null);
-          setIsCreating(false);
+          setCreateMode(null);
         }}
       />
     );
@@ -37,35 +46,60 @@ export default function RecipeList({ userId }: Props) {
 
   return (
     <div className="space-y-4">
+      {/* Header with create buttons */}
       <div className="flex items-center justify-between">
         <p className="text-sm text-zinc-500 dark:text-zinc-400">
           {recipes?.length || 0} recipe{recipes?.length !== 1 ? 's' : ''}
         </p>
-        <button
-          onClick={() => setIsCreating(true)}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-violet-600 text-white hover:bg-violet-700 transition-colors"
-        >
-          <Plus size={14} />
-          New Recipe
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setCreateMode('manual')}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
+          >
+            <Wrench size={12} />
+            Manual
+          </button>
+          <button
+            onClick={() => setCreateMode('email-first')}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg bg-violet-600 text-white hover:bg-violet-700 transition-colors"
+          >
+            <Sparkles size={14} />
+            Create from Email
+          </button>
+        </div>
       </div>
 
       {!recipes || recipes.length === 0 ? (
-        <div className="text-center py-16 px-4">
-          <BookOpen className="w-10 h-10 text-zinc-300 dark:text-zinc-700 mx-auto mb-3" />
-          <p className="text-sm font-medium text-zinc-600 dark:text-zinc-400 mb-1">
-            No recipes yet
-          </p>
-          <p className="text-xs text-zinc-400 dark:text-zinc-500 mb-4">
-            Create your first enrichment recipe to personalize cold emails.
-          </p>
-          <button
-            onClick={() => setIsCreating(true)}
-            className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-lg bg-violet-600 text-white hover:bg-violet-700 transition-colors"
-          >
-            <Plus size={14} />
-            Create Recipe
-          </button>
+        /* Empty state -- prominently features the email-first flow */
+        <div className="text-center py-12 px-4">
+          <div className="max-w-md mx-auto">
+            <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-violet-100 to-violet-50 dark:from-violet-900/30 dark:to-violet-900/10 flex items-center justify-center mx-auto mb-4">
+              <Sparkles className="w-7 h-7 text-violet-500" />
+            </div>
+            <h3 className="text-base font-semibold text-zinc-900 dark:text-white mb-2">
+              Build your first recipe from an email
+            </h3>
+            <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-6 leading-relaxed">
+              Write a personalized cold email, and AI will automatically detect your variables and
+              build the enrichment recipe to fill them. No manual step configuration needed.
+            </p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+              <button
+                onClick={() => setCreateMode('email-first')}
+                className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-lg bg-violet-600 text-white hover:bg-violet-700 transition-colors shadow-sm"
+              >
+                <Sparkles size={14} />
+                Create from Email
+              </button>
+              <button
+                onClick={() => setCreateMode('manual')}
+                className="inline-flex items-center gap-1.5 px-4 py-2 text-sm text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors"
+              >
+                <Wrench size={14} />
+                Or build manually
+              </button>
+            </div>
+          </div>
         </div>
       ) : (
         <div className="grid gap-3 sm:grid-cols-2">
