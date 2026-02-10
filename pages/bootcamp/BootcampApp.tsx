@@ -51,7 +51,8 @@ import {
   OnboardingStep,
 } from '../../types/bootcamp-types';
 import { queryKeys } from '../../lib/queryClient';
-import { Menu, X, Terminal, Users } from 'lucide-react';
+import { Menu, X, Terminal, Users, AlertCircle } from 'lucide-react';
+import ErrorBoundary from '../../components/shared/ErrorBoundary';
 
 const TamBuilder = lazy(() => import('../../components/tam/TamBuilder'));
 const ConnectionQualifier = lazy(
@@ -698,15 +699,36 @@ const BootcampApp: React.FC = () => {
                 />
               )}
               {currentLesson.id === 'virtual:tam-builder' ? (
-                <Suspense
+                <ErrorBoundary
                   fallback={
-                    <div className="flex items-center justify-center h-96">
-                      <div className="w-8 h-8 border-2 border-zinc-300 dark:border-zinc-700 border-t-violet-500 rounded-full animate-spin" />
+                    <div className="flex flex-col items-center justify-center h-96 gap-4 p-8">
+                      <AlertCircle className="w-12 h-12 text-red-500" />
+                      <h3 className="text-lg font-semibold text-zinc-900 dark:text-white">
+                        TAM Builder encountered an error
+                      </h3>
+                      <p className="text-sm text-zinc-500 dark:text-zinc-400 text-center max-w-md">
+                        Try reloading the page. If the issue persists, your project data is safe —
+                        contact support.
+                      </p>
+                      <button
+                        onClick={() => window.location.reload()}
+                        className="px-4 py-2 bg-violet-600 text-white rounded-lg text-sm font-medium hover:bg-violet-700 transition-colors"
+                      >
+                        Reload Page
+                      </button>
                     </div>
                   }
                 >
-                  <TamBuilder userId={bootcampStudent?.id || ''} />
-                </Suspense>
+                  <Suspense
+                    fallback={
+                      <div className="flex items-center justify-center h-96">
+                        <div className="w-8 h-8 border-2 border-zinc-300 dark:border-zinc-700 border-t-violet-500 rounded-full animate-spin" />
+                      </div>
+                    }
+                  >
+                    <TamBuilder userId={bootcampStudent?.id || ''} />
+                  </Suspense>
+                </ErrorBoundary>
               ) : currentLesson.id === 'virtual:connection-qualifier' ? (
                 <Suspense
                   fallback={
