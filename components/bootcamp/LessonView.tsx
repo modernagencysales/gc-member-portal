@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { ChatInterface } from '../chat';
 import MyBlueprint from './MyBlueprint';
+import LessonDescription from './LessonDescription';
 import { BootcampStudent } from '../../types/bootcamp-types';
 
 interface LessonViewProps {
@@ -456,10 +457,7 @@ const LessonView: React.FC<LessonViewProps> = ({
 
             {/* Show description text below content if available */}
             {!isTextContent && lesson.description && (
-              <div
-                className="mt-4 bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200 dark:border-zinc-800 p-6 md:p-8 text-sm leading-relaxed text-zinc-700 dark:text-zinc-300 whitespace-pre-wrap"
-                dangerouslySetInnerHTML={{ __html: lesson.description }}
-              />
+              <LessonDescription description={lesson.description} />
             )}
           </div>
         </div>
