@@ -255,6 +255,7 @@ const AdminBootcampInviteCodesPage: React.FC = () => {
               <tr>
                 <th className="px-4 py-3 text-left">Code</th>
                 <th className="px-4 py-3 text-left">Cohort</th>
+                <th className="px-4 py-3 text-left">Grants</th>
                 <th className="px-4 py-3 text-center">Uses</th>
                 <th className="px-4 py-3 text-center">Expires</th>
                 <th className="px-4 py-3 text-center">Status</th>
@@ -265,7 +266,7 @@ const AdminBootcampInviteCodesPage: React.FC = () => {
               {filteredCodes.length === 0 ? (
                 <tr>
                   <td
-                    colSpan={6}
+                    colSpan={7}
                     className={`px-4 py-8 text-center ${
                       isDarkMode ? 'text-slate-400' : 'text-slate-500'
                     }`}
@@ -309,6 +310,37 @@ const AdminBootcampInviteCodesPage: React.FC = () => {
                       <div className="flex items-center gap-2">
                         <Users className="w-4 h-4 text-slate-400" />
                         <span className="text-sm">{code.cohortName || 'Unknown'}</span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex flex-col gap-1">
+                        {code.grantedAccessLevel && code.grantedAccessLevel !== 'Full Access' && (
+                          <span
+                            className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium w-fit ${
+                              code.grantedAccessLevel === 'Lead Magnet'
+                                ? 'bg-violet-100 text-violet-800 dark:bg-violet-900/30 dark:text-violet-400'
+                                : 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400'
+                            }`}
+                          >
+                            {code.grantedAccessLevel}
+                          </span>
+                        )}
+                        {code.toolGrants && code.toolGrants.length > 0 && (
+                          <span
+                            className={`text-xs ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}
+                          >
+                            {code.toolGrants.length} tool{code.toolGrants.length !== 1 ? 's' : ''} ·{' '}
+                            {code.toolGrants[0].credits} credits
+                          </span>
+                        )}
+                        {(!code.grantedAccessLevel || code.grantedAccessLevel === 'Full Access') &&
+                          (!code.toolGrants || code.toolGrants.length === 0) && (
+                            <span
+                              className={`text-xs ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}
+                            >
+                              —
+                            </span>
+                          )}
                       </div>
                     </td>
                     <td className="px-4 py-3 text-center">
