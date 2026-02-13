@@ -7,6 +7,7 @@ import { supabase } from '../lib/supabaseClient';
 import {
   TamProject,
   TamCompany,
+  TamCompanyFeedback,
   TamContact,
   TamJob,
   TamProjectInput,
@@ -18,7 +19,7 @@ const TAM_PROJECT_COLUMNS =
   'id, user_id, name, status, icp_profile, sourcing_strategy, created_at, updated_at';
 
 const TAM_COMPANY_COLUMNS =
-  'id, project_id, name, domain, linkedin_url, source, industry, employee_count, location, description, qualification_status, qualification_reason, us_employee_pct, digital_footprint_score, segment_tags, raw_data, created_at';
+  'id, project_id, name, domain, linkedin_url, source, industry, employee_count, location, description, qualification_status, qualification_reason, us_employee_pct, digital_footprint_score, similarity_score, feedback, segment_tags, raw_data, created_at';
 
 const TAM_CONTACT_COLUMNS =
   'id, company_id, project_id, first_name, last_name, title, linkedin_url, email, email_status, phone, linkedin_last_post_date, linkedin_active, source, raw_data, created_at';
@@ -60,6 +61,8 @@ function mapTamCompany(record: Record<string, unknown>): TamCompany {
     qualificationReason: record.qualification_reason as string | null,
     usEmployeePct: record.us_employee_pct as number | null,
     digitalFootprintScore: record.digital_footprint_score as number | null,
+    similarityScore: record.similarity_score as number | null,
+    feedback: (record.feedback as TamCompanyFeedback) || null,
     segmentTags: record.segment_tags as Record<string, string> | null,
     rawData: record.raw_data as Record<string, unknown> | null,
     createdAt: record.created_at as string,
@@ -249,6 +252,8 @@ export async function insertTamCompanies(
     qualification_reason: company.qualificationReason || null,
     us_employee_pct: company.usEmployeePct || null,
     digital_footprint_score: company.digitalFootprintScore || null,
+    similarity_score: company.similarityScore || null,
+    feedback: company.feedback || null,
     segment_tags: company.segmentTags || null,
     raw_data: company.rawData || null,
   }));
@@ -279,6 +284,8 @@ export async function updateTamCompany(
   if (updates.usEmployeePct !== undefined) updateData.us_employee_pct = updates.usEmployeePct;
   if (updates.digitalFootprintScore !== undefined)
     updateData.digital_footprint_score = updates.digitalFootprintScore;
+  if (updates.similarityScore !== undefined) updateData.similarity_score = updates.similarityScore;
+  if (updates.feedback !== undefined) updateData.feedback = updates.feedback;
   if (updates.segmentTags !== undefined) updateData.segment_tags = updates.segmentTags;
   if (updates.rawData !== undefined) updateData.raw_data = updates.rawData;
 
@@ -287,6 +294,21 @@ export async function updateTamCompany(
     .update(updateData)
     .eq('id', companyId)
     .select()
+    .single();
+
+  if (error) throw new Error(error.message);
+  return mapTamCompany(data);
+}
+
+export async function updateCompanyFeedback(
+  companyId: string,
+  feedback: TamCompanyFeedback | null
+): Promise<TamCompany> {
+  const { data, error } = await supabase
+    .from('tam_companies')
+    .update({ feedback })
+    .eq('id', companyId)
+    .select(TAM_COMPANY_COLUMNS)
     .single();
 
   if (error) throw new Error(error.message);

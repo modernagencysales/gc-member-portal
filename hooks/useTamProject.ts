@@ -11,10 +11,17 @@ import {
   createTamProject,
   updateTamProject,
   updateTamCompany,
+  updateCompanyFeedback,
   createTamJob,
   updateTamJob,
 } from '../services/tam-supabase';
-import { TamProject, TamCompany, TamJob, TamProjectInput } from '../types/tam-types';
+import {
+  TamProject,
+  TamCompany,
+  TamCompanyFeedback,
+  TamJob,
+  TamProjectInput,
+} from '../types/tam-types';
 
 // ============================================
 // Query Hooks
@@ -122,6 +129,23 @@ export function useUpdateTamCompanyMutation() {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.tamCompanies(data.projectId) });
       queryClient.invalidateQueries({ queryKey: queryKeys.tamStats(data.projectId) });
+    },
+  });
+}
+
+export function useCompanyFeedbackMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      companyId,
+      feedback,
+    }: {
+      companyId: string;
+      feedback: TamCompanyFeedback | null;
+    }) => updateCompanyFeedback(companyId, feedback),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.tamCompanies(data.projectId) });
     },
   });
 }

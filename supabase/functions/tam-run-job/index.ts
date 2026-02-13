@@ -69,6 +69,7 @@ interface SourcedCompany {
   location: string | null;
   description: string | null;
   digital_footprint_score: number | null;
+  similarity_score: number | null;
   source: string;
   raw: Record<string, unknown>;
 }
@@ -89,44 +90,43 @@ async function discolikeGet(
     url.searchParams.set(key, String(value));
   }
   const response = await fetch(url.toString(), {
-    headers: { Authorization: `Bearer ${apiKey}`, Accept: 'application/json' },
+    headers: { 'x-discolike-key': apiKey, Accept: 'application/json' },
   });
   if (!response.ok) {
-    throw new Error(`Discolike ${path} failed: ${response.status} ${response.statusText}`);
+    const body = await response.text().catch(() => '');
+    throw new Error(
+      `Discolike ${path} failed: ${response.status} ${response.statusText} — ${body}`
+    );
   }
   return response.json();
 }
 
-async function discolikeBizData(
+// Domain consensus discovery — pass multiple seed domains for best results
+async function discolikeDiscoverByDomains(
   apiKey: string,
-  domain: string
-): Promise<{
-  keywords: string[];
-  industry_groups: string[];
-  description: string;
-  score: number;
-}> {
-  const data = await discolikeGet(apiKey, '/v1/bizdata', { domain });
-  return {
-    keywords: data.keywords || [],
-    industry_groups: data.industry_groups || [],
-    description: data.description || '',
-    score: data.score || 0,
-  };
-}
-
-async function discolikeDiscover(
-  apiKey: string,
-  keyword: string,
+  domains: string[],
   country: string,
   maxRecords: number
 ): Promise<any[]> {
-  const data = await discolikeGet(apiKey, '/v1/discover', {
-    keyword,
-    country,
-    max_records: maxRecords,
-    min_score: 50,
+  // DiscoLike expects multiple `domain` query params for consensus
+  const url = new URL(`${DISCOLIKE_BASE}/v1/discover`);
+  for (const d of domains) {
+    url.searchParams.append('domain', d);
+  }
+  if (country) url.searchParams.set('country', country);
+  url.searchParams.set('max_records', String(maxRecords));
+  url.searchParams.set('min_score', '50');
+
+  const response = await fetch(url.toString(), {
+    headers: { 'x-discolike-key': apiKey, Accept: 'application/json' },
   });
+  if (!response.ok) {
+    const body = await response.text().catch(() => '');
+    throw new Error(
+      `Discolike discover failed: ${response.status} ${response.statusText} — ${body}`
+    );
+  }
+  const data = await response.json();
   return data.results || data.companies || [];
 }
 
@@ -216,38 +216,49 @@ function buildProspeoCompanyFilters(icpProfile: any): Record<string, any> {
     };
   }
 
-  // Employee size filter — map wizard ranges to Prospeo ranges
+  // Employee size filter — map wizard ranges to Prospeo's company_headcount_range (flat array)
+  // Prospeo ranges: 1-10, 11-20, 21-50, 51-100, 101-200, 201-500, 501-1000, 1001-2000, 2001-5000, 5001-10000, 10000+
   if (icpProfile.employeeSizeRanges?.length) {
-    const sizeMap: Record<string, string> = {
-      '1-10': '1-10',
-      '11-50': '11-50',
-      '51-200': '51-200',
-      '201-1000': '201-1000',
-      '1000+': '1001-5000',
+    const sizeMap: Record<string, string[]> = {
+      '1-10': ['1-10'],
+      '11-50': ['11-20', '21-50'],
+      '51-200': ['51-100', '101-200'],
+      '201-1000': ['201-500', '501-1000'],
+      '1000+': ['1001-2000', '2001-5000', '5001-10000', '10000+'],
     };
-    const prospeoSizes = icpProfile.employeeSizeRanges
-      .map((s: string) => sizeMap[s])
-      .filter(Boolean);
+    const prospeoSizes = icpProfile.employeeSizeRanges.flatMap((s: string) => sizeMap[s] || []);
     if (prospeoSizes.length > 0) {
-      filters.company_size = { include: prospeoSizes };
+      filters.company_headcount_range = prospeoSizes;
     }
   }
 
   // Location filter
   if (icpProfile.geography === 'us_only') {
-    filters.company_location = { include: ['United States'] };
+    filters.company_location_search = { include: ['United States'] };
   } else if (
     icpProfile.geography === 'specific_countries' &&
     icpProfile.specificCountries?.length
   ) {
-    filters.company_location = { include: icpProfile.specificCountries };
+    filters.company_location_search = { include: icpProfile.specificCountries };
   }
 
-  // Seed company domains — search by website
+  // Seed company domains — search by website (normalize to clean domains)
   if (icpProfile.seedCompanyDomains?.length) {
-    filters.company = {
-      websites: { include: icpProfile.seedCompanyDomains },
-    };
+    const cleanDomains = icpProfile.seedCompanyDomains
+      .map((d: string) => {
+        let domain = d.trim().toLowerCase();
+        domain = domain.replace(/^https?:\/\//, '');
+        domain = domain.replace(/^www\./, '');
+        domain = domain.split('/')[0];
+        domain = domain.split(':')[0];
+        return domain;
+      })
+      .filter((d: string) => d && d.includes('.') && !d.includes(' '));
+    if (cleanDomains.length > 0) {
+      filters.company = {
+        websites: { include: cleanDomains },
+      };
+    }
   }
 
   return filters;
@@ -263,10 +274,11 @@ function buildProspeoPersonFilters(icpProfile: any, companyDomains: string[]): R
     };
   }
 
-  // Seniority filter
+  // Seniority filter — map wizard values to Prospeo enum
+  // Prospeo values: Founder/Owner, C-Suite, Partner, Vice President, Head, Director, Manager, Senior, Entry, Intern
   const seniorityMap: Record<string, string> = {
-    'C-Suite': 'C-Level',
-    VP: 'VP',
+    'C-Suite': 'C-Suite',
+    VP: 'Vice President',
     Director: 'Director',
     Manager: 'Manager',
     Founder: 'Founder/Owner',
@@ -282,12 +294,12 @@ function buildProspeoPersonFilters(icpProfile: any, companyDomains: string[]): R
 
   // Location filter
   if (icpProfile.geography === 'us_only') {
-    filters.person_location = { include: ['United States'] };
+    filters.person_location_search = { include: ['United States'] };
   } else if (
     icpProfile.geography === 'specific_countries' &&
     icpProfile.specificCountries?.length
   ) {
-    filters.person_location = { include: icpProfile.specificCountries };
+    filters.person_location_search = { include: icpProfile.specificCountries };
   }
 
   return filters;
@@ -382,6 +394,7 @@ async function batchInsertCompanies(
         location: c.location,
         description: c.description,
         digital_footprint_score: c.digital_footprint_score,
+        similarity_score: c.similarity_score,
         qualification_status: 'pending',
         raw_data: c.raw,
       }))
@@ -409,14 +422,25 @@ async function sourceFromProspeo(
   const filters = buildProspeoCompanyFilters(icpProfile);
 
   if (Object.keys(filters).length === 0) {
+    // Fallback industries must use exact Prospeo enum values
     const fallback: Record<string, string[]> = {
-      b2b_saas: ['Software', 'Information Technology'],
-      ecommerce_dtc: ['Retail', 'E-commerce'],
-      amazon_sellers: ['Retail', 'E-commerce'],
-      local_service: ['Professional Services'],
-      agencies: ['Marketing & Advertising', 'Professional Services'],
+      b2b_saas: [
+        'Software Development',
+        'Technology, Information and Internet',
+        'IT Services and IT Consulting',
+      ],
+      ecommerce_dtc: [
+        'General Retail',
+        'Online and Mail Order Retail',
+        'Internet Marketplace Platforms',
+      ],
+      amazon_sellers: ['General Retail', 'Online and Mail Order Retail'],
+      local_service: ['Professional Services', 'Consumer Services'],
+      agencies: ['Advertising Services', 'Marketing Services', 'Professional Services'],
     };
-    filters.company_industry = { include: fallback[icpProfile.businessModel] || ['Software'] };
+    filters.company_industry = {
+      include: fallback[icpProfile.businessModel] || ['Software Development'],
+    };
   }
 
   const companies: SourcedCompany[] = [];
@@ -441,6 +465,7 @@ async function sourceFromProspeo(
               .join(', ') || null,
           description: co.description || co.description_seo || null,
           digital_footprint_score: null,
+          similarity_score: null,
           source: 'prospeo',
           raw: co,
         });
@@ -458,7 +483,7 @@ async function sourceFromProspeo(
   return companies;
 }
 
-// ---- Source: Discolike ----
+// ---- Source: Discolike (domain consensus) ----
 
 async function sourceFromDiscolike(
   apiKey: string,
@@ -467,34 +492,19 @@ async function sourceFromDiscolike(
   progress: ProgressFn
 ): Promise<SourcedCompany[]> {
   const companies: SourcedCompany[] = [];
-  const limits = icpProfile.sourcingLimits || {};
-  const maxKeywords = limits.discolikeMaxKeywords || 10;
-  const maxRecords = limits.discolikeMaxRecordsPerKeyword || 2000;
 
-  // BizData: extract keywords from seed domains
-  const seedDomains = (icpProfile.seedCompanyDomains || []).slice(0, 10);
-  const keywordCounts = new Map<string, number>();
+  // Domain consensus requires seed domains — skip if none provided
+  const seedDomains = (icpProfile.seedCompanyDomains || [])
+    .map((d: string) => normalizeDomain(d))
+    .filter(Boolean)
+    .slice(0, 10);
 
-  for (let i = 0; i < seedDomains.length; i++) {
-    try {
-      const biz = await discolikeBizData(apiKey, seedDomains[i]);
-      for (const kw of biz.keywords)
-        keywordCounts.set(kw.toLowerCase(), (keywordCounts.get(kw.toLowerCase()) || 0) + 1);
-    } catch {
-      /* skip */
-    }
-    await delay(500);
-    await progress(((i + 1) / seedDomains.length) * 0.25);
+  if (seedDomains.length === 0) {
+    console.log('DiscoLike: no seed domains, skipping');
+    return companies;
   }
 
-  // Merge seed keywords (by frequency) with ICP industry keywords
-  const kwSet = new Set<string>();
-  const sorted = [...keywordCounts.entries()].sort((a, b) => b[1] - a[1]);
-  for (const [kw] of sorted) kwSet.add(kw);
-  for (const kw of icpProfile.industryKeywords || []) kwSet.add(kw.toLowerCase());
-  const keywords = [...kwSet].slice(0, maxKeywords);
-
-  if (keywords.length === 0) return companies;
+  const maxRecords = icpProfile.sourcingLimits?.discolikeMaxRecords || 200;
 
   // Country filter
   let country = '';
@@ -503,31 +513,30 @@ async function sourceFromDiscolike(
     country = icpProfile.specificCountries[0];
   }
 
-  // Discover for each keyword
-  for (let i = 0; i < keywords.length; i++) {
-    try {
-      const results = await discolikeDiscover(apiKey, keywords[i], country, maxRecords);
-      for (const r of results) {
-        addCompany(companies, seen, {
-          name: r.name || r.company_name || r.domain || '',
-          domain: r.domain || r.website || null,
-          linkedin_url: null,
-          industry: r.industry || r.category || null,
-          employee_count: r.employees || r.employee_count || null,
-          location: r.address || r.location || r.country || null,
-          description: r.description || null,
-          digital_footprint_score: r.score || r.digital_footprint_score || null,
-          source: 'discolike',
-          raw: r,
-        });
-      }
-    } catch {
-      /* skip */
-    }
-    await delay(500);
-    await progress(0.25 + ((i + 1) / keywords.length) * 0.75);
+  await progress(0.1);
+
+  // Single domain consensus call with all seed domains
+  const results = await discolikeDiscoverByDomains(apiKey, seedDomains, country, maxRecords);
+
+  await progress(0.8);
+
+  for (const r of results) {
+    addCompany(companies, seen, {
+      name: r.name || r.company_name || r.domain || '',
+      domain: r.domain || r.website || null,
+      linkedin_url: null,
+      industry: r.industry || r.category || null,
+      employee_count: r.employees || r.employee_count || null,
+      location: r.address || r.location || r.country || null,
+      description: r.description || null,
+      digital_footprint_score: r.score || r.digital_footprint_score || null,
+      similarity_score: r.similarity || null,
+      source: 'discolike',
+      raw: r,
+    });
   }
 
+  await progress(1.0);
   return companies;
 }
 
@@ -565,6 +574,7 @@ async function sourceFromBlitzApi(
             null,
           description: r.description || r.tagline || null,
           digital_footprint_score: null,
+          similarity_score: null,
           source: 'blitzapi',
           raw: r,
         });
@@ -598,16 +608,48 @@ async function handleSourceCompanies(supabase: any, job: any, project: any) {
   const pg = (start: number, end: number) => progressFn(supabase, job.id, start, end);
 
   // Fixed progress ranges: Prospeo 0-30, Discolike 30-60, BlitzAPI 60-90, Insert 90-100
-  const prospeoCompanies = await sourceFromProspeo(prospeoKey, icpProfile, seen, pg(0, 30));
-  const discolikeCompanies = discolikeKey
-    ? await sourceFromDiscolike(discolikeKey, icpProfile, seen, pg(30, 60))
-    : [];
-  const blitzCompanies = blitzKey
-    ? await sourceFromBlitzApi(blitzKey, icpProfile, seen, pg(60, 90))
-    : [];
+  // Each source runs independently — one failing doesn't block the others
+  const errors: string[] = [];
+
+  let prospeoCompanies: SourcedCompany[] = [];
+  try {
+    prospeoCompanies = await sourceFromProspeo(prospeoKey, icpProfile, seen, pg(0, 30));
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.error('Prospeo sourcing failed:', msg);
+    errors.push(`Prospeo: ${msg}`);
+  }
+
+  let discolikeCompanies: SourcedCompany[] = [];
+  if (discolikeKey) {
+    try {
+      discolikeCompanies = await sourceFromDiscolike(discolikeKey, icpProfile, seen, pg(30, 60));
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error('Discolike sourcing failed:', msg);
+      errors.push(`Discolike: ${msg}`);
+    }
+  }
+
+  let blitzCompanies: SourcedCompany[] = [];
+  if (blitzKey) {
+    try {
+      blitzCompanies = await sourceFromBlitzApi(blitzKey, icpProfile, seen, pg(60, 90));
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error('BlitzAPI sourcing failed:', msg);
+      errors.push(`BlitzAPI: ${msg}`);
+    }
+  }
 
   // Insert all (already deduped via shared `seen` set)
   const allCompanies = [...prospeoCompanies, ...discolikeCompanies, ...blitzCompanies];
+
+  // If ALL sources failed and we have zero companies, throw so the job is marked failed
+  if (allCompanies.length === 0 && errors.length > 0) {
+    throw new Error(`All sources failed: ${errors.join('; ')}`);
+  }
+
   const { inserted, failed } = await batchInsertCompanies(
     supabase,
     job.project_id,
@@ -630,6 +672,7 @@ async function handleSourceCompanies(supabase: any, job: any, project: any) {
     discolikeCount: counts.discolike || 0,
     blitzapiCount: counts.blitzapi || 0,
     source: sources.join('+') || 'none',
+    ...(errors.length > 0 ? { warnings: errors } : {}),
   };
 }
 
@@ -824,39 +867,43 @@ async function handleFindContacts(supabase: any, job: any, project: any) {
           if (currentCount >= maxContactsPerCompany) continue;
           companyContactCounts.set(matchedCompany.id, currentCount + 1);
 
-          // Enrich person to get email
+          // Find email via centralized API hub
           let email: string | null = null;
           let emailStatus = 'not_found';
-          let phone: string | null = null;
+          const phone: string | null = null;
 
-          if (person.person_id) {
+          const firstName = person.first_name || '';
+          const lastName = person.last_name || '';
+          if (firstName && lastName && companyDomain) {
             try {
-              const enrichResponse = await fetch(`${PROSPEO_BASE}/enrich-person`, {
-                method: 'POST',
-                headers: prospeoHeaders(prospeoKey),
-                body: JSON.stringify({
-                  data: { person_id: person.person_id },
-                  only_verified_email: false,
-                }),
-              });
+              const gtmSystemUrl = Deno.env.get('GTM_SYSTEM_URL');
+              const serviceKey = Deno.env.get('SERVICE_API_KEY');
+              if (gtmSystemUrl && serviceKey) {
+                const enrichResponse = await fetch(`${gtmSystemUrl}/api/services/find-email`, {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'X-Service-Key': serviceKey,
+                  },
+                  body: JSON.stringify({
+                    first_name: firstName,
+                    last_name: lastName,
+                    company_domain: companyDomain,
+                    linkedin_url: person.linkedin_url || undefined,
+                  }),
+                });
 
-              const enrichData = await enrichResponse.json();
-              if (!enrichData.error && enrichData.person) {
-                if (enrichData.person.email?.email) {
-                  email = enrichData.person.email.email;
-                  emailStatus =
-                    enrichData.person.email.status === 'verified' ? 'verified' : 'found';
-                }
-                if (enrichData.person.mobile?.mobile) {
-                  phone = enrichData.person.mobile.mobile;
+                if (enrichResponse.ok) {
+                  const enrichData = await enrichResponse.json();
+                  if (enrichData.email) {
+                    email = enrichData.email;
+                    emailStatus = enrichData.validated ? 'verified' : 'found';
+                  }
                 }
               }
             } catch {
               // Continue without enrichment
             }
-
-            // Rate limit enrichment calls
-            await new Promise((r) => setTimeout(r, 200));
           }
 
           // Insert contact
@@ -973,6 +1020,125 @@ async function handleCheckLinkedin(supabase: any, job: any, _project: any) {
 }
 
 // ============================================
+// Refine DiscoLike (feedback-driven re-discovery)
+// ============================================
+
+async function handleRefineDiscolike(supabase: any, job: any, project: any) {
+  const discolikeKey = Deno.env.get('DISCOLIKE_API_KEY');
+  if (!discolikeKey) throw new Error('DISCOLIKE_API_KEY not configured');
+
+  const icpProfile = project?.icp_profile || {};
+  const pg = (start: number, end: number) => progressFn(supabase, job.id, start, end);
+
+  // Get original seed domains from ICP profile
+  const originalSeeds = (icpProfile.seedCompanyDomains || [])
+    .map((d: string) => normalizeDomain(d))
+    .filter(Boolean) as string[];
+
+  // Get liked companies' domains (expand seed set)
+  const { data: likedCompanies } = await supabase
+    .from('tam_companies')
+    .select('domain')
+    .eq('project_id', job.project_id)
+    .eq('source', 'discolike')
+    .eq('feedback', 'liked')
+    .not('domain', 'is', null);
+
+  const likedDomains = (likedCompanies || [])
+    .map((c: any) => normalizeDomain(c.domain))
+    .filter(Boolean) as string[];
+
+  // Get disliked companies' domains (exclude from results)
+  const { data: dislikedCompanies } = await supabase
+    .from('tam_companies')
+    .select('domain')
+    .eq('project_id', job.project_id)
+    .eq('source', 'discolike')
+    .eq('feedback', 'disliked')
+    .not('domain', 'is', null);
+
+  const dislikedDomains = new Set(
+    (dislikedCompanies || []).map((c: any) => normalizeDomain(c.domain)).filter(Boolean)
+  );
+
+  // Build expanded seed set: original seeds + liked domains (up to 10)
+  const seedSet = new Set<string>([...originalSeeds, ...likedDomains]);
+  const seedDomains = [...seedSet].slice(0, 10);
+
+  if (seedDomains.length === 0) {
+    return { companiesFound: 0, message: 'No seed domains available' };
+  }
+
+  await pg(0, 10)(0.5);
+
+  // Get existing domains in project for dedup
+  const { data: existingCompanies } = await supabase
+    .from('tam_companies')
+    .select('domain')
+    .eq('project_id', job.project_id)
+    .not('domain', 'is', null);
+
+  const seen = new Set<string>(
+    (existingCompanies || []).map((c: any) => normalizeDomain(c.domain)).filter(Boolean) as string[]
+  );
+
+  // Country filter
+  let country = '';
+  if (icpProfile.geography === 'us_only') country = 'US';
+  else if (icpProfile.geography === 'specific_countries' && icpProfile.specificCountries?.length) {
+    country = icpProfile.specificCountries[0];
+  }
+
+  const maxRecords = icpProfile.sourcingLimits?.discolikeMaxRecords || 200;
+
+  await pg(10, 20)(0.5);
+
+  // Run domain consensus discovery with expanded seed set
+  const results = await discolikeDiscoverByDomains(discolikeKey, seedDomains, country, maxRecords);
+
+  await pg(20, 60)(1.0);
+
+  // Filter out disliked domains and build company list
+  const companies: SourcedCompany[] = [];
+  for (const r of results) {
+    const domain = normalizeDomain(r.domain || r.website || null);
+    if (domain && dislikedDomains.has(domain)) continue;
+
+    addCompany(companies, seen, {
+      name: r.name || r.company_name || r.domain || '',
+      domain: r.domain || r.website || null,
+      linkedin_url: null,
+      industry: r.industry || r.category || null,
+      employee_count: r.employees || r.employee_count || null,
+      location: r.address || r.location || r.country || null,
+      description: r.description || null,
+      digital_footprint_score: r.score || r.digital_footprint_score || null,
+      similarity_score: r.similarity || null,
+      source: 'discolike',
+      raw: r,
+    });
+  }
+
+  // Insert new companies
+  const { inserted, failed } = await batchInsertCompanies(
+    supabase,
+    job.project_id,
+    companies,
+    pg(60, 100)
+  );
+
+  return {
+    companiesFound: companies.length,
+    inserted,
+    failed,
+    seedDomainsUsed: seedDomains.length,
+    likedCount: likedDomains.length,
+    dislikedExcluded: dislikedDomains.size,
+    totalResults: results.length,
+  };
+}
+
+// ============================================
 // Main serve function
 // ============================================
 
@@ -1038,6 +1204,9 @@ serve(async (req) => {
           break;
         case 'check_linkedin':
           resultSummary = await handleCheckLinkedin(supabase, job, project);
+          break;
+        case 'refine_discolike':
+          resultSummary = await handleRefineDiscolike(supabase, job, project);
           break;
         default:
           throw new Error(`Unknown job type: ${job.job_type}`);

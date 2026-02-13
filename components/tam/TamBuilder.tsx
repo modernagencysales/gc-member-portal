@@ -302,7 +302,11 @@ const TamBuilder: React.FC<TamBuilderProps> = ({ userId }) => {
         {/* Pipeline Phase */}
         {phase === 'pipeline' && activeProjectId && (
           <div className="p-6 flex items-center justify-center min-h-[500px]">
-            <PipelineProgress steps={pipeline.steps} error={pipeline.error} />
+            <PipelineProgress
+              steps={pipeline.steps}
+              error={pipeline.error}
+              onNewProject={handleNewProject}
+            />
           </div>
         )}
 

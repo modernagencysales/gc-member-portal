@@ -1,10 +1,11 @@
 import React from 'react';
-import { Check, Loader2, AlertCircle, Building2, Shield, Users } from 'lucide-react';
+import { Check, Loader2, AlertCircle, Building2, Shield, Users, RotateCcw } from 'lucide-react';
 import { PipelineStepState } from '../../hooks/useTamPipeline';
 
 interface PipelineProgressProps {
   steps: PipelineStepState[];
   error: string | null;
+  onNewProject?: () => void;
 }
 
 const STEP_ICONS: Record<string, React.ReactNode> = {
@@ -13,7 +14,7 @@ const STEP_ICONS: Record<string, React.ReactNode> = {
   find_contacts: <Users className="w-5 h-5" />,
 };
 
-const PipelineProgress: React.FC<PipelineProgressProps> = ({ steps, error }) => {
+const PipelineProgress: React.FC<PipelineProgressProps> = ({ steps, error, onNewProject }) => {
   return (
     <div className="w-full max-w-2xl mx-auto space-y-8">
       <div className="text-center mb-8">
@@ -102,7 +103,7 @@ const PipelineProgress: React.FC<PipelineProgressProps> = ({ steps, error }) => 
                 {/* Error message for failed step */}
                 {step.status === 'failed' && (
                   <p className="text-xs text-red-600 dark:text-red-400 mt-1">
-                    Step failed. You can retry from the chat.
+                    Step failed. Try creating a new project with adjusted criteria.
                   </p>
                 )}
               </div>
@@ -112,8 +113,17 @@ const PipelineProgress: React.FC<PipelineProgressProps> = ({ steps, error }) => 
       </div>
 
       {error && (
-        <div className="rounded-xl border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20 p-4 text-center">
+        <div className="rounded-xl border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20 p-4 text-center space-y-3">
           <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+          {onNewProject && (
+            <button
+              onClick={onNewProject}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-violet-600 text-white hover:bg-violet-700 transition-colors"
+            >
+              <RotateCcw className="w-4 h-4" />
+              Start New Project
+            </button>
+          )}
         </div>
       )}
     </div>

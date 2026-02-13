@@ -23,7 +23,8 @@ export type TamJobType =
   | 'qualify'
   | 'find_contacts'
   | 'enrich_emails'
-  | 'check_linkedin';
+  | 'check_linkedin'
+  | 'refine_discolike';
 
 export type TamJobStatus = 'pending' | 'running' | 'awaiting_approval' | 'completed' | 'failed';
 
@@ -58,10 +59,8 @@ export interface IcpProfile {
 export interface SourcingLimits {
   /** Prospeo max pages (25 results/page). Default: 40 → ~1,000 companies */
   prospeoMaxPages?: number;
-  /** Discolike max records per keyword. Default: 2000 */
-  discolikeMaxRecordsPerKeyword?: number;
-  /** Discolike max keywords to search. Default: 10 */
-  discolikeMaxKeywords?: number;
+  /** Discolike max records (domain consensus). Default: 200 */
+  discolikeMaxRecords?: number;
   /** BlitzAPI max pages (100 results/page). Default: 20 → ~2,000 companies. Set to 200 for ~20k */
   blitzApiMaxPages?: number;
 }
@@ -87,6 +86,8 @@ export interface TamProject {
   updatedAt: string;
 }
 
+export type TamCompanyFeedback = 'liked' | 'disliked';
+
 export interface TamCompany {
   id: string;
   projectId: string;
@@ -102,6 +103,8 @@ export interface TamCompany {
   qualificationReason: string | null;
   usEmployeePct: number | null;
   digitalFootprintScore: number | null;
+  similarityScore: number | null;
+  feedback: TamCompanyFeedback | null;
   segmentTags: Record<string, string> | null;
   rawData: Record<string, unknown> | null;
   createdAt: string;

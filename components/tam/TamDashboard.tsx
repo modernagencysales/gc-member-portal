@@ -1,7 +1,13 @@
-import React, { useState, useMemo, useCallback, memo } from 'react';
-import { MessageSquare } from 'lucide-react';
-import { TamContact } from '../../types/tam-types';
-import { useTamCompanies, useTamContacts, useTamStats } from '../../hooks/useTamProject';
+import React, { useState, useMemo, useCallback, useEffect, memo } from 'react';
+import { MessageSquare, RefreshCw, Loader2 } from 'lucide-react';
+import { TamContact, TamCompanyFeedback } from '../../types/tam-types';
+import {
+  useTamCompanies,
+  useTamContacts,
+  useTamStats,
+  useCompanyFeedbackMutation,
+} from '../../hooks/useTamProject';
+import { useTamRefine } from '../../hooks/useTamRefine';
 import TamStatsBar from './TamStatsBar';
 import FilterBar, { Filters } from './dashboard/FilterBar';
 import CompanyTable from './dashboard/CompanyTable';
@@ -24,10 +30,18 @@ const TamDashboard: React.FC<TamDashboardProps> = ({ projectId, onOpenChat }) =>
     source: 'all',
   });
 
+  const feedbackMutation = useCompanyFeedbackMutation();
+  const refine = useTamRefine();
+
   // Fetch data
   const { data: stats } = useTamStats(projectId);
-  const { data: companies = [] } = useTamCompanies(projectId);
+  const { data: companies = [], refetch: refetchCompanies } = useTamCompanies(projectId);
   const { data: contacts = [] } = useTamContacts(projectId);
+
+  // Refetch companies when refine completes
+  useEffect(() => {
+    if (refine.result) refetchCompanies();
+  }, [refine.result, refetchCompanies]);
 
   // Group contacts by company
   const contactsByCompany = useMemo(() => {
@@ -139,6 +153,27 @@ const TamDashboard: React.FC<TamDashboardProps> = ({ projectId, onOpenChat }) =>
     });
   }, [allFilteredContacts]);
 
+  // DiscoLike feedback stats
+  const discolikeStats = useMemo(() => {
+    const discolikeCompanies = companies.filter((c) => c.source === 'discolike');
+    return {
+      total: discolikeCompanies.length,
+      liked: discolikeCompanies.filter((c) => c.feedback === 'liked').length,
+      disliked: discolikeCompanies.filter((c) => c.feedback === 'disliked').length,
+    };
+  }, [companies]);
+
+  const handleFeedback = useCallback(
+    (companyId: string, feedback: TamCompanyFeedback | null) => {
+      feedbackMutation.mutate({ companyId, feedback });
+    },
+    [feedbackMutation]
+  );
+
+  const handleRefine = useCallback(() => {
+    refine.startRefine(projectId);
+  }, [projectId, refine]);
+
   const segmentTabs: { key: SegmentTab; label: string }[] = [
     { key: 'all', label: 'All' },
     { key: 'linkedin_active', label: 'LinkedIn Active' },
@@ -151,6 +186,51 @@ const TamDashboard: React.FC<TamDashboardProps> = ({ projectId, onOpenChat }) =>
       {stats && <TamStatsBar stats={stats} />}
 
       <FilterBar filters={filters} onFiltersChange={setFilters} sources={sources} />
+
+      {/* DiscoLike Refine Bar */}
+      {discolikeStats.total > 0 && (
+        <div className="flex items-center justify-between rounded-lg border border-violet-200 dark:border-violet-800 bg-violet-50 dark:bg-violet-900/10 px-4 py-3">
+          <div className="flex items-center gap-3 text-sm">
+            <span className="font-medium text-violet-700 dark:text-violet-300">
+              Lookalike Companies
+            </span>
+            <span className="text-violet-600 dark:text-violet-400">
+              {discolikeStats.total} found
+            </span>
+            {(discolikeStats.liked > 0 || discolikeStats.disliked > 0) && (
+              <span className="text-xs text-zinc-500 dark:text-zinc-400">
+                {discolikeStats.liked > 0 && `${discolikeStats.liked} liked`}
+                {discolikeStats.liked > 0 && discolikeStats.disliked > 0 && ', '}
+                {discolikeStats.disliked > 0 && `${discolikeStats.disliked} disliked`}
+              </span>
+            )}
+          </div>
+          <button
+            onClick={handleRefine}
+            disabled={
+              refine.isRefining || (discolikeStats.liked === 0 && discolikeStats.disliked === 0)
+            }
+            className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium bg-violet-600 text-white hover:bg-violet-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            {refine.isRefining ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <RefreshCw className="w-4 h-4" />
+            )}
+            {refine.isRefining
+              ? `Refining${refine.progress > 0 ? ` (${refine.progress}%)` : '...'}`
+              : 'Refine Lookalikes'}
+          </button>
+        </div>
+      )}
+
+      {refine.result && !refine.isRefining && (
+        <p className="text-sm text-green-600 dark:text-green-400">
+          Found {(refine.result.companiesFound as number) || 0} new lookalike companies
+        </p>
+      )}
+
+      {refine.error && <p className="text-sm text-red-600 dark:text-red-400">{refine.error}</p>}
 
       {/* Segment Tabs */}
       <div className="flex gap-6 border-b border-zinc-200 dark:border-zinc-800">
@@ -176,6 +256,7 @@ const TamDashboard: React.FC<TamDashboardProps> = ({ projectId, onOpenChat }) =>
         selectedContactIds={selectedContactIds}
         onToggleContact={toggleContact}
         onSelectAll={selectAllContacts}
+        onFeedback={discolikeStats.total > 0 ? handleFeedback : undefined}
       />
 
       <BulkActions

@@ -1,6 +1,11 @@
 import React, { useState, useCallback, memo } from 'react';
-import { ChevronDown, ChevronRight } from 'lucide-react';
-import { TamCompany, TamContact, TamQualificationStatus } from '../../../types/tam-types';
+import { ChevronDown, ChevronRight, ThumbsUp, ThumbsDown } from 'lucide-react';
+import {
+  TamCompany,
+  TamCompanyFeedback,
+  TamContact,
+  TamQualificationStatus,
+} from '../../../types/tam-types';
 import ContactRow from './ContactRow';
 
 interface CompanyTableProps {
@@ -10,6 +15,7 @@ interface CompanyTableProps {
   selectedContactIds: Set<string>;
   onToggleContact: (contactId: string) => void;
   onSelectAll: () => void;
+  onFeedback?: (companyId: string, feedback: TamCompanyFeedback | null) => void;
 }
 
 function getQualificationBadgeClasses(status: TamQualificationStatus): string {
@@ -32,6 +38,7 @@ const CompanyTable: React.FC<CompanyTableProps> = ({
   selectedContactIds,
   onToggleContact,
   onSelectAll,
+  onFeedback,
 }) => {
   const [expandedCompanyIds, setExpandedCompanyIds] = useState<Set<string>>(new Set());
 
@@ -83,6 +90,11 @@ const CompanyTable: React.FC<CompanyTableProps> = ({
               <th className="px-4 py-3 text-left text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">
                 Status
               </th>
+              {onFeedback && (
+                <th className="px-4 py-3 text-center text-xs font-medium text-zinc-500 dark:text-zinc-400 uppercase tracking-wide">
+                  Feedback
+                </th>
+              )}
             </tr>
           </thead>
           <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
@@ -135,6 +147,45 @@ const CompanyTable: React.FC<CompanyTableProps> = ({
                         {company.qualificationStatus}
                       </span>
                     </td>
+                    {onFeedback && company.source === 'discolike' ? (
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-1">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onFeedback(company.id, company.feedback === 'liked' ? null : 'liked');
+                            }}
+                            className={`p-1 rounded transition-colors ${
+                              company.feedback === 'liked'
+                                ? 'text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900/30'
+                                : 'text-zinc-400 hover:text-green-600 dark:hover:text-green-400'
+                            }`}
+                            title="Good match"
+                          >
+                            <ThumbsUp className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onFeedback(
+                                company.id,
+                                company.feedback === 'disliked' ? null : 'disliked'
+                              );
+                            }}
+                            className={`p-1 rounded transition-colors ${
+                              company.feedback === 'disliked'
+                                ? 'text-red-600 dark:text-red-400 bg-red-100 dark:bg-red-900/30'
+                                : 'text-zinc-400 hover:text-red-600 dark:hover:text-red-400'
+                            }`}
+                            title="Bad match"
+                          >
+                            <ThumbsDown className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </td>
+                    ) : onFeedback ? (
+                      <td className="px-4 py-3"></td>
+                    ) : null}
                   </tr>
 
                   {isExpanded &&

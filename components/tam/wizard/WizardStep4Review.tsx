@@ -190,17 +190,10 @@ const LIMIT_FIELDS: {
     perPageSize: 25,
   },
   {
-    key: 'discolikeMaxKeywords',
-    label: 'Discolike keywords',
-    defaultValue: 10,
-    hint: 'search terms to expand',
-    perPageSize: 0,
-  },
-  {
-    key: 'discolikeMaxRecordsPerKeyword',
-    label: 'Discolike records/keyword',
-    defaultValue: 2000,
-    hint: 'companies per keyword',
+    key: 'discolikeMaxRecords',
+    label: 'Discolike max records',
+    defaultValue: 200,
+    hint: 'companies from domain consensus',
     perPageSize: 0,
   },
   {
@@ -214,8 +207,7 @@ const LIMIT_FIELDS: {
 
 function estimateCompanies(limits: Partial<SourcingLimits>): string {
   const prospeo = (limits.prospeoMaxPages || 40) * 25;
-  const discolike =
-    (limits.discolikeMaxKeywords || 10) * (limits.discolikeMaxRecordsPerKeyword || 2000);
+  const discolike = limits.discolikeMaxRecords || 200;
   const blitz = (limits.blitzApiMaxPages || 20) * 100;
   const total = prospeo + discolike + blitz;
   return `~${total.toLocaleString()} max (before dedup)`;
