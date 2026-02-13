@@ -1147,16 +1147,39 @@ export async function fetchStudentCurriculumAsLegacy(
     const lessons: Lesson[] = [];
 
     for (const lmsLesson of lmsWeek.lessons) {
-      // If lesson has content items, create a lesson for each
+      // If lesson has content items, combine video+text into single entries
       if (lmsLesson.contentItems.length > 0) {
-        for (const contentItem of lmsLesson.contentItems) {
-          lessons.push({
-            id: contentItem.id,
-            title: contentItem.title,
-            embedUrl: contentItemToEmbedUrl(contentItem),
-            description: contentItem.description || lmsLesson.description,
-            cohort: curriculum.cohort.name,
-          });
+        // Separate primary content (video, etc.) from text content items
+        const primaryItems = lmsLesson.contentItems.filter((ci) => ci.contentType !== 'text');
+        const textItems = lmsLesson.contentItems.filter((ci) => ci.contentType === 'text');
+        // Combine all text content into a single description
+        const combinedText = textItems
+          .map((ti) => ti.contentText || '')
+          .filter(Boolean)
+          .join('\n\n');
+
+        if (primaryItems.length > 0) {
+          // Attach text content as description on the primary item(s)
+          for (const contentItem of primaryItems) {
+            lessons.push({
+              id: contentItem.id,
+              title: contentItem.title,
+              embedUrl: contentItemToEmbedUrl(contentItem),
+              description: combinedText || contentItem.description || lmsLesson.description,
+              cohort: curriculum.cohort.name,
+            });
+          }
+        } else {
+          // Lesson only has text items — show as standalone text lesson
+          for (const contentItem of textItems) {
+            lessons.push({
+              id: contentItem.id,
+              title: contentItem.title,
+              embedUrl: contentItemToEmbedUrl(contentItem),
+              description: contentItem.description || lmsLesson.description,
+              cohort: curriculum.cohort.name,
+            });
+          }
         }
       } else {
         // Lesson with no content items - create placeholder

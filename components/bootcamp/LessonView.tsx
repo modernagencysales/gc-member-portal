@@ -453,6 +453,14 @@ const LessonView: React.FC<LessonViewProps> = ({
                 <iframe src={lesson.embedUrl} className="w-full h-full border-0" allowFullScreen />
               </div>
             )}
+
+            {/* Show description text below content if available */}
+            {!isTextContent && lesson.description && (
+              <div
+                className="mt-4 bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200 dark:border-zinc-800 p-6 md:p-8 text-sm leading-relaxed text-zinc-700 dark:text-zinc-300 whitespace-pre-wrap"
+                dangerouslySetInnerHTML={{ __html: lesson.description }}
+              />
+            )}
           </div>
         </div>
       )}
