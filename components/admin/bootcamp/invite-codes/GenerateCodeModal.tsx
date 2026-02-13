@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { X, Loader2 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { useTheme } from '../../../../context/ThemeContext';
-import { BootcampCohort, ToolGrant } from '../../../../types/bootcamp-types';
+import { BootcampAccessLevel, BootcampCohort, ToolGrant } from '../../../../types/bootcamp-types';
 import { AITool } from '../../../../types/chat-types';
 import { fetchActiveAITools } from '../../../../services/chat-supabase';
 
@@ -18,7 +18,7 @@ interface GenerateCodeModalProps {
       maxUses?: number;
       expiresAt?: Date;
       customCode?: string;
-      accessLevel?: string;
+      accessLevel?: BootcampAccessLevel;
       toolGrants?: ToolGrant[];
     }
   ) => Promise<void>;
@@ -39,7 +39,7 @@ const GenerateCodeModal: React.FC<GenerateCodeModalProps> = ({
     count: 1,
     maxUses: '',
     expiresAt: '',
-    accessLevel: 'Lead Magnet',
+    accessLevel: 'Lead Magnet' as BootcampAccessLevel,
     customCode: '',
     creditsPerTool: 10,
     selectedToolSlugs: [] as string[],
@@ -52,11 +52,11 @@ const GenerateCodeModal: React.FC<GenerateCodeModalProps> = ({
 
   const handleCustomCodeChange = (value: string) => {
     const sanitized = value.toUpperCase().replace(/[^A-Z0-9\-_]/g, '');
-    setFormData({
-      ...formData,
+    setFormData((prev) => ({
+      ...prev,
       customCode: sanitized,
-      count: sanitized ? 1 : formData.count,
-    });
+      count: sanitized ? 1 : prev.count,
+    }));
   };
 
   const handleToolToggle = (slug: string) => {
@@ -76,7 +76,7 @@ const GenerateCodeModal: React.FC<GenerateCodeModalProps> = ({
       maxUses?: number;
       expiresAt?: Date;
       customCode?: string;
-      accessLevel?: string;
+      accessLevel?: BootcampAccessLevel;
       toolGrants?: ToolGrant[];
     } = {};
 
@@ -107,7 +107,7 @@ const GenerateCodeModal: React.FC<GenerateCodeModalProps> = ({
       count: 1,
       maxUses: '',
       expiresAt: '',
-      accessLevel: 'Lead Magnet',
+      accessLevel: 'Lead Magnet' as BootcampAccessLevel,
       customCode: '',
       creditsPerTool: 10,
       selectedToolSlugs: [],
@@ -175,7 +175,9 @@ const GenerateCodeModal: React.FC<GenerateCodeModalProps> = ({
             <label className={labelClasses}>Access Level</label>
             <select
               value={formData.accessLevel}
-              onChange={(e) => setFormData({ ...formData, accessLevel: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, accessLevel: e.target.value as BootcampAccessLevel })
+              }
               className={inputClasses}
             >
               {ACCESS_LEVELS.map((level) => (
@@ -190,10 +192,10 @@ const GenerateCodeModal: React.FC<GenerateCodeModalProps> = ({
           {/* 3. Tool Grants section */}
           <div
             className={`p-4 rounded-lg border ${
-              isDarkMode ? 'border-slate-700' : 'border-slate-200'
+              isDarkMode ? 'bg-slate-800/50 border-slate-700' : 'bg-slate-50 border-slate-200'
             }`}
           >
-            <label className={labelClasses}>Tool Grants</label>
+            <label className={labelClasses}>Tool Grants (Optional)</label>
 
             <div className="mb-3">
               <label
@@ -211,10 +213,14 @@ const GenerateCodeModal: React.FC<GenerateCodeModalProps> = ({
                 onChange={(e) =>
                   setFormData({
                     ...formData,
-                    creditsPerTool: parseInt(e.target.value, 10) || 1,
+                    creditsPerTool: parseInt(e.target.value, 10) || 10,
                   })
                 }
-                className={inputClasses}
+                className={`w-24 px-3 py-1.5 rounded-lg border text-sm ${
+                  isDarkMode
+                    ? 'bg-slate-800 border-slate-600 text-white'
+                    : 'bg-white border-slate-300 text-slate-900'
+                } focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
               />
             </div>
 

@@ -8,7 +8,11 @@ import {
   useUpdateInviteCodeMutation,
   useDeleteInviteCodeMutation,
 } from '../../../../hooks/useBootcampAdminMutations';
-import { BootcampInviteCode, ToolGrant } from '../../../../types/bootcamp-types';
+import {
+  BootcampAccessLevel,
+  BootcampInviteCode,
+  ToolGrant,
+} from '../../../../types/bootcamp-types';
 import GenerateCodeModal from './GenerateCodeModal';
 import {
   Plus,
@@ -95,7 +99,7 @@ const AdminBootcampInviteCodesPage: React.FC = () => {
       maxUses?: number;
       expiresAt?: Date;
       customCode?: string;
-      accessLevel?: string;
+      accessLevel?: BootcampAccessLevel;
       toolGrants?: ToolGrant[];
     }
   ) => {
