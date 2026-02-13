@@ -8,7 +8,7 @@ import {
   useUpdateInviteCodeMutation,
   useDeleteInviteCodeMutation,
 } from '../../../../hooks/useBootcampAdminMutations';
-import { BootcampInviteCode } from '../../../../types/bootcamp-types';
+import { BootcampInviteCode, ToolGrant } from '../../../../types/bootcamp-types';
 import GenerateCodeModal from './GenerateCodeModal';
 import {
   Plus,
@@ -91,7 +91,13 @@ const AdminBootcampInviteCodesPage: React.FC = () => {
   const handleCreateCodes = async (
     cohortId: string,
     count: number,
-    options?: { maxUses?: number; expiresAt?: Date }
+    options?: {
+      maxUses?: number;
+      expiresAt?: Date;
+      customCode?: string;
+      accessLevel?: string;
+      toolGrants?: ToolGrant[];
+    }
   ) => {
     for (let i = 0; i < count; i++) {
       await createMutation.mutateAsync({ cohortId, options });
