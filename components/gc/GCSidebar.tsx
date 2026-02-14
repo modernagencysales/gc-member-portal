@@ -14,6 +14,7 @@ import {
   Sparkles,
   Shield,
   BarChart3,
+  Plug2,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
@@ -28,6 +29,7 @@ interface GCSidebarProps {
 
 const navItems = [
   { path: '/portal/command-center', icon: BarChart3, label: 'Command Center' },
+  { path: '/portal/integrations', icon: Plug2, label: 'Integrations' },
   { path: '/portal', icon: LayoutDashboard, label: 'Dashboard', end: true },
   { path: '/portal/onboarding', icon: CheckSquare, label: 'Onboarding' },
   { path: '/portal/tools', icon: Wrench, label: 'My Tools' },
