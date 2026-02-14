@@ -21,6 +21,7 @@ const ToolsPage = lazy(() => import('./components/gc/tools/ToolsPage'));
 const CampaignsPage = lazy(() => import('./components/gc/campaigns/CampaignsPage'));
 const ICPPage = lazy(() => import('./components/gc/icp/ICPPage'));
 const ResourcesPage = lazy(() => import('./components/gc/resources/ResourcesPage'));
+const CommandCenter = lazy(() => import('./components/gc/command-center/CommandCenter'));
 
 // Lazy-loaded: Admin (unified)
 const UnifiedAdminLayout = lazy(() => import('./components/admin/UnifiedAdminLayout'));
@@ -127,6 +128,7 @@ const App: React.FC = () => {
           <Route path="campaigns" element={<CampaignsPage />} />
           <Route path="icp" element={<ICPPage />} />
           <Route path="resources" element={<ResourcesPage />} />
+          <Route path="command-center" element={<CommandCenter />} />
         </Route>
 
         {/* Unified Admin Dashboard */}
