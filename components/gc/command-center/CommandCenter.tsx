@@ -30,8 +30,6 @@ import {
   formatChannelName,
 } from '../../../services/command-center';
 import type { CommandCenterData } from '../../../types/command-center-types';
-import FinancialsTab from './FinancialsTab';
-
 const TENANT_ID = '7a3474f9-dd56-4ce0-a8b2-0372452ba90e';
 
 const CHANNEL_COLORS: Record<string, string> = {
@@ -49,7 +47,7 @@ const CommandCenter: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<CommandCenterData | null>(null);
   const [period, setPeriod] = useState<'7d' | '30d' | '90d'>('30d');
-  const [activeTab, setActiveTab] = useState<'overview' | 'financials'>('overview');
+  const [activeTab] = useState<'overview'>('overview');
 
   useEffect(() => {
     loadData();
@@ -71,7 +69,7 @@ const CommandCenter: React.FC = () => {
   const textPrimary = isDarkMode ? 'text-white' : 'text-slate-900';
   const textSecondary = isDarkMode ? 'text-slate-400' : 'text-slate-600';
 
-  const tabButtonClass = (tab: 'overview' | 'financials') =>
+  const tabButtonClass = (tab: 'overview') =>
     `px-4 py-2 text-sm font-medium transition-colors border-b-2 ${
       activeTab === tab
         ? 'border-blue-500 text-blue-600'
@@ -111,20 +109,8 @@ const CommandCenter: React.FC = () => {
         </div>
       </div>
 
-      {/* Tab Switcher */}
-      <div className={`flex border-b ${isDarkMode ? 'border-slate-700' : 'border-gray-200'}`}>
-        <button className={tabButtonClass('overview')} onClick={() => setActiveTab('overview')}>
-          Overview
-        </button>
-        <button className={tabButtonClass('financials')} onClick={() => setActiveTab('financials')}>
-          Financials
-        </button>
-      </div>
-
-      {/* Tab Content */}
-      {activeTab === 'financials' ? (
-        <FinancialsTab tenantId={TENANT_ID} period={period} />
-      ) : loading ? (
+      {/* Content */}
+      {loading ? (
         <LoadingState message="Loading Command Center..." />
       ) : !data ? (
         <div className="text-center py-12 text-slate-500">Failed to load data.</div>
