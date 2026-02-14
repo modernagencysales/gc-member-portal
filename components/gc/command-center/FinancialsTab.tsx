@@ -14,6 +14,7 @@ import { LoadingState } from '../../shared/LoadingSpinner';
 import { fetchPnLMetrics, fetchExpenseMetrics, triggerSync } from '../../../services/financial';
 import type { PnLMetrics, ExpenseMetrics, ChannelPnL } from '../../../types/financial-types';
 import { CHANNEL_LABELS } from '../../../types/financial-types';
+import TransactionList from './TransactionList';
 
 // Colors for each GTM channel in charts
 const CHANNEL_COLORS: Record<string, string> = {
@@ -320,6 +321,9 @@ const FinancialsTab: React.FC<FinancialsTabProps> = ({ tenantId, period }) => {
           <p className={`text-center py-8 ${textSecondary}`}>No channel data for this period.</p>
         )}
       </div>
+
+      {/* Transaction List with Inline Classification Override */}
+      <TransactionList tenantId={tenantId} period={period} />
     </div>
   );
 };
