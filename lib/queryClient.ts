@@ -135,4 +135,9 @@ export const queryKeys = {
   coldEmailContactLists: (studentId: string) => ['coldEmail', 'contactLists', studentId] as const,
   coldEmailContacts: (listId: string, limit?: number, offset?: number) =>
     ['coldEmail', 'contacts', listId, limit, offset] as const,
+
+  // Intro Offers
+  introOffers: () => ['introOffer', 'list'] as const,
+  introOffer: (offerId: string) => ['introOffer', 'detail', offerId] as const,
+  introOfferDeliverables: (offerId: string) => ['introOffer', 'deliverables', offerId] as const,
 };

@@ -15,6 +15,7 @@ import {
   Wrench,
   FileText,
   Award,
+  Package,
 } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 
@@ -52,6 +53,10 @@ const sections: NavSection[] = [
       { to: '/admin/gc/tools', icon: Wrench, label: 'Member Tools' },
       { to: '/admin/gc/onboarding', icon: ListChecks, label: 'Member Onboarding' },
     ],
+  },
+  {
+    label: 'Intro Offers',
+    items: [{ to: '/admin/intro-offers', icon: Package, label: 'Offers', end: true }],
   },
   {
     label: 'Affiliates',

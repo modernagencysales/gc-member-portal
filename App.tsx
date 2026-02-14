@@ -55,6 +55,13 @@ const AdminLmsCurriculumPage = lazy(
 // Lazy-loaded: Blueprint Admin
 const AdminBlueprintsPage = lazy(() => import('./components/admin/blueprints/AdminBlueprintsPage'));
 
+// Lazy-loaded: Intro Offer
+const AdminIntroOfferList = lazy(() => import('./components/admin/intro-offer/IntroOfferList'));
+const AdminIntroOfferDetail = lazy(() => import('./components/admin/intro-offer/IntroOfferDetail'));
+const OfferProgressTracker = lazy(
+  () => import('./components/portal/intro-offer/OfferProgressTracker')
+);
+
 // Lazy-loaded: Bootcamp
 const BootcampApp = lazy(() => import('./pages/bootcamp/BootcampApp'));
 const BootcampJoin = lazy(() => import('./components/bootcamp/BootcampJoin'));
@@ -149,6 +156,9 @@ const App: React.FC = () => {
           {/* GC Portal */}
           <Route path="gc/tools" element={<AdminToolsPage />} />
           <Route path="gc/onboarding" element={<AdminOnboardingPage />} />
+          {/* Intro Offers */}
+          <Route path="intro-offers" element={<AdminIntroOfferList />} />
+          <Route path="intro-offers/:offerId" element={<AdminIntroOfferDetail />} />
           {/* Affiliates */}
           <Route path="affiliates" element={<AdminAffiliatesPage />} />
           {/* Legacy redirects (within layout) */}
@@ -223,6 +233,9 @@ const App: React.FC = () => {
 
         {/* Case Studies */}
         <Route path="/case-studies" element={<CaseStudiesPage />} />
+
+        {/* Intro Offer progress tracker (public, client-facing) */}
+        <Route path="/intro-offer/:offerId" element={<OfferProgressTracker />} />
 
         {/* Generic (non-personalized) offer pages for partners/affiliates */}
         <Route path="/offer/:offerType" element={<GenericOfferPage />} />
