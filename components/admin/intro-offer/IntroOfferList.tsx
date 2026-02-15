@@ -1,12 +1,13 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { Search, Package, RefreshCw } from 'lucide-react';
+import { Search, Package, RefreshCw, Plus } from 'lucide-react';
 import { useTheme } from '../../../context/ThemeContext';
 import { queryKeys } from '../../../lib/queryClient';
 import { fetchIntroOffers, fetchLeadName } from '../../../services/intro-offer-supabase';
 import { STATUS_CONFIGS } from '../../../types/intro-offer-types';
 import type { IntroOffer } from '../../../types/intro-offer-types';
+import NewOfferModal from './NewOfferModal';
 
 function daysSince(dateStr: string): number {
   return Math.floor((Date.now() - new Date(dateStr).getTime()) / (1000 * 60 * 60 * 24));
@@ -48,6 +49,7 @@ const IntroOfferList: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [leadNames, setLeadNames] = useState<Record<string, string>>({});
+  const [showNewModal, setShowNewModal] = useState(false);
 
   const {
     data: offers,
@@ -112,17 +114,26 @@ const IntroOfferList: React.FC = () => {
             Manage $2,500 GTM Launch Packages
           </p>
         </div>
-        <button
-          onClick={() => refetch()}
-          className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-            isDarkMode
-              ? 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'
-              : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
-          }`}
-        >
-          <RefreshCw className="w-4 h-4" />
-          Refresh
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => refetch()}
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+              isDarkMode
+                ? 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'
+                : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+            }`}
+          >
+            <RefreshCw className="w-4 h-4" />
+            Refresh
+          </button>
+          <button
+            onClick={() => setShowNewModal(true)}
+            className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+          >
+            <Plus className="w-4 h-4" />
+            New Offer
+          </button>
+        </div>
       </div>
 
       {/* Stats */}
@@ -237,6 +248,17 @@ const IntroOfferList: React.FC = () => {
           </table>
         )}
       </div>
+
+      {/* New Offer Modal */}
+      {showNewModal && (
+        <NewOfferModal
+          onClose={() => setShowNewModal(false)}
+          onSuccess={() => {
+            setShowNewModal(false);
+            refetch();
+          }}
+        />
+      )}
     </div>
   );
 };

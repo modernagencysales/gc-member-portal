@@ -85,6 +85,19 @@ async function gtmFetch(path: string, options: RequestInit = {}) {
   return res.json();
 }
 
+export async function createIntroOffer(params: {
+  client_name: string;
+  client_email?: string;
+  amount_paid?: number;
+  discount_code?: string;
+  notes?: string;
+}) {
+  return gtmFetch('/api/intro-offers', {
+    method: 'POST',
+    body: JSON.stringify(params),
+  });
+}
+
 export async function submitInterview(offerId: string, interviewData: Record<string, unknown>) {
   return gtmFetch(`/api/intro-offers/${offerId}/interview`, {
     method: 'POST',
