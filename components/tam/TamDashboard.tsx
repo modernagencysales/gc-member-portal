@@ -1,12 +1,7 @@
 import React, { useState, useMemo, useCallback, useEffect, memo } from 'react';
 import { MessageSquare, RefreshCw, Loader2 } from 'lucide-react';
-import { TamContact, TamCompany, TamCompanyFeedback } from '../../types/tam-types';
-import {
-  useTamCompanies,
-  useTamContacts,
-  useTamStats,
-  useCompanyFeedbackMutation,
-} from '../../hooks/useTamProject';
+import { TamContact, TamCompany } from '../../types/tam-types';
+import { useTamCompanies, useTamContacts, useTamStats } from '../../hooks/useTamProject';
 import { useTamRefine } from '../../hooks/useTamRefine';
 import TamStatsBar from './TamStatsBar';
 import FilterBar, { Filters } from './dashboard/FilterBar';
@@ -30,7 +25,6 @@ const TamDashboard: React.FC<TamDashboardProps> = ({ projectId, onOpenChat }) =>
     source: 'all',
   });
 
-  const feedbackMutation = useCompanyFeedbackMutation();
   const refine = useTamRefine();
 
   // Fetch data
@@ -47,17 +41,6 @@ const TamDashboard: React.FC<TamDashboardProps> = ({ projectId, onOpenChat }) =>
   const companyMap = useMemo(() => {
     return new Map(companies.map((c) => [c.id, c]));
   }, [companies]);
-
-  // Group contacts by company
-  const contactsByCompany = useMemo(() => {
-    const map = new Map<string, TamContact[]>();
-    contacts.forEach((contact) => {
-      const companyContacts = map.get(contact.companyId) || [];
-      companyContacts.push(contact);
-      map.set(contact.companyId, companyContacts);
-    });
-    return map;
-  }, [contacts]);
 
   // Get unique sources
   const sources = useMemo(() => {
@@ -161,13 +144,6 @@ const TamDashboard: React.FC<TamDashboardProps> = ({ projectId, onOpenChat }) =>
       disliked: discolikeCompanies.filter((c) => c.feedback === 'disliked').length,
     };
   }, [companies]);
-
-  const handleFeedback = useCallback(
-    (companyId: string, feedback: TamCompanyFeedback | null) => {
-      feedbackMutation.mutate({ companyId, feedback });
-    },
-    [feedbackMutation]
-  );
 
   const handleRefine = useCallback(() => {
     refine.startRefine(projectId);
