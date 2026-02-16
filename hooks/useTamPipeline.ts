@@ -194,14 +194,17 @@ export function useTamPipeline(): UseTamPipelineReturn {
         let existingJobs: TamJob[] = [];
         try {
           existingJobs = await fetchTamJobs(projectId);
-        } catch {
-          // If fetch fails, proceed without dedup (creates fresh jobs)
+        } catch (err) {
+          console.warn('Failed to fetch existing jobs, proceeding without dedup:', err);
         }
 
         for (const stepDef of PIPELINE_STEPS) {
           if (abortedRef.current) return;
 
-          const existingJob = existingJobs.find((j) => j.jobType === stepDef.step);
+          // Find the most recent job for this step type (jobs are ordered by created_at ASC)
+          const matchingJobs = existingJobs.filter((j) => j.jobType === stepDef.step);
+          const existingJob =
+            matchingJobs.length > 0 ? matchingJobs[matchingJobs.length - 1] : undefined;
 
           if (existingJob?.status === 'completed') {
             // Already done — skip
