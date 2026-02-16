@@ -1189,24 +1189,77 @@ serve(async (req) => {
       .eq('id', job.project_id)
       .single();
 
+    // Long-running job types are dispatched to gtm-system Trigger.dev tasks.
+    // The client polls tam_job_queue for progress updates.
+    const longRunningTypes = [
+      'source_companies',
+      'qualify',
+      'find_contacts',
+      'check_linkedin',
+      'refine_discolike',
+    ];
+
+    if (longRunningTypes.includes(job.job_type)) {
+      const gtmSystemUrl = Deno.env.get('GTM_SYSTEM_URL');
+      const serviceApiKey = Deno.env.get('SERVICE_API_KEY');
+
+      if (!gtmSystemUrl || !serviceApiKey) {
+        await supabase
+          .from('tam_job_queue')
+          .update({
+            status: 'failed',
+            result_summary: { error: 'GTM_SYSTEM_URL or SERVICE_API_KEY not configured' },
+          })
+          .eq('id', jobId);
+        return new Response(JSON.stringify({ error: 'Backend not configured' }), {
+          status: 500,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      const triggerRes = await fetch(`${gtmSystemUrl}/api/tam/run`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': serviceApiKey,
+        },
+        body: JSON.stringify({
+          jobId,
+          jobType: job.job_type,
+          projectId: job.project_id,
+        }),
+      });
+
+      if (!triggerRes.ok) {
+        const errBody = await triggerRes.text().catch(() => 'Unknown error');
+        await supabase
+          .from('tam_job_queue')
+          .update({
+            status: 'failed',
+            result_summary: { error: `Backend dispatch failed: ${errBody}` },
+          })
+          .eq('id', jobId);
+        return new Response(JSON.stringify({ error: 'Backend dispatch failed' }), {
+          status: 502,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      const triggerData = await triggerRes.json();
+      return new Response(
+        JSON.stringify({ success: true, dispatched: true, taskId: triggerData.taskId }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // All job types should be dispatched above; this is a fallback
     let resultSummary: Record<string, unknown> = {};
 
     try {
       switch (job.job_type) {
         case 'source_companies':
+          // Legacy fallback — normally dispatched to Trigger.dev
           resultSummary = await handleSourceCompanies(supabase, job, project);
-          break;
-        case 'qualify':
-          resultSummary = await handleQualify(supabase, job, project);
-          break;
-        case 'find_contacts':
-          resultSummary = await handleFindContacts(supabase, job, project);
-          break;
-        case 'check_linkedin':
-          resultSummary = await handleCheckLinkedin(supabase, job, project);
-          break;
-        case 'refine_discolike':
-          resultSummary = await handleRefineDiscolike(supabase, job, project);
           break;
         default:
           throw new Error(`Unknown job type: ${job.job_type}`);

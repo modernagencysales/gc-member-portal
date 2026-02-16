@@ -190,18 +190,43 @@ export function useTamPipeline(): UseTamPipelineReturn {
       );
 
       try {
-        // Step 1: Source Companies
-        await runStep(projectId, 'source_companies');
+        // Check for existing jobs to avoid duplicates
+        let existingJobs: TamJob[] = [];
+        try {
+          existingJobs = await fetchTamJobs(projectId);
+        } catch {
+          // If fetch fails, proceed without dedup (creates fresh jobs)
+        }
 
-        if (abortedRef.current) return;
+        for (const stepDef of PIPELINE_STEPS) {
+          if (abortedRef.current) return;
 
-        // Step 2: Qualify
-        await runStep(projectId, 'qualify');
+          const existingJob = existingJobs.find((j) => j.jobType === stepDef.step);
 
-        if (abortedRef.current) return;
+          if (existingJob?.status === 'completed') {
+            // Already done — skip
+            updateStepState(stepDef.step, {
+              status: 'completed',
+              progress: 100,
+              resultSummary: existingJob.resultSummary,
+            });
+            continue;
+          }
 
-        // Step 3: Find Contacts
-        await runStep(projectId, 'find_contacts');
+          if (existingJob?.status === 'running' || existingJob?.status === 'pending') {
+            // Resume polling the existing job
+            setCurrentStep(stepDef.step);
+            updateStepState(stepDef.step, {
+              status: 'running',
+              progress: existingJob.progress,
+            });
+            await waitForJobCompletion(projectId, existingJob.id, stepDef.step);
+            continue;
+          }
+
+          // No existing job (or failed) — create and run new one
+          await runStep(projectId, stepDef.step);
+        }
 
         setIsComplete(true);
         setCurrentStep(null);
@@ -211,7 +236,7 @@ export function useTamPipeline(): UseTamPipelineReturn {
         setIsRunning(false);
       }
     },
-    [runStep]
+    [runStep, updateStepState, waitForJobCompletion]
   );
 
   return {

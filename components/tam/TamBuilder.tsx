@@ -67,18 +67,11 @@ const TamBuilder: React.FC<TamBuilderProps> = ({ userId }) => {
           }
           break;
         case 'sourcing':
-          setPhase('chat');
-          setActiveTab('strategy');
-          break;
         case 'enriching':
-          // Imported projects have no ICP profile — show dashboard (may still be running)
-          if (!resumableProject.icpProfile) {
-            setPhase('dashboard');
-            setActiveTab('list');
-          } else {
-            setPhase('chat');
-            setActiveTab('strategy');
-          }
+          // Show dashboard for in-progress projects — it works with partial data
+          // and the user can see what's been found so far
+          setPhase('dashboard');
+          setActiveTab('list');
           break;
         case 'complete':
           setPhase('dashboard');
