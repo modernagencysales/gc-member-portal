@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useCallback, useEffect, memo } from 'react';
 import { MessageSquare, RefreshCw, Loader2 } from 'lucide-react';
-import { TamContact, TamCompanyFeedback } from '../../types/tam-types';
+import { TamContact, TamCompany, TamCompanyFeedback } from '../../types/tam-types';
 import {
   useTamCompanies,
   useTamContacts,
@@ -10,7 +10,7 @@ import {
 import { useTamRefine } from '../../hooks/useTamRefine';
 import TamStatsBar from './TamStatsBar';
 import FilterBar, { Filters } from './dashboard/FilterBar';
-import CompanyTable from './dashboard/CompanyTable';
+import ContactTable from './dashboard/ContactTable';
 import BulkActions from './dashboard/BulkActions';
 
 interface TamDashboardProps {
@@ -24,7 +24,7 @@ const TamDashboard: React.FC<TamDashboardProps> = ({ projectId, onOpenChat }) =>
   const [selectedContactIds, setSelectedContactIds] = useState<Set<string>>(new Set());
   const [activeSegment, setActiveSegment] = useState<SegmentTab>('all');
   const [filters, setFilters] = useState<Filters>({
-    qualificationStatus: 'all',
+    qualificationStatus: 'qualified',
     emailStatus: 'all',
     linkedinStatus: 'all',
     source: 'all',
@@ -42,6 +42,11 @@ const TamDashboard: React.FC<TamDashboardProps> = ({ projectId, onOpenChat }) =>
   useEffect(() => {
     if (refine.result) refetchCompanies();
   }, [refine.result, refetchCompanies]);
+
+  // Company lookup map
+  const companyMap = useMemo(() => {
+    return new Map(companies.map((c) => [c.id, c]));
+  }, [companies]);
 
   // Group contacts by company
   const contactsByCompany = useMemo(() => {
@@ -63,9 +68,13 @@ const TamDashboard: React.FC<TamDashboardProps> = ({ projectId, onOpenChat }) =>
     return Array.from(sourceSet).sort();
   }, [companies]);
 
-  // Apply filters and segments
-  const filteredCompanies = useMemo(() => {
-    return companies.filter((company) => {
+  // Filter contacts based on their parent company's qualification + all other filters
+  const filteredContacts = useMemo(() => {
+    return contacts.filter((contact) => {
+      const company = companyMap.get(contact.companyId);
+      if (!company) return false;
+
+      // Company-level filters
       if (
         filters.qualificationStatus !== 'all' &&
         company.qualificationStatus !== filters.qualificationStatus
@@ -77,59 +86,49 @@ const TamDashboard: React.FC<TamDashboardProps> = ({ projectId, onOpenChat }) =>
         return false;
       }
 
-      const companyContacts = contactsByCompany.get(company.id) || [];
-
+      // Segment filters
       if (activeSegment === 'linkedin_active') {
-        const hasActiveLinkedIn = companyContacts.some(
-          (c) =>
-            c.linkedinActive === true &&
-            (c.emailStatus === 'verified' || c.emailStatus === 'catch_all')
-        );
-        if (!hasActiveLinkedIn) return false;
+        if (
+          !contact.linkedinActive ||
+          (contact.emailStatus !== 'verified' && contact.emailStatus !== 'catch_all')
+        ) {
+          return false;
+        }
       } else if (activeSegment === 'email_only') {
-        const hasEmailOnly = companyContacts.some(
-          (c) =>
-            (c.linkedinActive === false || c.linkedinActive === null) &&
-            (c.emailStatus === 'verified' || c.emailStatus === 'catch_all')
-        );
-        if (!hasEmailOnly) return false;
+        if (
+          contact.linkedinActive ||
+          (contact.emailStatus !== 'verified' && contact.emailStatus !== 'catch_all')
+        ) {
+          return false;
+        }
       } else if (activeSegment === 'needs_review') {
-        const needsReview = companyContacts.some(
-          (c) => !c.email || c.emailStatus === 'invalid' || c.emailStatus === 'not_found'
-        );
-        if (!needsReview) return false;
+        if (
+          contact.email &&
+          contact.emailStatus !== 'invalid' &&
+          contact.emailStatus !== 'not_found'
+        ) {
+          return false;
+        }
       }
 
-      if (filters.emailStatus !== 'all') {
-        const hasMatchingEmail = companyContacts.some((c) => c.emailStatus === filters.emailStatus);
-        if (!hasMatchingEmail) return false;
+      // Contact-level filters
+      if (filters.emailStatus !== 'all' && contact.emailStatus !== filters.emailStatus) {
+        return false;
       }
 
       if (filters.linkedinStatus !== 'all') {
-        if (filters.linkedinStatus === 'active') {
-          const hasActive = companyContacts.some((c) => c.linkedinActive === true);
-          if (!hasActive) return false;
-        } else if (filters.linkedinStatus === 'inactive') {
-          const hasInactive = companyContacts.some(
-            (c) => c.linkedinActive === false || c.linkedinActive === null
-          );
-          if (!hasInactive) return false;
-        }
+        if (filters.linkedinStatus === 'active' && !contact.linkedinActive) return false;
+        if (
+          filters.linkedinStatus === 'inactive' &&
+          contact.linkedinActive !== false &&
+          contact.linkedinActive !== null
+        )
+          return false;
       }
 
       return true;
     });
-  }, [companies, contactsByCompany, filters, activeSegment]);
-
-  // Get all contacts from filtered companies
-  const allFilteredContacts = useMemo(() => {
-    const contactSet = new Set<TamContact>();
-    filteredCompanies.forEach((company) => {
-      const companyContacts = contactsByCompany.get(company.id) || [];
-      companyContacts.forEach((contact) => contactSet.add(contact));
-    });
-    return Array.from(contactSet);
-  }, [filteredCompanies, contactsByCompany]);
+  }, [contacts, companyMap, filters, activeSegment]);
 
   const toggleContact = useCallback((contactId: string) => {
     setSelectedContactIds((prev) => {
@@ -145,13 +144,13 @@ const TamDashboard: React.FC<TamDashboardProps> = ({ projectId, onOpenChat }) =>
 
   const selectAllContacts = useCallback(() => {
     setSelectedContactIds((prev) => {
-      if (prev.size === allFilteredContacts.length) {
+      if (prev.size === filteredContacts.length) {
         return new Set();
       } else {
-        return new Set(allFilteredContacts.map((c) => c.id));
+        return new Set(filteredContacts.map((c) => c.id));
       }
     });
-  }, [allFilteredContacts]);
+  }, [filteredContacts]);
 
   // DiscoLike feedback stats
   const discolikeStats = useMemo(() => {
@@ -174,16 +173,77 @@ const TamDashboard: React.FC<TamDashboardProps> = ({ projectId, onOpenChat }) =>
     refine.startRefine(projectId);
   }, [projectId, refine]);
 
-  const segmentTabs: { key: SegmentTab; label: string }[] = [
-    { key: 'all', label: 'All' },
-    { key: 'linkedin_active', label: 'LinkedIn Active' },
-    { key: 'email_only', label: 'Email Only' },
-    { key: 'needs_review', label: 'Needs Review' },
-  ];
+  // Qualification summary for the info banner
+  const qualificationSummary = useMemo(() => {
+    const qualified = companies.filter((c) => c.qualificationStatus === 'qualified').length;
+    const disqualified = companies.filter((c) => c.qualificationStatus === 'disqualified').length;
+    const pending = companies.filter((c) => c.qualificationStatus === 'pending').length;
+    return { qualified, disqualified, pending };
+  }, [companies]);
+
+  const segmentTabs: { key: SegmentTab; label: string; count: number }[] = useMemo(
+    () => [
+      { key: 'all', label: 'All Contacts', count: filteredContacts.length },
+      {
+        key: 'linkedin_active',
+        label: 'LinkedIn Active',
+        count: contacts.filter(
+          (c) =>
+            c.linkedinActive &&
+            (c.emailStatus === 'verified' || c.emailStatus === 'catch_all') &&
+            (filters.qualificationStatus === 'all' ||
+              companyMap.get(c.companyId)?.qualificationStatus === filters.qualificationStatus)
+        ).length,
+      },
+      {
+        key: 'email_only',
+        label: 'Email Only',
+        count: contacts.filter(
+          (c) =>
+            !c.linkedinActive &&
+            (c.emailStatus === 'verified' || c.emailStatus === 'catch_all') &&
+            (filters.qualificationStatus === 'all' ||
+              companyMap.get(c.companyId)?.qualificationStatus === filters.qualificationStatus)
+        ).length,
+      },
+      {
+        key: 'needs_review',
+        label: 'Needs Review',
+        count: contacts.filter(
+          (c) =>
+            (!c.email || c.emailStatus === 'invalid' || c.emailStatus === 'not_found') &&
+            (filters.qualificationStatus === 'all' ||
+              companyMap.get(c.companyId)?.qualificationStatus === filters.qualificationStatus)
+        ).length,
+      },
+    ],
+    [filteredContacts, contacts, filters.qualificationStatus, companyMap]
+  );
 
   return (
     <div className="space-y-6">
       {stats && <TamStatsBar stats={stats} />}
+
+      {/* Qualification Summary */}
+      {qualificationSummary.qualified + qualificationSummary.disqualified > 0 && (
+        <div className="flex items-center gap-4 text-sm px-1">
+          <span className="text-zinc-500 dark:text-zinc-400">Companies:</span>
+          <span className="text-green-600 dark:text-green-400 font-medium">
+            {qualificationSummary.qualified} qualified
+          </span>
+          {qualificationSummary.disqualified > 0 && (
+            <span className="text-red-500 dark:text-red-400">
+              {qualificationSummary.disqualified} disqualified
+            </span>
+          )}
+          {qualificationSummary.pending > 0 && (
+            <span className="text-zinc-400">{qualificationSummary.pending} pending</span>
+          )}
+          <span className="text-violet-600 dark:text-violet-400 font-medium">
+            {filteredContacts.length} contacts shown
+          </span>
+        </div>
+      )}
 
       <FilterBar filters={filters} onFiltersChange={setFilters} sources={sources} />
 
@@ -245,23 +305,22 @@ const TamDashboard: React.FC<TamDashboardProps> = ({ projectId, onOpenChat }) =>
             }`}
           >
             {tab.label}
+            <span className="ml-1.5 text-xs text-zinc-400 dark:text-zinc-500">({tab.count})</span>
           </button>
         ))}
       </div>
 
-      <CompanyTable
-        companies={filteredCompanies}
-        contactsByCompany={contactsByCompany}
-        allFilteredContacts={allFilteredContacts}
+      <ContactTable
+        contacts={filteredContacts}
+        companyMap={companyMap}
         selectedContactIds={selectedContactIds}
         onToggleContact={toggleContact}
         onSelectAll={selectAllContacts}
-        onFeedback={discolikeStats.total > 0 ? handleFeedback : undefined}
       />
 
       <BulkActions
         selectedContactIds={selectedContactIds}
-        allFilteredContacts={allFilteredContacts}
+        allFilteredContacts={filteredContacts}
         companies={companies}
       />
 
