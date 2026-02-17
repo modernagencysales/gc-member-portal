@@ -277,6 +277,31 @@ export interface CallGrantConfig {
 }
 
 // ============================================
+// Sprint Product Config
+// ============================================
+export interface SprintProductConfig {
+  enabled: boolean;
+  products: {
+    sprint: {
+      stripeProductId: string;
+      cohortId: string;
+      accessLevel: BootcampAccessLevel;
+      role: StudentCohortRole;
+    };
+    dmKit: {
+      stripeProductId: string;
+      contentGrantIds: string[];
+    };
+    gptSuite: {
+      stripeProductId: string;
+      toolSlugs: string[];
+      creditsPerTool: number;
+      accessDays: number;
+    };
+  };
+}
+
+// ============================================
 // Funnel Access Tool Presets
 // ============================================
 export interface FunnelToolPreset {
