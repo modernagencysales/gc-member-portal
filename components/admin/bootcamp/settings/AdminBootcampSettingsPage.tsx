@@ -8,6 +8,7 @@ import { BootcampSettings } from '../../../../types/bootcamp-types';
 import { Settings, Video, Sparkles, Info, Save, Bot } from 'lucide-react';
 import FunnelToolPresetsEditor from './FunnelToolPresetsEditor';
 import CallGrantConfigEditor from './CallGrantConfigEditor';
+import SprintProductConfigEditor from './SprintProductConfigEditor';
 import EnrollmentConfigEditor from './EnrollmentConfigEditor';
 
 const AdminBootcampSettingsPage: React.FC = () => {
@@ -317,6 +318,9 @@ const AdminBootcampSettingsPage: React.FC = () => {
 
         {/* Call Attendance Grants */}
         <CallGrantConfigEditor />
+
+        {/* Sprint Product Delivery */}
+        <SprintProductConfigEditor />
 
         {/* Funnel Access Tool Presets */}
         <FunnelToolPresetsEditor />
