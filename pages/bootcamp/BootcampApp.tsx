@@ -67,6 +67,7 @@ const ColdEmailRecipesPage = lazy(
 const EmailEnrichmentPage = lazy(
   () => import('../../components/bootcamp/email-enrichment/EmailEnrichmentPage')
 );
+const IntroOffer = lazy(() => import('../../components/bootcamp/IntroOffer'));
 
 const BootcampApp: React.FC = () => {
   const queryClient = useQueryClient();
@@ -777,6 +778,16 @@ const BootcampApp: React.FC = () => {
                   }
                 >
                   <EmailEnrichmentPage userId={bootcampStudent?.id || ''} />
+                </Suspense>
+              ) : currentLesson.id === 'virtual:intro-offer' ? (
+                <Suspense
+                  fallback={
+                    <div className="flex items-center justify-center h-96">
+                      <div className="w-8 h-8 border-2 border-zinc-300 dark:border-zinc-700 border-t-violet-500 rounded-full animate-spin" />
+                    </div>
+                  }
+                >
+                  <IntroOffer />
                 </Suspense>
               ) : currentLesson.id === 'virtual:my-posts' ? (
                 <MyPosts prospectId={bootcampStudent?.prospectId} studentId={bootcampStudent?.id} />

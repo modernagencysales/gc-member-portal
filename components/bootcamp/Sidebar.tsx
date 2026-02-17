@@ -28,6 +28,7 @@ import {
   Mail,
   MessageSquare,
   Send,
+  Rocket,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import type { FunnelAccessState } from '../../hooks/useFunnelAccess';
@@ -421,6 +422,30 @@ const Sidebar: React.FC<SidebarProps> = ({
                 </div>
               );
             })}
+          </div>
+
+          {/* Intro Offer */}
+          <div className="px-1">
+            <button
+              onClick={() => {
+                onSelectLesson({
+                  id: 'virtual:intro-offer',
+                  title: 'Intro Offer',
+                  embedUrl: 'virtual:intro-offer',
+                });
+                onCloseMobile();
+              }}
+              className={`flex items-center gap-2.5 w-full p-2.5 rounded-lg text-xs font-semibold transition-all ${
+                currentLessonId === 'virtual:intro-offer'
+                  ? 'bg-violet-500/10 text-violet-600 dark:text-violet-400 ring-1 ring-violet-500/20'
+                  : 'text-violet-600 dark:text-violet-400 hover:bg-violet-50 dark:hover:bg-violet-900/20'
+              }`}
+            >
+              <div className="w-6 h-6 rounded-md bg-violet-500 flex items-center justify-center shrink-0">
+                <Rocket size={14} className="text-white" />
+              </div>
+              <span>Intro Offer</span>
+            </button>
           </div>
 
           {/* Tools divider */}
