@@ -312,6 +312,12 @@ const BlueprintPage: React.FC = () => {
   const authorityScore = prospect.authorityScore ?? 0;
   const introParagraph = getScoreBasedIntro(authorityScore);
 
+  // Hide booking UI for disqualified survey respondents (low revenue)
+  // Cold email leads (no monthlyIncome) still see booking
+  const DISQUALIFYING_REVENUE = ['Not generating revenue yet', 'Under $5k', '$5k-$10k'];
+  const showBooking =
+    !prospect.monthlyIncome || !DISQUALIFYING_REVENUE.includes(prospect.monthlyIncome);
+
   // Dynamic CTA: offer unlock → "View Your Offer", otherwise default
   const offerUrl =
     prospect.offerUnlocked && prospect.slug ? `/blueprint/${prospect.slug}/offer` : undefined;
@@ -456,29 +462,31 @@ const BlueprintPage: React.FC = () => {
           <ContentRoadmap posts={posts} />
         </ScrollReveal>
 
-        {/* 14. CTA #1 — "Book Your 30-Min Strategy Call" */}
-        <ScrollReveal delay={100}>
-          <div className="flex flex-col items-center gap-4">
-            <CTAButton
-              text={ctaText}
-              subtext={ctaSubtext}
-              onClick={ctaHref ? undefined : scrollToCalEmbed}
-              href={ctaHref}
-              size="large"
-              icon={offerUrl ? 'arrow' : 'calendar'}
-              useBrandColors={hasTenantBranding}
-            />
-            {authorityScore > 0 && (
-              <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                Your Authority Score:{' '}
-                <span className="font-semibold text-violet-600 dark:text-violet-400">
-                  {authorityScore}/100
-                </span>{' '}
-                — let&apos;s unlock the rest.
-              </p>
-            )}
-          </div>
-        </ScrollReveal>
+        {/* 14. CTA #1 — "Book Your 30-Min Strategy Call" (hidden for disqualified unless offer/tenant link) */}
+        {(ctaHref || showBooking) && (
+          <ScrollReveal delay={100}>
+            <div className="flex flex-col items-center gap-4">
+              <CTAButton
+                text={ctaText}
+                subtext={ctaSubtext}
+                onClick={ctaHref ? undefined : scrollToCalEmbed}
+                href={ctaHref}
+                size="large"
+                icon={offerUrl ? 'arrow' : 'calendar'}
+                useBrandColors={hasTenantBranding}
+              />
+              {authorityScore > 0 && (
+                <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                  Your Authority Score:{' '}
+                  <span className="font-semibold text-violet-600 dark:text-violet-400">
+                    {authorityScore}/100
+                  </span>{' '}
+                  — let&apos;s unlock the rest.
+                </p>
+              )}
+            </div>
+          </ScrollReveal>
+        )}
 
         {/* 15. TestimonialQuote — specific, with before/after metrics */}
         <ScrollReveal>
@@ -500,37 +508,41 @@ const BlueprintPage: React.FC = () => {
           </ScrollReveal>
         )}
 
-        {/* 17. What Happens Next — rewritten SimpleSteps */}
-        <ScrollReveal>
-          <SimpleSteps />
-        </ScrollReveal>
+        {/* 17. What Happens Next — rewritten SimpleSteps (hidden for disqualified) */}
+        {showBooking && (
+          <ScrollReveal>
+            <SimpleSteps />
+          </ScrollReveal>
+        )}
       </div>
 
-      {/* Bottom section — headline, Cal embed, credibility note */}
-      <div className="max-w-4xl mx-auto px-4 pb-12 sm:pb-16 space-y-6">
-        <ScrollReveal>
-          <h2 className="text-3xl sm:text-4xl font-bold text-center text-zinc-900 dark:text-zinc-100">
-            {tenantBranding?.offer_title || 'Book Your Free Strategy Call Now'}
-          </h2>
-        </ScrollReveal>
+      {/* Bottom section — headline, Cal embed, credibility note (hidden for disqualified) */}
+      {showBooking && (
+        <div className="max-w-4xl mx-auto px-4 pb-12 sm:pb-16 space-y-6">
+          <ScrollReveal>
+            <h2 className="text-3xl sm:text-4xl font-bold text-center text-zinc-900 dark:text-zinc-100">
+              {tenantBranding?.offer_title || 'Book Your Free Strategy Call Now'}
+            </h2>
+          </ScrollReveal>
 
-        <ScrollReveal>
-          <CalEmbed ref={calEmbedRef} calLink={calBookingLink} prospectInfo={prospectInfo} />
-        </ScrollReveal>
+          <ScrollReveal>
+            <CalEmbed ref={calEmbedRef} calLink={calBookingLink} prospectInfo={prospectInfo} />
+          </ScrollReveal>
 
-        <ScrollReveal delay={100}>
-          <p className="text-center text-sm text-zinc-500 dark:text-zinc-400">
-            Your call is with a senior strategist from the Modern Agency Sales team — 200+
-            blueprints delivered, $4.7M+ in client pipeline. No juniors, no scripts.
-          </p>
-        </ScrollReveal>
-      </div>
+          <ScrollReveal delay={100}>
+            <p className="text-center text-sm text-zinc-500 dark:text-zinc-400">
+              Your call is with a senior strategist from the Modern Agency Sales team — 200+
+              blueprints delivered, $4.7M+ in client pipeline. No juniors, no scripts.
+            </p>
+          </ScrollReveal>
+        </div>
+      )}
 
       {/* 22. StickyCTA (fixed position) */}
       <StickyCTA
         text={stickyCtaText}
         calEmbedRef={calEmbedRef}
-        isVisible={settings?.stickyCTAEnabled ?? true}
+        isVisible={(settings?.stickyCTAEnabled ?? true) && (!!stickyCtaHref || showBooking)}
         href={stickyCtaHref}
         useBrandColors={hasTenantBranding}
       />

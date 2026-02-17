@@ -67,7 +67,8 @@ const BlueprintThankYou: React.FC = () => {
     reportUrl?: string;
     monthlyIncome?: string;
   } | null;
-  const showBooking = state?.monthlyIncome !== 'Not generating revenue yet';
+  const DISQUALIFYING_REVENUE = ['Not generating revenue yet', 'Under $5k', '$5k-$10k'];
+  const showBooking = !state?.monthlyIncome || !DISQUALIFYING_REVENUE.includes(state.monthlyIncome);
   const calEmbedRef = useRef<HTMLDivElement>(null);
 
   const { data: settings } = useQuery({
