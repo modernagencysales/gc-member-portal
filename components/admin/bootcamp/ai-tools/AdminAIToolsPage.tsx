@@ -25,7 +25,7 @@ import {
   useBulkUpdateAIToolsMutation,
   useReorderAIToolsMutation,
 } from '../../../../hooks/useChatMutation';
-import { AITool, AIToolInput } from '../../../../types/chat-types';
+import { AITool, AIToolInput, formatCategoryLabel } from '../../../../types/chat-types';
 import AIToolModal from './AIToolModal';
 import BulkEditModal from './BulkEditModal';
 import {
@@ -132,6 +132,15 @@ const SortableToolRow: React.FC<SortableToolRowProps> = ({
         </button>
       </td>
       <td className="px-4 py-3">
+        {tool.category ? (
+          <span className="inline-flex px-2 py-0.5 rounded-full text-xs font-medium bg-violet-100 text-violet-800 dark:bg-violet-900/30 dark:text-violet-400">
+            {formatCategoryLabel(tool.category!)}
+          </span>
+        ) : (
+          <span className={`text-xs ${isDarkMode ? 'text-slate-600' : 'text-slate-400'}`}>—</span>
+        )}
+      </td>
+      <td className="px-4 py-3">
         <span className={`text-sm ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
           {tool.model.replace('claude-', '')}
         </span>
@@ -228,6 +237,13 @@ const AdminAIToolsPage: React.FC = () => {
       );
     });
   }, [tools, searchQuery]);
+
+  // Existing categories (for modal datalist)
+  const existingCategories = useMemo(() => {
+    if (!tools) return [];
+    const cats = new Set(tools.map((t) => t.category).filter(Boolean) as string[]);
+    return Array.from(cats).sort();
+  }, [tools]);
 
   // Stats
   const stats = useMemo(() => {
@@ -432,6 +448,7 @@ const AdminAIToolsPage: React.FC = () => {
                   </th>
                   <th className="px-4 py-3 text-left">Tool</th>
                   <th className="px-4 py-3 text-left">Slug</th>
+                  <th className="px-4 py-3 text-left">Category</th>
                   <th className="px-4 py-3 text-left">Model</th>
                   <th className="px-4 py-3 text-left">Max Tokens</th>
                   <th className="px-4 py-3 text-center">Status</th>
@@ -446,7 +463,7 @@ const AdminAIToolsPage: React.FC = () => {
                   {filteredTools.length === 0 ? (
                     <tr>
                       <td
-                        colSpan={8}
+                        colSpan={9}
                         className={`px-4 py-8 text-center ${
                           isDarkMode ? 'text-slate-400' : 'text-slate-500'
                         }`}
@@ -487,6 +504,7 @@ const AdminAIToolsPage: React.FC = () => {
         onSubmit={handleSubmit}
         initialData={editingTool}
         isLoading={createMutation.isPending || updateMutation.isPending}
+        existingCategories={existingCategories}
       />
 
       {/* Delete Confirmation Modal */}

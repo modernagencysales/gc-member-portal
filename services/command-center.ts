@@ -1,7 +1,5 @@
 import type { CommandCenterData } from '../types/command-center-types';
-
-const GTM_SYSTEM_URL =
-  import.meta.env.VITE_GTM_SYSTEM_URL || 'https://gtm-system-production.up.railway.app';
+import { GTM_SYSTEM_URL } from '../lib/api-config';
 
 export async function fetchCommandCenterData(
   tenantId: string,

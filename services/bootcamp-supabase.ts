@@ -37,7 +37,7 @@ const BOOTCAMP_PROGRESS_COLUMNS = 'id, student_id, checklist_item_id, status, co
 const BOOTCAMP_SURVEY_COLUMNS =
   'id, student_id, company_name, website, industry, company_size, role_title, primary_goal, biggest_challenges, linkedin_experience, target_audience, current_lead_gen_methods, monthly_outreach_volume, tools_currently_using, completed_at, created_at, updated_at';
 
-const BOOTCAMP_COHORT_COLUMNS = 'id, name, description, status, created_at, updated_at';
+const BOOTCAMP_COHORT_COLUMNS = 'id, name, description, status, created_at, start_date, end_date';
 
 // ============================================
 // Bootcamp Students

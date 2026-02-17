@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Loader2, Plus, Trash2 } from 'lucide-react';
 import { useTheme } from '../../../../context/ThemeContext';
-import { AITool, AIToolInput } from '../../../../types/chat-types';
+import { AITool, AIToolInput, formatCategoryLabel } from '../../../../types/chat-types';
 
 interface AIToolModalProps {
   isOpen: boolean;
@@ -9,6 +9,7 @@ interface AIToolModalProps {
   onSubmit: (data: AIToolInput) => Promise<void>;
   initialData?: AITool | null;
   isLoading?: boolean;
+  existingCategories?: string[];
 }
 
 const AVAILABLE_MODELS = [
@@ -25,12 +26,14 @@ const AIToolModal: React.FC<AIToolModalProps> = ({
   onSubmit,
   initialData,
   isLoading,
+  existingCategories = [],
 }) => {
   const { isDarkMode } = useTheme();
   const [formData, setFormData] = useState<AIToolInput>({
     slug: '',
     name: '',
     description: '',
+    category: null,
     systemPrompt: '',
     model: 'claude-sonnet-4-20250514',
     maxTokens: 1024,
@@ -46,6 +49,7 @@ const AIToolModal: React.FC<AIToolModalProps> = ({
         slug: initialData.slug || '',
         name: initialData.name || '',
         description: initialData.description || '',
+        category: initialData.category ?? null,
         systemPrompt: initialData.systemPrompt || '',
         model: initialData.model || 'claude-sonnet-4-20250514',
         maxTokens: initialData.maxTokens || 1024,
@@ -58,6 +62,7 @@ const AIToolModal: React.FC<AIToolModalProps> = ({
         slug: '',
         name: '',
         description: '',
+        category: null,
         systemPrompt: '',
         model: 'claude-sonnet-4-20250514',
         maxTokens: 1024,
@@ -178,15 +183,43 @@ const AIToolModal: React.FC<AIToolModalProps> = ({
             </div>
           </div>
 
-          <div>
-            <label className={labelClass}>Description</label>
-            <input
-              type="text"
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              className={inputClass}
-              placeholder="Helps you craft compelling messages..."
-            />
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className={labelClass}>Description</label>
+              <input
+                type="text"
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                className={inputClass}
+                placeholder="Helps you craft compelling messages..."
+              />
+            </div>
+            <div>
+              <label className={labelClass}>Category</label>
+              <input
+                type="text"
+                list="category-options"
+                value={formData.category || ''}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    category: e.target.value.trim() || null,
+                  })
+                }
+                className={inputClass}
+                placeholder="e.g. lead-magnet, strategy"
+              />
+              <datalist id="category-options">
+                {existingCategories.map((cat) => (
+                  <option key={cat} value={cat}>
+                    {formatCategoryLabel(cat)}
+                  </option>
+                ))}
+              </datalist>
+              <p className={`text-xs mt-1 ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>
+                Sidebar group — pick existing or type a new one
+              </p>
+            </div>
           </div>
 
           {/* System Prompt */}

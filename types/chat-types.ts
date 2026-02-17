@@ -8,11 +8,33 @@ export type MessageRole = 'user' | 'assistant';
 // AI Tools
 // ============================================
 
+export type AIToolCategory = string | null;
+
+/** Display labels for known categories. Unknown categories get auto-formatted. */
+export const CATEGORY_LABELS: Record<string, string> = {
+  'lead-magnet': 'Lead Magnet',
+  'profile-posts': 'Profile + Posts',
+  linkedin: 'LinkedIn',
+  outbound: 'Outbound',
+};
+
+/** Format a category slug into a display label */
+export function formatCategoryLabel(category: string): string {
+  return (
+    CATEGORY_LABELS[category] ||
+    category
+      .split('-')
+      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+      .join(' ')
+  );
+}
+
 export interface AITool {
   id: string;
   slug: string;
   name: string;
   description: string | null;
+  category: AIToolCategory;
   systemPrompt: string;
   model: string;
   maxTokens: number;
@@ -28,6 +50,7 @@ export interface AIToolInput {
   slug: string;
   name: string;
   description?: string;
+  category?: AIToolCategory;
   systemPrompt: string;
   model?: string;
   maxTokens?: number;

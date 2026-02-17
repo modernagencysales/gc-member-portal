@@ -5,6 +5,7 @@ import {
   InfraTier,
   ServiceProvider,
 } from '../../../../types/infrastructure-types';
+import { buildGtmHeaders } from '../../../../lib/api-config';
 
 interface Props {
   tier: InfraTier;
@@ -37,11 +38,7 @@ export default function DomainPicker({
     setChecking(true);
     setFetchError(null);
     try {
-      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-      const infraKey = import.meta.env.VITE_INFRA_API_KEY;
-      if (infraKey) {
-        headers['x-infra-key'] = infraKey;
-      }
+      const headers = buildGtmHeaders();
       const res = await fetch(`${gtmSystemUrl}/api/infrastructure/domains/check`, {
         method: 'POST',
         headers,

@@ -13,16 +13,26 @@ import {
 } from 'lucide-react';
 import { ProspectPost } from '../../types/blueprint-types';
 import { getProspectPosts } from '../../services/blueprint-supabase';
+import PostFinalizerPanel from './PostFinalizerPanel';
 
 interface MyPostsProps {
   prospectId?: string;
+  studentId?: string;
 }
 
-type FilterType = 'all' | 'ready' | 'needs-review';
+type FilterType = 'all' | 'ready' | 'needs-review' | 'finalized';
 
 const POSTS_PER_PAGE = 20;
 
-const MyPosts: React.FC<MyPostsProps> = ({ prospectId }) => {
+function countActionItems(raw?: string): number {
+  if (!raw) return 0;
+  return raw
+    .split('\n')
+    .map((line) => line.replace(/^[\s]*[-\u2022*\d.)\]]+[\s]*/, '').trim())
+    .filter((line) => line.length > 0).length;
+}
+
+const MyPosts: React.FC<MyPostsProps> = ({ prospectId, studentId }) => {
   const [posts, setPosts] = useState<ProspectPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -31,6 +41,7 @@ const MyPosts: React.FC<MyPostsProps> = ({ prospectId }) => {
   const [expandedPostId, setExpandedPostId] = useState<string | null>(null);
   const [copiedPostId, setCopiedPostId] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [finalizerPostId, setFinalizerPostId] = useState<string | null>(null);
 
   // Fetch posts on mount
   useEffect(() => {
@@ -57,8 +68,12 @@ const MyPosts: React.FC<MyPostsProps> = ({ prospectId }) => {
   }, [prospectId]);
 
   // Counts
-  const readyCount = useMemo(() => posts.filter((p) => p.postReady && !p.toFix).length, [posts]);
+  const readyCount = useMemo(
+    () => posts.filter((p) => p.postReady && !p.toFix && !p.finalizedContent).length,
+    [posts]
+  );
   const needsReviewCount = useMemo(() => posts.filter((p) => p.toFix).length, [posts]);
+  const finalizedCount = useMemo(() => posts.filter((p) => !!p.finalizedContent).length, [posts]);
 
   // Filtered + searched posts
   const filteredPosts = useMemo(() => {
@@ -66,9 +81,11 @@ const MyPosts: React.FC<MyPostsProps> = ({ prospectId }) => {
 
     // Apply filter
     if (filter === 'ready') {
-      result = result.filter((p) => p.postReady && !p.toFix);
+      result = result.filter((p) => p.postReady && !p.toFix && !p.finalizedContent);
     } else if (filter === 'needs-review') {
       result = result.filter((p) => p.toFix);
+    } else if (filter === 'finalized') {
+      result = result.filter((p) => !!p.finalizedContent);
     }
 
     // Apply search
@@ -122,6 +139,18 @@ const MyPosts: React.FC<MyPostsProps> = ({ prospectId }) => {
   const toggleExpand = useCallback((postId: string) => {
     setExpandedPostId((prev) => (prev === postId ? null : postId));
   }, []);
+
+  // Handle finalizer save
+  const handleFinalizerSaved = useCallback((postId: string, finalizedContent: string) => {
+    setPosts((prev) =>
+      prev.map((p) =>
+        p.id === postId ? { ...p, finalizedContent, toFix: false, postReady: true } : p
+      )
+    );
+    setFinalizerPostId(null);
+  }, []);
+
+  const finalizerPost = finalizerPostId ? posts.find((p) => p.id === finalizerPostId) : null;
 
   // No Blueprint / no prospectId CTA
   if (!prospectId) {
@@ -195,6 +224,12 @@ const MyPosts: React.FC<MyPostsProps> = ({ prospectId }) => {
     );
   }
 
+  // Progress bar percentages
+  const total = posts.length;
+  const finalizedPct = Math.round((finalizedCount / total) * 100);
+  const readyPct = Math.round((readyCount / total) * 100);
+  const reviewPct = Math.round((needsReviewCount / total) * 100);
+
   return (
     <div className="max-w-4xl mx-auto">
       {/* Header */}
@@ -202,7 +237,12 @@ const MyPosts: React.FC<MyPostsProps> = ({ prospectId }) => {
         <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mb-2">
           My LinkedIn Posts
         </h1>
-        <div className="flex items-center gap-3 flex-wrap">
+        <div className="flex items-center gap-3 flex-wrap mb-4">
+          {finalizedCount > 0 && (
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
+              {finalizedCount} Finalized
+            </span>
+          )}
           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-green-500/10 text-green-600 dark:text-green-400 border border-green-500/20">
             {readyCount} Ready
           </span>
@@ -215,6 +255,28 @@ const MyPosts: React.FC<MyPostsProps> = ({ prospectId }) => {
             {posts.length} total posts
           </span>
         </div>
+
+        {/* Progress bar */}
+        <div className="w-full h-2 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden flex">
+          {finalizedPct > 0 && (
+            <div
+              className="h-full bg-blue-500 transition-all duration-300"
+              style={{ width: `${finalizedPct}%` }}
+            />
+          )}
+          {readyPct > 0 && (
+            <div
+              className="h-full bg-green-500 transition-all duration-300"
+              style={{ width: `${readyPct}%` }}
+            />
+          )}
+          {reviewPct > 0 && (
+            <div
+              className="h-full bg-amber-500 transition-all duration-300"
+              style={{ width: `${reviewPct}%` }}
+            />
+          )}
+        </div>
       </div>
 
       {/* Filter Bar */}
@@ -223,6 +285,7 @@ const MyPosts: React.FC<MyPostsProps> = ({ prospectId }) => {
           {(
             [
               { key: 'all', label: 'All' },
+              { key: 'finalized', label: 'Finalized' },
               { key: 'ready', label: 'Ready to Post' },
               { key: 'needs-review', label: 'Needs Review' },
             ] as const
@@ -268,7 +331,10 @@ const MyPosts: React.FC<MyPostsProps> = ({ prospectId }) => {
         {paginatedPosts.map((post) => {
           const isExpanded = expandedPostId === post.id;
           const isCopied = copiedPostId === post.id;
+          const isFinalized = !!post.finalizedContent;
           const isReady = post.postReady && !post.toFix;
+          const actionItemCount = countActionItems(post.actionItems);
+          const displayContent = post.finalizedContent || post.postContent;
 
           return (
             <div
@@ -276,45 +342,70 @@ const MyPosts: React.FC<MyPostsProps> = ({ prospectId }) => {
               className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl overflow-hidden hover:border-zinc-300 dark:hover:border-zinc-700 transition-all"
             >
               {/* Post Header (always visible) */}
-              <button
-                onClick={() => toggleExpand(post.id)}
-                className="w-full flex items-center gap-4 p-4 text-left group"
-              >
-                {/* Post number */}
-                <div className="w-10 h-10 shrink-0 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
-                  <span className="text-sm font-semibold text-zinc-500 dark:text-zinc-400">
-                    #{post.number ?? '?'}
-                  </span>
-                </div>
-
-                {/* Title + preview */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-0.5">
-                    <h3 className="text-sm font-medium text-zinc-900 dark:text-zinc-100 truncate">
-                      {post.name || `Post #${post.number ?? '?'}`}
-                    </h3>
-                    {isReady ? (
-                      <span className="shrink-0 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-green-500/10 text-green-600 dark:text-green-400 border border-green-500/20">
-                        Ready
-                      </span>
-                    ) : post.toFix ? (
-                      <span className="shrink-0 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
-                        Needs Review
-                      </span>
-                    ) : null}
+              <div className="flex items-center gap-4 p-4">
+                <button
+                  onClick={() => toggleExpand(post.id)}
+                  className="flex items-center gap-4 flex-1 min-w-0 text-left group"
+                >
+                  {/* Post number */}
+                  <div className="w-10 h-10 shrink-0 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center">
+                    <span className="text-sm font-semibold text-zinc-500 dark:text-zinc-400">
+                      #{post.number ?? '?'}
+                    </span>
                   </div>
-                  {post.firstSentence && (
-                    <p className="text-xs text-zinc-500 dark:text-zinc-400 truncate leading-relaxed">
-                      {post.firstSentence}
-                    </p>
-                  )}
-                </div>
 
-                {/* Expand icon */}
-                <div className="shrink-0 text-zinc-400 dark:text-zinc-500 group-hover:text-zinc-600 dark:group-hover:text-zinc-300 transition-colors">
-                  {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-                </div>
-              </button>
+                  {/* Title + preview */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-0.5">
+                      <h3 className="text-sm font-medium text-zinc-900 dark:text-zinc-100 truncate">
+                        {post.name || `Post #${post.number ?? '?'}`}
+                      </h3>
+                      {isFinalized ? (
+                        <span className="shrink-0 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
+                          Finalized
+                        </span>
+                      ) : isReady ? (
+                        <span className="shrink-0 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-green-500/10 text-green-600 dark:text-green-400 border border-green-500/20">
+                          Ready
+                        </span>
+                      ) : post.toFix ? (
+                        <span className="shrink-0 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+                          Needs Review
+                        </span>
+                      ) : null}
+                      {post.toFix && actionItemCount > 0 && (
+                        <span className="shrink-0 text-[10px] text-zinc-400 dark:text-zinc-500">
+                          {actionItemCount} action item{actionItemCount !== 1 ? 's' : ''}
+                        </span>
+                      )}
+                    </div>
+                    {post.firstSentence && (
+                      <p className="text-xs text-zinc-500 dark:text-zinc-400 truncate leading-relaxed">
+                        {post.firstSentence}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Expand icon */}
+                  <div className="shrink-0 text-zinc-400 dark:text-zinc-500 group-hover:text-zinc-600 dark:group-hover:text-zinc-300 transition-colors">
+                    {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                  </div>
+                </button>
+
+                {/* Finalize button (in header, always visible for needs-review posts) */}
+                {post.toFix && studentId && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setFinalizerPostId(post.id);
+                    }}
+                    className="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-medium bg-violet-500/10 text-violet-600 dark:text-violet-400 border border-violet-500/20 hover:bg-violet-500/20 transition-all"
+                  >
+                    <Sparkles size={12} />
+                    Finalize
+                  </button>
+                )}
+              </div>
 
               {/* Expanded Content */}
               {isExpanded && (
@@ -338,10 +429,21 @@ const MyPosts: React.FC<MyPostsProps> = ({ prospectId }) => {
 
                   {/* Post content */}
                   <div className="p-4">
-                    {post.postContent ? (
-                      <div className="bg-zinc-50 dark:bg-zinc-800/30 rounded-lg p-4 border border-zinc-200 dark:border-zinc-700/50">
+                    {isFinalized && (
+                      <p className="text-[10px] font-medium text-blue-500 dark:text-blue-400 mb-1.5 uppercase tracking-wide">
+                        Finalized Version
+                      </p>
+                    )}
+                    {displayContent ? (
+                      <div
+                        className={`rounded-lg p-4 border ${
+                          isFinalized
+                            ? 'bg-blue-50 dark:bg-blue-900/10 border-blue-200 dark:border-blue-800/30'
+                            : 'bg-zinc-50 dark:bg-zinc-800/30 border-zinc-200 dark:border-zinc-700/50'
+                        }`}
+                      >
                         <pre className="text-sm text-zinc-800 dark:text-zinc-200 leading-relaxed whitespace-pre-wrap font-sans">
-                          {post.postContent}
+                          {displayContent}
                         </pre>
                       </div>
                     ) : (
@@ -351,13 +453,13 @@ const MyPosts: React.FC<MyPostsProps> = ({ prospectId }) => {
                     )}
                   </div>
 
-                  {/* Copy button */}
-                  {post.postContent && (
-                    <div className="px-4 pb-4">
+                  {/* Buttons */}
+                  {displayContent && (
+                    <div className="px-4 pb-4 flex items-center gap-2">
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleCopy(post.id, post.postContent!);
+                          handleCopy(post.id, displayContent);
                         }}
                         className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-medium transition-all ${
                           isCopied
@@ -377,6 +479,18 @@ const MyPosts: React.FC<MyPostsProps> = ({ prospectId }) => {
                           </>
                         )}
                       </button>
+                      {post.toFix && studentId && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setFinalizerPostId(post.id);
+                          }}
+                          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-medium bg-violet-500/10 text-violet-600 dark:text-violet-400 border border-violet-500/20 hover:bg-violet-500/20 transition-all"
+                        >
+                          <Sparkles size={14} />
+                          Finalize with AI
+                        </button>
+                      )}
                     </div>
                   )}
                 </div>
@@ -427,6 +541,16 @@ const MyPosts: React.FC<MyPostsProps> = ({ prospectId }) => {
             <ChevronRight size={16} />
           </button>
         </div>
+      )}
+
+      {/* Post Finalizer Panel */}
+      {finalizerPost && studentId && (
+        <PostFinalizerPanel
+          post={finalizerPost}
+          studentId={studentId}
+          onClose={() => setFinalizerPostId(null)}
+          onSaved={handleFinalizerSaved}
+        />
       )}
     </div>
   );

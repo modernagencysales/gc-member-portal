@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   ArrowLeft,
   Sparkles,
@@ -22,15 +22,7 @@ import ReviewVariablesStep from './email-first/ReviewVariablesStep';
 import ReviewRecipeStep from './email-first/ReviewRecipeStep';
 import SaveRecipeStep from './email-first/SaveRecipeStep';
 
-/** Build headers for gtm-system API calls, including auth if available */
-function buildGtmHeaders(): Record<string, string> {
-  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-  const infraKey = import.meta.env.VITE_INFRA_API_KEY;
-  if (infraKey) {
-    headers['x-infra-key'] = infraKey;
-  }
-  return headers;
-}
+import { GTM_SYSTEM_URL, buildGtmHeaders } from '../../../../lib/api-config';
 
 interface Props {
   userId: string;
@@ -44,17 +36,6 @@ const STEPS: { id: EmailFirstStep; label: string; icon: React.ReactNode }[] = [
   { id: 'recipe', label: 'Recipe', icon: <Settings2 size={14} /> },
   { id: 'save', label: 'Save', icon: <Save size={14} /> },
 ];
-
-function getGtmSystemUrl(): string {
-  const envUrl = import.meta.env.VITE_GTM_SYSTEM_URL || '';
-  // The env var may include a webhook path — strip to base URL
-  try {
-    const url = new URL(envUrl);
-    return `${url.protocol}//${url.host}`;
-  } catch {
-    return envUrl;
-  }
-}
 
 export default function EmailFirstRecipeBuilder({ userId, onClose, onSaved }: Props) {
   const createRecipe = useCreateRecipe();
@@ -86,7 +67,7 @@ export default function EmailFirstRecipeBuilder({ userId, onClose, onSaved }: Pr
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const gtmSystemUrl = useMemo(() => getGtmSystemUrl(), []);
+  const gtmSystemUrl = GTM_SYSTEM_URL;
   const currentStepIndex = STEPS.findIndex((s) => s.id === currentStep);
 
   // --- API calls ---

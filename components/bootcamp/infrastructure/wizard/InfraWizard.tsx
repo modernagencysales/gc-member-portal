@@ -7,6 +7,7 @@ import {
   InfraProvision,
 } from '../../../../types/infrastructure-types';
 import type { InfraMode } from '../InfrastructurePage';
+import { GTM_SYSTEM_URL } from '../../../../lib/api-config';
 import TierSelection from './TierSelection';
 import DomainPicker from './DomainPicker';
 import MailboxConfig from './MailboxConfig';
@@ -37,7 +38,7 @@ export default function InfraWizard({ userId, mode = 'account_setup', existingPr
     mailboxPattern2: existingProvision?.mailboxPattern2 || '',
   });
 
-  const gtmSystemUrl = import.meta.env.VITE_GTM_SYSTEM_URL;
+  const gtmSystemUrl = GTM_SYSTEM_URL;
 
   const updateState = (updates: Partial<WizardState>) => {
     setWizardState((prev) => ({ ...prev, ...updates }));

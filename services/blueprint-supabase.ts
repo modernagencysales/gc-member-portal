@@ -20,7 +20,7 @@ const PROSPECT_COLUMNS =
   'id, full_name, first_name, last_name, email, phone, company, location, linkedin_url, normalized_linkedin_url, profile_photo, banner_image, company_logo, current_headline, current_bio, job_title, connections, business_type, linkedin_challenge, linkedin_help_area, posting_frequency, has_funnel, learning_investment, monthly_income, interested_in_mas, timezone, source_url, lead_magnet_source, submission_date, posts_clean_text, their_existing_posts, raw_profile_json, raw_company_research, knowledge_base, authority_score, score_profile_optimization, score_content_presence, score_outbound_systems, score_inbound_infrastructure, score_social_proof, score_summary, whats_working_1, whats_working_2, whats_working_3, revenue_leaks_1, revenue_leaks_2, revenue_leaks_3, bottom_line, buyer_persona, strategic_gap, strategic_opportunity, fit_score, fit_assessment, how_to_take_further, recommended_headline, headline_outcome_based, headline_authority_based, headline_hybrid, headline_recommendation, headline_recommendation_reason, recommended_bio, profile_analysis, profile_rewrite, voice_style_guide, improvement_suggestions, lm_card_1, lm_card_2, lm_card_3, lm_1_content_type, lm_1_headline, lm_1_subheadline, lm_1_match, lm_1_est_hours, lm_2_content_type, lm_2_headline, lm_2_subheadline, lm_2_match, lm_2_est_hours, lm_3_content_type, lm_3_headline, lm_3_subheadline, lm_3_match, lm_3_est_hours, lead_mag_1, lead_mag_2, lead_mag_3, lm_post_1, lm_post_2, lm_post_3, featured_slot_1, featured_slot_2, featured_slot_3, next_steps_30_day, next_steps_90_day, formatted_report, status, processing_step, analysis_status, analysis_date, error_log, email_sent_at, send_email, slug, offer_unlocked, recommended_offer, offer_note, created_at, updated_at';
 
 const POST_COLUMNS =
-  'id, prospect_id, template_id, name, post_content, first_sentence, post_ready, to_fix, action_items, number, created_at';
+  'id, prospect_id, template_id, name, post_content, first_sentence, post_ready, to_fix, action_items, finalized_content, number, created_at';
 
 const BLUEPRINT_SETTINGS_COLUMNS =
   'id, sticky_cta_enabled, foundations_payment_url, engineering_payment_url, cal_booking_link, show_bootcamp_offer, show_gc_offer, show_dfy_offer, bootcamp_offer_title, bootcamp_offer_description, bootcamp_offer_cta, gc_offer_title, gc_offer_description, gc_offer_cta, dfy_offer_title, dfy_offer_description, dfy_offer_cta, dfy_offer_url, default_offer_unlocked, blueprint_video_url, call_booked_video_url, thank_you_video_url, foundations_offer_video_url, engineering_offer_video_url, senja_widget_url, max_logos_landing, max_logos_blueprint, created_at, updated_at';
@@ -236,6 +236,7 @@ function mapProspectPost(record: Record<string, unknown>): ProspectPost {
     postReady: record.post_ready as boolean | undefined,
     toFix: record.to_fix as boolean | undefined,
     actionItems: record.action_items as string | undefined,
+    finalizedContent: record.finalized_content as string | undefined,
     number: record.number as number | undefined,
     createdAt: new Date(record.created_at as string),
   };
@@ -545,6 +546,35 @@ export async function getProspectPosts(prospectId: string): Promise<ProspectPost
   } catch (error) {
     console.error('Failed to fetch prospect posts:', error);
     return [];
+  }
+}
+
+/**
+ * Update a post's finalized content and mark it as ready
+ */
+export async function updatePostFinalizedContent(
+  postId: string,
+  content: string
+): Promise<boolean> {
+  try {
+    const { error } = await supabase
+      .from('posts')
+      .update({
+        finalized_content: content,
+        to_fix: false,
+        post_ready: true,
+      })
+      .eq('id', postId);
+
+    if (error) {
+      console.error('Error updating finalized content:', error);
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error('Failed to update finalized content:', error);
+    return false;
   }
 }
 

@@ -16,10 +16,10 @@ import {
 } from 'lucide-react';
 
 // ============================================
-// Stripe Payment Links (replace with real URLs)
+// Stripe Payment Links
 // ============================================
 const STRIPE_LINKS = {
-  core: 'https://buy.stripe.com/PLACEHOLDER_CORE',
+  core: import.meta.env.VITE_STRIPE_INTRO_OFFER_URL || '',
 };
 
 // ============================================
@@ -225,12 +225,17 @@ const IntroOffer: React.FC = () => {
             ))}
           </ul>
           <a
-            href={STRIPE_LINKS.core}
+            href={STRIPE_LINKS.core || '#'}
             target="_blank"
             rel="noopener noreferrer"
-            className="block w-full text-center py-3.5 rounded-lg font-semibold text-base bg-violet-500 hover:bg-violet-600 text-white transition-colors"
+            className={`block w-full text-center py-3.5 rounded-lg font-semibold text-base transition-colors ${
+              STRIPE_LINKS.core
+                ? 'bg-violet-500 hover:bg-violet-600 text-white'
+                : 'bg-zinc-300 text-zinc-500 cursor-not-allowed pointer-events-none'
+            }`}
+            aria-disabled={!STRIPE_LINKS.core}
           >
-            Get Started
+            {STRIPE_LINKS.core ? 'Get Started' : 'Coming Soon'}
           </a>
         </div>
       </section>

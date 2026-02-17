@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import { X, Sparkles, Loader2 } from 'lucide-react';
 import { useTheme } from '../../../../context/ThemeContext';
+import { GTM_SYSTEM_URL } from '../../../../lib/api-config';
 
-const INTAKE_API_URL =
-  import.meta.env.VITE_GTM_SYSTEM_URL ||
-  'https://gtm-system-production.up.railway.app/api/webhooks/blueprint-form';
+const INTAKE_API_URL = `${GTM_SYSTEM_URL}/api/webhooks/blueprint-form`;
 
 interface GenerateBlueprintModalProps {
   isOpen: boolean;

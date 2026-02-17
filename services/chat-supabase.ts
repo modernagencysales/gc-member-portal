@@ -6,6 +6,7 @@
 import { supabase } from '../lib/supabaseClient';
 import {
   AITool,
+  AIToolCategory,
   AIToolInput,
   ChatConversation,
   ChatConversationInput,
@@ -16,7 +17,7 @@ import {
 
 // Explicit column lists (avoid select('*'))
 const AI_TOOL_COLUMNS =
-  'id, slug, name, description, system_prompt, model, max_tokens, welcome_message, suggested_prompts, is_active, sort_order, created_at, updated_at';
+  'id, slug, name, description, category, system_prompt, model, max_tokens, welcome_message, suggested_prompts, is_active, sort_order, created_at, updated_at';
 
 const CONVERSATION_COLUMNS = 'id, student_id, tool_id, title, created_at, updated_at';
 
@@ -33,6 +34,7 @@ function mapAITool(data: Record<string, unknown>): AITool {
     slug: data.slug as string,
     name: data.name as string,
     description: data.description as string | null,
+    category: (data.category as AIToolCategory) ?? null,
     systemPrompt: data.system_prompt as string,
     model: data.model as string,
     maxTokens: data.max_tokens as number,
@@ -120,6 +122,7 @@ export async function createAITool(tool: AIToolInput): Promise<AITool> {
     slug: tool.slug,
     name: tool.name,
     description: tool.description,
+    category: tool.category ?? null,
     system_prompt: tool.systemPrompt,
     model: tool.model || 'claude-sonnet-4-20250514',
     max_tokens: tool.maxTokens || 1024,
@@ -140,6 +143,7 @@ export async function updateAITool(toolId: string, updates: Partial<AIToolInput>
   if (updates.slug !== undefined) updateData.slug = updates.slug;
   if (updates.name !== undefined) updateData.name = updates.name;
   if (updates.description !== undefined) updateData.description = updates.description;
+  if (updates.category !== undefined) updateData.category = updates.category;
   if (updates.systemPrompt !== undefined) updateData.system_prompt = updates.systemPrompt;
   if (updates.model !== undefined) updateData.model = updates.model;
   if (updates.maxTokens !== undefined) updateData.max_tokens = updates.maxTokens;

@@ -3,7 +3,6 @@ import { useNavigate, Link } from 'react-router-dom';
 import {
   Linkedin,
   Mail,
-  Phone,
   CheckCircle,
   Sparkles,
   FileText,
@@ -19,9 +18,9 @@ import {
   ClientLogo,
 } from '../../services/blueprint-supabase';
 
-const INTAKE_API_URL =
-  import.meta.env.VITE_GTM_SYSTEM_URL ||
-  'https://gtm-system-production.up.railway.app/api/webhooks/blueprint-form';
+import { GTM_SYSTEM_URL } from '../../lib/api-config';
+
+const INTAKE_API_URL = `${GTM_SYSTEM_URL}/api/webhooks/blueprint-form`;
 
 const SESSION_KEY = 'blueprint_partial';
 const SESSION_MAX_AGE = 30 * 60 * 1000; // 30 minutes
@@ -408,6 +407,7 @@ const BlueprintQuestionnaire: React.FC<QuestionnaireProps> = ({
   }, [autoAdvanceTimer]);
 
   const validateAndAdvance = useCallback(() => {
+    if (isSubmitting) return;
     const isOptional = step.required === false;
     if (step.validation && value.trim()) {
       const err = step.validation(value);
@@ -428,7 +428,7 @@ const BlueprintQuestionnaire: React.FC<QuestionnaireProps> = ({
     } else {
       onComplete(formData);
     }
-  }, [step, value, currentStep, totalSteps, onComplete, formData]);
+  }, [step, value, currentStep, totalSteps, onComplete, formData, isSubmitting]);
 
   const goBack = useCallback(() => {
     if (currentStep > 0) {
@@ -459,6 +459,7 @@ const BlueprintQuestionnaire: React.FC<QuestionnaireProps> = ({
   }, [step.type, validateAndAdvance, onExit]);
 
   const handleOptionSelect = (optValue: string) => {
+    if (isSubmitting) return;
     const updated = { ...formData, [step.field]: optValue };
     setFormData(updated);
     setStepError(null);
@@ -557,7 +558,8 @@ const BlueprintQuestionnaire: React.FC<QuestionnaireProps> = ({
                   <button
                     key={opt.value}
                     onClick={() => handleOptionSelect(opt.value)}
-                    className={`flex items-center gap-3 px-4 py-3.5 rounded-xl border-2 text-left transition-all duration-150 ${
+                    disabled={isSubmitting}
+                    className={`flex items-center gap-3 px-4 py-3.5 rounded-xl border-2 text-left transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed ${
                       isSelected
                         ? 'border-violet-500 bg-violet-50 dark:bg-violet-500/10 text-violet-700 dark:text-violet-300'
                         : 'border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 hover:border-zinc-300 dark:hover:border-zinc-600'
@@ -588,7 +590,8 @@ const BlueprintQuestionnaire: React.FC<QuestionnaireProps> = ({
                   <button
                     key={opt.value}
                     onClick={() => handleOptionSelect(opt.value)}
-                    className={`flex-1 py-4 rounded-xl border-2 text-center text-lg font-semibold transition-all duration-150 ${
+                    disabled={isSubmitting}
+                    className={`flex-1 py-4 rounded-xl border-2 text-center text-lg font-semibold transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed ${
                       isSelected
                         ? 'border-violet-500 bg-violet-50 dark:bg-violet-500/10 text-violet-700 dark:text-violet-300'
                         : 'border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 hover:border-zinc-300 dark:hover:border-zinc-600'
@@ -755,6 +758,7 @@ const BlueprintLandingPage: React.FC = () => {
   const navigate = useNavigate();
   const [phase, setPhase] = useState<Phase>('landing');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const submittingRef = useRef(false);
   const [error, setError] = useState<string | null>(null);
   const [logos, setLogos] = useState<ClientLogo[]>([]);
   const [maxLogosLanding, setMaxLogosLanding] = useState<number | undefined>(6);
@@ -852,6 +856,10 @@ const BlueprintLandingPage: React.FC = () => {
   };
 
   const handleQuestionnaireComplete = async (finalData: FormData) => {
+    // Belt-and-suspenders: ref guard prevents duplicate submissions even if
+    // React hasn't flushed the isSubmitting state update yet
+    if (submittingRef.current) return;
+    submittingRef.current = true;
     setIsSubmitting(true);
     setError(null);
 
@@ -902,12 +910,16 @@ const BlueprintLandingPage: React.FC = () => {
         const text = await response.text().catch(() => '(no body)');
         console.error('[Blueprint] Non-JSON response:', response.status, text);
         setError(`Server error (${response.status}). Please try again.`);
+        // Re-enable on error so user can retry
+        submittingRef.current = false;
+        setIsSubmitting(false);
         return;
       }
 
       console.log('[Blueprint] Response data:', data);
 
       if (response.ok) {
+        // Success — keep button disabled, navigate away
         sessionStorage.removeItem(SESSION_KEY);
         navigate('/blueprint/thank-you', {
           state: {
@@ -917,6 +929,7 @@ const BlueprintLandingPage: React.FC = () => {
           },
         });
       } else if (response.status === 409) {
+        // Duplicate — still a success, navigate away
         sessionStorage.removeItem(SESSION_KEY);
         navigate('/blueprint/thank-you', {
           state: {
@@ -932,11 +945,15 @@ const BlueprintLandingPage: React.FC = () => {
             data.message ||
             `Something went wrong (${response.status}). Please try again.`
         );
+        // Re-enable on error so user can retry
+        submittingRef.current = false;
+        setIsSubmitting(false);
       }
     } catch (err) {
       console.error('[Blueprint] Network/fetch error:', err);
       setError('Something went wrong. Please check your connection and try again.');
-    } finally {
+      // Re-enable on error so user can retry
+      submittingRef.current = false;
       setIsSubmitting(false);
     }
   };

@@ -271,6 +271,7 @@ export interface ProspectPost {
   postReady?: boolean;
   toFix?: boolean;
   actionItems?: string;
+  finalizedContent?: string;
   number?: number;
   createdAt: Date;
 }

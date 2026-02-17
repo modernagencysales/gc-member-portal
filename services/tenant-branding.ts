@@ -34,7 +34,9 @@ interface CacheEntry {
 // Configuration
 // ============================================
 
-const BACKEND_URL = import.meta.env.VITE_BLUEPRINT_BACKEND_URL || 'http://localhost:3000';
+import { BLUEPRINT_BACKEND_URL } from '../lib/api-config';
+
+const BACKEND_URL = BLUEPRINT_BACKEND_URL;
 
 /** Cache TTL in milliseconds — 5 minutes */
 const CACHE_TTL_MS = 5 * 60 * 1000;

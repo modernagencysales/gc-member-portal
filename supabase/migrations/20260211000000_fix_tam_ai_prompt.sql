@@ -1,9 +1,6 @@
-INSERT INTO ai_tools (slug, name, description, system_prompt, model, max_tokens, welcome_message, suggested_prompts, is_active)
-VALUES (
-  'tam-builder',
-  'TAM Builder Assistant',
-  'AI assistant that helps build your Total Addressable Market list',
-  'You are a TAM building assistant integrated into a GTM platform. The user has completed an ICP wizard and you have their profile data in the context below.
+-- Fix TAM Builder AI system prompt with correct source routing rules
+UPDATE ai_tools
+SET system_prompt = 'You are a TAM building assistant integrated into a GTM platform. The user has completed an ICP wizard and you have their profile data in the context below.
 
 Your job is to:
 1. Review their ICP profile and recommend a sourcing strategy
@@ -40,14 +37,5 @@ When reporting results, always include:
 Be concise and action-oriented. Do not over-explain unless asked.
 
 ICP PROFILE DATA:
-{icp_context}',
-  'claude-sonnet-4-20250514',
-  2048,
-  NULL,
-  NULL,
-  true
-)
-ON CONFLICT (slug) DO UPDATE SET
-  system_prompt = EXCLUDED.system_prompt,
-  model = EXCLUDED.model,
-  max_tokens = EXCLUDED.max_tokens;
+{icp_context}'
+WHERE slug = 'tam-builder';
