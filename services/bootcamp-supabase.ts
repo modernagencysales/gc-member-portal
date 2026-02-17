@@ -21,6 +21,7 @@ import {
   ToolGrant,
   FunnelToolPresets,
   CallGrantConfig,
+  SprintProductConfig,
   EnrollmentConfig,
 } from '../types/bootcamp-types';
 
@@ -1514,6 +1515,60 @@ export async function saveCallGrantConfig(config: CallGrantConfig): Promise<void
   });
 
   if (error) throw new Error(`Failed to save call grant config: ${error.message}`);
+}
+
+// ============================================
+// Sprint Product Config
+// ============================================
+
+const DEFAULT_SPRINT_PRODUCT_CONFIG: SprintProductConfig = {
+  enabled: false,
+  products: {
+    sprint: {
+      stripeProductId: '',
+      cohortId: '',
+      accessLevel: 'Curriculum Only',
+      role: 'student',
+    },
+    dmKit: {
+      stripeProductId: '',
+      contentGrantIds: ['dm_conversion_kit'],
+    },
+    gptSuite: {
+      stripeProductId: '',
+      toolSlugs: [],
+      creditsPerTool: 10,
+      accessDays: 30,
+    },
+  },
+};
+
+export async function fetchSprintProductConfig(): Promise<SprintProductConfig> {
+  try {
+    const { data, error } = await supabase
+      .from('bootcamp_settings')
+      .select('value')
+      .eq('key', 'sprint_product_config')
+      .single();
+
+    if (error || !data) {
+      return DEFAULT_SPRINT_PRODUCT_CONFIG;
+    }
+
+    return { ...DEFAULT_SPRINT_PRODUCT_CONFIG, ...(data.value as Partial<SprintProductConfig>) };
+  } catch {
+    return DEFAULT_SPRINT_PRODUCT_CONFIG;
+  }
+}
+
+export async function saveSprintProductConfig(config: SprintProductConfig): Promise<void> {
+  const { error } = await supabase.from('bootcamp_settings').upsert({
+    key: 'sprint_product_config',
+    value: config,
+    description: 'Auto-provision students from Sprint product purchases',
+  });
+
+  if (error) throw new Error(`Failed to save sprint product config: ${error.message}`);
 }
 
 // ============================================
