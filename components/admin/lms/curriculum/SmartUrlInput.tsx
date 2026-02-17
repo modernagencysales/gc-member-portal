@@ -60,6 +60,7 @@ const SmartUrlInput: React.FC<SmartUrlInputProps> = ({
       text: 'Text',
       external_link: 'Link',
       credentials: 'Credentials',
+      sop_link: 'Reference SOP',
     };
 
     return fallbacks[type] || 'Content';

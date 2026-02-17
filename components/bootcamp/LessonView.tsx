@@ -18,6 +18,7 @@ import {
 import { ChatInterface } from '../chat';
 import MyBlueprint from './MyBlueprint';
 import LessonDescription from './LessonDescription';
+import SopLinksCard from './SopLinksCard';
 import { BootcampStudent } from '../../types/bootcamp-types';
 
 interface LessonViewProps {
@@ -458,6 +459,11 @@ const LessonView: React.FC<LessonViewProps> = ({
             {/* Show description text below content if available */}
             {!isTextContent && lesson.description && (
               <LessonDescription description={lesson.description} />
+            )}
+
+            {/* Show reference SOPs if available */}
+            {lesson.sopLinks && lesson.sopLinks.length > 0 && (
+              <SopLinksCard sopLinks={lesson.sopLinks} />
             )}
           </div>
         </div>

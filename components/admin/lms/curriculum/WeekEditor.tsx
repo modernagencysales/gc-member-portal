@@ -78,6 +78,8 @@ const getContentTypeIcon = (type: string) => {
       return <Link className="w-3.5 h-3.5" />;
     case 'credentials':
       return <Key className="w-3.5 h-3.5" />;
+    case 'sop_link':
+      return <BookOpen className="w-3.5 h-3.5" />;
     default:
       return <FileText className="w-3.5 h-3.5" />;
   }

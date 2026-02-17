@@ -1115,6 +1115,9 @@ function contentItemToEmbedUrl(item: LmsContentItem): string {
       // Encode credentials as JSON for the credentials renderer
       return `credentials:${JSON.stringify(item.credentialsData || {})}`;
 
+    case 'sop_link':
+      return item.embedUrl || '';
+
     default:
       return item.embedUrl || '';
   }
@@ -1147,11 +1150,20 @@ export async function fetchStudentCurriculumAsLegacy(
     const lessons: Lesson[] = [];
 
     for (const lmsLesson of lmsWeek.lessons) {
+      // Extract SOP link items separately
+      const sopLinkItems = lmsLesson.contentItems.filter((ci) => ci.contentType === 'sop_link');
+      const sopLinks = sopLinkItems.map((ci) => ({
+        id: ci.id,
+        title: ci.title,
+        url: ci.embedUrl || '',
+      }));
+      const nonSopItems = lmsLesson.contentItems.filter((ci) => ci.contentType !== 'sop_link');
+
       // If lesson has content items, combine video+text into single entries
-      if (lmsLesson.contentItems.length > 0) {
+      if (nonSopItems.length > 0) {
         // Separate primary content (video, etc.) from text content items
-        const primaryItems = lmsLesson.contentItems.filter((ci) => ci.contentType !== 'text');
-        const textItems = lmsLesson.contentItems.filter((ci) => ci.contentType === 'text');
+        const primaryItems = nonSopItems.filter((ci) => ci.contentType !== 'text');
+        const textItems = nonSopItems.filter((ci) => ci.contentType === 'text');
         // Combine all text content into a single description
         const combinedText = textItems
           .map((ti) => ti.contentText || '')
@@ -1167,6 +1179,7 @@ export async function fetchStudentCurriculumAsLegacy(
               embedUrl: contentItemToEmbedUrl(contentItem),
               description: combinedText || contentItem.description || lmsLesson.description,
               cohort: curriculum.cohort.name,
+              ...(sopLinks.length > 0 && { sopLinks }),
             });
           }
         } else {
@@ -1178,9 +1191,20 @@ export async function fetchStudentCurriculumAsLegacy(
               embedUrl: contentItemToEmbedUrl(contentItem),
               description: contentItem.description || lmsLesson.description,
               cohort: curriculum.cohort.name,
+              ...(sopLinks.length > 0 && { sopLinks }),
             });
           }
         }
+      } else if (sopLinks.length > 0) {
+        // Lesson only has SOP links — show as text placeholder with SOPs
+        lessons.push({
+          id: lmsLesson.id,
+          title: lmsLesson.title,
+          embedUrl: `text:${lmsLesson.description || 'No content available'}`,
+          description: lmsLesson.description,
+          cohort: curriculum.cohort.name,
+          sopLinks,
+        });
       } else {
         // Lesson with no content items - create placeholder
         lessons.push({

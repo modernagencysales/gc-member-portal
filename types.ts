@@ -18,6 +18,7 @@ export interface Lesson {
   cohort?: string;
   description?: string;
   transcript?: TranscriptEntry[];
+  sopLinks?: { id: string; title: string; url: string }[];
 }
 
 export interface ActionItem {

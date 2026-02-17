@@ -38,6 +38,7 @@ const CONTENT_TYPE_OPTIONS: { value: LmsContentType; label: string; icon: React.
   { value: 'text', label: 'Text/Notes', icon: <FileText className="w-4 h-4" /> },
   { value: 'external_link', label: 'External Link', icon: <Link className="w-4 h-4" /> },
   { value: 'credentials', label: 'Credentials', icon: <Key className="w-4 h-4" /> },
+  { value: 'sop_link', label: 'Reference SOP', icon: <BookOpen className="w-4 h-4" /> },
 ];
 
 const LmsContentItemModal: React.FC<LmsContentItemModalProps> = ({
@@ -109,9 +110,14 @@ const LmsContentItemModal: React.FC<LmsContentItemModalProps> = ({
 
   if (!isOpen) return null;
 
-  const showUrlField = ['video', 'slide_deck', 'guide', 'clay_table', 'external_link'].includes(
-    formData.contentType || ''
-  );
+  const showUrlField = [
+    'video',
+    'slide_deck',
+    'guide',
+    'clay_table',
+    'external_link',
+    'sop_link',
+  ].includes(formData.contentType || '');
   const showAiToolField = formData.contentType === 'ai_tool';
   const showTextField = formData.contentType === 'text';
   const showCredentialsFields = formData.contentType === 'credentials';
@@ -211,7 +217,9 @@ const LmsContentItemModal: React.FC<LmsContentItemModalProps> = ({
                       ? 'Guidde URL'
                       : formData.contentType === 'clay_table'
                         ? 'Clay Table URL'
-                        : 'External URL'}{' '}
+                        : formData.contentType === 'sop_link'
+                          ? 'Playbook SOP URL'
+                          : 'External URL'}{' '}
                 *
               </label>
               <input
@@ -227,7 +235,9 @@ const LmsContentItemModal: React.FC<LmsContentItemModalProps> = ({
                         ? 'https://app.guidde.com/share/...'
                         : formData.contentType === 'clay_table'
                           ? 'https://app.clay.com/...'
-                          : 'https://...'
+                          : formData.contentType === 'sop_link'
+                            ? 'https://dwy-playbook.vercel.app/...'
+                            : 'https://...'
                 }
                 required={showUrlField}
                 className={`w-full px-4 py-2.5 rounded-lg border ${

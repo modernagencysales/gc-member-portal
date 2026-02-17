@@ -17,7 +17,8 @@ export type LmsContentType =
   | 'ai_tool' // Reference to AI tool slug
   | 'text' // Plain text/markdown content
   | 'external_link' // Link to external resource
-  | 'credentials'; // Login credentials with copy buttons
+  | 'credentials' // Login credentials with copy buttons
+  | 'sop_link'; // Reference SOP from playbook
 
 export const LMS_CONTENT_TYPE_LABELS: Record<LmsContentType, string> = {
   video: 'Video',
@@ -28,6 +29,7 @@ export const LMS_CONTENT_TYPE_LABELS: Record<LmsContentType, string> = {
   text: 'Text/Notes',
   external_link: 'External Link',
   credentials: 'Credentials',
+  sop_link: 'Reference SOP',
 };
 
 // ============================================
@@ -286,6 +288,10 @@ export function detectContentType(url: string): LmsContentType {
 
   // Clay tables
   if (lowerUrl.includes('clay.com')) return 'clay_table';
+
+  // Playbook SOPs
+  if (lowerUrl.includes('dwy-playbook.vercel.app') || lowerUrl.includes('playbook.keen.digital'))
+    return 'sop_link';
 
   // Default to external link
   return 'external_link';
