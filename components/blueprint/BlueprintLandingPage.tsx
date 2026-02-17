@@ -34,6 +34,7 @@ interface FormData {
   fullName: string;
   linkedinUrl: string;
   phone: string;
+  smsConsent: string;
   timezone: string;
   businessType: string;
   linkedinChallenge: string;
@@ -529,6 +530,43 @@ const BlueprintQuestionnaire: React.FC<QuestionnaireProps> = ({
                 placeholder={step.placeholder}
                 className="w-full px-4 py-3.5 rounded-xl text-lg border-2 border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:border-violet-500 dark:focus:border-violet-500 transition-colors"
               />
+              {step.id === 'phone' && (
+                <label className="flex items-start gap-2.5 mt-4 cursor-pointer select-none group">
+                  <input
+                    type="checkbox"
+                    checked={formData.smsConsent === 'true'}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        smsConsent: e.target.checked ? 'true' : '',
+                      }))
+                    }
+                    className="mt-0.5 w-4 h-4 rounded border-zinc-300 dark:border-zinc-600 text-violet-500 focus:ring-violet-500 flex-shrink-0"
+                  />
+                  <span className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">
+                    I agree to receive SMS messages from Modern Agency Sales. Msg frequency varies.
+                    Msg & data rates may apply. Reply STOP to unsubscribe, HELP for help.{' '}
+                    <a
+                      href="/privacy"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="underline hover:text-zinc-700 dark:hover:text-zinc-300"
+                    >
+                      Privacy Policy
+                    </a>
+                    {' & '}
+                    <a
+                      href="/terms"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="underline hover:text-zinc-700 dark:hover:text-zinc-300"
+                    >
+                      Terms of Service
+                    </a>
+                    .
+                  </span>
+                </label>
+              )}
             </div>
           )}
 
@@ -746,6 +784,21 @@ const Footer: React.FC = () => (
       >
         Become an Affiliate
       </Link>
+      <div className="flex justify-center gap-3">
+        <Link
+          to="/privacy"
+          className="text-[11px] text-zinc-400 hover:text-zinc-500 transition-colors"
+        >
+          Privacy Policy
+        </Link>
+        <span className="text-[11px] text-zinc-300 dark:text-zinc-700">&middot;</span>
+        <Link
+          to="/terms"
+          className="text-[11px] text-zinc-400 hover:text-zinc-500 transition-colors"
+        >
+          Terms of Service
+        </Link>
+      </div>
     </div>
   </footer>
 );
@@ -770,6 +823,7 @@ const BlueprintLandingPage: React.FC = () => {
     fullName: '',
     linkedinUrl: '',
     phone: '',
+    smsConsent: '',
     timezone: '',
     businessType: '',
     linkedinChallenge: '',
@@ -875,6 +929,7 @@ const BlueprintLandingPage: React.FC = () => {
         full_name: finalData.fullName,
         email: finalData.email,
         phone: finalData.phone || undefined,
+        sms_consent: finalData.smsConsent === 'true',
         timezone: finalData.timezone || undefined,
         business_type: finalData.businessType,
         monthly_income: finalData.monthlyIncome,

@@ -9,8 +9,13 @@ const OfferPage = lazy(() => import('./components/blueprint/OfferPage'));
 const BlueprintThankYou = lazy(() => import('./components/blueprint/BlueprintThankYou'));
 const CallBookedThankYou = lazy(() => import('./components/blueprint/CallBookedThankYou'));
 const GenericOfferPage = lazy(() => import('./components/blueprint/GenericOfferPage'));
+const DFYOfferPage = lazy(() => import('./components/blueprint/DFYOfferPage'));
 const CaseStudiesPage = lazy(() => import('./components/blueprint/CaseStudiesPage'));
 const ProgramsPage = lazy(() => import('./components/blueprint/ProgramsPage'));
+
+// Lazy-loaded: Legal pages
+const PrivacyPolicy = lazy(() => import('./components/legal/PrivacyPolicy'));
+const TermsOfService = lazy(() => import('./components/legal/TermsOfService'));
 
 // Lazy-loaded: GC Portal
 const GCLogin = lazy(() => import('./components/gc/GCLogin'));
@@ -237,8 +242,15 @@ const App: React.FC = () => {
         {/* Intro Offer progress tracker (public, client-facing) */}
         <Route path="/intro-offer/:offerId" element={<OfferProgressTracker />} />
 
+        {/* DFY (Done-For-You) offer page */}
+        <Route path="/offer/dfy" element={<DFYOfferPage />} />
+
         {/* Generic (non-personalized) offer pages for partners/affiliates */}
         <Route path="/offer/:offerType" element={<GenericOfferPage />} />
+
+        {/* Legal Pages */}
+        <Route path="/privacy" element={<PrivacyPolicy />} />
+        <Route path="/terms" element={<TermsOfService />} />
 
         {/* Catch-all redirect to home */}
         <Route path="*" element={<Navigate to="/" replace />} />

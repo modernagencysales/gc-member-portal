@@ -407,6 +407,21 @@ const Footer: React.FC = () => (
       >
         Become an Affiliate
       </Link>
+      <div className="flex justify-center gap-3">
+        <Link
+          to="/privacy"
+          className="text-[11px] text-zinc-400 hover:text-zinc-500 transition-colors"
+        >
+          Privacy Policy
+        </Link>
+        <span className="text-[11px] text-zinc-300 dark:text-zinc-700">&middot;</span>
+        <Link
+          to="/terms"
+          className="text-[11px] text-zinc-400 hover:text-zinc-500 transition-colors"
+        >
+          Terms of Service
+        </Link>
+      </div>
     </div>
   </footer>
 );

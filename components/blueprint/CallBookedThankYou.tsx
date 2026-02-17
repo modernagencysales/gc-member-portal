@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { CheckCircle, Mail, FileText, Target, Monitor, ClipboardList, Zap } from 'lucide-react';
 import ThemeToggle from './ThemeToggle';
 
@@ -176,10 +176,25 @@ const CallBookedThankYou: React.FC = () => {
 
       {/* Footer */}
       <footer className="border-t border-zinc-200 dark:border-zinc-800 py-8">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 text-center">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 text-center space-y-2">
           <p className="text-sm text-zinc-500">
             &copy; {new Date().getFullYear()} Modern Agency Sales. All rights reserved.
           </p>
+          <div className="flex justify-center gap-3">
+            <Link
+              to="/privacy"
+              className="text-[11px] text-zinc-400 hover:text-zinc-500 transition-colors"
+            >
+              Privacy Policy
+            </Link>
+            <span className="text-[11px] text-zinc-300 dark:text-zinc-700">&middot;</span>
+            <Link
+              to="/terms"
+              className="text-[11px] text-zinc-400 hover:text-zinc-500 transition-colors"
+            >
+              Terms of Service
+            </Link>
+          </div>
         </div>
       </footer>
     </div>
