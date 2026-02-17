@@ -20,8 +20,6 @@ import {
 // ============================================
 const STRIPE_LINKS = {
   core: 'https://buy.stripe.com/PLACEHOLDER_CORE',
-  coreAds: 'https://buy.stripe.com/PLACEHOLDER_CORE_ADS',
-  full: 'https://buy.stripe.com/PLACEHOLDER_FULL',
 };
 
 // ============================================
@@ -88,56 +86,15 @@ const STEPS = [
   },
 ];
 
-interface PricingTier {
-  name: string;
-  price: string;
-  description: string;
-  features: string[];
-  stripeUrl: string;
-  highlighted?: boolean;
-}
-
-const TIERS: PricingTier[] = [
-  {
-    name: 'Core',
-    price: '$2,500',
-    description: 'Done-for-you GTM launch',
-    features: [
-      '4 LinkedIn posts written & published',
-      '1 lead magnet fully built',
-      'Lead list sourced for your ICP',
-      'HeyReach setup + campaigns running',
-      'MagnetLab setup + full funnel',
-      '5-email nurture flow',
-      'VSL script for thank-you page',
-    ],
-    stripeUrl: STRIPE_LINKS.core,
-  },
-  {
-    name: 'Core + LI Ads',
-    price: '$3,500',
-    description: 'GTM launch + paid amplification',
-    features: [
-      'Everything in Core',
-      'LinkedIn ads account setup',
-      'Thought Leader Ad campaigns configured',
-      'Retargeting audience built',
-    ],
-    stripeUrl: STRIPE_LINKS.coreAds,
-    highlighted: true,
-  },
-  {
-    name: 'Full Package',
-    price: '$4,500',
-    description: 'GTM launch + ads + cold email',
-    features: [
-      'Everything in Core + LI Ads',
-      'Cold email infrastructure setup',
-      'Domains, DNS, warmup configured',
-      'Email sequences written & loaded',
-    ],
-    stripeUrl: STRIPE_LINKS.full,
-  },
+const PRICE = '$2,500';
+const PRICE_FEATURES = [
+  '4 LinkedIn posts written & published',
+  '1 lead magnet fully built',
+  'Lead list sourced for your ICP',
+  'HeyReach setup + campaigns running',
+  'MagnetLab setup + full funnel',
+  '5-email nurture flow',
+  'VSL script for thank-you page',
 ];
 
 // ============================================
@@ -250,56 +207,31 @@ const IntroOffer: React.FC = () => {
         </p>
       </section>
 
-      {/* Pricing Tiers */}
-      <section className="space-y-6">
-        <h2 className="text-xl font-bold text-zinc-900 dark:text-white text-center">
-          Choose Your Package
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {TIERS.map((tier) => (
-            <div
-              key={tier.name}
-              className={`relative flex flex-col p-6 rounded-xl border ${
-                tier.highlighted
-                  ? 'border-violet-500 bg-violet-50/50 dark:bg-violet-500/5 ring-2 ring-violet-500/20'
-                  : 'border-zinc-200 dark:border-zinc-700/50 bg-white dark:bg-zinc-800/50'
-              }`}
-            >
-              {tier.highlighted && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 bg-violet-500 text-white text-xs font-medium rounded-full">
-                  Most Popular
-                </div>
-              )}
-              <h3 className="font-semibold text-zinc-900 dark:text-white">{tier.name}</h3>
-              <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">{tier.description}</p>
-              <div className="mt-4 mb-5">
-                <span className="text-3xl font-bold text-zinc-900 dark:text-white">
-                  {tier.price}
-                </span>
-                <span className="text-sm text-zinc-400 ml-1">one-time</span>
-              </div>
-              <ul className="space-y-2 mb-6 flex-1">
-                {tier.features.map((feature) => (
-                  <li key={feature} className="flex items-start gap-2">
-                    <CheckCircle2 size={14} className="text-violet-500 mt-0.5 shrink-0" />
-                    <span className="text-sm text-zinc-700 dark:text-zinc-300">{feature}</span>
-                  </li>
-                ))}
-              </ul>
-              <a
-                href={tier.stripeUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`block w-full text-center py-3 rounded-lg font-semibold text-sm transition-colors ${
-                  tier.highlighted
-                    ? 'bg-violet-500 hover:bg-violet-600 text-white'
-                    : 'bg-zinc-900 hover:bg-zinc-800 dark:bg-zinc-100 dark:hover:bg-zinc-200 text-white dark:text-zinc-900'
-                }`}
-              >
-                Get Started
-              </a>
-            </div>
-          ))}
+      {/* Pricing */}
+      <section className="max-w-lg mx-auto">
+        <div className="border border-violet-500 rounded-xl p-8 bg-white dark:bg-zinc-800/50 ring-2 ring-violet-500/20 text-center">
+          <p className="text-sm font-medium text-violet-600 dark:text-violet-400 mb-2">
+            One-Time Investment
+          </p>
+          <div className="mb-6">
+            <span className="text-5xl font-bold text-zinc-900 dark:text-white">{PRICE}</span>
+          </div>
+          <ul className="space-y-2.5 mb-8 text-left">
+            {PRICE_FEATURES.map((feature) => (
+              <li key={feature} className="flex items-start gap-2.5">
+                <CheckCircle2 size={16} className="text-violet-500 mt-0.5 shrink-0" />
+                <span className="text-sm text-zinc-700 dark:text-zinc-300">{feature}</span>
+              </li>
+            ))}
+          </ul>
+          <a
+            href={STRIPE_LINKS.core}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block w-full text-center py-3.5 rounded-lg font-semibold text-base bg-violet-500 hover:bg-violet-600 text-white transition-colors"
+          >
+            Get Started
+          </a>
         </div>
       </section>
 
