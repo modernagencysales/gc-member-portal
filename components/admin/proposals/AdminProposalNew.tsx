@@ -22,6 +22,7 @@ const AdminProposalNew: React.FC = () => {
 
   // Step 1 state
   const [prospectSearch, setProspectSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [selectedProspect, setSelectedProspect] = useState<Prospect | null>(null);
   const [manualMode, setManualMode] = useState(false);
   const [clientName, setClientName] = useState('');
@@ -37,7 +38,9 @@ const AdminProposalNew: React.FC = () => {
   // Step 3 state
   const [selectedPackages, setSelectedPackages] = useState<string[]>([]);
   const [customItems, setCustomItems] = useState<{ label: string; price: string }[]>([]);
-  const [paymentTerms, setPaymentTerms] = useState('Net 30');
+  const [paymentTerms, setPaymentTerms] = useState(
+    'Full payment upfront before work begins. Monthly retainer billed automatically to card on file at the start of each month.'
+  );
 
   // Step 4 state
   const [generating, setGenerating] = useState(false);
@@ -45,24 +48,25 @@ const AdminProposalNew: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const { data: prospects } = useQuery({
-    queryKey: queryKeys.blueprintAdminProspects(),
-    queryFn: () => listProspects(),
+  // Debounce search input
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(prospectSearch), 300);
+    return () => clearTimeout(timer);
+  }, [prospectSearch]);
+
+  const {
+    data: searchResults,
+    isLoading: searchLoading,
+    isError: searchError,
+  } = useQuery({
+    queryKey: ['proposals', 'prospectSearch', debouncedSearch],
+    queryFn: () => listProspects({ search: debouncedSearch, limit: 10 }),
+    enabled: debouncedSearch.length >= 2,
   });
 
   const { data: packages } = useQuery({
     queryKey: queryKeys.proposalPackages(),
     queryFn: fetchProposalPackages,
-  });
-
-  const filteredProspects = prospects?.filter((p) => {
-    if (!prospectSearch) return false;
-    const q = prospectSearch.toLowerCase();
-    return (
-      p.fullName?.toLowerCase().includes(q) ||
-      p.company?.toLowerCase().includes(q) ||
-      p.email?.toLowerCase().includes(q)
-    );
   });
 
   const handleSelectProspect = (prospect: Prospect) => {
@@ -211,9 +215,35 @@ const AdminProposalNew: React.FC = () => {
                   />
                 </div>
 
-                {filteredProspects && filteredProspects.length > 0 && (
+                {debouncedSearch.length >= 2 && searchLoading && (
+                  <p className="text-sm text-zinc-500 dark:text-zinc-400 flex items-center gap-2">
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Searching...
+                  </p>
+                )}
+
+                {searchError && (
+                  <p className="text-sm text-red-500">
+                    Search failed. Try entering details manually.
+                  </p>
+                )}
+
+                {debouncedSearch.length >= 2 &&
+                  !searchLoading &&
+                  searchResults &&
+                  searchResults.length === 0 && (
+                    <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                      No prospects found for &ldquo;{debouncedSearch}&rdquo;
+                    </p>
+                  )}
+
+                {prospectSearch.length === 1 && (
+                  <p className="text-sm text-zinc-400">Type at least 2 characters to search</p>
+                )}
+
+                {searchResults && searchResults.length > 0 && prospectSearch.length >= 2 && (
                   <div className="border border-zinc-200 dark:border-zinc-700 rounded-lg max-h-48 overflow-y-auto">
-                    {filteredProspects.slice(0, 10).map((p) => (
+                    {searchResults.map((p) => (
                       <button
                         key={p.id}
                         onClick={() => handleSelectProspect(p)}
