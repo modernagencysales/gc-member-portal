@@ -13,6 +13,9 @@ const DFYOfferPage = lazy(() => import('./components/blueprint/DFYOfferPage'));
 const CaseStudiesPage = lazy(() => import('./components/blueprint/CaseStudiesPage'));
 const ProgramsPage = lazy(() => import('./components/blueprint/ProgramsPage'));
 
+// Lazy-loaded: Proposal pages
+const ProposalPage = lazy(() => import('./components/proposal/ProposalPage'));
+
 // Lazy-loaded: Legal pages
 const PrivacyPolicy = lazy(() => import('./components/legal/PrivacyPolicy'));
 const TermsOfService = lazy(() => import('./components/legal/TermsOfService'));
@@ -247,6 +250,9 @@ const App: React.FC = () => {
 
         {/* Generic (non-personalized) offer pages for partners/affiliates */}
         <Route path="/offer/:offerType" element={<GenericOfferPage />} />
+
+        {/* Proposals */}
+        <Route path="/proposal/:slug" element={<ProposalPage />} />
 
         {/* Legal Pages */}
         <Route path="/privacy" element={<PrivacyPolicy />} />
