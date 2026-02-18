@@ -67,6 +67,9 @@ const AdminBlueprintsPage = lazy(() => import('./components/admin/blueprints/Adm
 const AdminProposalsPage = lazy(() => import('./components/admin/proposals/AdminProposalsPage'));
 const AdminProposalNew = lazy(() => import('./components/admin/proposals/AdminProposalNew'));
 const AdminProposalEdit = lazy(() => import('./components/admin/proposals/AdminProposalEdit'));
+const ProposalPromptsEditor = lazy(
+  () => import('./components/admin/proposals/ProposalPromptsEditor')
+);
 
 // Lazy-loaded: Intro Offer
 const AdminIntroOfferList = lazy(() => import('./components/admin/intro-offer/IntroOfferList'));
@@ -172,6 +175,7 @@ const App: React.FC = () => {
           {/* Proposals */}
           <Route path="proposals" element={<AdminProposalsPage />} />
           <Route path="proposals/new" element={<AdminProposalNew />} />
+          <Route path="proposals/prompts" element={<ProposalPromptsEditor />} />
           <Route path="proposals/:proposalId" element={<AdminProposalEdit />} />
           {/* Intro Offers */}
           <Route path="intro-offers" element={<AdminIntroOfferList />} />

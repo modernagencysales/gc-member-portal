@@ -73,3 +73,30 @@ export async function fetchProposalPackages(): Promise<ProposalPackageConfig[]> 
   if (error || !data) return [];
   return data.value?.packages || [];
 }
+
+// Proposal AI Prompts — editable via admin panel
+export interface ProposalPrompts {
+  system_prompt: string;
+  user_message_template: string;
+  eval_prompt: string;
+}
+
+export async function fetchProposalPrompts(): Promise<ProposalPrompts | null> {
+  const { data, error } = await supabase
+    .from('bootcamp_settings')
+    .select('value')
+    .eq('key', 'proposal_prompts')
+    .single();
+
+  if (error || !data) return null;
+  return data.value as ProposalPrompts;
+}
+
+export async function saveProposalPrompts(prompts: ProposalPrompts): Promise<void> {
+  const { error } = await supabase
+    .from('bootcamp_settings')
+    .update({ value: prompts })
+    .eq('key', 'proposal_prompts');
+
+  if (error) throw new Error(error.message);
+}
