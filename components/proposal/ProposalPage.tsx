@@ -9,6 +9,7 @@ import {
   Clock,
   ArrowRight,
   Sparkles,
+  Download,
 } from 'lucide-react';
 import ThemeToggle from '../blueprint/ThemeToggle';
 import { SenjaEmbed } from '../blueprint/offer-components';
@@ -206,7 +207,7 @@ const ProposalPage: React.FC = () => {
           <span className="text-sm font-bold tracking-wider uppercase text-zinc-500 dark:text-zinc-400">
             Modern Agency Sales
           </span>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             {proposal.clientLogoUrl ? (
               <img
                 src={proposal.clientLogoUrl}
@@ -218,6 +219,13 @@ const ProposalPage: React.FC = () => {
                 {proposal.clientCompany}
               </span>
             )}
+            <button
+              onClick={() => window.print()}
+              className="print:hidden inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border border-zinc-200 dark:border-zinc-700 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
+            >
+              <Download className="w-3.5 h-3.5" />
+              PDF
+            </button>
           </div>
         </div>
         <div className="h-[3px]" style={{ backgroundColor: clientAccent }} />

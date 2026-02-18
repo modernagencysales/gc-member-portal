@@ -36,6 +36,7 @@ export interface GenerateProposalInput {
   client_name: string;
   client_company: string;
   client_title?: string;
+  client_website?: string;
 }
 
 export async function generateProposal(

@@ -28,6 +28,7 @@ const AdminProposalNew: React.FC = () => {
   const [clientName, setClientName] = useState('');
   const [clientCompany, setClientCompany] = useState('');
   const [clientTitle, setClientTitle] = useState('');
+  const [clientWebsite, setClientWebsite] = useState('');
   const [prospectId, setProspectId] = useState<string | undefined>();
 
   // Step 2 state
@@ -129,6 +130,7 @@ const AdminProposalNew: React.FC = () => {
         client_name: clientName,
         client_company: clientCompany,
         client_title: clientTitle || undefined,
+        client_website: clientWebsite || undefined,
       });
       setGeneratedProposalId(result.proposal_id);
     } catch (err) {
@@ -259,15 +261,30 @@ const AdminProposalNew: React.FC = () => {
                 )}
 
                 {selectedProspect && (
-                  <div className="bg-violet-50 dark:bg-violet-900/20 border border-violet-200 dark:border-violet-800 rounded-lg p-3">
-                    <p className="text-sm font-medium text-violet-700 dark:text-violet-400">
-                      Selected: {selectedProspect.fullName}
-                    </p>
-                    <p className="text-xs text-violet-600 dark:text-violet-500">
-                      {selectedProspect.company}{' '}
-                      {selectedProspect.jobTitle ? `- ${selectedProspect.jobTitle}` : ''}
-                    </p>
-                  </div>
+                  <>
+                    <div className="bg-violet-50 dark:bg-violet-900/20 border border-violet-200 dark:border-violet-800 rounded-lg p-3">
+                      <p className="text-sm font-medium text-violet-700 dark:text-violet-400">
+                        Selected: {selectedProspect.fullName}
+                      </p>
+                      <p className="text-xs text-violet-600 dark:text-violet-500">
+                        {selectedProspect.company}{' '}
+                        {selectedProspect.jobTitle ? `- ${selectedProspect.jobTitle}` : ''}
+                      </p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium mb-1">Website</label>
+                      <input
+                        type="url"
+                        value={clientWebsite}
+                        onChange={(e) => setClientWebsite(e.target.value)}
+                        className={INPUT_CLASS}
+                        placeholder="https://acmecorp.com"
+                      />
+                      <p className="text-xs text-zinc-400 mt-1">
+                        Used to extract logo and brand colors
+                      </p>
+                    </div>
+                  </>
                 )}
 
                 <button
@@ -308,6 +325,19 @@ const AdminProposalNew: React.FC = () => {
                     className={INPUT_CLASS}
                     placeholder="CEO"
                   />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Website</label>
+                  <input
+                    type="url"
+                    value={clientWebsite}
+                    onChange={(e) => setClientWebsite(e.target.value)}
+                    className={INPUT_CLASS}
+                    placeholder="https://acmecorp.com"
+                  />
+                  <p className="text-xs text-zinc-400 mt-1">
+                    Used to extract logo and brand colors
+                  </p>
                 </div>
                 <button
                   onClick={() => setManualMode(false)}
