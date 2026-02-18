@@ -20,6 +20,8 @@ const routeTitles: Record<string, string> = {
   '/admin/gc/tools': 'GC Member Tools',
   '/admin/gc/onboarding': 'GC Onboarding',
   '/admin/affiliates': 'Affiliate Program',
+  '/admin/proposals': 'Proposals',
+  '/admin/proposals/new': 'New Proposal',
 };
 
 const UnifiedAdminLayout: React.FC = () => {
@@ -36,10 +38,16 @@ const UnifiedAdminLayout: React.FC = () => {
     return <Navigate to="/login" replace />;
   }
 
-  // Match dynamic curriculum route
-  const pageTitle = location.pathname.startsWith('/admin/courses/curriculum/')
-    ? 'Curriculum Editor'
-    : routeTitles[location.pathname] || 'Admin';
+  // Match dynamic routes
+  let pageTitle = routeTitles[location.pathname] || 'Admin';
+  if (location.pathname.startsWith('/admin/courses/curriculum/')) {
+    pageTitle = 'Curriculum Editor';
+  } else if (
+    location.pathname.match(/^\/admin\/proposals\/[^/]+$/) &&
+    location.pathname !== '/admin/proposals/new'
+  ) {
+    pageTitle = 'Edit Proposal';
+  }
 
   return (
     <div

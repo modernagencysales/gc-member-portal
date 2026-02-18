@@ -63,6 +63,11 @@ const AdminLmsCurriculumPage = lazy(
 // Lazy-loaded: Blueprint Admin
 const AdminBlueprintsPage = lazy(() => import('./components/admin/blueprints/AdminBlueprintsPage'));
 
+// Lazy-loaded: Proposals Admin
+const AdminProposalsPage = lazy(() => import('./components/admin/proposals/AdminProposalsPage'));
+const AdminProposalNew = lazy(() => import('./components/admin/proposals/AdminProposalNew'));
+const AdminProposalEdit = lazy(() => import('./components/admin/proposals/AdminProposalEdit'));
+
 // Lazy-loaded: Intro Offer
 const AdminIntroOfferList = lazy(() => import('./components/admin/intro-offer/IntroOfferList'));
 const AdminIntroOfferDetail = lazy(() => import('./components/admin/intro-offer/IntroOfferDetail'));
@@ -164,6 +169,10 @@ const App: React.FC = () => {
           {/* GC Portal */}
           <Route path="gc/tools" element={<AdminToolsPage />} />
           <Route path="gc/onboarding" element={<AdminOnboardingPage />} />
+          {/* Proposals */}
+          <Route path="proposals" element={<AdminProposalsPage />} />
+          <Route path="proposals/new" element={<AdminProposalNew />} />
+          <Route path="proposals/:proposalId" element={<AdminProposalEdit />} />
           {/* Intro Offers */}
           <Route path="intro-offers" element={<AdminIntroOfferList />} />
           <Route path="intro-offers/:offerId" element={<AdminIntroOfferDetail />} />
