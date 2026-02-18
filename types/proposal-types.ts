@@ -55,6 +55,7 @@ export interface ProposalAboutUs {
   blurb: string;
   stats: { label: string; value: string }[];
   socialProof: string[];
+  signOff?: string;
 }
 
 export interface ProposalClientSnapshot {
