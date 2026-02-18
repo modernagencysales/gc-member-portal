@@ -140,4 +140,10 @@ export const queryKeys = {
   introOffers: () => ['introOffer', 'list'] as const,
   introOffer: (offerId: string) => ['introOffer', 'detail', offerId] as const,
   introOfferDeliverables: (offerId: string) => ['introOffer', 'deliverables', offerId] as const,
+
+  // Proposals
+  proposalBySlug: (slug: string) => ['proposal', slug] as const,
+  proposalById: (id: string) => ['proposal', 'detail', id] as const,
+  proposalsList: () => ['proposals', 'list'] as const,
+  proposalPackages: () => ['proposals', 'packages'] as const,
 };
