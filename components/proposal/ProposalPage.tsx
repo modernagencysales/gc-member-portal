@@ -209,11 +209,13 @@ const ProposalPage: React.FC = () => {
           </span>
           <div className="flex items-center gap-3">
             {proposal.clientLogoUrl ? (
-              <img
-                src={proposal.clientLogoUrl}
-                alt={proposal.clientCompany}
-                className="h-8 object-contain"
-              />
+              <div className="dark:bg-white dark:rounded-md dark:px-2 dark:py-1">
+                <img
+                  src={proposal.clientLogoUrl}
+                  alt={proposal.clientCompany}
+                  className="h-8 object-contain"
+                />
+              </div>
             ) : (
               <span className="text-sm font-semibold text-zinc-700 dark:text-zinc-300">
                 {proposal.clientCompany}
