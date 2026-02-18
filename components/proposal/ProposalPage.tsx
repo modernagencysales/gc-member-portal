@@ -61,25 +61,17 @@ function GoalCard({ goal, accent }: { goal: ProposalGoal; accent: string }) {
     aspirational: Target,
     experimental: FlaskConical,
   };
-  const labels: Record<ProposalGoal['type'], string> = {
-    metric: 'Metric-Driven',
-    aspirational: 'Aspirational',
-    experimental: 'Experimental',
-  };
   const Icon = icons[goal.type] || Target;
 
   return (
     <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm dark:shadow-none p-8 sm:p-10">
-      <div className="flex items-center gap-3 mb-5">
+      <div className="mb-5">
         <div
           className="w-11 h-11 rounded-xl flex items-center justify-center"
           style={{ backgroundColor: accent, color: '#fff' }}
         >
           <Icon className="w-5 h-5" />
         </div>
-        <span className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
-          {labels[goal.type]}
-        </span>
       </div>
       <h4 className="text-lg font-bold mb-2">{goal.title}</h4>
       <p className="text-base text-zinc-500 dark:text-zinc-400 leading-relaxed mb-4">
