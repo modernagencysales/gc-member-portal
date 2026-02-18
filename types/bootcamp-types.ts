@@ -279,6 +279,11 @@ export interface CallGrantConfig {
 // ============================================
 // Sprint Product Config
 // ============================================
+export interface GptSuiteVariant {
+  stripeProductId: string;
+  accessDays: number;
+}
+
 export interface SprintProductConfig {
   enabled: boolean;
   products: {
@@ -291,9 +296,11 @@ export interface SprintProductConfig {
     dmKit: {
       stripeProductId: string;
       contentGrantIds: string[];
+      cohortId?: string;
     };
     gptSuite: {
       stripeProductId: string;
+      variants?: GptSuiteVariant[];
       toolSlugs: string[];
       creditsPerTool: number;
       accessDays: number;

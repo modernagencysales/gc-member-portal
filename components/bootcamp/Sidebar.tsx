@@ -111,6 +111,7 @@ const Sidebar: React.FC<SidebarProps> = ({
 
   const isFunnelAccess = user?.status === 'Funnel Access';
   const isLeadMagnet = user?.status === 'Lead Magnet';
+  const isCurriculumOnly = user?.status === 'Curriculum Only';
   const isEnrolledStudent =
     courseEnrollments.length > 0 ||
     user?.status === 'Full Access' ||
@@ -536,8 +537,8 @@ const Sidebar: React.FC<SidebarProps> = ({
                 </button>
               )}
 
-              {/* Lead Magnet */}
-              {aiTools.length > 0 && (
+              {/* AI Tools sections - hidden for Curriculum Only users */}
+              {!isCurriculumOnly && aiTools.length > 0 && (
                 <div className="space-y-0.5">
                   <button
                     onClick={() => toggleGroup('lead-magnet')}
@@ -572,7 +573,7 @@ const Sidebar: React.FC<SidebarProps> = ({
               )}
 
               {/* Profile + Posts */}
-              {aiTools.length > 0 && (
+              {!isCurriculumOnly && aiTools.length > 0 && (
                 <div className="space-y-0.5">
                   <button
                     onClick={() => toggleGroup('profile-posts')}
@@ -606,7 +607,7 @@ const Sidebar: React.FC<SidebarProps> = ({
               )}
 
               {/* LinkedIn */}
-              <div className="space-y-0.5">
+              {!isCurriculumOnly && <div className="space-y-0.5">
                 <button
                   onClick={() => toggleGroup('linkedin')}
                   className="w-full flex items-center justify-between p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-400 transition-colors"
@@ -654,10 +655,10 @@ const Sidebar: React.FC<SidebarProps> = ({
                     </button>
                   </div>
                 )}
-              </div>
+              </div>}
 
               {/* GTM Infrastructure */}
-              <div className="space-y-0.5">
+              {!isCurriculumOnly && <div className="space-y-0.5">
                 <button
                   onClick={() => toggleGroup('infrastructure')}
                   className="w-full flex items-center justify-between p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-400 transition-colors"
@@ -728,10 +729,10 @@ const Sidebar: React.FC<SidebarProps> = ({
                     </button>
                   </div>
                 )}
-              </div>
+              </div>}
 
               {/* Outbound */}
-              <div className="space-y-0.5">
+              {!isCurriculumOnly && <div className="space-y-0.5">
                 <button
                   onClick={() => toggleGroup('outbound')}
                   className="w-full flex items-center justify-between p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-400 transition-colors"
@@ -831,10 +832,10 @@ const Sidebar: React.FC<SidebarProps> = ({
                     </button>
                   </div>
                 )}
-              </div>
+              </div>}
 
               {/* Clay Tables */}
-              {toolGroups.tables.length > 0 && (
+              {!isCurriculumOnly && toolGroups.tables.length > 0 && (
                 <div className="space-y-0.5">
                   <button
                     onClick={() => toggleGroup('tables')}
@@ -859,7 +860,7 @@ const Sidebar: React.FC<SidebarProps> = ({
               )}
 
               {/* Access & Links */}
-              {toolGroups.logins.length > 0 && (
+              {!isCurriculumOnly && toolGroups.logins.length > 0 && (
                 <div className="space-y-0.5">
                   <button
                     onClick={() => toggleGroup('logins')}
