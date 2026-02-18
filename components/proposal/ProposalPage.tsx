@@ -50,6 +50,26 @@ function NotFoundState() {
 }
 
 // ---------------------------------------------------------------------------
+// Text Helper — splits long text into digestible paragraphs
+// ---------------------------------------------------------------------------
+
+function TextBlock({ text, className }: { text: string; className?: string }) {
+  const paragraphs = text.split(/\n\n+/).filter(Boolean);
+  if (paragraphs.length <= 1) {
+    return <p className={className}>{text}</p>;
+  }
+  return (
+    <div className="space-y-3">
+      {paragraphs.map((p, i) => (
+        <p key={i} className={className}>
+          {p}
+        </p>
+      ))}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Goal Card
 // ---------------------------------------------------------------------------
 
@@ -62,8 +82,8 @@ function GoalCard({ goal, accent }: { goal: ProposalGoal; accent: string }) {
   const Icon = icons[goal.type] || Target;
 
   return (
-    <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm dark:shadow-none p-8 sm:p-10">
-      <div className="mb-5">
+    <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 shadow-sm dark:shadow-none p-6 sm:p-8">
+      <div className="mb-4">
         <div
           className="w-11 h-11 rounded-xl flex items-center justify-center"
           style={{ backgroundColor: accent, color: '#fff' }}
@@ -71,8 +91,8 @@ function GoalCard({ goal, accent }: { goal: ProposalGoal; accent: string }) {
           <Icon className="w-5 h-5" />
         </div>
       </div>
-      <h4 className="text-lg font-bold mb-2">{goal.title}</h4>
-      <p className="text-base text-zinc-500 dark:text-zinc-400 leading-relaxed mb-4">
+      <h4 className="text-base font-bold mb-2">{goal.title}</h4>
+      <p className="text-sm text-zinc-500 dark:text-zinc-400 leading-relaxed mb-4">
         {goal.description}
       </p>
       <div className="flex items-center gap-2 text-sm text-zinc-400">
@@ -106,9 +126,10 @@ function DeliverableRow({ service, accent }: { service: ProposalService; accent:
               </span>
             )}
           </div>
-          <p className="text-base text-zinc-500 dark:text-zinc-400 leading-relaxed mb-3">
-            {service.description}
-          </p>
+          <TextBlock
+            text={service.description}
+            className="text-sm text-zinc-500 dark:text-zinc-400 leading-relaxed mb-3"
+          />
           {service.deliverables.length > 0 && (
             <ul className="space-y-1.5">
               {service.deliverables.map((d, j) => (
@@ -236,10 +257,10 @@ const ProposalPage: React.FC = () => {
       {/* ------------------------------------------------------------------ */}
       {letterParagraphs.length > 0 && (
         <section className="py-16 sm:py-20 px-6">
-          <div className="max-w-3xl mx-auto">
-            <div className="space-y-6">
+          <div className="max-w-2xl mx-auto">
+            <div className="space-y-5">
               {letterParagraphs.map((paragraph, i) => (
-                <p key={i} className="text-lg text-zinc-600 dark:text-zinc-300 leading-relaxed">
+                <p key={i} className="text-base text-zinc-600 dark:text-zinc-300 leading-relaxed">
                   {paragraph}
                 </p>
               ))}
@@ -284,9 +305,10 @@ const ProposalPage: React.FC = () => {
                 </div>
               )}
             </div>
-            <p className="text-lg text-zinc-600 dark:text-zinc-300 leading-relaxed">
-              {proposal.clientSnapshot.currentState}
-            </p>
+            <TextBlock
+              text={proposal.clientSnapshot.currentState}
+              className="text-base text-zinc-600 dark:text-zinc-300 leading-relaxed"
+            />
           </div>
 
           {/* Goals heading */}
@@ -347,7 +369,7 @@ const ProposalPage: React.FC = () => {
                       {phase.duration}
                     </span>
                   </div>
-                  <p className="text-base text-zinc-500 dark:text-zinc-400 leading-relaxed">
+                  <p className="text-sm text-zinc-500 dark:text-zinc-400 leading-relaxed">
                     {phase.description}
                   </p>
                   {phase.milestones.length > 0 && (
@@ -485,10 +507,11 @@ const ProposalPage: React.FC = () => {
       <section className="py-20 sm:py-24 px-6 bg-gradient-to-b from-zinc-50 to-white dark:from-zinc-900/50 dark:to-zinc-950">
         <div className="max-w-3xl mx-auto">
           {proposal.aboutUs.signOff && (
-            <div className="mb-12">
-              <p className="text-lg text-zinc-600 dark:text-zinc-300 leading-relaxed mb-6">
-                {proposal.aboutUs.signOff}
-              </p>
+            <div className="max-w-2xl mx-auto mb-12">
+              <TextBlock
+                text={proposal.aboutUs.signOff}
+                className="text-base text-zinc-600 dark:text-zinc-300 leading-relaxed mb-4"
+              />
               <p className="text-lg font-bold">— Tim McCormick</p>
               <p className="text-sm text-zinc-500 dark:text-zinc-400">
                 Founder, Modern Agency Sales
