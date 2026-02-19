@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { CourseData, Lesson, User } from '../../types';
 import { AITool } from '../../types/chat-types';
 import { StudentEnrollment } from '../../types/bootcamp-types';
@@ -94,6 +94,13 @@ const Sidebar: React.FC<SidebarProps> = ({
     window.location.reload();
   };
   const [expandedWeeks, setExpandedWeeks] = useState<string[]>(data.weeks.map((w) => w.id));
+
+  // Auto-expand all weeks when course data changes (e.g. switching cohorts)
+  const weekIdKey = data.weeks.map((w) => w.id).join(',');
+  useEffect(() => {
+    setExpandedWeeks(data.weeks.map((w) => w.id));
+  }, [weekIdKey]);
+
   const [expandedGroups, setExpandedGroups] = useState<string[]>([
     'lead-magnet',
     'profile-posts',
