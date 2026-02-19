@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
+import remarkBreaks from 'remark-breaks';
+import remarkGfm from 'remark-gfm';
 import { Lesson, Week } from '../../types';
 import {
   CheckCircle,
@@ -24,29 +26,51 @@ import { BootcampStudent } from '../../types/bootcamp-types';
 
 // Preprocess text content to normalize non-standard formatting into proper markdown
 const preprocessTextContent = (content: string): string => {
-  return content
-    .split('\n')
-    .map((line) => {
-      const trimmed = line.trim();
+  const lines = content.split('\n');
+  const result: string[] = [];
 
-      // Convert lines starting with bullet-like characters to markdown list items
-      if (/^[●•▪▸‣⁃◆◇○]\s/.test(trimmed)) {
-        return `- ${trimmed.replace(/^[●•▪▸‣⁃◆◇○]\s*/, '')}`;
+  for (let i = 0; i < lines.length; i++) {
+    const trimmed = lines[i].trim();
+
+    // Skip empty lines, pass through as blank
+    if (!trimmed) {
+      result.push('');
+      continue;
+    }
+
+    // Convert lines starting with bullet-like characters to markdown list items
+    if (/^[●•▪▸‣⁃◆◇○]\s/.test(trimmed)) {
+      result.push(`- ${trimmed.replace(/^[●•▪▸‣⁃◆◇○]\s*/, '')}`);
+      continue;
+    }
+
+    // Fix bold markers with trailing spaces: **text ** → **text**
+    let fixed = trimmed.replace(/\*\*(.+?)\s+\*\*/g, '**$1**');
+
+    // Convert emoji-prefixed ALL-CAPS headers to markdown headings
+    // e.g. "⚡ ENERGY & TONE:" or "💡 STEP 1: START THE CONVO"
+
+    if (/^[^\w\s*#\-`[\]()]{1,2}\s+[A-Z][A-Z\s\d:&()/]+$/u.test(trimmed)) {
+      // Add blank line before heading for proper markdown parsing
+      if (result.length > 0 && result[result.length - 1] !== '') {
+        result.push('');
       }
+      result.push(`## ${trimmed}`);
+      result.push(''); // blank line after heading
+      continue;
+    }
 
-      // Fix bold markers with trailing spaces: **text ** → **text**
-      let fixed = line.replace(/\*\*(.+?)\s+\*\*/g, '**$1**');
+    // Detect "Label:" patterns at start of line and bold them
+    // e.g. "Golden Rule:" → "**Golden Rule:**"
+    // e.g. "Example Structure:" → "**Example Structure:**"
+    if (/^[A-Z][A-Za-z\s]+:\s/.test(fixed) && fixed.length < 80) {
+      fixed = fixed.replace(/^([A-Z][A-Za-z\s]+:)/, '**$1**');
+    }
 
-      // Convert emoji-prefixed ALL-CAPS headers to markdown headings
-      // e.g. "⚡ ENERGY & TONE:" or "💡 STEP 1: START THE CONVO"
+    result.push(fixed);
+  }
 
-      if (/^[^\w\s*#\-`[\]()]{1,2}\s+[A-Z][A-Z\s\d:&()/]+$/u.test(trimmed)) {
-        return `## ${trimmed}`;
-      }
-
-      return fixed;
-    })
-    .join('\n');
+  return result.join('\n');
 };
 
 interface LessonViewProps {
@@ -334,7 +358,7 @@ const LessonView: React.FC<LessonViewProps> = ({
           <div className="mb-8">
             {isTextContent ? (
               <div className="bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200 dark:border-zinc-800 p-8 md:p-12 text-zinc-700 dark:text-zinc-300 document-content">
-                <ReactMarkdown>
+                <ReactMarkdown remarkPlugins={[remarkBreaks, remarkGfm]}>
                   {preprocessTextContent(lesson.embedUrl.replace(/^text:\s*/, ''))}
                 </ReactMarkdown>
               </div>
