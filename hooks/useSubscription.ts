@@ -45,11 +45,16 @@ export function useSubscription(
       };
     }
 
-    // Sprint + AI Tools: use access_expires_at directly
-    if (student.accessLevel === 'Sprint + AI Tools' && student.accessExpiresAt) {
+    // Time-limited access: use access_expires_at for Sprint + AI Tools and Curriculum Only
+    const isTimeLimited =
+      (student.accessLevel === 'Sprint + AI Tools' || student.accessLevel === 'Curriculum Only') &&
+      student.accessExpiresAt;
+
+    if (isTimeLimited) {
       const now = new Date();
-      const expiresAt = new Date(student.accessExpiresAt);
+      const expiresAt = new Date(student.accessExpiresAt!);
       const daysRemaining = Math.ceil((expiresAt.getTime() - now.getTime()) / 86400000);
+      const isCurriculumOnly = student.accessLevel === 'Curriculum Only';
 
       // Calculate percent elapsed based on creation date
       const createdAt = new Date(student.createdAt);
@@ -68,7 +73,7 @@ export function useSubscription(
           isReadOnly: true,
           accessExpiresAt: expiresAt,
           percentElapsed: 100,
-          isFunnelAccess: true,
+          isFunnelAccess: !isCurriculumOnly,
         };
       }
 
@@ -76,22 +81,22 @@ export function useSubscription(
         return {
           accessState: 'expiring' as AccessState,
           daysRemaining,
-          canUseAiTools: true,
+          canUseAiTools: !isCurriculumOnly,
           isReadOnly: false,
           accessExpiresAt: expiresAt,
           percentElapsed,
-          isFunnelAccess: true,
+          isFunnelAccess: !isCurriculumOnly,
         };
       }
 
       return {
         accessState: 'active' as AccessState,
         daysRemaining,
-        canUseAiTools: true,
+        canUseAiTools: !isCurriculumOnly,
         isReadOnly: false,
         accessExpiresAt: expiresAt,
         percentElapsed,
-        isFunnelAccess: true,
+        isFunnelAccess: !isCurriculumOnly,
       };
     }
 
