@@ -12,7 +12,7 @@ import { Save, ShoppingCart, Sparkles } from 'lucide-react';
 
 const ACCESS_LEVELS: BootcampAccessLevel[] = [
   'Lead Magnet',
-  'Funnel Access',
+  'Sprint + AI Tools',
   'Curriculum Only',
   'Full Access',
 ];

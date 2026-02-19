@@ -367,13 +367,13 @@ serve(async (req) => {
               break;
             }
 
-            // Update expiry for existing Funnel Access student
+            // Update expiry for existing Sprint + AI Tools student
             const expiresAt = new Date();
             expiresAt.setDate(expiresAt.getDate() + durationDays);
             await supabase
               .from('bootcamp_students')
               .update({
-                access_level: 'Funnel Access',
+                access_level: 'Sprint + AI Tools',
                 access_expires_at: expiresAt.toISOString(),
                 updated_at: new Date().toISOString(),
               })
@@ -381,7 +381,7 @@ serve(async (req) => {
 
             studentId = existingFunnelStudent.id;
           } else {
-            // Create new Funnel Access student
+            // Create new Sprint + AI Tools student
             const expiresAt = new Date();
             expiresAt.setDate(expiresAt.getDate() + durationDays);
 
@@ -390,7 +390,7 @@ serve(async (req) => {
               .insert({
                 email: funnelEmail,
                 full_name: funnelName,
-                access_level: 'Funnel Access',
+                access_level: 'Sprint + AI Tools',
                 access_expires_at: expiresAt.toISOString(),
                 enrollment_source: 'thrivecart_funnel',
                 enrollment_metadata: {
@@ -412,7 +412,7 @@ serve(async (req) => {
 
             studentId = newFunnelStudent.id;
             console.log(
-              `Created Funnel Access student ${studentId} for ${funnelEmail} (${durationDays} days)`
+              `Created Sprint + AI Tools student ${studentId} for ${funnelEmail} (${durationDays} days)`
             );
           }
 

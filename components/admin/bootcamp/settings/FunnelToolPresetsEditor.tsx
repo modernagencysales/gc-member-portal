@@ -119,7 +119,7 @@ const FunnelToolPresetsEditor: React.FC = () => {
       >
         <div className="flex items-center gap-3">
           <Package className={`w-5 h-5 ${isDarkMode ? 'text-violet-400' : 'text-violet-600'}`} />
-          <h3 className="font-semibold">Funnel Access Tool Presets</h3>
+          <h3 className="font-semibold">Sprint + AI Tools Tool Presets</h3>
         </div>
         {hasChanges && (
           <button
@@ -135,7 +135,7 @@ const FunnelToolPresetsEditor: React.FC = () => {
 
       <div className="p-6 space-y-6">
         <p className={`text-sm ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
-          Configure which AI tools are available for Funnel Access users. Each preset can be
+          Configure which AI tools are available for Sprint + AI Tools users. Each preset can be
           assigned when creating a ThriveCart checkout link via the <code>tool_preset</code>{' '}
           metadata key.
         </p>

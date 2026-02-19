@@ -11,7 +11,7 @@ export type BootcampAccessLevel =
   | 'Full Access'
   | 'Curriculum Only'
   | 'Lead Magnet'
-  | 'Funnel Access';
+  | 'Sprint + AI Tools';
 
 export type SubscriptionStatus = 'none' | 'active' | 'canceled' | 'past_due';
 
@@ -65,7 +65,7 @@ export interface BootcampStudent {
   notes?: string;
   /** Link to prospect record for Blueprint access */
   prospectId?: string;
-  /** Time-limited access expiry for Funnel Access users */
+  /** Time-limited access expiry for Sprint + AI Tools users */
   accessExpiresAt?: Date;
   createdAt: Date;
   updatedAt: Date;
@@ -309,7 +309,7 @@ export interface SprintProductConfig {
 }
 
 // ============================================
-// Funnel Access Tool Presets
+// Sprint + AI Tools Tool Presets
 // ============================================
 export interface FunnelToolPreset {
   name: string;

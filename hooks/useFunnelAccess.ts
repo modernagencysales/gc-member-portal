@@ -22,7 +22,7 @@ export function useFunnelAccess(
   const subscription = useSubscription(student, cohort);
 
   return useMemo(() => {
-    if (!student || student.accessLevel !== 'Funnel Access' || !student.accessExpiresAt) {
+    if (!student || student.accessLevel !== 'Sprint + AI Tools' || !student.accessExpiresAt) {
       return {
         isFunnelAccess: false,
         isExpired: false,

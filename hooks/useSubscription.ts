@@ -45,8 +45,8 @@ export function useSubscription(
       };
     }
 
-    // Funnel Access: use access_expires_at directly
-    if (student.accessLevel === 'Funnel Access' && student.accessExpiresAt) {
+    // Sprint + AI Tools: use access_expires_at directly
+    if (student.accessLevel === 'Sprint + AI Tools' && student.accessExpiresAt) {
       const now = new Date();
       const expiresAt = new Date(student.accessExpiresAt);
       const daysRemaining = Math.ceil((expiresAt.getTime() - now.getTime()) / 86400000);

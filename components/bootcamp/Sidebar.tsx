@@ -109,13 +109,13 @@ const Sidebar: React.FC<SidebarProps> = ({
     [enrollments]
   );
 
-  const isFunnelAccess = user?.status === 'Funnel Access';
+  const isFunnelAccess = user?.status === 'Sprint + AI Tools';
   const isLeadMagnet = user?.status === 'Lead Magnet';
   const isCurriculumOnly = user?.status === 'Curriculum Only';
   const isEnrolledStudent =
     courseEnrollments.length > 0 ||
     user?.status === 'Full Access' ||
-    user?.status === 'Funnel Access' ||
+    user?.status === 'Sprint + AI Tools' ||
     user?.status === 'Curriculum Only';
   const hasGrantedTools = isLeadMagnet && grantedTools && grantedTools.length > 0;
   const userDomain = user?.email.split('@')[1] || '';
@@ -517,7 +517,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                 </div>
               </button>
 
-              {/* Funnel Access subtle nudge */}
+              {/* Sprint + AI Tools subtle nudge */}
               {funnelAccess?.nudgeTier === 'subtle' && (
                 <FunnelNudgeSubtle
                   userEmail={user?.email}
@@ -526,7 +526,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                 />
               )}
 
-              {/* Redeem Code for Funnel Access / Lead Magnet users */}
+              {/* Redeem Code for Sprint + AI Tools / Lead Magnet users */}
               {(isFunnelAccess || isLeadMagnet) && onRedeemCode && (
                 <button
                   onClick={onRedeemCode}

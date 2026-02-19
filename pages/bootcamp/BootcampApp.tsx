@@ -108,7 +108,7 @@ const BootcampApp: React.FC = () => {
   // Subscription access state - pass null for cohort until we fetch it (gives unlimited access)
   const { accessState, daysRemaining } = useSubscription(bootcampStudent, null);
 
-  // Funnel Access nudge state
+  // Sprint + AI Tools nudge state
   const funnelAccess = useFunnelAccess(bootcampStudent);
 
   // Fetch AI tools for Resources section (global, all cohorts)
@@ -580,7 +580,7 @@ const BootcampApp: React.FC = () => {
     );
   }
 
-  // Funnel Access lockout - full-page takeover when expired
+  // Sprint + AI Tools lockout - full-page takeover when expired
   const calcomUrl = import.meta.env.VITE_CALCOM_BOOKING_URL || '';
   if (funnelAccess.isExpired) {
     return (
@@ -650,7 +650,7 @@ const BootcampApp: React.FC = () => {
           grantedTools={grantedTools}
           grantedWeekIds={grantedWeekIds}
           onRedeemCode={
-            user?.status === 'Lead Magnet' || user?.status === 'Funnel Access'
+            user?.status === 'Lead Magnet' || user?.status === 'Sprint + AI Tools'
               ? () => setShowRedeemModal(true)
               : undefined
           }
@@ -675,7 +675,7 @@ const BootcampApp: React.FC = () => {
             </div>
           ) : (
             <div className="p-6 md:p-10 lg:p-14">
-              {/* Funnel Access nudge banners */}
+              {/* Sprint + AI Tools nudge banners */}
               {funnelAccess.nudgeTier === 'urgent' && (
                 <FunnelNudgeUrgent
                   userEmail={bootcampStudent?.email}
@@ -813,7 +813,7 @@ const BootcampApp: React.FC = () => {
         </main>
       </div>
 
-      {/* Funnel Access sticky bar (persistent + urgent tiers) */}
+      {/* Sprint + AI Tools sticky bar (persistent + urgent tiers) */}
       {(funnelAccess.nudgeTier === 'persistent' || funnelAccess.nudgeTier === 'urgent') && (
         <FunnelNudgeStickyBar
           userEmail={bootcampStudent?.email}
@@ -823,7 +823,7 @@ const BootcampApp: React.FC = () => {
         />
       )}
 
-      {/* Funnel Access urgent modal (once per session) */}
+      {/* Sprint + AI Tools urgent modal (once per session) */}
       {funnelAccess.nudgeTier === 'urgent' && (
         <FunnelNudgeModal
           userEmail={bootcampStudent?.email}

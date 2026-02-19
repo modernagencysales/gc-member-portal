@@ -6,7 +6,7 @@ import { BootcampAccessLevel, BootcampCohort, ToolGrant } from '../../../../type
 import { AITool } from '../../../../types/chat-types';
 import { fetchActiveAITools } from '../../../../services/chat-supabase';
 
-const ACCESS_LEVELS = ['Lead Magnet', 'Funnel Access', 'Curriculum Only', 'Full Access'] as const;
+const ACCESS_LEVELS = ['Lead Magnet', 'Sprint + AI Tools', 'Curriculum Only', 'Full Access'] as const;
 
 interface GenerateCodeModalProps {
   isOpen: boolean;

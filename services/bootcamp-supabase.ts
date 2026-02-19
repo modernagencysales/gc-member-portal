@@ -1472,7 +1472,7 @@ export async function saveFunnelToolPresets(presets: FunnelToolPresets): Promise
   const { error } = await supabase.from('bootcamp_settings').upsert({
     key: 'funnel_tool_presets',
     value: presets,
-    description: 'Tool preset configurations for Funnel Access users',
+    description: 'Tool preset configurations for Sprint + AI Tools users',
   });
 
   if (error) throw new Error(`Failed to save funnel tool presets: ${error.message}`);

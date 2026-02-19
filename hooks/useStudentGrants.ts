@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { getStudentGrants, StudentGrants } from '../services/bootcamp-supabase';
 
 export function useStudentGrants(studentId: string | undefined, accessLevel: string) {
-  const needsGrants = accessLevel === 'Lead Magnet' || accessLevel === 'Funnel Access';
+  const needsGrants = accessLevel === 'Lead Magnet' || accessLevel === 'Sprint + AI Tools';
 
   const { data, isLoading, refetch } = useQuery<StudentGrants>({
     queryKey: ['studentGrants', studentId],
@@ -20,8 +20,8 @@ export function useStudentGrants(studentId: string | undefined, accessLevel: str
     };
   }
 
-  // Funnel Access users see all curriculum (no week filtering) but have filtered tools
-  if (accessLevel === 'Funnel Access') {
+  // Sprint + AI Tools users see all curriculum (no week filtering) but have filtered tools
+  if (accessLevel === 'Sprint + AI Tools') {
     return {
       grantedTools: data?.tools ?? [],
       grantedWeekIds: null, // See all curriculum

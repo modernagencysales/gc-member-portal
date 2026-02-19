@@ -264,7 +264,7 @@ const StudentCsvImportModal: React.FC<StudentCsvImportModalProps> = ({ isOpen, o
                 | 'Full Access'
                 | 'Curriculum Only'
                 | 'Lead Magnet'
-                | 'Funnel Access') || 'Full Access',
+                | 'Sprint + AI Tools') || 'Full Access',
             status:
               (student.status as 'Onboarding' | 'Active' | 'Completed' | 'Paused' | 'Churned') ||
               'Onboarding',

@@ -422,8 +422,8 @@ serve(async (req) => {
     const accessLevel = studentRecord?.access_level || 'Full Access';
     const subscriptionActive = studentRecord?.subscription_status === 'active';
 
-    // Funnel Access expiry check
-    if (accessLevel === 'Funnel Access') {
+    // Sprint + AI Tools expiry check
+    if (accessLevel === 'Sprint + AI Tools') {
       const { data: funnelStudent } = await supabase
         .from('bootcamp_students')
         .select('access_expires_at')

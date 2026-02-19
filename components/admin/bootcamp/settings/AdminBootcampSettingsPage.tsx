@@ -322,7 +322,7 @@ const AdminBootcampSettingsPage: React.FC = () => {
         {/* Sprint Product Delivery */}
         <SprintProductConfigEditor />
 
-        {/* Funnel Access Tool Presets */}
+        {/* Sprint + AI Tools Tool Presets */}
         <FunnelToolPresetsEditor />
 
         {/* Manual Tracking Info */}
