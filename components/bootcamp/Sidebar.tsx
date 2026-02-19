@@ -151,7 +151,6 @@ const Sidebar: React.FC<SidebarProps> = ({
           titleUpper.includes('SLACK') ||
           titleUpper.includes('ACCESS') ||
           titleUpper.includes('LOGIN') ||
-          url.startsWith('text:') ||
           url.startsWith('credentials:');
 
         if (isTable) {
