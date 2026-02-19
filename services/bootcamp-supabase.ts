@@ -1468,14 +1468,27 @@ export async function fetchFunnelToolPresets(): Promise<FunnelToolPresets> {
   }
 }
 
-export async function saveFunnelToolPresets(presets: FunnelToolPresets): Promise<void> {
-  const { error } = await supabase.from('bootcamp_settings').upsert({
-    key: 'funnel_tool_presets',
-    value: presets,
-    description: 'Tool preset configurations for Sprint + AI Tools users',
-  }, { onConflict: 'key' });
+async function upsertBootcampSetting(key: string, value: unknown, description: string): Promise<void> {
+  // Try update first (works when row exists)
+  const { data, error: updateError } = await supabase
+    .from('bootcamp_settings')
+    .update({ value, description })
+    .eq('key', key)
+    .select('id');
 
-  if (error) throw new Error(`Failed to save funnel tool presets: ${error.message}`);
+  if (updateError) throw new Error(updateError.message);
+
+  // If no row was updated, insert a new one
+  if (!data || data.length === 0) {
+    const { error: insertError } = await supabase
+      .from('bootcamp_settings')
+      .insert({ key, value, description });
+    if (insertError) throw new Error(insertError.message);
+  }
+}
+
+export async function saveFunnelToolPresets(presets: FunnelToolPresets): Promise<void> {
+  await upsertBootcampSetting('funnel_tool_presets', presets, 'Tool preset configurations for Sprint + AI Tools users');
 }
 
 // ============================================
@@ -1508,13 +1521,7 @@ export async function fetchCallGrantConfig(): Promise<CallGrantConfig> {
 }
 
 export async function saveCallGrantConfig(config: CallGrantConfig): Promise<void> {
-  const { error } = await supabase.from('bootcamp_settings').upsert({
-    key: 'call_grant_config',
-    value: config,
-    description: 'Auto-grant AI tool credits when prospects attend calls',
-  }, { onConflict: 'key' });
-
-  if (error) throw new Error(`Failed to save call grant config: ${error.message}`);
+  await upsertBootcampSetting('call_grant_config', config, 'Auto-grant AI tool credits when prospects attend calls');
 }
 
 // ============================================
@@ -1562,13 +1569,7 @@ export async function fetchSprintProductConfig(): Promise<SprintProductConfig> {
 }
 
 export async function saveSprintProductConfig(config: SprintProductConfig): Promise<void> {
-  const { error } = await supabase.from('bootcamp_settings').upsert({
-    key: 'sprint_product_config',
-    value: config,
-    description: 'Auto-provision students from Sprint product purchases',
-  }, { onConflict: 'key' });
-
-  if (error) throw new Error(`Failed to save sprint product config: ${error.message}`);
+  await upsertBootcampSetting('sprint_product_config', config, 'Auto-provision students from Sprint product purchases');
 }
 
 // ============================================
@@ -1591,11 +1592,5 @@ export async function fetchEnrollmentConfig(): Promise<EnrollmentConfig | null> 
 }
 
 export async function saveEnrollmentConfig(config: EnrollmentConfig): Promise<void> {
-  const { error } = await supabase.from('bootcamp_settings').upsert({
-    key: 'enrollment_config',
-    value: config,
-    description: 'Active enrollment configuration per product type',
-  }, { onConflict: 'key' });
-
-  if (error) throw new Error(`Failed to save enrollment config: ${error.message}`);
+  await upsertBootcampSetting('enrollment_config', config, 'Active enrollment configuration per product type');
 }
