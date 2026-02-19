@@ -1468,24 +1468,42 @@ async function upsertBootcampSetting(
   value: unknown,
   description: string
 ): Promise<void> {
-  // Try RPC function first (SECURITY DEFINER, bypasses RLS)
+  // Strategy 1: RPC function (SECURITY DEFINER, most reliable)
   const { error: rpcError } = await supabase.rpc('upsert_bootcamp_setting', {
     p_key: key,
     p_value: value,
     p_description: description,
   });
+  if (!rpcError) return;
+  console.warn('[settings] RPC failed:', rpcError.message);
 
-  if (!rpcError) return; // Success
-
-  // Fallback: direct upsert (requires GRANT + RLS policies)
-  console.warn(
-    'RPC upsert_bootcamp_setting failed, falling back to direct upsert:',
-    rpcError.message
-  );
-  const { error } = await supabase
+  // Strategy 2: Check if row exists, then UPDATE or INSERT separately
+  const { data: existing } = await supabase
     .from('bootcamp_settings')
-    .upsert({ key, value, description }, { onConflict: 'key' });
-  if (error) throw new Error(error.message);
+    .select('id')
+    .eq('key', key)
+    .maybeSingle();
+
+  if (existing) {
+    // Row exists — UPDATE by primary key (avoids upsert entirely)
+    const { error: updateError } = await supabase
+      .from('bootcamp_settings')
+      .update({ value, description })
+      .eq('id', existing.id);
+    if (updateError) {
+      console.error('[settings] UPDATE by id failed:', updateError.message);
+      throw new Error(updateError.message);
+    }
+  } else {
+    // Row doesn't exist — INSERT
+    const { error: insertError } = await supabase
+      .from('bootcamp_settings')
+      .insert({ key, value, description });
+    if (insertError) {
+      console.error('[settings] INSERT failed:', insertError.message);
+      throw new Error(insertError.message);
+    }
+  }
 }
 
 export async function saveFunnelToolPresets(presets: FunnelToolPresets): Promise<void> {
