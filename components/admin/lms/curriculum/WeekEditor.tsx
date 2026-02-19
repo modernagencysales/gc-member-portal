@@ -313,13 +313,18 @@ const WeekEditor: React.FC<WeekEditorProps> = ({
                         onSave={(title) => onUpdateContent(content.id, { title })}
                         className="flex-1"
                       />
-                      {content.embedUrl && (
-                        <InlineInput
-                          value={content.embedUrl}
-                          onSave={(embedUrl) => onUpdateContent(content.id, { embedUrl })}
-                          className="text-xs text-zinc-400 max-w-[200px] truncate"
-                        />
-                      )}
+                      {content.embedUrl &&
+                        (content.contentType === 'text' || content.embedUrl.startsWith('text:') ? (
+                          <span className="text-xs text-zinc-500 italic">(text content)</span>
+                        ) : content.embedUrl.startsWith('credentials:') ? (
+                          <span className="text-xs text-zinc-500 italic">(credentials)</span>
+                        ) : (
+                          <InlineInput
+                            value={content.embedUrl}
+                            onSave={(embedUrl) => onUpdateContent(content.id, { embedUrl })}
+                            className="text-xs text-zinc-400 max-w-[200px] truncate"
+                          />
+                        ))}
                       {hoveredItem === `content-${content.id}` && (
                         <button
                           onClick={() => onDeleteContent(content.id)}

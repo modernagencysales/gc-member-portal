@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import ReactMarkdown from 'react-markdown';
 import { Lesson, Week } from '../../types';
 import {
   CheckCircle,
@@ -305,10 +306,9 @@ const LessonView: React.FC<LessonViewProps> = ({
         <div className="animate-slide-in">
           <div className="mb-8">
             {isTextContent ? (
-              <div
-                className="bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200 dark:border-zinc-800 p-8 md:p-12 text-zinc-700 dark:text-zinc-300 document-content"
-                dangerouslySetInnerHTML={{ __html: lesson.embedUrl.replace(/^text:\s*/, '') }}
-              />
+              <div className="bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200 dark:border-zinc-800 p-8 md:p-12 text-zinc-700 dark:text-zinc-300 document-content">
+                <ReactMarkdown>{lesson.embedUrl.replace(/^text:\s*/, '')}</ReactMarkdown>
+              </div>
             ) : isCredentials && credentialsData ? (
               <div className="bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200 dark:border-zinc-800 p-8 md:p-12">
                 <div className="flex items-center gap-3 mb-6">

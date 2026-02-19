@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import ReactMarkdown from 'react-markdown';
 import { useTheme } from '../../../../context/ThemeContext';
 import {
   LmsContentItem,
@@ -18,6 +19,15 @@ import {
   Table,
   Presentation,
   BookOpen,
+  Bold,
+  Italic,
+  Heading2,
+  List,
+  ListOrdered,
+  Link2,
+  Eye,
+  Code,
+  Minus,
 } from 'lucide-react';
 
 interface LmsContentItemModalProps {
@@ -40,6 +50,162 @@ const CONTENT_TYPE_OPTIONS: { value: LmsContentType; label: string; icon: React.
   { value: 'credentials', label: 'Credentials', icon: <Key className="w-4 h-4" /> },
   { value: 'sop_link', label: 'Reference SOP', icon: <BookOpen className="w-4 h-4" /> },
 ];
+
+// Markdown toolbar editor for text content
+const TextContentEditor: React.FC<{
+  value: string;
+  onChange: (val: string) => void;
+  isDarkMode: boolean;
+  required?: boolean;
+}> = ({ value, onChange, isDarkMode, required }) => {
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [showPreview, setShowPreview] = useState(false);
+
+  const insertMarkdown = useCallback(
+    (before: string, after: string = '') => {
+      const ta = textareaRef.current;
+      if (!ta) return;
+      const start = ta.selectionStart;
+      const end = ta.selectionEnd;
+      const selected = value.substring(start, end);
+      const newText = value.substring(0, start) + before + selected + after + value.substring(end);
+      onChange(newText);
+      // Restore cursor position after the inserted text
+      requestAnimationFrame(() => {
+        ta.focus();
+        const cursorPos = start + before.length + selected.length + after.length;
+        ta.setSelectionRange(
+          selected ? cursorPos : start + before.length,
+          selected ? cursorPos : start + before.length
+        );
+      });
+    },
+    [value, onChange]
+  );
+
+  const toolbarButtons = [
+    {
+      icon: <Bold className="w-3.5 h-3.5" />,
+      action: () => insertMarkdown('**', '**'),
+      title: 'Bold',
+    },
+    {
+      icon: <Italic className="w-3.5 h-3.5" />,
+      action: () => insertMarkdown('*', '*'),
+      title: 'Italic',
+    },
+    {
+      icon: <Heading2 className="w-3.5 h-3.5" />,
+      action: () => insertMarkdown('\n## ', '\n'),
+      title: 'Heading',
+    },
+    {
+      icon: <List className="w-3.5 h-3.5" />,
+      action: () => insertMarkdown('\n- '),
+      title: 'Bullet list',
+    },
+    {
+      icon: <ListOrdered className="w-3.5 h-3.5" />,
+      action: () => insertMarkdown('\n1. '),
+      title: 'Numbered list',
+    },
+    {
+      icon: <Link2 className="w-3.5 h-3.5" />,
+      action: () => insertMarkdown('[', '](url)'),
+      title: 'Link',
+    },
+    {
+      icon: <Code className="w-3.5 h-3.5" />,
+      action: () => insertMarkdown('`', '`'),
+      title: 'Code',
+    },
+    {
+      icon: <Minus className="w-3.5 h-3.5" />,
+      action: () => insertMarkdown('\n---\n'),
+      title: 'Divider',
+    },
+  ];
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-1.5">
+        <label
+          className={`block text-sm font-medium ${isDarkMode ? 'text-slate-300' : 'text-slate-700'}`}
+        >
+          Text Content *
+        </label>
+        <button
+          type="button"
+          onClick={() => setShowPreview(!showPreview)}
+          className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-colors ${
+            showPreview
+              ? 'bg-violet-600 text-white'
+              : isDarkMode
+                ? 'text-slate-400 hover:bg-slate-800'
+                : 'text-slate-500 hover:bg-slate-100'
+          }`}
+        >
+          <Eye className="w-3.5 h-3.5" />
+          {showPreview ? 'Editing' : 'Preview'}
+        </button>
+      </div>
+
+      {showPreview ? (
+        <div
+          className={`w-full min-h-[300px] max-h-[60vh] overflow-y-auto px-6 py-4 rounded-lg border text-sm document-content ${
+            isDarkMode
+              ? 'bg-slate-800 border-slate-700 text-slate-200'
+              : 'bg-white border-slate-300 text-slate-800'
+          }`}
+        >
+          <ReactMarkdown>{value || '*Nothing to preview*'}</ReactMarkdown>
+        </div>
+      ) : (
+        <>
+          {/* Toolbar */}
+          <div
+            className={`flex items-center gap-0.5 px-2 py-1.5 rounded-t-lg border border-b-0 ${
+              isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-slate-50 border-slate-300'
+            }`}
+          >
+            {toolbarButtons.map((btn, i) => (
+              <button
+                key={i}
+                type="button"
+                onClick={btn.action}
+                title={btn.title}
+                className={`p-1.5 rounded ${
+                  isDarkMode
+                    ? 'text-slate-400 hover:bg-slate-700 hover:text-slate-200'
+                    : 'text-slate-500 hover:bg-slate-200 hover:text-slate-700'
+                }`}
+              >
+                {btn.icon}
+              </button>
+            ))}
+          </div>
+
+          <textarea
+            ref={textareaRef}
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            placeholder="Write your content using Markdown formatting..."
+            rows={16}
+            required={required}
+            className={`w-full px-4 py-3 rounded-b-lg border ${
+              isDarkMode
+                ? 'bg-slate-800 border-slate-700 text-white placeholder:text-slate-500'
+                : 'bg-white border-slate-300 text-slate-900 placeholder:text-slate-400'
+            } focus:ring-2 focus:ring-violet-500 focus:border-transparent resize-y font-mono text-sm min-h-[200px]`}
+          />
+        </>
+      )}
+      <p className={`text-xs mt-1 ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>
+        Supports Markdown: **bold**, *italic*, ## headings, - lists, [links](url), --- dividers
+      </p>
+    </div>
+  );
+};
 
 const LmsContentItemModal: React.FC<LmsContentItemModalProps> = ({
   isOpen,
@@ -280,32 +446,14 @@ const LmsContentItemModal: React.FC<LmsContentItemModalProps> = ({
             </div>
           )}
 
-          {/* Text Content Field */}
+          {/* Text Content Field with Markdown Editor */}
           {showTextField && (
-            <div>
-              <label
-                className={`block text-sm font-medium mb-1.5 ${
-                  isDarkMode ? 'text-slate-300' : 'text-slate-700'
-                }`}
-              >
-                Text Content *
-              </label>
-              <textarea
-                value={formData.contentText}
-                onChange={(e) => setFormData({ ...formData, contentText: e.target.value })}
-                placeholder="Enter text content, notes, or instructions..."
-                rows={6}
-                required={showTextField}
-                className={`w-full px-4 py-2.5 rounded-lg border ${
-                  isDarkMode
-                    ? 'bg-slate-800 border-slate-700 text-white placeholder:text-slate-500'
-                    : 'bg-white border-slate-300 text-slate-900 placeholder:text-slate-400'
-                } focus:ring-2 focus:ring-violet-500 focus:border-transparent resize-none font-mono text-sm`}
-              />
-              <p className={`text-xs mt-1 ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>
-                Supports basic HTML formatting
-              </p>
-            </div>
+            <TextContentEditor
+              value={formData.contentText || ''}
+              onChange={(val) => setFormData({ ...formData, contentText: val })}
+              isDarkMode={isDarkMode}
+              required={showTextField}
+            />
           )}
 
           {/* Credentials Fields */}
