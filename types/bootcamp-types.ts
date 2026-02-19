@@ -274,6 +274,7 @@ export interface CallGrantConfig {
   creditsPerTool: number;
   toolSlugs: string[];
   accessLevel: BootcampAccessLevel;
+  accessDays?: number;
 }
 
 // ============================================

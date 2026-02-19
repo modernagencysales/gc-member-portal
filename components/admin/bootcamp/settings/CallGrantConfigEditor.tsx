@@ -177,6 +177,29 @@ const CallGrantConfigEditor: React.FC = () => {
           </select>
         </div>
 
+        {/* Access duration */}
+        <div>
+          <label className="font-medium">Access Duration (Days)</label>
+          <p className={`text-sm mt-0.5 mb-3 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+            How many days the student has access before it expires. Set to 0 for unlimited.
+          </p>
+          <input
+            type="number"
+            min={0}
+            max={365}
+            value={localConfig.accessDays ?? 30}
+            onChange={(e) => {
+              setLocalConfig({ ...localConfig, accessDays: parseInt(e.target.value) || 0 });
+              setHasChanges(true);
+            }}
+            className={`w-32 px-4 py-2.5 rounded-lg border ${
+              isDarkMode
+                ? 'bg-slate-800 border-slate-700 text-white'
+                : 'bg-white border-slate-300 text-slate-900'
+            } focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+          />
+        </div>
+
         {/* Tool selection */}
         <div>
           <p
