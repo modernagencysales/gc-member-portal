@@ -565,7 +565,14 @@ const Sidebar: React.FC<SidebarProps> = ({
                 </button>
               )}
 
-              {/* AI Tools sections - hidden for Curriculum Only users */}
+              {/* LinkedIn AI Automation Suite - hidden for Curriculum Only users */}
+              {!isCurriculumOnly && aiTools.length > 0 && (
+                <div className="mt-3 mb-1 px-2">
+                  <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500">
+                    LinkedIn AI Automation Suite
+                  </span>
+                </div>
+              )}
 
               {/* Foundations */}
               {!isCurriculumOnly &&
@@ -595,8 +602,6 @@ const Sidebar: React.FC<SidebarProps> = ({
                     )}
                   </div>
                 )}
-
-              {/* Lead Magnet */}
               {!isCurriculumOnly && aiTools.length > 0 && (
                 <div className="space-y-0.5">
                   <button
@@ -605,7 +610,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                   >
                     <div className="flex items-center gap-2.5 text-xs font-medium">
                       <Sparkles size={12} className="text-violet-500" />
-                      <span>Lead Magnet</span>
+                      <span>The Lead Magnet GPT</span>
                     </div>
                     {isGroupExpanded('lead-magnet') ? (
                       <ChevronDown size={12} />
@@ -640,7 +645,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                   >
                     <div className="flex items-center gap-2.5 text-xs font-medium">
                       <FileText size={12} className="text-blue-500" />
-                      <span>Profile + Posts</span>
+                      <span>The LinkedIn Post GPT</span>
                     </div>
                     {isGroupExpanded('profile-posts') ? (
                       <ChevronDown size={12} />
@@ -674,7 +679,7 @@ const Sidebar: React.FC<SidebarProps> = ({
                   >
                     <div className="flex items-center gap-2.5 text-xs font-medium">
                       <MessageSquare size={12} className="text-blue-500" />
-                      <span>LinkedIn</span>
+                      <span>The DM Script GPT</span>
                     </div>
                     {isGroupExpanded('linkedin') ? (
                       <ChevronDown size={12} />
