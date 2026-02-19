@@ -29,6 +29,7 @@ import {
   MessageSquare,
   Send,
   Rocket,
+  Compass,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import type { FunnelAccessState } from '../../hooks/useFunnelAccess';
@@ -97,6 +98,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   const [collapsedWeeks, setCollapsedWeeks] = useState<Set<string>>(new Set());
 
   const [expandedGroups, setExpandedGroups] = useState<string[]>([
+    'foundations',
     'lead-magnet',
     'profile-posts',
     'outbound',
@@ -564,6 +566,37 @@ const Sidebar: React.FC<SidebarProps> = ({
               )}
 
               {/* AI Tools sections - hidden for Curriculum Only users */}
+
+              {/* Foundations */}
+              {!isCurriculumOnly &&
+                aiTools.filter((t) => ['offer-generator', 'niche-finder'].includes(t.slug)).length >
+                  0 && (
+                  <div className="space-y-0.5">
+                    <button
+                      onClick={() => toggleGroup('foundations')}
+                      className="w-full flex items-center justify-between p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-400 transition-colors"
+                    >
+                      <div className="flex items-center gap-2.5 text-xs font-medium">
+                        <Compass size={12} className="text-emerald-500" />
+                        <span>Foundations</span>
+                      </div>
+                      {isGroupExpanded('foundations') ? (
+                        <ChevronDown size={12} />
+                      ) : (
+                        <ChevronRight size={12} />
+                      )}
+                    </button>
+                    {isGroupExpanded('foundations') && (
+                      <div className="ml-4 border-l border-zinc-200 dark:border-zinc-800 pl-1.5">
+                        {aiTools
+                          .filter((t) => ['offer-generator', 'niche-finder'].includes(t.slug))
+                          .map(renderAIToolItem)}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+              {/* Lead Magnet */}
               {!isCurriculumOnly && aiTools.length > 0 && (
                 <div className="space-y-0.5">
                   <button
