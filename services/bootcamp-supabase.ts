@@ -631,12 +631,7 @@ export async function updateBootcampSetting<K extends keyof BootcampSettings>(
   value: BootcampSettings[K]
 ): Promise<void> {
   const dbKey = SETTINGS_KEY_MAP[key];
-  // Use upsert to create the row if it doesn't exist
-  const { error } = await supabase
-    .from('bootcamp_settings')
-    .upsert({ key: dbKey, value }, { onConflict: 'key' });
-
-  if (error) throw new Error(error.message);
+  await upsertBootcampSetting(dbKey, value, '');
 }
 
 // ============================================
@@ -1468,17 +1463,37 @@ export async function fetchFunnelToolPresets(): Promise<FunnelToolPresets> {
   }
 }
 
-async function upsertBootcampSetting(key: string, value: unknown, description: string): Promise<void> {
-  const { error } = await supabase.rpc('upsert_bootcamp_setting', {
+async function upsertBootcampSetting(
+  key: string,
+  value: unknown,
+  description: string
+): Promise<void> {
+  // Try RPC function first (SECURITY DEFINER, bypasses RLS)
+  const { error: rpcError } = await supabase.rpc('upsert_bootcamp_setting', {
     p_key: key,
     p_value: value,
     p_description: description,
   });
+
+  if (!rpcError) return; // Success
+
+  // Fallback: direct upsert (requires GRANT + RLS policies)
+  console.warn(
+    'RPC upsert_bootcamp_setting failed, falling back to direct upsert:',
+    rpcError.message
+  );
+  const { error } = await supabase
+    .from('bootcamp_settings')
+    .upsert({ key, value, description }, { onConflict: 'key' });
   if (error) throw new Error(error.message);
 }
 
 export async function saveFunnelToolPresets(presets: FunnelToolPresets): Promise<void> {
-  await upsertBootcampSetting('funnel_tool_presets', presets, 'Tool preset configurations for Sprint + AI Tools users');
+  await upsertBootcampSetting(
+    'funnel_tool_presets',
+    presets,
+    'Tool preset configurations for Sprint + AI Tools users'
+  );
 }
 
 // ============================================
@@ -1511,7 +1526,11 @@ export async function fetchCallGrantConfig(): Promise<CallGrantConfig> {
 }
 
 export async function saveCallGrantConfig(config: CallGrantConfig): Promise<void> {
-  await upsertBootcampSetting('call_grant_config', config, 'Auto-grant AI tool credits when prospects attend calls');
+  await upsertBootcampSetting(
+    'call_grant_config',
+    config,
+    'Auto-grant AI tool credits when prospects attend calls'
+  );
 }
 
 // ============================================
@@ -1559,7 +1578,11 @@ export async function fetchSprintProductConfig(): Promise<SprintProductConfig> {
 }
 
 export async function saveSprintProductConfig(config: SprintProductConfig): Promise<void> {
-  await upsertBootcampSetting('sprint_product_config', config, 'Auto-provision students from Sprint product purchases');
+  await upsertBootcampSetting(
+    'sprint_product_config',
+    config,
+    'Auto-provision students from Sprint product purchases'
+  );
 }
 
 // ============================================
@@ -1582,5 +1605,9 @@ export async function fetchEnrollmentConfig(): Promise<EnrollmentConfig | null> 
 }
 
 export async function saveEnrollmentConfig(config: EnrollmentConfig): Promise<void> {
-  await upsertBootcampSetting('enrollment_config', config, 'Active enrollment configuration per product type');
+  await upsertBootcampSetting(
+    'enrollment_config',
+    config,
+    'Active enrollment configuration per product type'
+  );
 }

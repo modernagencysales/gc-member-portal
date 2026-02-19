@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { CourseData, Lesson, User } from '../../types';
 import { AITool } from '../../types/chat-types';
 import { StudentEnrollment } from '../../types/bootcamp-types';
@@ -93,13 +93,8 @@ const Sidebar: React.FC<SidebarProps> = ({
     logout();
     window.location.reload();
   };
-  const [expandedWeeks, setExpandedWeeks] = useState<string[]>(data.weeks.map((w) => w.id));
-
-  // Auto-expand all weeks when course data changes (e.g. switching cohorts)
-  const weekIdKey = data.weeks.map((w) => w.id).join(',');
-  useEffect(() => {
-    setExpandedWeeks(data.weeks.map((w) => w.id));
-  }, [weekIdKey]);
+  // Track explicitly collapsed weeks (all weeks expanded by default)
+  const [collapsedWeeks, setCollapsedWeeks] = useState<Set<string>>(new Set());
 
   const [expandedGroups, setExpandedGroups] = useState<string[]>([
     'lead-magnet',
@@ -128,9 +123,12 @@ const Sidebar: React.FC<SidebarProps> = ({
   const userDomain = user?.email.split('@')[1] || '';
 
   const toggleWeek = (weekId: string) => {
-    setExpandedWeeks((prev) =>
-      prev.includes(weekId) ? prev.filter((id) => id !== weekId) : [...prev, weekId]
-    );
+    setCollapsedWeeks((prev) => {
+      const next = new Set(prev);
+      if (next.has(weekId)) next.delete(weekId);
+      else next.add(weekId);
+      return next;
+    });
   };
 
   const toggleGroup = (groupId: string) => {
@@ -139,7 +137,7 @@ const Sidebar: React.FC<SidebarProps> = ({
     );
   };
 
-  const isWeekExpanded = (weekId: string) => expandedWeeks.includes(weekId);
+  const isWeekExpanded = (weekId: string) => !collapsedWeeks.has(weekId);
   const isGroupExpanded = (groupId: string) => expandedGroups.includes(groupId);
 
   const toolGroups = useMemo(() => {
@@ -613,232 +611,238 @@ const Sidebar: React.FC<SidebarProps> = ({
               )}
 
               {/* LinkedIn */}
-              {!isCurriculumOnly && <div className="space-y-0.5">
-                <button
-                  onClick={() => toggleGroup('linkedin')}
-                  className="w-full flex items-center justify-between p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-400 transition-colors"
-                >
-                  <div className="flex items-center gap-2.5 text-xs font-medium">
-                    <MessageSquare size={12} className="text-blue-500" />
-                    <span>LinkedIn</span>
-                  </div>
-                  {isGroupExpanded('linkedin') ? (
-                    <ChevronDown size={12} />
-                  ) : (
-                    <ChevronRight size={12} />
-                  )}
-                </button>
-                {isGroupExpanded('linkedin') && (
-                  <div className="ml-4 border-l border-zinc-200 dark:border-zinc-800 pl-1.5">
-                    {aiTools
-                      .filter((t) => ['dm-chat-helper'].includes(t.slug))
-                      .map(renderAIToolItem)}
-                    <button
-                      onClick={() => {
-                        onSelectLesson({
-                          id: 'virtual:connection-qualifier',
-                          title: 'Connection Qualifier',
-                          embedUrl: 'virtual:connection-qualifier',
-                        });
-                        onCloseMobile();
-                      }}
-                      className={`flex items-center w-full py-1.5 px-3 rounded-lg text-[11px] transition-all ${
-                        currentLessonId === 'virtual:connection-qualifier'
-                          ? 'bg-violet-500/10 text-violet-600 dark:text-violet-400 font-medium'
-                          : 'text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100'
-                      }`}
-                    >
-                      <span
-                        className={`mr-2.5 shrink-0 ${
+              {!isCurriculumOnly && (
+                <div className="space-y-0.5">
+                  <button
+                    onClick={() => toggleGroup('linkedin')}
+                    className="w-full flex items-center justify-between p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-400 transition-colors"
+                  >
+                    <div className="flex items-center gap-2.5 text-xs font-medium">
+                      <MessageSquare size={12} className="text-blue-500" />
+                      <span>LinkedIn</span>
+                    </div>
+                    {isGroupExpanded('linkedin') ? (
+                      <ChevronDown size={12} />
+                    ) : (
+                      <ChevronRight size={12} />
+                    )}
+                  </button>
+                  {isGroupExpanded('linkedin') && (
+                    <div className="ml-4 border-l border-zinc-200 dark:border-zinc-800 pl-1.5">
+                      {aiTools
+                        .filter((t) => ['dm-chat-helper'].includes(t.slug))
+                        .map(renderAIToolItem)}
+                      <button
+                        onClick={() => {
+                          onSelectLesson({
+                            id: 'virtual:connection-qualifier',
+                            title: 'Connection Qualifier',
+                            embedUrl: 'virtual:connection-qualifier',
+                          });
+                          onCloseMobile();
+                        }}
+                        className={`flex items-center w-full py-1.5 px-3 rounded-lg text-[11px] transition-all ${
                           currentLessonId === 'virtual:connection-qualifier'
-                            ? 'text-violet-500'
-                            : 'text-zinc-400 dark:text-zinc-600'
+                            ? 'bg-violet-500/10 text-violet-600 dark:text-violet-400 font-medium'
+                            : 'text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100'
                         }`}
                       >
-                        <Users size={14} />
-                      </span>
-                      <span className="truncate">Connection Qualifier</span>
-                    </button>
-                  </div>
-                )}
-              </div>}
+                        <span
+                          className={`mr-2.5 shrink-0 ${
+                            currentLessonId === 'virtual:connection-qualifier'
+                              ? 'text-violet-500'
+                              : 'text-zinc-400 dark:text-zinc-600'
+                          }`}
+                        >
+                          <Users size={14} />
+                        </span>
+                        <span className="truncate">Connection Qualifier</span>
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* GTM Infrastructure */}
-              {!isCurriculumOnly && <div className="space-y-0.5">
-                <button
-                  onClick={() => toggleGroup('infrastructure')}
-                  className="w-full flex items-center justify-between p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-400 transition-colors"
-                >
-                  <div className="flex items-center gap-2.5 text-xs font-medium">
-                    <Server size={12} className="text-emerald-500" />
-                    <span>GTM Infrastructure</span>
-                  </div>
-                  {isGroupExpanded('infrastructure') ? (
-                    <ChevronDown size={12} />
-                  ) : (
-                    <ChevronRight size={12} />
-                  )}
-                </button>
-                {isGroupExpanded('infrastructure') && (
-                  <div className="ml-4 border-l border-zinc-200 dark:border-zinc-800 pl-1.5">
-                    <button
-                      onClick={() => {
-                        onSelectLesson({
-                          id: 'virtual:infra-account-setup',
-                          title: 'Account Setup',
-                          embedUrl: 'virtual:infra-account-setup',
-                        });
-                        onCloseMobile();
-                      }}
-                      className={`flex items-center w-full py-1.5 px-3 rounded-lg text-[11px] transition-all ${
-                        currentLessonId === 'virtual:infra-account-setup'
-                          ? 'bg-violet-500/10 text-violet-600 dark:text-violet-400 font-medium'
-                          : 'text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100'
-                      }`}
-                    >
-                      <span
-                        className={`mr-2.5 shrink-0 ${
+              {!isCurriculumOnly && (
+                <div className="space-y-0.5">
+                  <button
+                    onClick={() => toggleGroup('infrastructure')}
+                    className="w-full flex items-center justify-between p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-400 transition-colors"
+                  >
+                    <div className="flex items-center gap-2.5 text-xs font-medium">
+                      <Server size={12} className="text-emerald-500" />
+                      <span>GTM Infrastructure</span>
+                    </div>
+                    {isGroupExpanded('infrastructure') ? (
+                      <ChevronDown size={12} />
+                    ) : (
+                      <ChevronRight size={12} />
+                    )}
+                  </button>
+                  {isGroupExpanded('infrastructure') && (
+                    <div className="ml-4 border-l border-zinc-200 dark:border-zinc-800 pl-1.5">
+                      <button
+                        onClick={() => {
+                          onSelectLesson({
+                            id: 'virtual:infra-account-setup',
+                            title: 'Account Setup',
+                            embedUrl: 'virtual:infra-account-setup',
+                          });
+                          onCloseMobile();
+                        }}
+                        className={`flex items-center w-full py-1.5 px-3 rounded-lg text-[11px] transition-all ${
                           currentLessonId === 'virtual:infra-account-setup'
-                            ? 'text-violet-500'
-                            : 'text-zinc-400 dark:text-zinc-600'
+                            ? 'bg-violet-500/10 text-violet-600 dark:text-violet-400 font-medium'
+                            : 'text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100'
                         }`}
                       >
-                        <Users size={14} />
-                      </span>
-                      <span className="truncate">Account Setup</span>
-                    </button>
-                    <button
-                      onClick={() => {
-                        onSelectLesson({
-                          id: 'virtual:infra-email-infra',
-                          title: 'Email Infra',
-                          embedUrl: 'virtual:infra-email-infra',
-                        });
-                        onCloseMobile();
-                      }}
-                      className={`flex items-center w-full py-1.5 px-3 rounded-lg text-[11px] transition-all ${
-                        currentLessonId === 'virtual:infra-email-infra'
-                          ? 'bg-violet-500/10 text-violet-600 dark:text-violet-400 font-medium'
-                          : 'text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100'
-                      }`}
-                    >
-                      <span
-                        className={`mr-2.5 shrink-0 ${
+                        <span
+                          className={`mr-2.5 shrink-0 ${
+                            currentLessonId === 'virtual:infra-account-setup'
+                              ? 'text-violet-500'
+                              : 'text-zinc-400 dark:text-zinc-600'
+                          }`}
+                        >
+                          <Users size={14} />
+                        </span>
+                        <span className="truncate">Account Setup</span>
+                      </button>
+                      <button
+                        onClick={() => {
+                          onSelectLesson({
+                            id: 'virtual:infra-email-infra',
+                            title: 'Email Infra',
+                            embedUrl: 'virtual:infra-email-infra',
+                          });
+                          onCloseMobile();
+                        }}
+                        className={`flex items-center w-full py-1.5 px-3 rounded-lg text-[11px] transition-all ${
                           currentLessonId === 'virtual:infra-email-infra'
-                            ? 'text-violet-500'
-                            : 'text-zinc-400 dark:text-zinc-600'
+                            ? 'bg-violet-500/10 text-violet-600 dark:text-violet-400 font-medium'
+                            : 'text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100'
                         }`}
                       >
-                        <Mail size={14} />
-                      </span>
-                      <span className="truncate">Email Infra</span>
-                    </button>
-                  </div>
-                )}
-              </div>}
+                        <span
+                          className={`mr-2.5 shrink-0 ${
+                            currentLessonId === 'virtual:infra-email-infra'
+                              ? 'text-violet-500'
+                              : 'text-zinc-400 dark:text-zinc-600'
+                          }`}
+                        >
+                          <Mail size={14} />
+                        </span>
+                        <span className="truncate">Email Infra</span>
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Outbound */}
-              {!isCurriculumOnly && <div className="space-y-0.5">
-                <button
-                  onClick={() => toggleGroup('outbound')}
-                  className="w-full flex items-center justify-between p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-400 transition-colors"
-                >
-                  <div className="flex items-center gap-2.5 text-xs font-medium">
-                    <Send size={12} className="text-orange-500" />
-                    <span>Outbound</span>
-                  </div>
-                  {isGroupExpanded('outbound') ? (
-                    <ChevronDown size={12} />
-                  ) : (
-                    <ChevronRight size={12} />
-                  )}
-                </button>
-                {isGroupExpanded('outbound') && (
-                  <div className="ml-4 border-l border-zinc-200 dark:border-zinc-800 pl-1.5">
-                    {aiTools
-                      .filter((t) => ['cold-email-mastermind'].includes(t.slug))
-                      .map(renderAIToolItem)}
-                    <button
-                      onClick={() => {
-                        onSelectLesson({
-                          id: 'virtual:tam-builder',
-                          title: 'TAM Builder',
-                          embedUrl: 'virtual:tam-builder',
-                        });
-                        onCloseMobile();
-                      }}
-                      className={`flex items-center w-full py-1.5 px-3 rounded-lg text-[11px] transition-all ${
-                        currentLessonId === 'virtual:tam-builder'
-                          ? 'bg-violet-500/10 text-violet-600 dark:text-violet-400 font-medium'
-                          : 'text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100'
-                      }`}
-                    >
-                      <span
-                        className={`mr-2.5 shrink-0 ${
+              {!isCurriculumOnly && (
+                <div className="space-y-0.5">
+                  <button
+                    onClick={() => toggleGroup('outbound')}
+                    className="w-full flex items-center justify-between p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-700 dark:text-zinc-400 transition-colors"
+                  >
+                    <div className="flex items-center gap-2.5 text-xs font-medium">
+                      <Send size={12} className="text-orange-500" />
+                      <span>Outbound</span>
+                    </div>
+                    {isGroupExpanded('outbound') ? (
+                      <ChevronDown size={12} />
+                    ) : (
+                      <ChevronRight size={12} />
+                    )}
+                  </button>
+                  {isGroupExpanded('outbound') && (
+                    <div className="ml-4 border-l border-zinc-200 dark:border-zinc-800 pl-1.5">
+                      {aiTools
+                        .filter((t) => ['cold-email-mastermind'].includes(t.slug))
+                        .map(renderAIToolItem)}
+                      <button
+                        onClick={() => {
+                          onSelectLesson({
+                            id: 'virtual:tam-builder',
+                            title: 'TAM Builder',
+                            embedUrl: 'virtual:tam-builder',
+                          });
+                          onCloseMobile();
+                        }}
+                        className={`flex items-center w-full py-1.5 px-3 rounded-lg text-[11px] transition-all ${
                           currentLessonId === 'virtual:tam-builder'
-                            ? 'text-violet-500'
-                            : 'text-zinc-400 dark:text-zinc-600'
+                            ? 'bg-violet-500/10 text-violet-600 dark:text-violet-400 font-medium'
+                            : 'text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100'
                         }`}
                       >
-                        <Target size={14} />
-                      </span>
-                      <span className="truncate">TAM Builder</span>
-                    </button>
-                    <button
-                      onClick={() => {
-                        onSelectLesson({
-                          id: 'virtual:cold-email-recipes',
-                          title: 'Recipe Builder',
-                          embedUrl: 'virtual:cold-email-recipes',
-                        });
-                        onCloseMobile();
-                      }}
-                      className={`flex items-center w-full py-1.5 px-3 rounded-lg text-[11px] transition-all ${
-                        currentLessonId === 'virtual:cold-email-recipes'
-                          ? 'bg-violet-500/10 text-violet-600 dark:text-violet-400 font-medium'
-                          : 'text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100'
-                      }`}
-                    >
-                      <span
-                        className={`mr-2.5 shrink-0 ${
+                        <span
+                          className={`mr-2.5 shrink-0 ${
+                            currentLessonId === 'virtual:tam-builder'
+                              ? 'text-violet-500'
+                              : 'text-zinc-400 dark:text-zinc-600'
+                          }`}
+                        >
+                          <Target size={14} />
+                        </span>
+                        <span className="truncate">TAM Builder</span>
+                      </button>
+                      <button
+                        onClick={() => {
+                          onSelectLesson({
+                            id: 'virtual:cold-email-recipes',
+                            title: 'Recipe Builder',
+                            embedUrl: 'virtual:cold-email-recipes',
+                          });
+                          onCloseMobile();
+                        }}
+                        className={`flex items-center w-full py-1.5 px-3 rounded-lg text-[11px] transition-all ${
                           currentLessonId === 'virtual:cold-email-recipes'
-                            ? 'text-violet-500'
-                            : 'text-zinc-400 dark:text-zinc-600'
+                            ? 'bg-violet-500/10 text-violet-600 dark:text-violet-400 font-medium'
+                            : 'text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100'
                         }`}
                       >
-                        <Mail size={14} />
-                      </span>
-                      <span className="truncate">Recipe Builder</span>
-                    </button>
-                    <button
-                      onClick={() => {
-                        onSelectLesson({
-                          id: 'virtual:email-enrichment',
-                          title: 'Email Enrichment',
-                          embedUrl: 'virtual:email-enrichment',
-                        });
-                        onCloseMobile();
-                      }}
-                      className={`flex items-center w-full py-1.5 px-3 rounded-lg text-[11px] transition-all ${
-                        currentLessonId === 'virtual:email-enrichment'
-                          ? 'bg-violet-500/10 text-violet-600 dark:text-violet-400 font-medium'
-                          : 'text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100'
-                      }`}
-                    >
-                      <span
-                        className={`mr-2.5 shrink-0 ${
+                        <span
+                          className={`mr-2.5 shrink-0 ${
+                            currentLessonId === 'virtual:cold-email-recipes'
+                              ? 'text-violet-500'
+                              : 'text-zinc-400 dark:text-zinc-600'
+                          }`}
+                        >
+                          <Mail size={14} />
+                        </span>
+                        <span className="truncate">Recipe Builder</span>
+                      </button>
+                      <button
+                        onClick={() => {
+                          onSelectLesson({
+                            id: 'virtual:email-enrichment',
+                            title: 'Email Enrichment',
+                            embedUrl: 'virtual:email-enrichment',
+                          });
+                          onCloseMobile();
+                        }}
+                        className={`flex items-center w-full py-1.5 px-3 rounded-lg text-[11px] transition-all ${
                           currentLessonId === 'virtual:email-enrichment'
-                            ? 'text-violet-500'
-                            : 'text-zinc-400 dark:text-zinc-600'
+                            ? 'bg-violet-500/10 text-violet-600 dark:text-violet-400 font-medium'
+                            : 'text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100'
                         }`}
                       >
-                        <Mail size={14} />
-                      </span>
-                      <span className="truncate">Email Enrichment</span>
-                    </button>
-                  </div>
-                )}
-              </div>}
+                        <span
+                          className={`mr-2.5 shrink-0 ${
+                            currentLessonId === 'virtual:email-enrichment'
+                              ? 'text-violet-500'
+                              : 'text-zinc-400 dark:text-zinc-600'
+                          }`}
+                        >
+                          <Mail size={14} />
+                        </span>
+                        <span className="truncate">Email Enrichment</span>
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Clay Tables */}
               {!isCurriculumOnly && toolGroups.tables.length > 0 && (

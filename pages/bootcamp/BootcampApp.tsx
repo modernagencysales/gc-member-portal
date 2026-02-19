@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, lazy, Suspense } from 'react';
+import React, { useState, useEffect, useCallback, useRef, lazy, Suspense } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSearchParams } from 'react-router-dom';
 import { fetchCourseData } from '../../services/airtable';
@@ -84,6 +84,7 @@ const BootcampApp: React.FC = () => {
   });
 
   // Legacy state for curriculum
+  const loadRequestRef = useRef(0);
   const [courseData, setCourseData] = useState<CourseData | null>(null);
   const [currentLesson, setCurrentLesson] = useState<Lesson | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -205,6 +206,7 @@ const BootcampApp: React.FC = () => {
   };
 
   const loadUserData = async (activeUser: User, cohortNameOverride?: string) => {
+    const thisLoadId = ++loadRequestRef.current;
     setLoading(true);
 
     const storageKey = getStorageKey(activeUser.email);
@@ -236,6 +238,9 @@ const BootcampApp: React.FC = () => {
     if (!data.weeks.length) {
       data = await fetchCourseData(cohortName, activeUser.email);
     }
+
+    // Prevent stale data from overwriting (race condition between init + enrollment load)
+    if (loadRequestRef.current !== thisLoadId) return;
 
     setCourseData(data);
 
