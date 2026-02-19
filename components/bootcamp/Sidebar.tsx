@@ -316,17 +316,32 @@ const Sidebar: React.FC<SidebarProps> = ({
               </>
             )}
 
-            {/* Course sections */}
+            {/* Course sections — Skool-style classroom layout */}
             {courseEnrollments.map((enrollment) => {
               const isActive = activeCourseId === enrollment.cohortId && !showDashboard;
               const label = enrollment.cohort.sidebarLabel || enrollment.cohort.name;
               const icon = enrollment.cohort.icon;
 
+              // When this course is active, use the loaded curriculum weeks
+              const courseWeeks = isActive ? data.weeks : [];
+
+              // Debug: log data state for active course
+              if (isActive && typeof console !== 'undefined') {
+                console.log(
+                  '[Sidebar] Active course:',
+                  label,
+                  '| weeks:',
+                  courseWeeks.length,
+                  courseWeeks.map((w) => `${w.title}(${w.lessons.length}L)`)
+                );
+              }
+
               return (
                 <div key={enrollment.cohortId}>
+                  {/* Course header button */}
                   <button
                     onClick={() => onSelectCourse?.(enrollment.cohortId)}
-                    className={`flex items-center gap-2.5 w-full p-2 rounded-lg text-xs font-medium transition-all ${
+                    className={`flex items-center gap-2.5 w-full p-2.5 rounded-lg text-xs font-semibold transition-all ${
                       isActive
                         ? 'bg-violet-500/10 text-violet-600 dark:text-violet-400'
                         : 'text-zinc-700 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800'
@@ -350,73 +365,80 @@ const Sidebar: React.FC<SidebarProps> = ({
                     />
                   </button>
 
-                  {/* Inline curriculum for active course */}
-                  {isActive && (
-                    <div className="ml-3 mt-1 space-y-1 animate-slide-in">
-                      {data.weeks.map((week) => {
+                  {/* Inline curriculum — Skool-style collapsible weeks */}
+                  {isActive && courseWeeks.length > 0 && (
+                    <div className="mt-1.5 space-y-2 animate-slide-in">
+                      {courseWeeks.map((week) => {
                         const coreLessons = week.lessons.filter(
                           (l) => !isToolbeltItem(l.id) && !l.title.toUpperCase().startsWith('TASK:')
                         );
 
                         if (coreLessons.length === 0 && week.actionItems.length === 0) return null;
 
+                        const expanded = isWeekExpanded(week.id);
+
                         return (
-                          <div key={week.id} className="mb-1">
+                          <div key={week.id}>
+                            {/* Week header — bold, Skool-style */}
                             <button
                               onClick={() => toggleWeek(week.id)}
-                              className="flex items-center justify-between w-full p-2 text-left text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:text-violet-600 dark:hover:text-violet-400"
+                              className="flex items-center justify-between w-full px-3 py-2 text-left"
                             >
-                              <div className="flex items-center gap-2 truncate">
-                                {week.actionItems.length > 0 &&
-                                  completedItems.size >= week.actionItems.length && (
-                                    <CheckCircle2 size={12} className="text-green-500" />
-                                  )}
-                                <span className="truncate">{week.title}</span>
-                              </div>
-                              {isWeekExpanded(week.id) ? (
-                                <ChevronDown size={12} />
-                              ) : (
-                                <ChevronRight size={12} />
-                              )}
+                              <span className="text-xs font-bold text-zinc-800 dark:text-zinc-200 truncate">
+                                {week.title}
+                              </span>
+                              <ChevronDown
+                                size={14}
+                                className={`shrink-0 text-zinc-400 transition-transform ${expanded ? '' : '-rotate-90'}`}
+                              />
                             </button>
-                            {isWeekExpanded(week.id) && (
-                              <div className="mt-1 space-y-0.5 ml-2">
-                                {coreLessons.map((lesson) => (
+
+                            {/* Lesson list — Skool-style with warm active highlight */}
+                            {expanded && (
+                              <div className="space-y-0.5 pb-1">
+                                {coreLessons.map((lesson) => {
+                                  const isLessonActive = lesson.id === currentLessonId;
+                                  return (
+                                    <button
+                                      key={lesson.id}
+                                      onClick={() => {
+                                        onSelectLesson(lesson);
+                                        onCloseMobile();
+                                      }}
+                                      className={`flex items-center gap-2.5 w-full px-4 py-2 text-xs transition-all ${
+                                        isLessonActive
+                                          ? 'bg-amber-100/80 dark:bg-amber-900/30 text-amber-900 dark:text-amber-200 font-medium border-l-2 border-amber-500'
+                                          : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800/60 border-l-2 border-transparent'
+                                      }`}
+                                    >
+                                      <span className="text-left leading-snug truncate">
+                                        {cleanTitle(lesson.title)}
+                                      </span>
+                                    </button>
+                                  );
+                                })}
+
+                                {/* Tasks button */}
+                                {week.actionItems.length > 0 && (
                                   <button
-                                    key={lesson.id}
                                     onClick={() => {
-                                      onSelectLesson(lesson);
+                                      onSelectLesson({
+                                        id: `${week.id}:checklist`,
+                                        title: 'Tasks',
+                                        embedUrl: 'virtual:checklist',
+                                      });
                                       onCloseMobile();
                                     }}
-                                    className={`flex items-start w-full p-2 rounded-lg text-[11px] transition-all ${lesson.id === currentLessonId ? 'bg-violet-500/10 text-violet-600 dark:text-violet-400 font-medium' : 'text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800'}`}
+                                    className={`flex items-center gap-2 w-full px-4 py-2 text-xs transition-all ${
+                                      currentLessonId === `${week.id}:checklist`
+                                        ? 'bg-violet-500 text-white font-medium rounded-md mx-1'
+                                        : 'text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800/60 border-l-2 border-transparent'
+                                    }`}
                                   >
-                                    <span className="mt-0.5 mr-2 shrink-0 opacity-70">
-                                      {getLessonIcon(lesson, lesson.id === currentLessonId)}
-                                    </span>
-                                    <span className="text-left leading-snug">
-                                      {cleanTitle(lesson.title)}
-                                    </span>
+                                    <ClipboardList size={12} />
+                                    <span>Tasks</span>
                                   </button>
-                                ))}
-
-                                <button
-                                  onClick={() => {
-                                    onSelectLesson({
-                                      id: `${week.id}:checklist`,
-                                      title: 'Tasks',
-                                      embedUrl: 'virtual:checklist',
-                                    });
-                                    onCloseMobile();
-                                  }}
-                                  className={`flex items-center gap-2.5 w-full p-2 rounded-lg text-[11px] font-medium transition-all mt-1 ${
-                                    currentLessonId === `${week.id}:checklist`
-                                      ? 'bg-violet-500 text-white'
-                                      : 'text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800'
-                                  }`}
-                                >
-                                  <ClipboardList size={12} />
-                                  <span>Tasks</span>
-                                </button>
+                                )}
                               </div>
                             )}
                           </div>
