@@ -22,6 +22,33 @@ import LessonDescription from './LessonDescription';
 import SopLinksCard from './SopLinksCard';
 import { BootcampStudent } from '../../types/bootcamp-types';
 
+// Preprocess text content to normalize non-standard formatting into proper markdown
+const preprocessTextContent = (content: string): string => {
+  return content
+    .split('\n')
+    .map((line) => {
+      const trimmed = line.trim();
+
+      // Convert lines starting with bullet-like characters to markdown list items
+      if (/^[●•▪▸‣⁃◆◇○]\s/.test(trimmed)) {
+        return `- ${trimmed.replace(/^[●•▪▸‣⁃◆◇○]\s*/, '')}`;
+      }
+
+      // Fix bold markers with trailing spaces: **text ** → **text**
+      let fixed = line.replace(/\*\*(.+?)\s+\*\*/g, '**$1**');
+
+      // Convert emoji-prefixed ALL-CAPS headers to markdown headings
+      // e.g. "⚡ ENERGY & TONE:" or "💡 STEP 1: START THE CONVO"
+
+      if (/^[^\w\s*#\-`[\]()]{1,2}\s+[A-Z][A-Z\s\d:&()/]+$/u.test(trimmed)) {
+        return `## ${trimmed}`;
+      }
+
+      return fixed;
+    })
+    .join('\n');
+};
+
 interface LessonViewProps {
   lesson: Lesson;
   currentWeek?: Week;
@@ -307,7 +334,9 @@ const LessonView: React.FC<LessonViewProps> = ({
           <div className="mb-8">
             {isTextContent ? (
               <div className="bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200 dark:border-zinc-800 p-8 md:p-12 text-zinc-700 dark:text-zinc-300 document-content">
-                <ReactMarkdown>{lesson.embedUrl.replace(/^text:\s*/, '')}</ReactMarkdown>
+                <ReactMarkdown>
+                  {preprocessTextContent(lesson.embedUrl.replace(/^text:\s*/, ''))}
+                </ReactMarkdown>
               </div>
             ) : isCredentials && credentialsData ? (
               <div className="bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200 dark:border-zinc-800 p-8 md:p-12">
