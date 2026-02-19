@@ -102,13 +102,13 @@ const StudentModal: React.FC<StudentModalProps> = ({
 
       {/* Modal */}
       <div
-        className={`relative w-full max-w-lg rounded-2xl shadow-xl ${
+        className={`relative w-full max-w-lg max-h-[90vh] flex flex-col rounded-2xl shadow-xl ${
           isDarkMode ? 'bg-slate-900' : 'bg-white'
         }`}
       >
         {/* Header */}
         <div
-          className={`flex items-center justify-between p-6 border-b ${
+          className={`flex items-center justify-between p-6 border-b shrink-0 ${
             isDarkMode ? 'border-slate-800' : 'border-slate-200'
           }`}
         >
@@ -124,7 +124,7 @@ const StudentModal: React.FC<StudentModalProps> = ({
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="p-6 space-y-4 overflow-y-auto">
           <div>
             <label className="block text-sm font-medium mb-1.5">Email *</label>
             <input
@@ -228,7 +228,7 @@ const StudentModal: React.FC<StudentModalProps> = ({
               onChange={(e) =>
                 setFormData({
                   ...formData,
-                  accessLevel: e.target.value as 'Full Access' | 'Curriculum Only',
+                  accessLevel: e.target.value as BootcampStudent['accessLevel'],
                 })
               }
               className={`w-full px-4 py-2.5 rounded-lg border ${
@@ -238,7 +238,9 @@ const StudentModal: React.FC<StudentModalProps> = ({
               } focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
             >
               <option value="Full Access">Full Access</option>
+              <option value="Sprint + AI Tools">Sprint + AI Tools</option>
               <option value="Curriculum Only">Curriculum Only</option>
+              <option value="Lead Magnet">Lead Magnet</option>
             </select>
           </div>
 
