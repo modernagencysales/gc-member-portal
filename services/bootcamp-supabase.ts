@@ -1473,7 +1473,7 @@ export async function saveFunnelToolPresets(presets: FunnelToolPresets): Promise
     key: 'funnel_tool_presets',
     value: presets,
     description: 'Tool preset configurations for Sprint + AI Tools users',
-  });
+  }, { onConflict: 'key' });
 
   if (error) throw new Error(`Failed to save funnel tool presets: ${error.message}`);
 }
@@ -1512,7 +1512,7 @@ export async function saveCallGrantConfig(config: CallGrantConfig): Promise<void
     key: 'call_grant_config',
     value: config,
     description: 'Auto-grant AI tool credits when prospects attend calls',
-  });
+  }, { onConflict: 'key' });
 
   if (error) throw new Error(`Failed to save call grant config: ${error.message}`);
 }
@@ -1566,7 +1566,7 @@ export async function saveSprintProductConfig(config: SprintProductConfig): Prom
     key: 'sprint_product_config',
     value: config,
     description: 'Auto-provision students from Sprint product purchases',
-  });
+  }, { onConflict: 'key' });
 
   if (error) throw new Error(`Failed to save sprint product config: ${error.message}`);
 }
@@ -1595,7 +1595,7 @@ export async function saveEnrollmentConfig(config: EnrollmentConfig): Promise<vo
     key: 'enrollment_config',
     value: config,
     description: 'Active enrollment configuration per product type',
-  });
+  }, { onConflict: 'key' });
 
   if (error) throw new Error(`Failed to save enrollment config: ${error.message}`);
 }
