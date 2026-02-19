@@ -111,12 +111,20 @@ const AdminStudentsPage: React.FC = () => {
     async (data: Partial<BootcampStudent>, selectedCohortIds: string[]) => {
       let studentId: string;
 
-      if (editingStudent) {
-        await updateMutation.mutateAsync({ studentId: editingStudent.id, updates: data });
-        studentId = editingStudent.id;
-      } else {
-        const created = await createMutation.mutateAsync(data);
-        studentId = (created as { id: string }).id;
+      try {
+        if (editingStudent) {
+          await updateMutation.mutateAsync({ studentId: editingStudent.id, updates: data });
+          studentId = editingStudent.id;
+        } else {
+          const created = await createMutation.mutateAsync(data);
+          studentId = (created as { id: string }).id;
+        }
+      } catch (err) {
+        console.error('Failed to save student:', err);
+        window.alert(
+          `Failed to save student: ${err instanceof Error ? err.message : 'Unknown error'}`
+        );
+        return;
       }
 
       // Sync enrollments

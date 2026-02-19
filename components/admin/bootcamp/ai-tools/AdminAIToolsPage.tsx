@@ -267,27 +267,46 @@ const AdminAIToolsPage: React.FC = () => {
   };
 
   const handleSubmit = async (data: AIToolInput) => {
-    if (editingTool) {
-      await updateMutation.mutateAsync({ toolId: editingTool.id, updates: data });
-    } else {
-      await createMutation.mutateAsync(data);
+    try {
+      if (editingTool) {
+        await updateMutation.mutateAsync({ toolId: editingTool.id, updates: data });
+      } else {
+        await createMutation.mutateAsync(data);
+      }
+      setIsModalOpen(false);
+      setEditingTool(null);
+    } catch (err) {
+      console.error('Failed to save AI tool:', err);
+      window.alert(`Failed to save tool: ${err instanceof Error ? err.message : 'Unknown error'}`);
     }
-    setIsModalOpen(false);
-    setEditingTool(null);
   };
 
   const handleDeleteTool = async () => {
     if (deletingTool) {
-      await deleteMutation.mutateAsync(deletingTool.id);
-      setDeletingTool(null);
+      try {
+        await deleteMutation.mutateAsync(deletingTool.id);
+        setDeletingTool(null);
+      } catch (err) {
+        console.error('Failed to delete AI tool:', err);
+        window.alert(
+          `Failed to delete tool: ${err instanceof Error ? err.message : 'Unknown error'}`
+        );
+      }
     }
   };
 
   const handleToggleActive = async (tool: AITool) => {
-    await updateMutation.mutateAsync({
-      toolId: tool.id,
-      updates: { isActive: !tool.isActive },
-    });
+    try {
+      await updateMutation.mutateAsync({
+        toolId: tool.id,
+        updates: { isActive: !tool.isActive },
+      });
+    } catch (err) {
+      console.error('Failed to toggle tool:', err);
+      window.alert(
+        `Failed to update tool: ${err instanceof Error ? err.message : 'Unknown error'}`
+      );
+    }
   };
 
   const handleCopySlug = (slug: string) => {
@@ -318,12 +337,19 @@ const AdminAIToolsPage: React.FC = () => {
   };
 
   const handleBulkUpdate = async (updates: { model?: string; maxTokens?: number }) => {
-    await bulkUpdateMutation.mutateAsync({
-      toolIds: Array.from(selectedToolIds),
-      updates,
-    });
-    setSelectedToolIds(new Set());
-    setIsBulkEditModalOpen(false);
+    try {
+      await bulkUpdateMutation.mutateAsync({
+        toolIds: Array.from(selectedToolIds),
+        updates,
+      });
+      setSelectedToolIds(new Set());
+      setIsBulkEditModalOpen(false);
+    } catch (err) {
+      console.error('Failed to bulk update tools:', err);
+      window.alert(
+        `Failed to update tools: ${err instanceof Error ? err.message : 'Unknown error'}`
+      );
+    }
   };
 
   const handleDragEnd = (event: DragEndEvent) => {

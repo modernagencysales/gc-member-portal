@@ -80,27 +80,42 @@ const AdminBootcampOnboardingPage: React.FC = () => {
   };
 
   const handleSubmit = async (itemData: Partial<BootcampChecklistItem>) => {
-    if (editingItem) {
-      await updateMutation.mutateAsync({ itemId: editingItem.id, updates: itemData });
-    } else {
-      await createMutation.mutateAsync(itemData);
+    try {
+      if (editingItem) {
+        await updateMutation.mutateAsync({ itemId: editingItem.id, updates: itemData });
+      } else {
+        await createMutation.mutateAsync(itemData);
+      }
+      setIsModalOpen(false);
+      setEditingItem(null);
+    } catch (err) {
+      console.error('Failed to save checklist item:', err);
+      window.alert(`Failed to save: ${err instanceof Error ? err.message : 'Unknown error'}`);
     }
-    setIsModalOpen(false);
-    setEditingItem(null);
   };
 
   const handleDelete = async () => {
     if (deletingItem) {
-      await deleteMutation.mutateAsync(deletingItem.item.id);
-      setDeletingItem(null);
+      try {
+        await deleteMutation.mutateAsync(deletingItem.item.id);
+        setDeletingItem(null);
+      } catch (err) {
+        console.error('Failed to delete checklist item:', err);
+        window.alert(`Failed to delete: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      }
     }
   };
 
   const handleToggleVisibility = async (item: BootcampChecklistItem) => {
-    await updateMutation.mutateAsync({
-      itemId: item.id,
-      updates: { isVisible: !item.isVisible },
-    });
+    try {
+      await updateMutation.mutateAsync({
+        itemId: item.id,
+        updates: { isVisible: !item.isVisible },
+      });
+    } catch (err) {
+      console.error('Failed to toggle visibility:', err);
+      window.alert(`Failed to update: ${err instanceof Error ? err.message : 'Unknown error'}`);
+    }
   };
 
   const handleReorder = async (item: BootcampChecklistItem, direction: 'up' | 'down') => {

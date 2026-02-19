@@ -103,23 +103,44 @@ const AdminBootcampInviteCodesPage: React.FC = () => {
       toolGrants?: ToolGrant[];
     }
   ) => {
-    for (let i = 0; i < count; i++) {
-      await createMutation.mutateAsync({ cohortId, options });
+    try {
+      for (let i = 0; i < count; i++) {
+        await createMutation.mutateAsync({ cohortId, options });
+      }
+      setIsModalOpen(false);
+    } catch (err) {
+      console.error('Failed to create invite codes:', err);
+      window.alert(
+        `Failed to create codes: ${err instanceof Error ? err.message : 'Unknown error'}`
+      );
     }
-    setIsModalOpen(false);
   };
 
   const handleToggleStatus = async (code: BootcampInviteCode) => {
-    await updateMutation.mutateAsync({
-      codeId: code.id,
-      updates: { status: code.status === 'Active' ? 'Disabled' : 'Active' },
-    });
+    try {
+      await updateMutation.mutateAsync({
+        codeId: code.id,
+        updates: { status: code.status === 'Active' ? 'Disabled' : 'Active' },
+      });
+    } catch (err) {
+      console.error('Failed to toggle invite code:', err);
+      window.alert(
+        `Failed to update code: ${err instanceof Error ? err.message : 'Unknown error'}`
+      );
+    }
   };
 
   const handleDeleteCode = async () => {
     if (deletingCode) {
-      await deleteMutation.mutateAsync(deletingCode.id);
-      setDeletingCode(null);
+      try {
+        await deleteMutation.mutateAsync(deletingCode.id);
+        setDeletingCode(null);
+      } catch (err) {
+        console.error('Failed to delete invite code:', err);
+        window.alert(
+          `Failed to delete code: ${err instanceof Error ? err.message : 'Unknown error'}`
+        );
+      }
     }
   };
 

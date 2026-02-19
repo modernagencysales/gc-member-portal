@@ -369,17 +369,24 @@ const AdminLmsCurriculumPage: React.FC = () => {
           isOpen={true}
           onClose={() => setContentModal(null)}
           onSubmit={async (data) => {
-            const week = curriculum.weeks.find((w) => w.id === contentModal.weekId);
-            const lesson = week?.lessons.find((l) => l.id === contentModal.lessonId);
-            await createContentMutation.mutateAsync({
-              item: {
-                ...data,
-                lessonId: contentModal.lessonId,
-                sortOrder: lesson?.contentItems.length || 0,
-              },
-              cohortId,
-            });
-            setContentModal(null);
+            try {
+              const week = curriculum.weeks.find((w) => w.id === contentModal.weekId);
+              const lesson = week?.lessons.find((l) => l.id === contentModal.lessonId);
+              await createContentMutation.mutateAsync({
+                item: {
+                  ...data,
+                  lessonId: contentModal.lessonId,
+                  sortOrder: lesson?.contentItems.length || 0,
+                },
+                cohortId,
+              });
+              setContentModal(null);
+            } catch (err) {
+              console.error('Failed to create content item:', err);
+              window.alert(
+                `Failed to save: ${err instanceof Error ? err.message : 'Unknown error'}`
+              );
+            }
           }}
           initialContentType={contentModal.contentType}
           isLoading={createContentMutation.isPending}

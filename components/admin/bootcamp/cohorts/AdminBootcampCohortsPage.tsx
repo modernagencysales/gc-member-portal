@@ -77,27 +77,48 @@ const AdminBootcampCohortsPage: React.FC = () => {
   };
 
   const handleSubmit = async (data: Partial<BootcampCohort>) => {
-    if (editingCohort) {
-      await updateMutation.mutateAsync({ cohortId: editingCohort.id, updates: data });
-    } else {
-      await createMutation.mutateAsync(data);
+    try {
+      if (editingCohort) {
+        await updateMutation.mutateAsync({ cohortId: editingCohort.id, updates: data });
+      } else {
+        await createMutation.mutateAsync(data);
+      }
+      setIsModalOpen(false);
+      setEditingCohort(null);
+    } catch (err) {
+      console.error('Failed to save cohort:', err);
+      window.alert(
+        `Failed to save cohort: ${err instanceof Error ? err.message : 'Unknown error'}`
+      );
     }
-    setIsModalOpen(false);
-    setEditingCohort(null);
   };
 
   const handleDeleteCohort = async () => {
     if (deletingCohort) {
-      await deleteMutation.mutateAsync(deletingCohort.id);
-      setDeletingCohort(null);
+      try {
+        await deleteMutation.mutateAsync(deletingCohort.id);
+        setDeletingCohort(null);
+      } catch (err) {
+        console.error('Failed to delete cohort:', err);
+        window.alert(
+          `Failed to delete cohort: ${err instanceof Error ? err.message : 'Unknown error'}`
+        );
+      }
     }
   };
 
   const handleToggleStatus = async (cohort: BootcampCohort) => {
-    await updateMutation.mutateAsync({
-      cohortId: cohort.id,
-      updates: { status: cohort.status === 'Active' ? 'Archived' : 'Active' },
-    });
+    try {
+      await updateMutation.mutateAsync({
+        cohortId: cohort.id,
+        updates: { status: cohort.status === 'Active' ? 'Archived' : 'Active' },
+      });
+    } catch (err) {
+      console.error('Failed to toggle status:', err);
+      window.alert(
+        `Failed to update status: ${err instanceof Error ? err.message : 'Unknown error'}`
+      );
+    }
   };
 
   return (

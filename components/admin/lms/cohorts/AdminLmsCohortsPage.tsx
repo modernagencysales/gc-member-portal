@@ -97,38 +97,66 @@ const AdminLmsCohortsPage: React.FC = () => {
   };
 
   const handleSubmit = async (data: LmsCohortFormData) => {
-    if (editingCohort) {
-      await updateMutation.mutateAsync({ cohortId: editingCohort.id, updates: data });
-    } else {
-      await createMutation.mutateAsync(data);
+    try {
+      if (editingCohort) {
+        await updateMutation.mutateAsync({ cohortId: editingCohort.id, updates: data });
+      } else {
+        await createMutation.mutateAsync(data);
+      }
+      setIsModalOpen(false);
+      setEditingCohort(null);
+    } catch (err) {
+      console.error('Failed to save cohort:', err);
+      window.alert(
+        `Failed to save cohort: ${err instanceof Error ? err.message : 'Unknown error'}`
+      );
     }
-    setIsModalOpen(false);
-    setEditingCohort(null);
   };
 
   const handleDeleteCohort = async () => {
     if (deletingCohort) {
-      await deleteMutation.mutateAsync(deletingCohort.id);
-      setDeletingCohort(null);
+      try {
+        await deleteMutation.mutateAsync(deletingCohort.id);
+        setDeletingCohort(null);
+      } catch (err) {
+        console.error('Failed to delete cohort:', err);
+        window.alert(
+          `Failed to delete cohort: ${err instanceof Error ? err.message : 'Unknown error'}`
+        );
+      }
     }
   };
 
   const handleToggleStatus = async (cohort: LmsCohort) => {
-    const nextStatus = cohort.status === 'Active' ? 'Archived' : 'Active';
-    await updateMutation.mutateAsync({
-      cohortId: cohort.id,
-      updates: { status: nextStatus },
-    });
+    try {
+      const nextStatus = cohort.status === 'Active' ? 'Archived' : 'Active';
+      await updateMutation.mutateAsync({
+        cohortId: cohort.id,
+        updates: { status: nextStatus },
+      });
+    } catch (err) {
+      console.error('Failed to toggle status:', err);
+      window.alert(
+        `Failed to update status: ${err instanceof Error ? err.message : 'Unknown error'}`
+      );
+    }
   };
 
   const handleDuplicate = async (newName: string, newDescription?: string) => {
     if (duplicatingCohort) {
-      await duplicateMutation.mutateAsync({
-        sourceCohortId: duplicatingCohort.id,
-        newName,
-        newDescription,
-      });
-      setDuplicatingCohort(null);
+      try {
+        await duplicateMutation.mutateAsync({
+          sourceCohortId: duplicatingCohort.id,
+          newName,
+          newDescription,
+        });
+        setDuplicatingCohort(null);
+      } catch (err) {
+        console.error('Failed to duplicate cohort:', err);
+        window.alert(
+          `Failed to duplicate cohort: ${err instanceof Error ? err.message : 'Unknown error'}`
+        );
+      }
     }
   };
 

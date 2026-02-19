@@ -43,19 +43,31 @@ const AdminToolsPage: React.FC = () => {
   };
 
   const handleSubmit = async (toolData: Partial<ToolAccess>) => {
-    if (editingTool) {
-      await updateMutation.mutateAsync({ toolId: editingTool.id, updates: toolData });
-    } else if (selectedMemberId) {
-      await createMutation.mutateAsync({ memberId: selectedMemberId, tool: toolData });
+    try {
+      if (editingTool) {
+        await updateMutation.mutateAsync({ toolId: editingTool.id, updates: toolData });
+      } else if (selectedMemberId) {
+        await createMutation.mutateAsync({ memberId: selectedMemberId, tool: toolData });
+      }
+      setIsModalOpen(false);
+      setEditingTool(null);
+    } catch (err) {
+      console.error('Failed to save tool:', err);
+      window.alert(`Failed to save tool: ${err instanceof Error ? err.message : 'Unknown error'}`);
     }
-    setIsModalOpen(false);
-    setEditingTool(null);
   };
 
   const handleDelete = async () => {
     if (deletingTool) {
-      await deleteMutation.mutateAsync(deletingTool.id);
-      setDeletingTool(null);
+      try {
+        await deleteMutation.mutateAsync(deletingTool.id);
+        setDeletingTool(null);
+      } catch (err) {
+        console.error('Failed to delete tool:', err);
+        window.alert(
+          `Failed to delete tool: ${err instanceof Error ? err.message : 'Unknown error'}`
+        );
+      }
     }
   };
 

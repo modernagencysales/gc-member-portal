@@ -100,8 +100,8 @@ export async function createLmsCohort(cohort: LmsCohortFormData): Promise<LmsCoh
     name: cohort.name,
     description: cohort.description,
     status: cohort.status || 'Active',
-    start_date: cohort.startDate,
-    end_date: cohort.endDate,
+    start_date: cohort.startDate || null,
+    end_date: cohort.endDate || null,
   };
 
   if (cohort.sidebarLabel !== undefined) insertData.sidebar_label = cohort.sidebarLabel;
@@ -127,8 +127,8 @@ export async function updateLmsCohort(
   if (updates.name !== undefined) updateData.name = updates.name;
   if (updates.description !== undefined) updateData.description = updates.description;
   if (updates.status !== undefined) updateData.status = updates.status;
-  if (updates.startDate !== undefined) updateData.start_date = updates.startDate;
-  if (updates.endDate !== undefined) updateData.end_date = updates.endDate;
+  if (updates.startDate !== undefined) updateData.start_date = updates.startDate || null;
+  if (updates.endDate !== undefined) updateData.end_date = updates.endDate || null;
   if (updates.sidebarLabel !== undefined) updateData.sidebar_label = updates.sidebarLabel;
   if (updates.icon !== undefined) updateData.icon = updates.icon;
   if (updates.sortOrder !== undefined) updateData.sort_order = updates.sortOrder;
