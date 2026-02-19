@@ -1469,22 +1469,12 @@ export async function fetchFunnelToolPresets(): Promise<FunnelToolPresets> {
 }
 
 async function upsertBootcampSetting(key: string, value: unknown, description: string): Promise<void> {
-  // Try update first (works when row exists)
-  const { data, error: updateError } = await supabase
-    .from('bootcamp_settings')
-    .update({ value, description })
-    .eq('key', key)
-    .select('id');
-
-  if (updateError) throw new Error(updateError.message);
-
-  // If no row was updated, insert a new one
-  if (!data || data.length === 0) {
-    const { error: insertError } = await supabase
-      .from('bootcamp_settings')
-      .insert({ key, value, description });
-    if (insertError) throw new Error(insertError.message);
-  }
+  const { error } = await supabase.rpc('upsert_bootcamp_setting', {
+    p_key: key,
+    p_value: value,
+    p_description: description,
+  });
+  if (error) throw new Error(error.message);
 }
 
 export async function saveFunnelToolPresets(presets: FunnelToolPresets): Promise<void> {
