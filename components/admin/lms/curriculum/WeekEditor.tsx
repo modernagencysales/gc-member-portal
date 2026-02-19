@@ -17,7 +17,12 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { useTheme } from '../../../../context/ThemeContext';
-import { LmsWeekWithLessons, LmsContentType, LmsActionItem } from '../../../../types/lms-types';
+import {
+  LmsWeekWithLessons,
+  LmsContentType,
+  LmsContentItem,
+  LmsActionItem,
+} from '../../../../types/lms-types';
 import {
   ChevronDown,
   ChevronRight,
@@ -32,6 +37,7 @@ import {
   Presentation,
   BookOpen,
   EyeOff,
+  Pencil,
 } from 'lucide-react';
 import InlineInput from './InlineInput';
 import InlineAddInput from './InlineAddInput';
@@ -53,6 +59,7 @@ interface WeekEditorProps {
   ) => void;
   onUpdateContent: (contentId: string, data: { title?: string; embedUrl?: string }) => void;
   onDeleteContent: (contentId: string) => void;
+  onEditContentItem: (content: LmsContentItem) => void;
   onAddAction: (text: string) => void;
   onUpdateAction: (actionId: string, updates: { text?: string; videoUrl?: string }) => void;
   onDeleteAction: (actionId: string) => void;
@@ -169,6 +176,7 @@ const WeekEditor: React.FC<WeekEditorProps> = ({
   onAddContent,
   onUpdateContent,
   onDeleteContent,
+  onEditContentItem,
   onAddAction,
   onUpdateAction,
   onDeleteAction,
@@ -326,12 +334,21 @@ const WeekEditor: React.FC<WeekEditorProps> = ({
                           />
                         ))}
                       {hoveredItem === `content-${content.id}` && (
-                        <button
-                          onClick={() => onDeleteContent(content.id)}
-                          className="p-0.5 text-red-500 hover:text-red-600"
-                        >
-                          <Trash2 className="w-3 h-3" />
-                        </button>
+                        <>
+                          <button
+                            onClick={() => onEditContentItem(content)}
+                            className="p-0.5 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200"
+                            title="Edit content item"
+                          >
+                            <Pencil className="w-3 h-3" />
+                          </button>
+                          <button
+                            onClick={() => onDeleteContent(content.id)}
+                            className="p-0.5 text-red-500 hover:text-red-600"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                          </button>
+                        </>
                       )}
                     </div>
                   ))}

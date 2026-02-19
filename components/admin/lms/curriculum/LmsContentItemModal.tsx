@@ -229,12 +229,17 @@ const LmsContentItemModal: React.FC<LmsContentItemModalProps> = ({
 
   useEffect(() => {
     if (initialData) {
+      // For text content, extract text from embedUrl if contentText is empty
+      let contentText = initialData.contentText || '';
+      if (!contentText && initialData.embedUrl?.startsWith('text:')) {
+        contentText = initialData.embedUrl.replace(/^text:\s*/, '');
+      }
       setFormData({
         title: initialData.title,
         contentType: initialData.contentType,
-        embedUrl: initialData.embedUrl || '',
+        embedUrl: initialData.embedUrl?.startsWith('text:') ? '' : initialData.embedUrl || '',
         aiToolSlug: initialData.aiToolSlug || '',
-        contentText: initialData.contentText || '',
+        contentText,
         credentialsData: initialData.credentialsData || {
           loginUrl: '',
           username: '',

@@ -18,6 +18,7 @@ import {
 import { fetchLmsCurriculumByCohort, fetchAllLmsCohorts } from '../../../../services/lms-supabase';
 import { queryKeys } from '../../../../lib/queryClient';
 import { useTheme } from '../../../../context/ThemeContext';
+import { LmsContentItem } from '../../../../types/lms-types';
 import {
   useCreateLmsWeekMutation,
   useUpdateLmsWeekMutation,
@@ -50,7 +51,8 @@ const AdminLmsCurriculumPage: React.FC = () => {
   const [contentModal, setContentModal] = useState<{
     lessonId: string;
     weekId: string;
-    contentType: 'credentials' | 'ai_tool';
+    contentType?: 'credentials' | 'ai_tool';
+    editingItem?: LmsContentItem;
   } | null>(null);
   const [showCsvImport, setShowCsvImport] = useState(false);
 
@@ -339,6 +341,13 @@ const AdminLmsCurriculumPage: React.FC = () => {
                     cohortId,
                   })
                 }
+                onEditContentItem={(content) =>
+                  setContentModal({
+                    lessonId: content.lessonId,
+                    weekId: week.id,
+                    editingItem: content,
+                  })
+                }
                 onOpenContentModal={(lessonId, contentType) =>
                   setContentModal({ lessonId, weekId: week.id, contentType })
                 }
@@ -363,33 +372,43 @@ const AdminLmsCurriculumPage: React.FC = () => {
         existingWeekCount={curriculum.weeks.length}
       />
 
-      {/* Content Modal for credentials/AI tool */}
+      {/* Content Modal for create/edit */}
       {contentModal && (
         <LmsContentItemModal
           isOpen={true}
           onClose={() => setContentModal(null)}
           onSubmit={async (data) => {
             try {
-              const week = curriculum.weeks.find((w) => w.id === contentModal.weekId);
-              const lesson = week?.lessons.find((l) => l.id === contentModal.lessonId);
-              await createContentMutation.mutateAsync({
-                item: {
-                  ...data,
+              if (contentModal.editingItem) {
+                await updateContentMutation.mutateAsync({
+                  itemId: contentModal.editingItem.id,
                   lessonId: contentModal.lessonId,
-                  sortOrder: lesson?.contentItems.length || 0,
-                },
-                cohortId,
-              });
+                  cohortId,
+                  updates: data,
+                });
+              } else {
+                const week = curriculum.weeks.find((w) => w.id === contentModal.weekId);
+                const lesson = week?.lessons.find((l) => l.id === contentModal.lessonId);
+                await createContentMutation.mutateAsync({
+                  item: {
+                    ...data,
+                    lessonId: contentModal.lessonId,
+                    sortOrder: lesson?.contentItems.length || 0,
+                  },
+                  cohortId,
+                });
+              }
               setContentModal(null);
             } catch (err) {
-              console.error('Failed to create content item:', err);
+              console.error('Failed to save content item:', err);
               window.alert(
                 `Failed to save: ${err instanceof Error ? err.message : 'Unknown error'}`
               );
             }
           }}
+          initialData={contentModal.editingItem || null}
           initialContentType={contentModal.contentType}
-          isLoading={createContentMutation.isPending}
+          isLoading={createContentMutation.isPending || updateContentMutation.isPending}
         />
       )}
     </div>
