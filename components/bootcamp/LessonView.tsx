@@ -193,6 +193,7 @@ const LessonView: React.FC<LessonViewProps> = ({
     'miro.com',
     'canva.com/design',
     'docs.google.com/spreadsheets', // Google Sheets published pages embed fine
+    'drive.google.com/file', // Google Drive files (PDF preview)
   ];
   // Detect external links that can't be embedded in iframes
   // Allowlist approach: if the URL isn't a known embeddable domain/special type, treat as external link
@@ -690,8 +691,18 @@ const LessonView: React.FC<LessonViewProps> = ({
                 </div>
               </a>
             ) : (
-              <div className="rounded-xl overflow-hidden border border-zinc-200 dark:border-zinc-800 bg-zinc-900 aspect-video shadow-sm">
-                <iframe src={lesson.embedUrl} className="w-full h-full border-0" allowFullScreen />
+              <div
+                className={`rounded-xl overflow-hidden border border-zinc-200 dark:border-zinc-800 bg-zinc-900 shadow-sm ${lesson.embedUrl.includes('drive.google.com/file') ? 'min-h-[80vh]' : 'aspect-video'}`}
+              >
+                <iframe
+                  src={
+                    lesson.embedUrl.includes('drive.google.com/file')
+                      ? lesson.embedUrl.replace(/\/view.*$/, '/preview')
+                      : lesson.embedUrl
+                  }
+                  className="w-full h-full border-0"
+                  allowFullScreen
+                />
               </div>
             )}
 
