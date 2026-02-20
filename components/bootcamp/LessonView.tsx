@@ -132,6 +132,9 @@ const LessonView: React.FC<LessonViewProps> = ({
   const isAistudio = lesson.embedUrl.includes('aistudio.google.com');
   const isTextContent = lesson.embedUrl.startsWith('text:');
 
+  // Google "Publish to Web" URLs are embeddable (end with /pub or /pubhtml)
+  const isGooglePublished = /\/(pub|pubhtml)(\?|$)/.test(lesson.embedUrl);
+
   // Detect external links that can't be embedded in iframes
   const NON_EMBEDDABLE_DOMAINS = [
     'drive.google.com',
@@ -151,6 +154,7 @@ const LessonView: React.FC<LessonViewProps> = ({
   const isExternalLink =
     !isTextContent &&
     !isAistudio &&
+    !isGooglePublished &&
     !lesson.embedUrl.startsWith('text:') &&
     !lesson.embedUrl.startsWith('ai-tool:') &&
     !lesson.embedUrl.startsWith('credentials:') &&

@@ -289,6 +289,16 @@ export function detectContentType(url: string): LmsContentType {
   // Clay tables
   if (lowerUrl.includes('clay.com')) return 'clay_table';
 
+  // Google Docs/Sheets/Slides published to web (embeddable)
+  if (
+    (lowerUrl.includes('docs.google.com') ||
+      lowerUrl.includes('sheets.google.com') ||
+      lowerUrl.includes('slides.google.com')) &&
+    /\/(pub|pubhtml)(\?|$)/.test(lowerUrl)
+  ) {
+    return 'guide';
+  }
+
   // Playbook SOPs
   if (lowerUrl.includes('dwy-playbook.vercel.app') || lowerUrl.includes('playbook.keen.digital'))
     return 'sop_link';
