@@ -33,6 +33,8 @@ const preprocessTextContent = (content: string): string => {
   normalized = normalized.replace(/\n\s*\*\*\s*$/gm, '');
   // Fix opening ** at end of previous line with text on next line: "**\nSome text" → "**Some text"
   normalized = normalized.replace(/\*\*\n([^*\n]+)\*\*/g, '**$1**');
+  // Remove empty heading markers (## with nothing after, from toolbar artifacts)
+  normalized = normalized.replace(/^#{1,6}\s*$/gm, '');
 
   const lines = normalized.split('\n');
   const result: string[] = [];
