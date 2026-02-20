@@ -446,6 +446,12 @@ const LessonView: React.FC<LessonViewProps> = ({
                   remarkPlugins={[remarkBreaks, remarkGfm]}
                   components={{
                     p: ({ children }) => <p style={{ marginBottom: '1rem' }}>{children}</p>,
+                    strong: ({ children }) => (
+                      <strong className="font-semibold text-zinc-900 dark:text-white">
+                        {children}
+                      </strong>
+                    ),
+                    em: ({ children }) => <em className="italic">{children}</em>,
                     h2: ({ children }) => (
                       <h2
                         style={{
