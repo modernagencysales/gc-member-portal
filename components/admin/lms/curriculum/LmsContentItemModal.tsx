@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import mammoth from 'mammoth';
 import ReactMarkdown from 'react-markdown';
 import remarkBreaks from 'remark-breaks';
 import remarkGfm from 'remark-gfm';
@@ -30,6 +31,7 @@ import {
   Eye,
   Code,
   Minus,
+  Upload,
 } from 'lucide-react';
 
 interface LmsContentItemModalProps {
@@ -61,7 +63,37 @@ const TextContentEditor: React.FC<{
   required?: boolean;
 }> = ({ value, onChange, isDarkMode, required }) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [showPreview, setShowPreview] = useState(false);
+  const [importing, setImporting] = useState(false);
+
+  const handleDocxImport = useCallback(
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      setImporting(true);
+      try {
+        const arrayBuffer = await file.arrayBuffer();
+        const result = await mammoth.convertToHtml({ arrayBuffer });
+        if (result.value) {
+          // Prefix with marker so the student view knows to render as HTML
+          onChange('<!--docx-->' + result.value);
+          setShowPreview(true);
+        }
+        if (result.messages.length > 0) {
+          console.warn('[DOCX Import] Warnings:', result.messages);
+        }
+      } catch (err) {
+        console.error('[DOCX Import] Error:', err);
+        window.alert('Failed to import DOCX file. Please try again.');
+      } finally {
+        setImporting(false);
+        // Reset file input so same file can be re-imported
+        if (fileInputRef.current) fileInputRef.current.value = '';
+      }
+    },
+    [onChange]
+  );
 
   const insertMarkdown = useCallback(
     (before: string, after: string = '') => {
@@ -237,9 +269,31 @@ const TextContentEditor: React.FC<{
           />
         </>
       )}
-      <p className={`text-xs mt-1 ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>
-        Supports Markdown: **bold**, *italic*, ## headings, - lists, [links](url), --- dividers
-      </p>
+      <div className="flex items-center gap-2 mt-1.5">
+        <p className={`text-xs flex-1 ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>
+          Supports Markdown: **bold**, *italic*, ## headings, - lists, [links](url), --- dividers
+        </p>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".docx"
+          onChange={handleDocxImport}
+          className="hidden"
+        />
+        <button
+          type="button"
+          onClick={() => fileInputRef.current?.click()}
+          disabled={importing}
+          className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-colors ${
+            isDarkMode
+              ? 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'
+              : 'text-slate-500 hover:bg-slate-100 hover:text-slate-700'
+          } ${importing ? 'opacity-50 cursor-wait' : ''}`}
+        >
+          <Upload className="w-3.5 h-3.5" />
+          {importing ? 'Importing...' : 'Import DOCX'}
+        </button>
+      </div>
     </div>
   );
 };
