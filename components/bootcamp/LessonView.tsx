@@ -159,9 +159,6 @@ const LessonView: React.FC<LessonViewProps> = ({
   const isAistudio = lesson.embedUrl.includes('aistudio.google.com');
   const isTextContent = lesson.embedUrl.startsWith('text:');
 
-  // Google "Publish to Web" URLs are embeddable (end with /pub or /pubhtml)
-  const isGooglePublished = /\/(pub|pubhtml)(\?|$)/.test(lesson.embedUrl);
-
   // Domains known to be safely embeddable in iframes
   const EMBEDDABLE_DOMAINS = [
     'youtube.com',
@@ -177,11 +174,12 @@ const LessonView: React.FC<LessonViewProps> = ({
     'figma.com/embed',
     'miro.com',
     'canva.com/design',
+    'docs.google.com/spreadsheets', // Google Sheets published pages embed fine
   ];
   // Detect external links that can't be embedded in iframes
   // Allowlist approach: if the URL isn't a known embeddable domain/special type, treat as external link
   const isExternalLink = (() => {
-    if (isTextContent || isAistudio || isGooglePublished) return false;
+    if (isTextContent || isAistudio) return false;
     if (
       lesson.embedUrl.startsWith('text:') ||
       lesson.embedUrl.startsWith('ai-tool:') ||
@@ -665,7 +663,7 @@ const LessonView: React.FC<LessonViewProps> = ({
                 </div>
               </a>
             ) : (
-              <div className="rounded-lg overflow-hidden border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 aspect-video">
+              <div className="rounded-xl overflow-hidden border border-zinc-200 dark:border-zinc-800 bg-zinc-900 aspect-video shadow-sm">
                 <iframe src={lesson.embedUrl} className="w-full h-full border-0" allowFullScreen />
               </div>
             )}
