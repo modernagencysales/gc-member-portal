@@ -167,16 +167,6 @@ const LessonView: React.FC<LessonViewProps> = ({
     textRawContent.trimStart().startsWith('<h1');
   const htmlContent = isHtmlContent ? textRawContent.replace('<!--docx-->', '') : '';
 
-  if (isTextContent) {
-    console.log('[LessonView] Text content debug:', {
-      embedUrlStart: lesson.embedUrl.substring(0, 80),
-      rawContentStart: textRawContent.substring(0, 80),
-      isHtmlContent,
-      startsWithDocx: textRawContent.startsWith('<!--docx-->'),
-      startsWithP: textRawContent.trimStart().startsWith('<p>'),
-    });
-  }
-
   // Domains known to be safely embeddable in iframes
   const EMBEDDABLE_DOMAINS = [
     'youtube.com',
@@ -195,10 +185,15 @@ const LessonView: React.FC<LessonViewProps> = ({
     'docs.google.com/spreadsheets', // Google Sheets published pages embed fine
     'drive.google.com/file', // Google Drive files (PDF preview)
   ];
+  // Detect PDF URLs (local or remote) — render as embedded viewer
+  const isPdf =
+    lesson.embedUrl.toLowerCase().endsWith('.pdf') ||
+    lesson.embedUrl.toLowerCase().includes('.pdf?');
+
   // Detect external links that can't be embedded in iframes
   // Allowlist approach: if the URL isn't a known embeddable domain/special type, treat as external link
   const isExternalLink = (() => {
-    if (isTextContent || isAistudio) return false;
+    if (isTextContent || isAistudio || isPdf) return false;
     if (
       lesson.embedUrl.startsWith('text:') ||
       lesson.embedUrl.startsWith('ai-tool:') ||
@@ -240,13 +235,6 @@ const LessonView: React.FC<LessonViewProps> = ({
   // 1. Detect Custom AI Tool (replaces Pickaxe)
   const isCustomAITool = lesson.embedUrl.startsWith('ai-tool:');
   const aiToolSlug = isCustomAITool ? lesson.embedUrl.replace('ai-tool:', '').trim() : null;
-
-  console.log('[LessonView] AI Tool detection:', {
-    embedUrl: lesson.embedUrl,
-    isCustomAITool,
-    aiToolSlug,
-    studentId,
-  });
 
   // 2. Detect Pickaxe Content (legacy)
   const isPickaxe =
@@ -654,6 +642,17 @@ const LessonView: React.FC<LessonViewProps> = ({
                 >
                   Open AI Studio <ExternalLink size={16} />
                 </a>
+              </div>
+            ) : isPdf ? (
+              <div
+                className="rounded-xl overflow-hidden border border-zinc-200 dark:border-zinc-800 bg-zinc-100 dark:bg-zinc-900 shadow-sm"
+                style={{ height: '85vh' }}
+              >
+                <iframe
+                  src={lesson.embedUrl}
+                  className="w-full h-full border-0"
+                  title={lesson.title}
+                />
               </div>
             ) : isExternalLink ? (
               <a
