@@ -103,7 +103,15 @@ const preprocessTextContent = (content: string): string => {
     result.push(fixed);
   }
 
-  return result.join('\n');
+  // Post-pass: clean up the output for proper markdown rendering
+  let output = result.join('\n');
+  // Collapse 3+ consecutive blank lines to 2 (one paragraph break)
+  output = output.replace(/\n{3,}/g, '\n\n');
+  // Remove blank lines between consecutive list items so they group into one <ul>
+  output = output.replace(/(^- .+)\n\n(- )/gm, '$1\n$2');
+  // Ensure blank line before headings
+  output = output.replace(/([^\n])\n(## )/g, '$1\n\n$2');
+  return output.trim();
 };
 
 interface LessonViewProps {
