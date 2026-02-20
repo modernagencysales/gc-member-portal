@@ -22,6 +22,7 @@ import { ChatInterface } from '../chat';
 import MyBlueprint from './MyBlueprint';
 import LessonDescription from './LessonDescription';
 import SopLinksCard from './SopLinksCard';
+import LessonNavigation from './LessonNavigation';
 import { BootcampStudent } from '../../types/bootcamp-types';
 
 // Preprocess text content to normalize non-standard formatting into proper markdown
@@ -41,10 +42,12 @@ const preprocessTextContent = (content: string): string => {
   const result: string[] = [];
 
   const addHeading = (text: string) => {
-    // Add blank line before heading for proper markdown parsing
+    // Add blank line and horizontal rule before heading for visual separation
     if (result.length > 0 && result[result.length - 1] !== '') {
       result.push('');
     }
+    result.push('---');
+    result.push('');
     result.push(`## ${text}`);
     result.push(''); // blank line after heading
   };
@@ -128,6 +131,8 @@ interface LessonViewProps {
   onSelectLesson: (lesson: Lesson) => void;
   studentId?: string;
   bootcampStudent?: BootcampStudent | null;
+  prevLesson?: Lesson | null;
+  nextLesson?: Lesson | null;
 }
 
 const LessonView: React.FC<LessonViewProps> = ({
@@ -142,6 +147,8 @@ const LessonView: React.FC<LessonViewProps> = ({
   onSelectLesson: _onSelectLesson,
   studentId,
   bootcampStudent,
+  prevLesson = null,
+  nextLesson = null,
 }) => {
   const [activeTaskId, setActiveTaskId] = useState<string | null>(null);
   const [copiedField, setCopiedField] = useState<string | null>(null);
@@ -437,7 +444,47 @@ const LessonView: React.FC<LessonViewProps> = ({
           <div className="mb-8">
             {isTextContent ? (
               <div className="bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200 dark:border-zinc-800 p-8 md:p-12 text-zinc-700 dark:text-zinc-300 document-content">
-                <ReactMarkdown remarkPlugins={[remarkBreaks, remarkGfm]}>
+                <ReactMarkdown
+                  remarkPlugins={[remarkBreaks, remarkGfm]}
+                  components={{
+                    p: ({ children }) => <p style={{ marginBottom: '1rem' }}>{children}</p>,
+                    h2: ({ children }) => (
+                      <h2
+                        style={{
+                          fontSize: '1.35rem',
+                          fontWeight: 600,
+                          marginTop: '2.5rem',
+                          marginBottom: '0.75rem',
+                          paddingTop: '1.5rem',
+                          borderTop: '1px solid rgba(161,161,170,0.2)',
+                        }}
+                      >
+                        {children}
+                      </h2>
+                    ),
+                    ul: ({ children }) => (
+                      <ul
+                        style={{
+                          marginBottom: '1rem',
+                          paddingLeft: '1.5rem',
+                          listStyleType: 'disc',
+                        }}
+                      >
+                        {children}
+                      </ul>
+                    ),
+                    li: ({ children }) => <li style={{ marginBottom: '0.375rem' }}>{children}</li>,
+                    hr: () => (
+                      <hr
+                        style={{
+                          border: 'none',
+                          borderTop: '1px solid rgba(161,161,170,0.2)',
+                          margin: '2rem 0',
+                        }}
+                      />
+                    ),
+                  }}
+                >
                   {preprocessTextContent(lesson.embedUrl.replace(/^text:\s*/, ''))}
                 </ReactMarkdown>
               </div>
@@ -633,6 +680,13 @@ const LessonView: React.FC<LessonViewProps> = ({
               <SopLinksCard sopLinks={lesson.sopLinks} />
             )}
           </div>
+
+          {/* Prev/Next navigation */}
+          <LessonNavigation
+            prevLesson={prevLesson}
+            nextLesson={nextLesson}
+            onSelectLesson={_onSelectLesson}
+          />
         </div>
       )}
     </div>
