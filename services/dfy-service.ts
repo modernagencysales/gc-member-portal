@@ -116,3 +116,23 @@ export async function getActivityLog(engagementId: string): Promise<DfyActivityE
   if (error || !data) return [];
   return data as DfyActivityEntry[];
 }
+
+// ============================================
+// Approve Deliverable
+// ============================================
+
+export async function approveDeliverable(
+  deliverableId: string,
+  portalSlug: string,
+  notes?: string
+): Promise<void> {
+  const res = await fetch(`${GTM_SYSTEM_URL}/api/dfy/deliverables/${deliverableId}/approve`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ portal_slug: portalSlug, notes }),
+  });
+  if (!res.ok) {
+    const error = await res.json().catch(() => ({ error: 'Approval failed' }));
+    throw new Error(error.error || 'Failed to approve deliverable');
+  }
+}

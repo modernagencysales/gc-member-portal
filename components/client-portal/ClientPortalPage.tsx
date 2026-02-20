@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
-import type { DfyEngagement, DfyDeliverable } from '../../services/dfy-service';
-import { getEngagementBySlug, getDeliverables } from '../../services/dfy-service';
+import type { DfyEngagement, DfyDeliverable, DfyActivityEntry } from '../../services/dfy-service';
+import { getEngagementBySlug, getDeliverables, getActivityLog } from '../../services/dfy-service';
 import DeliverableCard from './DeliverableCard';
+import ActivityTimeline from './ActivityTimeline';
 
 // ── Category config ────────────────────────────────────
 const CATEGORIES = ['onboarding', 'content', 'funnel', 'outbound'] as const;
@@ -34,10 +35,20 @@ const ClientPortalPage: React.FC = () => {
 
   const [engagement, setEngagement] = useState<DfyEngagement | null>(null);
   const [deliverables, setDeliverables] = useState<DfyDeliverable[]>([]);
+  const [activity, setActivity] = useState<DfyActivityEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const isWelcome = searchParams.get('welcome') === 'true';
+
+  const loadData = useCallback(async (engagementId: string) => {
+    const [dels, acts] = await Promise.all([
+      getDeliverables(engagementId),
+      getActivityLog(engagementId),
+    ]);
+    setDeliverables(dels);
+    setActivity(acts);
+  }, []);
 
   useEffect(() => {
     if (!slug) return;
@@ -57,9 +68,10 @@ const ClientPortalPage: React.FC = () => {
 
         setEngagement(eng);
 
-        const dels = await getDeliverables(eng.id);
+        const [dels, acts] = await Promise.all([getDeliverables(eng.id), getActivityLog(eng.id)]);
         if (cancelled) return;
         setDeliverables(dels);
+        setActivity(acts);
       } catch (err) {
         if (cancelled) return;
         setError(err instanceof Error ? err.message : 'Something went wrong');
@@ -73,6 +85,13 @@ const ClientPortalPage: React.FC = () => {
       cancelled = true;
     };
   }, [slug]);
+
+  // Reload function for after approvals or other mutations
+  const reload = useCallback(() => {
+    if (engagement) {
+      loadData(engagement.id);
+    }
+  }, [engagement, loadData]);
 
   // ── Loading state ──────────────────────────────────
   if (loading) {
@@ -185,7 +204,12 @@ const ClientPortalPage: React.FC = () => {
                   </h2>
                   <div className="space-y-3">
                     {items.map((d) => (
-                      <DeliverableCard key={d.id} deliverable={d} />
+                      <DeliverableCard
+                        key={d.id}
+                        deliverable={d}
+                        portalSlug={slug}
+                        onApproved={reload}
+                      />
                     ))}
                   </div>
                 </section>
@@ -200,6 +224,14 @@ const ClientPortalPage: React.FC = () => {
             </p>
           </div>
         )}
+
+        {/* ── Recent Activity ───────────────────────── */}
+        <div className="mt-10">
+          <h2 className="text-sm font-semibold text-gray-700 dark:text-zinc-300 mb-4">
+            Recent Activity
+          </h2>
+          <ActivityTimeline entries={activity} />
+        </div>
 
         {/* ── Footer ──────────────────────────────── */}
         <div className="mt-12 pt-6 border-t border-gray-100 dark:border-zinc-800 text-center">
