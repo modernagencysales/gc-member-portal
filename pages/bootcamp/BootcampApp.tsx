@@ -15,10 +15,13 @@ import {
 } from '../../services/bootcamp-supabase';
 import Sidebar from '../../components/bootcamp/Sidebar';
 import LessonView from '../../components/bootcamp/LessonView';
+import Breadcrumbs from '../../components/bootcamp/Breadcrumbs';
+import LessonNavigation from '../../components/bootcamp/LessonNavigation';
 import MyPosts from '../../components/bootcamp/MyPosts';
 import Login from '../../components/bootcamp/Login';
 import Register from '../../components/bootcamp/Register';
 import CourseDashboard from '../../components/bootcamp/CourseDashboard';
+import CommandPalette from '../../components/bootcamp/CommandPalette';
 import CourseOnboarding from '../../components/bootcamp/CourseOnboarding';
 import {
   OnboardingLayout,
@@ -52,6 +55,7 @@ import {
 } from '../../types/bootcamp-types';
 import { queryKeys } from '../../lib/queryClient';
 import { Menu, X, Terminal, Users, AlertCircle } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
 import ErrorBoundary from '../../components/shared/ErrorBoundary';
 
 const TamBuilder = lazy(() => import('../../components/tam/TamBuilder'));
@@ -71,6 +75,7 @@ const IntroOffer = lazy(() => import('../../components/bootcamp/IntroOffer'));
 
 const BootcampApp: React.FC = () => {
   const queryClient = useQueryClient();
+  const { logout } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
 
   // Check for invite code in URL
@@ -120,6 +125,9 @@ const BootcampApp: React.FC = () => {
 
   // Redeem code modal state
   const [showRedeemModal, setShowRedeemModal] = useState(false);
+
+  // Command palette state
+  const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
 
   // Student grants for Lead Magnet users
   const { grantedTools, grantedWeekIds, refetchGrants } = useStudentGrants(
@@ -270,6 +278,18 @@ const BootcampApp: React.FC = () => {
     else document.documentElement.classList.remove('dark');
     localStorage.setItem('gtm_os_theme', isDarkMode ? 'dark' : 'light');
   }, [isDarkMode]);
+
+  // Cmd+K to open command palette
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setCommandPaletteOpen((prev) => !prev);
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, []);
 
   const saveProgress = (
     items: Set<string>,
@@ -605,6 +625,45 @@ const BootcampApp: React.FC = () => {
       w.lessons.some((l) => l.id === currentLesson.id) || currentLesson.id === `${w.id}:checklist`
   );
 
+  // Compute flattened lesson list for prev/next navigation
+  const allLessons = courseData.weeks.flatMap((w) => w.lessons);
+  const currentLessonIdx = allLessons.findIndex((l) => l.id === currentLesson.id);
+  const prevLesson = currentLessonIdx > 0 ? allLessons[currentLessonIdx - 1] : null;
+  const nextLesson =
+    currentLessonIdx >= 0 && currentLessonIdx < allLessons.length - 1
+      ? allLessons[currentLessonIdx + 1]
+      : null;
+
+  // Breadcrumb segments
+  const courseName =
+    activeEnrollment?.cohort?.sidebarLabel || activeEnrollment?.cohort?.name || user.cohort;
+  const isVirtualPage =
+    currentLesson.id.startsWith('virtual:') || currentLesson.id === 'my-blueprint';
+  const breadcrumbSegments = [
+    ...(enrollments.length > 1
+      ? [
+          {
+            label: 'Dashboard',
+            onClick: () => {
+              setShowDashboard(true);
+            },
+          },
+        ]
+      : []),
+    ...(!isVirtualPage && courseName
+      ? [
+          {
+            label: courseName,
+            onClick: () => {
+              handleSelectCourse(activeCourseId || null);
+            },
+          },
+        ]
+      : []),
+    ...(!isVirtualPage && currentWeek ? [{ label: currentWeek.title }] : []),
+    { label: currentLesson.title.replace(/^(TOOL:|TASK:|TABLE:?)\s*/gi, '').trim() },
+  ];
+
   // Main curriculum view
   return (
     <div
@@ -612,7 +671,7 @@ const BootcampApp: React.FC = () => {
         isDarkMode ? 'bg-zinc-950 text-zinc-100' : 'bg-white text-zinc-900'
       }`}
     >
-      <div className="bg-zinc-900 text-zinc-400 text-xs py-1.5 px-4 flex items-center justify-center gap-2 font-medium z-50">
+      <div className="bg-zinc-900 text-zinc-400 text-xs py-1.5 px-4 hidden md:flex items-center justify-center gap-2 font-medium z-50">
         <Users size={12} /> {user.cohort} • {user.email}
       </div>
 
@@ -669,17 +728,19 @@ const BootcampApp: React.FC = () => {
 
         <main className="flex-1 h-full overflow-y-auto pt-14 md:pt-0 bg-white dark:bg-zinc-950 transition-colors duration-300">
           {showDashboard && enrollments.length > 1 ? (
-            <div className="p-6 md:p-10 lg:p-14">
+            <div className="p-6 md:p-10 lg:p-12">
               <CourseDashboard
                 enrollments={enrollments}
                 onSelectCourse={(courseId) => {
                   setShowDashboard(false);
                   setActiveCourseId(courseId);
                 }}
+                userName={bootcampStudent?.name || user?.name}
               />
             </div>
           ) : (
-            <div className="p-6 md:p-10 lg:p-14">
+            <div className="p-6 md:p-10 lg:p-12">
+              <Breadcrumbs segments={breadcrumbSegments} />
               {/* Sprint + AI Tools nudge banners */}
               {funnelAccess.nudgeTier === 'urgent' && (
                 <FunnelNudgeUrgent
@@ -811,6 +872,8 @@ const BootcampApp: React.FC = () => {
                   onSelectLesson={setCurrentLesson}
                   studentId={bootcampStudent?.id}
                   bootcampStudent={bootcampStudent}
+                  prevLesson={prevLesson}
+                  nextLesson={nextLesson}
                 />
               )}
             </div>
@@ -865,6 +928,27 @@ const BootcampApp: React.FC = () => {
           onSuccess={() => refetchGrants()}
         />
       )}
+
+      {/* Command Palette */}
+      <CommandPalette
+        isOpen={commandPaletteOpen}
+        onClose={() => setCommandPaletteOpen(false)}
+        courseData={courseData}
+        aiTools={aiTools || []}
+        onSelectLesson={(lesson) => {
+          setShowDashboard(false);
+          setCurrentLesson(lesson);
+        }}
+        onShowDashboard={() => setShowDashboard(true)}
+        onOpenSettings={bootcampStudent ? () => setShowSettingsModal(true) : undefined}
+        onToggleTheme={() => setIsDarkMode(!isDarkMode)}
+        onLogout={() => {
+          logout();
+          window.location.reload();
+        }}
+        isDarkMode={isDarkMode}
+        hasMultipleCourses={enrollments.length > 1}
+      />
 
       {/* Bug Reporting Widget */}
       <FeedbackWidget
