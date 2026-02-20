@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import ReactMarkdown from 'react-markdown';
+import remarkBreaks from 'remark-breaks';
+import remarkGfm from 'remark-gfm';
 import { useTheme } from '../../../../context/ThemeContext';
 import {
   LmsContentItem,
@@ -96,7 +98,40 @@ const TextContentEditor: React.FC<{
     },
     {
       icon: <Heading2 className="w-3.5 h-3.5" />,
-      action: () => insertMarkdown('\n## ', '\n'),
+      action: () => {
+        const ta = textareaRef.current;
+        if (!ta) return;
+        const start = ta.selectionStart;
+        const end = ta.selectionEnd;
+        const selected = value.substring(start, end);
+        // Find start of current line
+        const lineStart = value.lastIndexOf('\n', start - 1) + 1;
+        const linePrefix = value.substring(lineStart, start);
+        if (selected) {
+          // Wrap selection as heading
+          const prefix = lineStart === start && !linePrefix ? '' : '\n';
+          const newText =
+            value.substring(0, start) + prefix + '## ' + selected + '\n' + value.substring(end);
+          onChange(newText);
+        } else {
+          // Add heading at start of current line (or new line)
+          if (linePrefix.trim() === '') {
+            const newText = value.substring(0, lineStart) + '## ' + value.substring(start);
+            onChange(newText);
+            requestAnimationFrame(() => {
+              ta.focus();
+              ta.setSelectionRange(lineStart + 3, lineStart + 3);
+            });
+          } else {
+            const newText = value.substring(0, start) + '\n## ';
+            onChange(newText + value.substring(start));
+            requestAnimationFrame(() => {
+              ta.focus();
+              ta.setSelectionRange(start + 4, start + 4);
+            });
+          }
+        }
+      },
       title: 'Heading',
     },
     {
@@ -158,7 +193,9 @@ const TextContentEditor: React.FC<{
               : 'bg-white border-slate-300 text-slate-800'
           }`}
         >
-          <ReactMarkdown>{value || '*Nothing to preview*'}</ReactMarkdown>
+          <ReactMarkdown remarkPlugins={[remarkBreaks, remarkGfm]}>
+            {value || '*Nothing to preview*'}
+          </ReactMarkdown>
         </div>
       ) : (
         <>
