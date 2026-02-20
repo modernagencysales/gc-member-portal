@@ -135,33 +135,40 @@ const LessonView: React.FC<LessonViewProps> = ({
   // Google "Publish to Web" URLs are embeddable (end with /pub or /pubhtml)
   const isGooglePublished = /\/(pub|pubhtml)(\?|$)/.test(lesson.embedUrl);
 
-  // Detect external links that can't be embedded in iframes
-  const NON_EMBEDDABLE_DOMAINS = [
-    'drive.google.com',
-    'docs.google.com',
-    'sheets.google.com',
-    'slides.google.com',
-    'dropbox.com',
-    'notion.so',
-    'notion.site',
-    'figma.com',
-    'canva.com',
-    'github.com',
-    'linkedin.com',
-    'twitter.com',
-    'x.com',
+  // Domains known to be safely embeddable in iframes
+  const EMBEDDABLE_DOMAINS = [
+    'youtube.com',
+    'youtu.be',
+    'loom.com',
+    'vimeo.com',
+    'grain.com',
+    'grain.co',
+    'gamma.app',
+    'guidde.com',
+    'clay.com',
+    'airtable.com',
+    'figma.com/embed',
+    'miro.com',
+    'canva.com/design',
   ];
-  const isExternalLink =
-    !isTextContent &&
-    !isAistudio &&
-    !isGooglePublished &&
-    !lesson.embedUrl.startsWith('text:') &&
-    !lesson.embedUrl.startsWith('ai-tool:') &&
-    !lesson.embedUrl.startsWith('credentials:') &&
-    !lesson.embedUrl.startsWith('custom-embed:') &&
-    !lesson.embedUrl.startsWith('pickaxe:') &&
-    !lesson.embedUrl.startsWith('virtual:') &&
-    NON_EMBEDDABLE_DOMAINS.some((domain) => lesson.embedUrl.includes(domain));
+  // Detect external links that can't be embedded in iframes
+  // Allowlist approach: if the URL isn't a known embeddable domain/special type, treat as external link
+  const isExternalLink = (() => {
+    if (isTextContent || isAistudio || isGooglePublished) return false;
+    if (
+      lesson.embedUrl.startsWith('text:') ||
+      lesson.embedUrl.startsWith('ai-tool:') ||
+      lesson.embedUrl.startsWith('credentials:') ||
+      lesson.embedUrl.startsWith('custom-embed:') ||
+      lesson.embedUrl.startsWith('pickaxe:') ||
+      lesson.embedUrl.startsWith('virtual:')
+    )
+      return false;
+    // If it's not a URL (no protocol), not external
+    if (!lesson.embedUrl.startsWith('http')) return false;
+    // Check if URL is from a known embeddable domain
+    return !EMBEDDABLE_DOMAINS.some((domain) => lesson.embedUrl.includes(domain));
+  })();
 
   // Detect credentials content
   const isCredentials = lesson.embedUrl.startsWith('credentials:');
@@ -556,25 +563,40 @@ const LessonView: React.FC<LessonViewProps> = ({
                 </a>
               </div>
             ) : isExternalLink ? (
-              <div className="bg-white dark:bg-zinc-900 p-12 rounded-lg border border-zinc-200 dark:border-zinc-800 flex flex-col items-center justify-center text-center gap-6">
-                <ExternalLink size={32} className="text-violet-400" />
-                <div>
-                  <h3 className="text-zinc-900 dark:text-white font-semibold text-lg mb-2">
-                    {lesson.title}
-                  </h3>
-                  <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                    This resource opens in a new tab
-                  </p>
+              <a
+                href={lesson.embedUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200 dark:border-zinc-800 hover:border-violet-400 dark:hover:border-violet-500 hover:shadow-lg transition-all group cursor-pointer overflow-hidden"
+              >
+                {/* Preview banner area */}
+                <div className="bg-gradient-to-br from-violet-50 to-indigo-50 dark:from-violet-950/30 dark:to-indigo-950/30 px-8 py-10 flex items-center justify-center border-b border-zinc-200 dark:border-zinc-800">
+                  <div className="w-16 h-16 rounded-2xl bg-white dark:bg-zinc-800 shadow-sm flex items-center justify-center group-hover:scale-105 transition-transform">
+                    <ExternalLink size={28} className="text-violet-500" />
+                  </div>
                 </div>
-                <a
-                  href={lesson.embedUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-violet-500 hover:bg-violet-600 text-white px-6 py-3 rounded-lg font-medium flex items-center gap-2 transition-colors"
-                >
-                  Open Resource <ExternalLink size={16} />
-                </a>
-              </div>
+                {/* Link info */}
+                <div className="px-6 py-5 flex items-center gap-4">
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-zinc-900 dark:text-white font-semibold text-base mb-1 truncate">
+                      {lesson.title}
+                    </h3>
+                    <p className="text-sm text-zinc-500 dark:text-zinc-400 truncate">
+                      {(() => {
+                        try {
+                          const url = new URL(lesson.embedUrl);
+                          return url.hostname.replace('www.', '');
+                        } catch {
+                          return lesson.embedUrl;
+                        }
+                      })()}
+                    </p>
+                  </div>
+                  <div className="shrink-0 w-8 h-8 rounded-full bg-violet-100 dark:bg-violet-900/40 flex items-center justify-center group-hover:bg-violet-200 dark:group-hover:bg-violet-800/40 transition-colors">
+                    <ExternalLink size={14} className="text-violet-600 dark:text-violet-400" />
+                  </div>
+                </div>
+              </a>
             ) : (
               <div className="rounded-lg overflow-hidden border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 aspect-video">
                 <iframe src={lesson.embedUrl} className="w-full h-full border-0" allowFullScreen />
