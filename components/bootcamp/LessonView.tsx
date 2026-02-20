@@ -132,6 +132,33 @@ const LessonView: React.FC<LessonViewProps> = ({
   const isAistudio = lesson.embedUrl.includes('aistudio.google.com');
   const isTextContent = lesson.embedUrl.startsWith('text:');
 
+  // Detect external links that can't be embedded in iframes
+  const NON_EMBEDDABLE_DOMAINS = [
+    'drive.google.com',
+    'docs.google.com',
+    'sheets.google.com',
+    'slides.google.com',
+    'dropbox.com',
+    'notion.so',
+    'notion.site',
+    'figma.com',
+    'canva.com',
+    'github.com',
+    'linkedin.com',
+    'twitter.com',
+    'x.com',
+  ];
+  const isExternalLink =
+    !isTextContent &&
+    !isAistudio &&
+    !lesson.embedUrl.startsWith('text:') &&
+    !lesson.embedUrl.startsWith('ai-tool:') &&
+    !lesson.embedUrl.startsWith('credentials:') &&
+    !lesson.embedUrl.startsWith('custom-embed:') &&
+    !lesson.embedUrl.startsWith('pickaxe:') &&
+    !lesson.embedUrl.startsWith('virtual:') &&
+    NON_EMBEDDABLE_DOMAINS.some((domain) => lesson.embedUrl.includes(domain));
+
   // Detect credentials content
   const isCredentials = lesson.embedUrl.startsWith('credentials:');
   const credentialsData = isCredentials
@@ -522,6 +549,26 @@ const LessonView: React.FC<LessonViewProps> = ({
                   className="bg-violet-500 hover:bg-violet-600 text-white px-6 py-3 rounded-lg font-medium flex items-center gap-2 transition-colors"
                 >
                   Open AI Studio <ExternalLink size={16} />
+                </a>
+              </div>
+            ) : isExternalLink ? (
+              <div className="bg-white dark:bg-zinc-900 p-12 rounded-lg border border-zinc-200 dark:border-zinc-800 flex flex-col items-center justify-center text-center gap-6">
+                <ExternalLink size={32} className="text-violet-400" />
+                <div>
+                  <h3 className="text-zinc-900 dark:text-white font-semibold text-lg mb-2">
+                    {lesson.title}
+                  </h3>
+                  <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                    This resource opens in a new tab
+                  </p>
+                </div>
+                <a
+                  href={lesson.embedUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-violet-500 hover:bg-violet-600 text-white px-6 py-3 rounded-lg font-medium flex items-center gap-2 transition-colors"
+                >
+                  Open Resource <ExternalLink size={16} />
                 </a>
               </div>
             ) : (
