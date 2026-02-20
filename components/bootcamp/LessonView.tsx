@@ -26,7 +26,15 @@ import { BootcampStudent } from '../../types/bootcamp-types';
 
 // Preprocess text content to normalize non-standard formatting into proper markdown
 const preprocessTextContent = (content: string): string => {
-  const lines = content.split('\n');
+  // Pre-pass: fix bold markers split across lines
+  // e.g. "**Think: peer-to-peer\n**" → "**Think: peer-to-peer**\n"
+  let normalized = content.replace(/\*\*([^*\n]+)\n\s*\*\*/g, '**$1**\n');
+  // Also fix: lone "**" on its own line (orphaned closing marker) — remove it
+  normalized = normalized.replace(/\n\s*\*\*\s*$/gm, '');
+  // Fix opening ** at end of previous line with text on next line: "**\nSome text" → "**Some text"
+  normalized = normalized.replace(/\*\*\n([^*\n]+)\*\*/g, '**$1**');
+
+  const lines = normalized.split('\n');
   const result: string[] = [];
 
   const addHeading = (text: string) => {
