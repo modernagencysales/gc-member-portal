@@ -58,44 +58,45 @@ const preprocessTextContent = (content: string): string => {
       continue;
     }
 
+    // Unwrap **...** for pattern detection (content may be fully bold-wrapped)
+    const unwrapped = trimmed.replace(/^\*\*(.+)\*\*$/, '$1').trim();
+
     // Convert lines starting with bullet-like characters to markdown list items
-    if (/^[●•▪▸‣⁃◆◇○]\s/.test(trimmed)) {
-      result.push(`- ${trimmed.replace(/^[●•▪▸‣⁃◆◇○]\s*/, '')}`);
+    if (/^[●•▪▸‣⁃◆◇○][\s\t]/.test(unwrapped)) {
+      result.push(`- ${unwrapped.replace(/^[●•▪▸‣⁃◆◇○][\s\t]*/, '')}`);
       continue;
     }
 
     // Fix bold markers with trailing spaces: **text ** → **text**
     let fixed = trimmed.replace(/\*\*(.+?)\s+\*\*/g, '**$1**');
 
-    // Detect heading lines: emoji + uppercase text, or ALL-CAPS short lines
-    // Simple check: first character is non-ASCII (code point > 127 = emoji/symbol)
-    const firstCodePoint = trimmed.codePointAt(0) || 0;
+    // Detect heading lines using unwrapped text for pattern matching
+    // Emoji + uppercase text (code point > 127 = emoji/symbol)
+    const firstCodePoint = unwrapped.codePointAt(0) || 0;
     const isNonAsciiStart = firstCodePoint > 127;
 
-    if (isNonAsciiStart && trimmed.length < 120) {
-      // Strip non-ASCII leading chars + optional variation selectors + space
-      const textPart = trimmed.replace(/^[^\x20-\x7E]+\s*/, '');
+    if (isNonAsciiStart && unwrapped.length < 120) {
+      const textPart = unwrapped.replace(/^[^\x20-\x7E]+\s*/, '');
       if (textPart.length > 0 && /^[A-Z]/.test(textPart)) {
-        addHeading(trimmed);
+        addHeading(unwrapped);
         continue;
       }
     }
 
-    // Also detect ALL-CAPS short lines as headings (e.g. "EXAMPLE 2")
-    if (/^[A-Z][A-Z\s\d]+$/.test(trimmed) && trimmed.length < 60 && trimmed.length > 3) {
-      addHeading(trimmed);
+    // ALL-CAPS short lines as headings (e.g. "EXAMPLE 2")
+    if (/^[A-Z][A-Z\s\d]+$/.test(unwrapped) && unwrapped.length < 60 && unwrapped.length > 3) {
+      addHeading(unwrapped);
       continue;
     }
 
-    // Detect "STEP N:" or "EXAMPLE N" patterns without emoji as headings
-    if (/^(STEP|EXAMPLE)\s+\d/i.test(trimmed) && trimmed.length < 80) {
-      addHeading(trimmed);
+    // "STEP N:" or "EXAMPLE N" patterns as headings
+    if (/^(STEP|EXAMPLE)\s+\d/i.test(unwrapped) && unwrapped.length < 80) {
+      addHeading(unwrapped);
       continue;
     }
 
-    // Detect "Label:" patterns at start of line and bold them
-    // e.g. "Golden Rule:" → "**Golden Rule:**"
-    if (/^[A-Z][A-Za-z\s]+:/.test(fixed) && fixed.length < 100) {
+    // "Label:" patterns at start of line → bold them (skip if already bold-wrapped)
+    if (trimmed === unwrapped && /^[A-Z][A-Za-z\s]+:/.test(fixed) && fixed.length < 100) {
       fixed = fixed.replace(/^([A-Z][A-Za-z\s]+:)/, '**$1**');
     }
 
