@@ -159,6 +159,24 @@ const LessonView: React.FC<LessonViewProps> = ({
   const isAistudio = lesson.embedUrl.includes('aistudio.google.com');
   const isTextContent = lesson.embedUrl.startsWith('text:');
 
+  // Detect HTML content (from DOCX import) vs plain markdown
+  const textRawContent = isTextContent ? lesson.embedUrl.replace(/^text:\s*/, '') : '';
+  const isHtmlContent =
+    textRawContent.startsWith('<!--docx-->') ||
+    textRawContent.trimStart().startsWith('<p>') ||
+    textRawContent.trimStart().startsWith('<h1');
+  const htmlContent = isHtmlContent ? textRawContent.replace('<!--docx-->', '') : '';
+
+  if (isTextContent) {
+    console.log('[LessonView] Text content debug:', {
+      embedUrlStart: lesson.embedUrl.substring(0, 80),
+      rawContentStart: textRawContent.substring(0, 80),
+      isHtmlContent,
+      startsWithDocx: textRawContent.startsWith('<!--docx-->'),
+      startsWithP: textRawContent.trimStart().startsWith('<p>'),
+    });
+  }
+
   // Domains known to be safely embeddable in iframes
   const EMBEDDABLE_DOMAINS = [
     'youtube.com',
@@ -440,77 +458,61 @@ const LessonView: React.FC<LessonViewProps> = ({
       ) : (
         <div className="animate-slide-in">
           <div className="mb-8">
-            {isTextContent ? (
-              (() => {
-                const rawContent = lesson.embedUrl.replace(/^text:\s*/, '');
-                const isHtmlContent = rawContent.startsWith('<!--docx-->');
-
-                if (isHtmlContent) {
-                  // DOCX-imported HTML: render directly with full formatting
-                  const htmlContent = rawContent.replace('<!--docx-->', '');
-                  return (
-                    <div
-                      className="bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200 dark:border-zinc-800 p-8 md:p-12 text-zinc-700 dark:text-zinc-300 document-content"
-                      dangerouslySetInnerHTML={{ __html: htmlContent }}
-                    />
-                  );
-                }
-
-                // Markdown content: preprocess and render via ReactMarkdown
-                return (
-                  <div className="bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200 dark:border-zinc-800 p-8 md:p-12 text-zinc-700 dark:text-zinc-300 document-content">
-                    <ReactMarkdown
-                      remarkPlugins={[remarkBreaks, remarkGfm]}
-                      components={{
-                        p: ({ children }) => <p style={{ marginBottom: '1rem' }}>{children}</p>,
-                        strong: ({ children }) => (
-                          <strong style={{ fontWeight: 700 }}>{children}</strong>
-                        ),
-                        em: ({ children }) => <em style={{ fontStyle: 'italic' }}>{children}</em>,
-                        h2: ({ children }) => (
-                          <h2
-                            style={{
-                              fontSize: '1.35rem',
-                              fontWeight: 600,
-                              marginTop: '2.5rem',
-                              marginBottom: '0.75rem',
-                              paddingTop: '1.5rem',
-                              borderTop: '1px solid rgba(161,161,170,0.2)',
-                            }}
-                          >
-                            {children}
-                          </h2>
-                        ),
-                        ul: ({ children }) => (
-                          <ul
-                            style={{
-                              marginBottom: '1rem',
-                              paddingLeft: '1.5rem',
-                              listStyleType: 'disc',
-                            }}
-                          >
-                            {children}
-                          </ul>
-                        ),
-                        li: ({ children }) => (
-                          <li style={{ marginBottom: '0.375rem' }}>{children}</li>
-                        ),
-                        hr: () => (
-                          <hr
-                            style={{
-                              border: 'none',
-                              borderTop: '1px solid rgba(161,161,170,0.2)',
-                              margin: '2rem 0',
-                            }}
-                          />
-                        ),
-                      }}
-                    >
-                      {preprocessTextContent(rawContent)}
-                    </ReactMarkdown>
-                  </div>
-                );
-              })()
+            {isTextContent && isHtmlContent ? (
+              <div
+                className="bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200 dark:border-zinc-800 p-8 md:p-12 text-zinc-700 dark:text-zinc-300 document-content"
+                dangerouslySetInnerHTML={{ __html: htmlContent }}
+              />
+            ) : isTextContent ? (
+              <div className="bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200 dark:border-zinc-800 p-8 md:p-12 text-zinc-700 dark:text-zinc-300 document-content">
+                <ReactMarkdown
+                  remarkPlugins={[remarkBreaks, remarkGfm]}
+                  components={{
+                    p: ({ children }) => <p style={{ marginBottom: '1rem' }}>{children}</p>,
+                    strong: ({ children }) => (
+                      <strong style={{ fontWeight: 700 }}>{children}</strong>
+                    ),
+                    em: ({ children }) => <em style={{ fontStyle: 'italic' }}>{children}</em>,
+                    h2: ({ children }) => (
+                      <h2
+                        style={{
+                          fontSize: '1.35rem',
+                          fontWeight: 600,
+                          marginTop: '2.5rem',
+                          marginBottom: '0.75rem',
+                          paddingTop: '1.5rem',
+                          borderTop: '1px solid rgba(161,161,170,0.2)',
+                        }}
+                      >
+                        {children}
+                      </h2>
+                    ),
+                    ul: ({ children }) => (
+                      <ul
+                        style={{
+                          marginBottom: '1rem',
+                          paddingLeft: '1.5rem',
+                          listStyleType: 'disc',
+                        }}
+                      >
+                        {children}
+                      </ul>
+                    ),
+                    li: ({ children }) => <li style={{ marginBottom: '0.375rem' }}>{children}</li>,
+                    hr: () => (
+                      <hr
+                        style={{
+                          border: 'none',
+                          borderTop: '1px solid rgba(161,161,170,0.2)',
+                          margin: '2rem 0',
+                        }}
+                      />
+                    ),
+                  }}
+                >
+                  {preprocessTextContent(textRawContent)}
+                </ReactMarkdown>
+              </div>
             ) : isCredentials && credentialsData ? (
               <div className="bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200 dark:border-zinc-800 p-8 md:p-12">
                 <div className="flex items-center gap-3 mb-6">
