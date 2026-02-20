@@ -1,4 +1,6 @@
 import React from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { Lightbulb, ListChecks, FileText, HelpCircle } from 'lucide-react';
 
 interface LessonDescriptionProps {
@@ -105,8 +107,8 @@ const LessonDescription: React.FC<LessonDescriptionProps> = ({ description }) =>
   // If there's only a plain intro section with no structured headers, render simple
   if (sections.length === 1 && sections[0].type === 'intro') {
     return (
-      <div className="mt-4 bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200 dark:border-zinc-800 p-6 md:p-8 text-sm leading-relaxed text-zinc-700 dark:text-zinc-300 whitespace-pre-wrap">
-        {sections[0].content}
+      <div className="mt-4 bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200 dark:border-zinc-800 p-6 md:p-8 text-sm leading-relaxed text-zinc-700 dark:text-zinc-300 prose-description">
+        <ReactMarkdown remarkPlugins={[remarkGfm]}>{sections[0].content}</ReactMarkdown>
       </div>
     );
   }
@@ -121,9 +123,9 @@ const LessonDescription: React.FC<LessonDescriptionProps> = ({ description }) =>
           return (
             <div
               key={idx}
-              className={`rounded-lg border ${config.border} ${config.bg} p-5 text-sm leading-relaxed text-zinc-700 dark:text-zinc-300 whitespace-pre-wrap`}
+              className={`rounded-lg border ${config.border} ${config.bg} p-5 text-sm leading-relaxed text-zinc-700 dark:text-zinc-300 prose-description`}
             >
-              {section.content}
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{section.content}</ReactMarkdown>
             </div>
           );
         }
@@ -137,8 +139,8 @@ const LessonDescription: React.FC<LessonDescriptionProps> = ({ description }) =>
               <Icon size={16} className={config.iconColor} />
               <h3 className={`text-sm font-semibold ${config.headerColor}`}>{config.label}</h3>
             </div>
-            <div className="px-5 pb-4 text-sm leading-relaxed text-zinc-700 dark:text-zinc-300 whitespace-pre-wrap">
-              {section.content}
+            <div className="px-5 pb-4 text-sm leading-relaxed text-zinc-700 dark:text-zinc-300 prose-description">
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{section.content}</ReactMarkdown>
             </div>
           </div>
         );
