@@ -19,6 +19,7 @@ const ProposalPage = lazy(() => import('./components/proposal/ProposalPage'));
 // Lazy-loaded: Legal pages
 const PrivacyPolicy = lazy(() => import('./components/legal/PrivacyPolicy'));
 const TermsOfService = lazy(() => import('./components/legal/TermsOfService'));
+const MSAPage = lazy(() => import('./components/legal/MSAPage'));
 
 // Lazy-loaded: GC Portal
 const GCLogin = lazy(() => import('./components/gc/GCLogin'));
@@ -77,6 +78,9 @@ const AdminIntroOfferDetail = lazy(() => import('./components/admin/intro-offer/
 const OfferProgressTracker = lazy(
   () => import('./components/portal/intro-offer/OfferProgressTracker')
 );
+
+// Lazy-loaded: Client Portal (DFY)
+const ClientPortalPage = lazy(() => import('./components/client-portal/ClientPortalPage'));
 
 // Lazy-loaded: Bootcamp
 const BootcampApp = lazy(() => import('./pages/bootcamp/BootcampApp'));
@@ -267,9 +271,13 @@ const App: React.FC = () => {
         {/* Proposals */}
         <Route path="/proposal/:slug" element={<ProposalPage />} />
 
+        {/* DFY Client Portal (public, slug-based access) */}
+        <Route path="/client/:slug" element={<ClientPortalPage />} />
+
         {/* Legal Pages */}
         <Route path="/privacy" element={<PrivacyPolicy />} />
         <Route path="/terms" element={<TermsOfService />} />
+        <Route path="/terms/msa" element={<MSAPage />} />
 
         {/* Catch-all redirect to home */}
         <Route path="*" element={<Navigate to="/" replace />} />

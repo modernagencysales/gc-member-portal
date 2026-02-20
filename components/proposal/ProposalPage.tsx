@@ -12,6 +12,7 @@ import {
   Download,
 } from 'lucide-react';
 import ThemeToggle from '../blueprint/ThemeToggle';
+import SigningBlock from './SigningBlock';
 import { SenjaEmbed } from '../blueprint/offer-components';
 import { getProposalBySlug } from '../../services/proposal-supabase';
 import type { Proposal, ProposalGoal, ProposalService } from '../../types/proposal-types';
@@ -323,7 +324,7 @@ const ProposalPage: React.FC = () => {
 
           {/* Goals heading */}
           <h3 className="text-2xl sm:text-3xl font-bold tracking-tight mb-8 mt-16 text-center">
-            Where We&apos;re Taking You
+            Your Goals
           </h3>
 
           {/* Goal Cards */}
@@ -511,43 +512,17 @@ const ProposalPage: React.FC = () => {
         </div>
       </section>
 
-      {/* ------------------------------------------------------------------ */}
-      {/* 10. Personal Sign-off from Tim                                     */}
-      {/* ------------------------------------------------------------------ */}
-      <section className="py-20 sm:py-24 px-6 bg-gradient-to-b from-zinc-50 to-white dark:from-zinc-900/50 dark:to-zinc-950">
-        <div className="max-w-3xl mx-auto">
-          {proposal.aboutUs.signOff && (
-            <div className="max-w-2xl mx-auto mb-12">
-              <TextBlock
-                text={proposal.aboutUs.signOff}
-                className="text-base text-zinc-600 dark:text-zinc-300 leading-relaxed mb-4"
-              />
-              <p className="text-lg font-bold">— Tim McCormick</p>
-              <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                Founder, Modern Agency Sales
-              </p>
-            </div>
-          )}
-
-          {/* Booking CTA */}
-          <div className="text-center print:hidden">
-            <a
-              href={bookingUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-3 px-10 py-4 rounded-2xl font-bold text-lg text-white shadow-lg hover:shadow-xl transition-all hover:-translate-y-0.5"
-              style={{ backgroundColor: clientAccent }}
-            >
-              <Calendar className="w-5 h-5" />
-              Let&apos;s Talk
-              <ArrowRight className="w-5 h-5" />
-            </a>
-            <p className="mt-4 text-sm text-zinc-400 dark:text-zinc-500">
-              Or just reply to the email I sent this with.
-            </p>
-          </div>
-        </div>
-      </section>
+      {/* Section 10: Signing Block */}
+      {proposal.status === 'published' && (
+        <SigningBlock
+          proposalId={proposal.id}
+          services={proposal.services || []}
+          pricing={proposal.pricing || { total: '', frequency: '' }}
+          roadmap={proposal.roadmap}
+          clientAccent={clientAccent}
+          clientName={proposal.clientName || ''}
+        />
+      )}
 
       {/* ------------------------------------------------------------------ */}
       {/* 11. Senja Testimonials                                             */}
