@@ -24,19 +24,19 @@ import LessonDescription from './LessonDescription';
 import SopLinksCard from './SopLinksCard';
 import { BootcampStudent } from '../../types/bootcamp-types';
 
-// Check if a string starts with an emoji character
-const startsWithEmoji = (str: string): boolean => {
-  // Match common emoji: pictographic symbols, dingbats, symbols, variation selectors
-  // eslint-disable-next-line no-misleading-character-class
-  return /^[\u{1F300}-\u{1FAD6}\u{2600}-\u{27BF}\u{2300}-\u{23FF}\u{2B50}\u{2702}-\u{27B0}\u{FE00}-\u{FE0F}\u{200D}\u{20E3}\u{E0020}-\u{E007F}\u{2705}\u{2714}\u{2716}\u{274C}\u{274E}\u{2795}-\u{2797}\u{26A0}\u{26A1}\u{2B06}\u{2B07}\u{2B05}\u{25AA}\u{25AB}\u{25FB}-\u{25FE}\u{2934}\u{2935}\u{2139}\u{2122}\u{2611}\u{2660}-\u{2668}\u{23CF}\u{23E9}-\u{23F3}\u{23F8}-\u{23FA}\u{25B6}\u{23EA}\u{2602}\u{2603}\u{2614}\u{2615}\u{2648}-\u{2653}\u{267F}\u{2693}\u{26AA}\u{26AB}\u{26BD}\u{26BE}\u{26C4}\u{26C5}\u{26CE}\u{26D4}\u{26EA}\u{26F2}\u{26F3}\u{26F5}\u{26FA}\u{26FD}\u{2702}\u{2708}\u{2709}\u{270A}-\u{270D}\u{270F}\u{2712}\u{2728}\u{2733}\u{2734}\u{2744}\u{2747}\u{2753}-\u{2755}\u{2757}\u{2763}\u{2764}\u{2B1B}\u{2B1C}\u{2B55}\u{3030}\u{303D}\u{3297}\u{3299}\u{2049}\u{203C}\u{00A9}\u{00AE}\u{2666}\u{2665}\u{2660}\u{2663}]/u.test(
-    str
-  );
-};
-
 // Preprocess text content to normalize non-standard formatting into proper markdown
 const preprocessTextContent = (content: string): string => {
   const lines = content.split('\n');
   const result: string[] = [];
+
+  const addHeading = (text: string) => {
+    // Add blank line before heading for proper markdown parsing
+    if (result.length > 0 && result[result.length - 1] !== '') {
+      result.push('');
+    }
+    result.push(`## ${text}`);
+    result.push(''); // blank line after heading
+  };
 
   for (let i = 0; i < lines.length; i++) {
     const trimmed = lines[i].trim();
@@ -56,20 +56,30 @@ const preprocessTextContent = (content: string): string => {
     // Fix bold markers with trailing spaces: **text ** → **text**
     let fixed = trimmed.replace(/\*\*(.+?)\s+\*\*/g, '**$1**');
 
-    // Convert emoji-prefixed lines with uppercase text to markdown headings
-    // e.g. "⚡ ENERGY & TONE:" or "💡 STEP 1: START THE CONVO (The Icebreaker)"
-    if (startsWithEmoji(trimmed) && trimmed.length < 120) {
-      // Check that text after emoji + space starts with uppercase
-      const afterEmoji = trimmed.replace(/^[^\w\s]+\s*/, '');
-      if (afterEmoji.length > 0 && /^[A-Z]/.test(afterEmoji)) {
-        // Add blank line before heading for proper markdown parsing
-        if (result.length > 0 && result[result.length - 1] !== '') {
-          result.push('');
-        }
-        result.push(`## ${trimmed}`);
-        result.push(''); // blank line after heading
+    // Detect heading lines: emoji + uppercase text, or ALL-CAPS short lines
+    // Simple check: first character is non-ASCII (code point > 127 = emoji/symbol)
+    const firstCodePoint = trimmed.codePointAt(0) || 0;
+    const isNonAsciiStart = firstCodePoint > 127;
+
+    if (isNonAsciiStart && trimmed.length < 120) {
+      // Strip non-ASCII leading chars + optional variation selectors + space
+      const textPart = trimmed.replace(/^[^\x20-\x7E]+\s*/, '');
+      if (textPart.length > 0 && /^[A-Z]/.test(textPart)) {
+        addHeading(trimmed);
         continue;
       }
+    }
+
+    // Also detect ALL-CAPS short lines as headings (e.g. "EXAMPLE 2")
+    if (/^[A-Z][A-Z\s\d]+$/.test(trimmed) && trimmed.length < 60 && trimmed.length > 3) {
+      addHeading(trimmed);
+      continue;
+    }
+
+    // Detect "STEP N:" or "EXAMPLE N" patterns without emoji as headings
+    if (/^(STEP|EXAMPLE)\s+\d/i.test(trimmed) && trimmed.length < 80) {
+      addHeading(trimmed);
+      continue;
     }
 
     // Detect "Label:" patterns at start of line and bold them
