@@ -146,4 +146,13 @@ export const queryKeys = {
   proposalById: (id: string) => ['proposal', 'detail', id] as const,
   proposalsList: () => ['proposals', 'list'] as const,
   proposalPackages: () => ['proposals', 'packages'] as const,
+
+  // DFY Admin
+  dfyEngagements: () => ['dfy', 'engagements'] as const,
+  dfyEngagement: (id: string) => ['dfy', 'engagement', id] as const,
+  dfyDeliverables: (engagementId: string) => ['dfy', 'deliverables', engagementId] as const,
+  dfyActivity: (engagementId: string) => ['dfy', 'activity', engagementId] as const,
+  dfyTemplate: () => ['dfy', 'template'] as const,
+  dfyAllDeliverables: () => ['dfy', 'allDeliverables'] as const,
+  dfyAutomationRuns: (engagementId: string) => ['dfy', 'automation-runs', engagementId] as const,
 };
