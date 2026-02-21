@@ -16,6 +16,11 @@ import {
 } from '../types/blueprint-types';
 
 // Explicit column lists (select('*') fails silently on Vercel)
+// Lightweight list for admin table — only columns needed for display + filtering
+const PROSPECT_LIST_COLUMNS =
+  'id, full_name, first_name, last_name, email, company, authority_score, status, processing_step, slug, offer_unlocked, recommended_offer, created_at, updated_at';
+
+// Full columns for single-prospect detail views
 const PROSPECT_COLUMNS =
   'id, full_name, first_name, last_name, email, phone, company, location, linkedin_url, normalized_linkedin_url, profile_photo, banner_image, company_logo, current_headline, current_bio, job_title, connections, business_type, linkedin_challenge, linkedin_help_area, posting_frequency, has_funnel, learning_investment, monthly_income, interested_in_mas, timezone, source_url, lead_magnet_source, submission_date, posts_clean_text, their_existing_posts, raw_profile_json, raw_company_research, knowledge_base, authority_score, score_profile_optimization, score_content_presence, score_outbound_systems, score_inbound_infrastructure, score_social_proof, score_summary, whats_working_1, whats_working_2, whats_working_3, revenue_leaks_1, revenue_leaks_2, revenue_leaks_3, bottom_line, buyer_persona, strategic_gap, strategic_opportunity, fit_score, fit_assessment, how_to_take_further, recommended_headline, headline_outcome_based, headline_authority_based, headline_hybrid, headline_recommendation, headline_recommendation_reason, recommended_bio, profile_analysis, profile_rewrite, voice_style_guide, improvement_suggestions, lm_card_1, lm_card_2, lm_card_3, lm_1_content_type, lm_1_headline, lm_1_subheadline, lm_1_match, lm_1_est_hours, lm_2_content_type, lm_2_headline, lm_2_subheadline, lm_2_match, lm_2_est_hours, lm_3_content_type, lm_3_headline, lm_3_subheadline, lm_3_match, lm_3_est_hours, lead_mag_1, lead_mag_2, lead_mag_3, lm_post_1, lm_post_2, lm_post_3, featured_slot_1, featured_slot_2, featured_slot_3, next_steps_30_day, next_steps_90_day, formatted_report, status, processing_step, analysis_status, analysis_date, error_log, email_sent_at, send_email, slug, offer_unlocked, recommended_offer, offer_note, created_at, updated_at';
 
@@ -361,7 +366,7 @@ export async function listProspects(filters?: ProspectFilters): Promise<Prospect
   try {
     let query = supabase
       .from('prospects')
-      .select(PROSPECT_COLUMNS)
+      .select(PROSPECT_LIST_COLUMNS)
       .order('created_at', { ascending: false });
 
     // Apply filters
