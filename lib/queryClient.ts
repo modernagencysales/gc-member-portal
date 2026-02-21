@@ -153,6 +153,7 @@ export const queryKeys = {
   dfyDeliverables: (engagementId: string) => ['dfy', 'deliverables', engagementId] as const,
   dfyActivity: (engagementId: string) => ['dfy', 'activity', engagementId] as const,
   dfyTemplate: () => ['dfy', 'template'] as const,
+  dfyTemplateBySlug: (slug: string) => ['dfy', 'template', slug] as const,
   dfyAllDeliverables: () => ['dfy', 'allDeliverables'] as const,
   dfyAutomationRuns: (engagementId: string) => ['dfy', 'automation-runs', engagementId] as const,
 };

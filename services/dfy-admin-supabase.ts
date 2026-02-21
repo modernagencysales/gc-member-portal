@@ -99,6 +99,25 @@ export async function fetchDfyOnboardingTemplate(): Promise<unknown> {
   return typeof data.value === 'string' ? JSON.parse(data.value) : data.value;
 }
 
+export async function fetchDfyTemplateBySlug(slug: string): Promise<unknown> {
+  const key = `dfy_template_${slug}`;
+  const { data, error } = await supabase
+    .from('bootcamp_settings')
+    .select('value')
+    .eq('key', key)
+    .single();
+
+  if (error || !data) return null;
+  return typeof data.value === 'string' ? JSON.parse(data.value) : data.value;
+}
+
+export async function saveDfyTemplateBySlug(slug: string, template: unknown) {
+  return gtmAdminFetch('/api/dfy/admin/template', {
+    method: 'PUT',
+    body: JSON.stringify({ key: `dfy_template_${slug}`, template }),
+  });
+}
+
 export async function fetchAutomationRuns(engagementId: string): Promise<DfyAutomationRun[]> {
   const { data, error } = await supabase
     .from('dfy_automation_runs')

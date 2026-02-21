@@ -94,6 +94,72 @@ export interface DfyDeliverableTemplate {
 }
 
 // ============================================
+// Milestone-based template types (new format)
+// ============================================
+
+export type DfyAutomationType =
+  | 'profile_rewrite'
+  | 'lead_magnet_create'
+  | 'content_calendar'
+  | 'heyreach_campaign'
+  | 'infra_provision';
+
+export type DfyAutomationTrigger = 'on_create' | 'on_prerequisite_complete' | 'manual';
+
+export interface DfyMilestoneTemplate {
+  name: string;
+  description: string;
+  sort_order: number;
+  target_day_offset: number;
+}
+
+export interface DfyDeliverableTemplateV2 {
+  name: string;
+  description: string;
+  category: DfyCategory;
+  assignee: string;
+  relative_due_days: number;
+  milestone: string;
+  priority: 0 | 1 | 2 | 3 | 4;
+  depends_on?: string[];
+  automation_config: {
+    automatable: boolean;
+    automation_type?: DfyAutomationType;
+    trigger: DfyAutomationTrigger;
+    params?: Record<string, unknown>;
+  };
+  playbook_url?: string;
+}
+
+export interface DfyEngagementTemplate {
+  name: string;
+  milestones: DfyMilestoneTemplate[];
+  deliverables: DfyDeliverableTemplateV2[];
+}
+
+export const AUTOMATION_TYPE_LABELS: Record<DfyAutomationType, string> = {
+  profile_rewrite: 'Profile Rewrite',
+  lead_magnet_create: 'Lead Magnet Create',
+  content_calendar: 'Content Calendar',
+  heyreach_campaign: 'HeyReach Campaign',
+  infra_provision: 'Infra Provision',
+};
+
+export const AUTOMATION_TRIGGER_LABELS: Record<DfyAutomationTrigger, string> = {
+  on_create: 'On Create',
+  on_prerequisite_complete: 'On Prerequisite Complete',
+  manual: 'Manual',
+};
+
+export const PRIORITY_LABELS: Record<number, string> = {
+  0: 'None',
+  1: 'Urgent',
+  2: 'High',
+  3: 'Medium',
+  4: 'Low',
+};
+
+// ============================================
 // Constants
 // ============================================
 
