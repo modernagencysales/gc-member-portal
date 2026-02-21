@@ -1,9 +1,18 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import type { DfyEngagement, DfyDeliverable, DfyActivityEntry } from '../../services/dfy-service';
-import { getEngagementBySlug, getDeliverables, getActivityLog } from '../../services/dfy-service';
+import {
+  getEngagementBySlug,
+  getDeliverables,
+  getActivityLog,
+  requestLinkedInConnect,
+  updateClientChecklist,
+  validatePortalToken,
+  storePortalToken,
+} from '../../services/dfy-service';
 import DeliverableCard from './DeliverableCard';
 import ActivityTimeline from './ActivityTimeline';
+import ClientDashboard from './ClientDashboard';
 
 // ── Category config ────────────────────────────────────
 const CATEGORIES = ['onboarding', 'content', 'funnel', 'outbound'] as const;
@@ -18,10 +27,11 @@ const CATEGORY_HEADINGS: Record<string, string> = {
 // Status sort priority (lower = shown first)
 const STATUS_PRIORITY: Record<string, number> = {
   review: 0,
-  in_progress: 1,
-  pending: 2,
-  approved: 3,
-  completed: 4,
+  revision_requested: 1,
+  in_progress: 2,
+  pending: 3,
+  approved: 4,
+  completed: 5,
 };
 
 function statusSort(a: DfyDeliverable, b: DfyDeliverable): number {
@@ -40,6 +50,15 @@ const ClientPortalPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   const isWelcome = searchParams.get('welcome') === 'true';
+  const linkedInJustConnected = searchParams.get('linkedin') === 'connected';
+
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'deliverables' | 'activity'>(
+    'dashboard'
+  );
+  const [linkedInLoading, setLinkedInLoading] = useState(false);
+  const [recorderTool, setRecorderTool] = useState('');
+  const [recorderNotes, setRecorderNotes] = useState('');
+  const [recorderSaved, setRecorderSaved] = useState(false);
 
   const loadData = useCallback(async (engagementId: string) => {
     const [dels, acts] = await Promise.all([
@@ -57,6 +76,15 @@ const ClientPortalPage: React.FC = () => {
 
     async function load() {
       try {
+        // Handle magic link token from URL
+        const token = searchParams.get('token');
+        if (token) {
+          const result = await validatePortalToken(token);
+          if (!cancelled && result.valid) {
+            storePortalToken(token);
+          }
+        }
+
         const eng = await getEngagementBySlug(slug!);
         if (cancelled) return;
 
@@ -84,7 +112,7 @@ const ClientPortalPage: React.FC = () => {
     return () => {
       cancelled = true;
     };
-  }, [slug]);
+  }, [slug, searchParams]);
 
   // Reload function for after approvals or other mutations
   const reload = useCallback(() => {
@@ -171,9 +199,204 @@ const ClientPortalPage: React.FC = () => {
           </div>
         )}
 
+        {/* ── Onboarding Steps (when status is onboarding) ── */}
+        {engagement.status === 'onboarding' && (
+          <div className="mb-8 space-y-4">
+            <h2 className="text-sm font-semibold text-gray-700 dark:text-zinc-300">
+              Onboarding Steps
+            </h2>
+
+            {/* Step 1: Connect LinkedIn */}
+            <div className="rounded-lg border border-gray-200 dark:border-zinc-800 p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  {engagement.linkedin_connected_at || linkedInJustConnected ? (
+                    <div className="w-6 h-6 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+                      <svg
+                        className="w-4 h-4 text-green-600 dark:text-green-400"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M5 13l4 4L19 7"
+                        />
+                      </svg>
+                    </div>
+                  ) : (
+                    <div className="w-6 h-6 rounded-full bg-gray-100 dark:bg-zinc-800 flex items-center justify-center text-xs font-bold text-gray-500 dark:text-zinc-400">
+                      1
+                    </div>
+                  )}
+                  <div>
+                    <p className="text-sm font-medium text-gray-900 dark:text-zinc-100">
+                      Connect LinkedIn
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-zinc-400">
+                      {engagement.linkedin_connected_at || linkedInJustConnected
+                        ? 'Connected'
+                        : 'Connect your LinkedIn account so we can manage your profile'}
+                    </p>
+                  </div>
+                </div>
+                {!engagement.linkedin_connected_at && !linkedInJustConnected && (
+                  <button
+                    onClick={async () => {
+                      setLinkedInLoading(true);
+                      try {
+                        const { url } = await requestLinkedInConnect(slug!);
+                        window.open(url, '_blank');
+                      } catch {
+                        // Silently handle — user can retry
+                      } finally {
+                        setLinkedInLoading(false);
+                      }
+                    }}
+                    disabled={linkedInLoading}
+                    className="px-3 py-1.5 text-xs font-medium rounded-md bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50"
+                  >
+                    {linkedInLoading ? 'Opening...' : 'Connect'}
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Step 2: Recording Tool */}
+            <div className="rounded-lg border border-gray-200 dark:border-zinc-800 p-4">
+              <div className="flex items-center gap-3 mb-3">
+                {recorderSaved ? (
+                  <div className="w-6 h-6 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+                    <svg
+                      className="w-4 h-4 text-green-600 dark:text-green-400"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                  </div>
+                ) : (
+                  <div className="w-6 h-6 rounded-full bg-gray-100 dark:bg-zinc-800 flex items-center justify-center text-xs font-bold text-gray-500 dark:text-zinc-400">
+                    2
+                  </div>
+                )}
+                <div>
+                  <p className="text-sm font-medium text-gray-900 dark:text-zinc-100">
+                    Recording Tool
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-zinc-400">
+                    Which tool do you use to record calls?
+                  </p>
+                </div>
+              </div>
+              <div className="flex gap-2 ml-9">
+                <select
+                  value={recorderTool}
+                  onChange={(e) => setRecorderTool(e.target.value)}
+                  className="flex-1 text-sm rounded-md border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-gray-900 dark:text-zinc-100 px-2 py-1.5"
+                >
+                  <option value="">Select tool...</option>
+                  <option value="Grain">Grain</option>
+                  <option value="Fireflies">Fireflies</option>
+                  <option value="Otter">Otter</option>
+                  <option value="Fathom">Fathom</option>
+                  <option value="Other">Other</option>
+                </select>
+                <input
+                  type="text"
+                  placeholder="Notes (optional)"
+                  value={recorderNotes}
+                  onChange={(e) => setRecorderNotes(e.target.value)}
+                  className="flex-1 text-sm rounded-md border border-gray-300 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-gray-900 dark:text-zinc-100 px-2 py-1.5"
+                />
+                <button
+                  onClick={async () => {
+                    if (!recorderTool) return;
+                    try {
+                      await updateClientChecklist(slug!, {
+                        transcripts_access: {
+                          completed: true,
+                          notes: `${recorderTool}${recorderNotes ? ` — ${recorderNotes}` : ''}`,
+                        },
+                      });
+                      setRecorderSaved(true);
+                    } catch {
+                      // Silently handle
+                    }
+                  }}
+                  disabled={!recorderTool}
+                  className="px-3 py-1.5 text-xs font-medium rounded-md bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50"
+                >
+                  Save
+                </button>
+              </div>
+            </div>
+
+            {/* Step 3: Content Call */}
+            <div className="rounded-lg border border-gray-200 dark:border-zinc-800 p-4">
+              <div className="flex items-center gap-3">
+                {engagement.onboarding_checklist?.content_call?.completed ? (
+                  <div className="w-6 h-6 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+                    <svg
+                      className="w-4 h-4 text-green-600 dark:text-green-400"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                  </div>
+                ) : (
+                  <div className="w-6 h-6 rounded-full bg-gray-100 dark:bg-zinc-800 flex items-center justify-center text-xs font-bold text-gray-500 dark:text-zinc-400">
+                    3
+                  </div>
+                )}
+                <div>
+                  <p className="text-sm font-medium text-gray-900 dark:text-zinc-100">
+                    Content Call
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-zinc-400">
+                    {engagement.onboarding_checklist?.content_call?.completed
+                      ? 'Scheduled'
+                      : "We'll schedule a content call to learn your voice and expertise"}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Progress */}
+            {(() => {
+              const steps = [
+                !!(engagement.linkedin_connected_at || linkedInJustConnected),
+                recorderSaved,
+                !!engagement.onboarding_checklist?.content_call?.completed,
+              ];
+              const done = steps.filter(Boolean).length;
+              return (
+                <p className="text-xs text-gray-500 dark:text-zinc-400 text-center">
+                  {done} of 3 onboarding steps complete
+                </p>
+              );
+            })()}
+          </div>
+        )}
+
         {/* ── Progress bar ────────────────────────── */}
         {total > 0 && (
-          <div className="mb-8">
+          <div className="mb-6">
             <div className="flex items-center justify-between text-xs text-gray-500 dark:text-zinc-400 mb-1.5">
               <span>
                 {doneCount} of {total} deliverables complete
@@ -189,49 +412,78 @@ const ClientPortalPage: React.FC = () => {
           </div>
         )}
 
-        {/* ── Deliverables by category ────────────── */}
-        {total > 0 ? (
-          <div className="space-y-8">
-            {CATEGORIES.map((cat) => {
-              const items = deliverables.filter((d) => d.category === cat).sort(statusSort);
+        {/* ── Tab Navigation ──────────────────────── */}
+        <div className="flex gap-1 mb-6 border-b border-gray-200 dark:border-zinc-800">
+          {(['dashboard', 'deliverables', 'activity'] as const).map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+                activeTab === tab
+                  ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                  : 'border-transparent text-gray-500 dark:text-zinc-400 hover:text-gray-700 dark:hover:text-zinc-300'
+              }`}
+            >
+              {tab === 'dashboard'
+                ? 'Dashboard'
+                : tab === 'deliverables'
+                  ? 'Deliverables'
+                  : 'Activity'}
+            </button>
+          ))}
+        </div>
 
-              if (items.length === 0) return null;
+        {/* ── Dashboard Tab ───────────────────────── */}
+        {activeTab === 'dashboard' && slug && <ClientDashboard portalSlug={slug} />}
 
-              return (
-                <section key={cat}>
-                  <h2 className="text-sm font-semibold text-gray-700 dark:text-zinc-300 mb-3">
-                    {CATEGORY_HEADINGS[cat]}
-                  </h2>
-                  <div className="space-y-3">
-                    {items.map((d) => (
-                      <DeliverableCard
-                        key={d.id}
-                        deliverable={d}
-                        portalSlug={slug}
-                        onApproved={reload}
-                      />
-                    ))}
-                  </div>
-                </section>
-              );
-            })}
-          </div>
-        ) : (
-          /* ── Empty state ──────────────────────── */
-          <div className="text-center py-16">
-            <p className="text-sm text-gray-500 dark:text-zinc-400">
-              Your deliverables are being set up.
-            </p>
-          </div>
+        {/* ── Deliverables Tab ────────────────────── */}
+        {activeTab === 'deliverables' && (
+          <>
+            {total > 0 ? (
+              <div className="space-y-8">
+                {CATEGORIES.map((cat) => {
+                  const items = deliverables.filter((d) => d.category === cat).sort(statusSort);
+
+                  if (items.length === 0) return null;
+
+                  return (
+                    <section key={cat}>
+                      <h2 className="text-sm font-semibold text-gray-700 dark:text-zinc-300 mb-3">
+                        {CATEGORY_HEADINGS[cat]}
+                      </h2>
+                      <div className="space-y-3">
+                        {items.map((d) => (
+                          <DeliverableCard
+                            key={d.id}
+                            deliverable={d}
+                            portalSlug={slug}
+                            onApproved={reload}
+                          />
+                        ))}
+                      </div>
+                    </section>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="text-center py-16">
+                <p className="text-sm text-gray-500 dark:text-zinc-400">
+                  Your deliverables are being set up.
+                </p>
+              </div>
+            )}
+          </>
         )}
 
-        {/* ── Recent Activity ───────────────────────── */}
-        <div className="mt-10">
-          <h2 className="text-sm font-semibold text-gray-700 dark:text-zinc-300 mb-4">
-            Recent Activity
-          </h2>
-          <ActivityTimeline entries={activity} />
-        </div>
+        {/* ── Activity Tab ────────────────────────── */}
+        {activeTab === 'activity' && (
+          <div>
+            <h2 className="text-sm font-semibold text-gray-700 dark:text-zinc-300 mb-4">
+              Recent Activity
+            </h2>
+            <ActivityTimeline entries={activity} />
+          </div>
+        )}
 
         {/* ── Footer ──────────────────────────────── */}
         <div className="mt-12 pt-6 border-t border-gray-100 dark:border-zinc-800 text-center">

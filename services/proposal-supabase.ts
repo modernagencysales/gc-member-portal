@@ -11,7 +11,7 @@ import type {
 } from '../types/proposal-types';
 
 const PROPOSAL_COLUMNS =
-  'id, slug, prospect_id, status, client_name, client_title, client_company, client_logo_url, client_brand_color, client_website, headline, executive_summary, about_us, client_snapshot, goals, services, roadmap, pricing, next_steps, transcript_text, transcript_source, additional_notes, created_by, view_count, last_viewed_at, created_at, updated_at';
+  'id, slug, prospect_id, status, client_name, client_title, client_company, client_logo_url, client_brand_color, client_website, headline, executive_summary, about_us, client_snapshot, goals, services, roadmap, pricing, next_steps, transcript_text, transcript_source, additional_notes, created_by, view_count, last_viewed_at, created_at, updated_at, monthly_rate_cents';
 
 function mapProposal(record: Record<string, unknown>): Proposal {
   return {
@@ -53,6 +53,7 @@ function mapProposal(record: Record<string, unknown>): Proposal {
     lastViewedAt: (record.last_viewed_at as string) || null,
     createdAt: record.created_at as string,
     updatedAt: record.updated_at as string,
+    monthlyRateCents: (record.monthly_rate_cents as number) || null,
   };
 }
 

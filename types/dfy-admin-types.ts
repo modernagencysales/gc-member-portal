@@ -8,7 +8,15 @@ export type DfyEngagementStatus =
   | 'completed'
   | 'cancelled';
 
-export type DfyDeliverableStatus = 'pending' | 'in_progress' | 'review' | 'approved' | 'completed';
+export type DfyDeliverableStatus =
+  | 'pending'
+  | 'in_progress'
+  | 'review'
+  | 'approved'
+  | 'completed'
+  | 'revision_requested';
+
+export type DfyCommunicationPreference = 'email' | 'slack' | 'both';
 
 export type DfyCategory = 'onboarding' | 'content' | 'funnel' | 'outbound';
 
@@ -35,6 +43,7 @@ export interface DfyAdminEngagement {
   slack_channel_id: string | null;
   stripe_subscription_id: string | null;
   onboarding_checklist: OnboardingChecklist | null;
+  communication_preference: DfyCommunicationPreference;
   unipile_account_id: string | null;
   linkedin_connected_at: string | null;
   created_at: string;
@@ -57,7 +66,16 @@ export interface DfyAdminDeliverable {
   playbook_url: string | null;
   automation_type: string | null;
   automation_status: string;
+  automation_config?: {
+    automatable: boolean;
+    automation_type?: string;
+    trigger: string;
+    params?: Record<string, unknown>;
+  };
   depends_on: string[];
+  revision_feedback: string | null;
+  revision_requested_at: string | null;
+  revision_count: number;
   created_at: string;
 }
 
@@ -198,6 +216,7 @@ export const DELIVERABLE_STATUS_CONFIGS: Record<
   pending: { label: 'Pending', color: 'slate' },
   in_progress: { label: 'In Progress', color: 'blue' },
   review: { label: 'In Review', color: 'purple' },
+  revision_requested: { label: 'Revision Requested', color: 'orange' },
   approved: { label: 'Approved', color: 'green' },
   completed: { label: 'Completed', color: 'emerald' },
 };

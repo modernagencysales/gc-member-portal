@@ -17,6 +17,8 @@ import {
   Award,
   Package,
   ScrollText,
+  Briefcase,
+  LayoutTemplate,
 } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 
@@ -58,6 +60,13 @@ const sections: NavSection[] = [
   {
     label: 'Sales',
     items: [{ to: '/admin/proposals', icon: ScrollText, label: 'Proposals', end: true }],
+  },
+  {
+    label: 'DFY Clients',
+    items: [
+      { to: '/admin/dfy', icon: Briefcase, label: 'Engagements', end: true },
+      { to: '/admin/dfy/templates', icon: LayoutTemplate, label: 'Templates' },
+    ],
   },
   {
     label: 'Intro Offers',

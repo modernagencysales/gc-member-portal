@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import type { DfyDeliverable } from '../../services/dfy-service';
-import { approveDeliverable } from '../../services/dfy-service';
+import { approveDeliverable, requestRevision } from '../../services/dfy-service';
 
 // ── Status config ──────────────────────────────────────
 const STATUS_CONFIG: Record<string, { label: string; bg: string; text: string }> = {
@@ -28,6 +28,11 @@ const STATUS_CONFIG: Record<string, { label: string; bg: string; text: string }>
     label: 'Completed',
     bg: 'bg-green-200 dark:bg-green-900/60',
     text: 'text-green-800 dark:text-green-200',
+  },
+  revision_requested: {
+    label: 'Revision Requested',
+    bg: 'bg-orange-100 dark:bg-orange-900/40',
+    text: 'text-orange-700 dark:text-orange-300',
   },
 };
 
@@ -61,10 +66,14 @@ const DeliverableCard: React.FC<DeliverableCardProps> = ({
   const categoryLabel = CATEGORY_LABELS[deliverable.category] ?? deliverable.category;
 
   const [showApproval, setShowApproval] = useState(false);
+  const [showRevision, setShowRevision] = useState(false);
   const [notes, setNotes] = useState('');
+  const [revisionFeedback, setRevisionFeedback] = useState('');
   const [approving, setApproving] = useState(false);
+  const [requesting, setRequesting] = useState(false);
   const [approveError, setApproveError] = useState<string | null>(null);
   const [approved, setApproved] = useState(false);
+  const [revisionSent, setRevisionSent] = useState(false);
 
   const isReview = deliverable.status === 'review' && portalSlug;
 
@@ -80,6 +89,21 @@ const DeliverableCard: React.FC<DeliverableCardProps> = ({
       setApproveError(err instanceof Error ? err.message : 'Failed to approve deliverable');
     } finally {
       setApproving(false);
+    }
+  }
+
+  async function handleRequestRevision() {
+    if (!portalSlug || !revisionFeedback.trim()) return;
+    setRequesting(true);
+    setApproveError(null);
+    try {
+      await requestRevision(deliverable.id, portalSlug, revisionFeedback.trim());
+      setRevisionSent(true);
+      onApproved?.();
+    } catch (err) {
+      setApproveError(err instanceof Error ? err.message : 'Failed to request revision');
+    } finally {
+      setRequesting(false);
     }
   }
 
@@ -119,17 +143,25 @@ const DeliverableCard: React.FC<DeliverableCardProps> = ({
         )}
       </div>
 
-      {/* ── Approval section (review status only) ────── */}
-      {isReview && !approved && (
+      {/* ── Approval / Revision section (review status only) ────── */}
+      {isReview && !approved && !revisionSent && (
         <div className="mt-3 pt-3 border-t border-gray-100 dark:border-zinc-800">
-          {!showApproval ? (
-            <button
-              onClick={() => setShowApproval(true)}
-              className="text-xs font-medium text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 transition-colors"
-            >
-              Review & Approve
-            </button>
-          ) : (
+          {!showApproval && !showRevision ? (
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowApproval(true)}
+                className="text-xs font-medium text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 transition-colors"
+              >
+                Review & Approve
+              </button>
+              <button
+                onClick={() => setShowRevision(true)}
+                className="text-xs font-medium text-orange-600 dark:text-orange-400 hover:text-orange-700 dark:hover:text-orange-300 transition-colors"
+              >
+                Request Revision
+              </button>
+            </div>
+          ) : showApproval ? (
             <div className="space-y-3">
               <textarea
                 value={notes}
@@ -164,15 +196,57 @@ const DeliverableCard: React.FC<DeliverableCardProps> = ({
                 </button>
               </div>
             </div>
+          ) : (
+            <div className="space-y-3">
+              <textarea
+                value={revisionFeedback}
+                onChange={(e) => setRevisionFeedback(e.target.value)}
+                placeholder="Describe what changes you'd like..."
+                rows={3}
+                className="w-full rounded-md border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-3 py-2 text-sm text-gray-900 dark:text-zinc-100 placeholder-gray-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-orange-500 dark:focus:ring-orange-400 focus:border-transparent resize-none"
+              />
+
+              {approveError && (
+                <p className="text-xs text-red-600 dark:text-red-400">{approveError}</p>
+              )}
+
+              <div className="flex gap-2">
+                <button
+                  onClick={handleRequestRevision}
+                  disabled={requesting || !revisionFeedback.trim()}
+                  className="flex-1 rounded-md bg-orange-600 dark:bg-orange-500 px-4 py-2 text-sm font-medium text-white hover:bg-orange-700 dark:hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  {requesting ? 'Submitting...' : 'Submit Revision Request'}
+                </button>
+                <button
+                  onClick={() => {
+                    setShowRevision(false);
+                    setRevisionFeedback('');
+                    setApproveError(null);
+                  }}
+                  disabled={requesting}
+                  className="rounded-md border border-gray-200 dark:border-zinc-700 px-3 py-2 text-sm text-gray-600 dark:text-zinc-400 hover:bg-gray-50 dark:hover:bg-zinc-800 disabled:opacity-50 transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
           )}
         </div>
       )}
 
-      {/* ── Success state ───────────────────────────── */}
+      {/* ── Success states ───────────────────────────── */}
       {isReview && approved && (
         <div className="mt-3 pt-3 border-t border-gray-100 dark:border-zinc-800">
           <p className="text-xs font-medium text-green-600 dark:text-green-400">
             Approved successfully
+          </p>
+        </div>
+      )}
+      {isReview && revisionSent && (
+        <div className="mt-3 pt-3 border-t border-gray-100 dark:border-zinc-800">
+          <p className="text-xs font-medium text-orange-600 dark:text-orange-400">
+            Revision request submitted
           </p>
         </div>
       )}

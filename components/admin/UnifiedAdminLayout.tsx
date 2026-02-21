@@ -22,6 +22,8 @@ const routeTitles: Record<string, string> = {
   '/admin/affiliates': 'Affiliate Program',
   '/admin/proposals': 'Proposals',
   '/admin/proposals/new': 'New Proposal',
+  '/admin/dfy': 'DFY Engagements',
+  '/admin/dfy/templates': 'DFY Templates',
 };
 
 const UnifiedAdminLayout: React.FC = () => {
@@ -47,6 +49,11 @@ const UnifiedAdminLayout: React.FC = () => {
     location.pathname !== '/admin/proposals/new'
   ) {
     pageTitle = 'Edit Proposal';
+  } else if (
+    location.pathname.match(/^\/admin\/dfy\/[^/]+$/) &&
+    location.pathname !== '/admin/dfy/templates'
+  ) {
+    pageTitle = 'DFY Engagement Detail';
   }
 
   return (

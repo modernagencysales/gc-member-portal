@@ -98,6 +98,7 @@ export interface Proposal {
   lastViewedAt: string | null;
   createdAt: string;
   updatedAt: string;
+  monthlyRateCents: number | null;
 }
 
 // Config stored in bootcamp_settings key 'proposal_packages'

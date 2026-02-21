@@ -8,9 +8,9 @@ import type {
 
 // Column constants — must match DB schema (never select('*'))
 const ADMIN_ENGAGEMENT_COLUMNS =
-  'id, proposal_id, tenant_id, client_name, client_email, client_company, portal_slug, status, monthly_rate, start_date, linear_project_id, slack_channel_id, stripe_subscription_id, onboarding_checklist, unipile_account_id, linkedin_connected_at, created_at';
+  'id, proposal_id, tenant_id, client_name, client_email, client_company, portal_slug, status, monthly_rate, start_date, linear_project_id, slack_channel_id, stripe_subscription_id, onboarding_checklist, unipile_account_id, linkedin_connected_at, communication_preference, created_at';
 const DELIVERABLE_COLUMNS =
-  'id, engagement_id, name, description, category, status, assignee, due_date, sort_order, client_approved_at, client_notes, linear_issue_id, milestone_id, playbook_url, automation_type, automation_status, depends_on, created_at';
+  'id, engagement_id, name, description, category, status, assignee, due_date, sort_order, client_approved_at, client_notes, linear_issue_id, milestone_id, playbook_url, automation_type, automation_status, automation_config, depends_on, revision_feedback, revision_requested_at, revision_count, created_at';
 const AUTOMATION_RUN_COLUMNS =
   'id, engagement_id, deliverable_id, automation_type, status, trigger_run_id, error_log, started_at, completed_at, created_at';
 const ACTIVITY_COLUMNS =
@@ -146,7 +146,11 @@ export async function fetchAllDeliverables(): Promise<
 
 export async function updateEngagement(
   id: string,
-  data: { status?: string; onboarding_checklist?: Record<string, unknown> }
+  data: {
+    status?: string;
+    onboarding_checklist?: Record<string, unknown>;
+    communication_preference?: string;
+  }
 ) {
   return gtmAdminFetch(`/api/dfy/admin/engagements/${id}`, {
     method: 'PATCH',
@@ -156,7 +160,12 @@ export async function updateEngagement(
 
 export async function updateDeliverable(
   id: string,
-  data: { status?: string; assignee?: string; due_date?: string }
+  data: {
+    status?: string;
+    assignee?: string;
+    due_date?: string;
+    automation_config?: Record<string, unknown>;
+  }
 ) {
   return gtmAdminFetch(`/api/dfy/admin/deliverables/${id}`, {
     method: 'PATCH',
@@ -195,5 +204,12 @@ export async function syncPlaybooks(engagementId?: string) {
   return gtmAdminFetch('/api/dfy/admin/playbook-sync', {
     method: 'POST',
     body: JSON.stringify(engagementId ? { engagement_id: engagementId } : {}),
+  });
+}
+
+export async function resendMagicLink(engagementId: string) {
+  return gtmAdminFetch(`/api/dfy/client/magic-link`, {
+    method: 'POST',
+    body: JSON.stringify({ engagement_id: engagementId }),
   });
 }

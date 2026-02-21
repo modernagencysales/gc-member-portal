@@ -32,6 +32,7 @@ function toSnakeCase(obj: Record<string, unknown>): Record<string, unknown> {
     pricing: 'pricing',
     nextSteps: 'next_steps',
     aboutUs: 'about_us',
+    monthlyRateCents: 'monthly_rate_cents',
     status: 'status',
   };
   const result: Record<string, unknown> = {};
@@ -82,6 +83,7 @@ interface FormState {
     paymentTerms: string;
   };
   nextSteps: ProposalNextStep[];
+  monthlyRateCents: number | null;
 }
 
 function proposalToForm(p: Proposal): FormState {
@@ -117,6 +119,8 @@ function proposalToForm(p: Proposal): FormState {
       paymentTerms: p.pricing.paymentTerms,
     },
     nextSteps: p.nextSteps,
+    monthlyRateCents:
+      ((p as unknown as Record<string, unknown>).monthlyRateCents as number | null) ?? null,
   };
 }
 
@@ -938,6 +942,28 @@ const AdminProposalEdit: React.FC = () => {
               className={INPUT_CLASS}
             />
           </div>
+        </div>
+        <div className="mt-4">
+          <label className="block text-sm font-medium mb-1">
+            Monthly Rate ($)
+            <span className="text-xs text-zinc-400 ml-1">
+              Used for Stripe billing — overrides regex from Total
+            </span>
+          </label>
+          <input
+            type="number"
+            min="0"
+            step="1"
+            placeholder="e.g. 2500 for $2,500/mo"
+            value={form.monthlyRateCents ? Math.round(form.monthlyRateCents / 100) : ''}
+            onChange={(e) => {
+              const dollars = parseInt(e.target.value, 10);
+              setForm((prev) =>
+                prev ? { ...prev, monthlyRateCents: isNaN(dollars) ? null : dollars * 100 } : prev
+              );
+            }}
+            className={INPUT_CLASS}
+          />
         </div>
       </section>
 

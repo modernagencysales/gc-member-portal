@@ -79,6 +79,11 @@ const OfferProgressTracker = lazy(
   () => import('./components/portal/intro-offer/OfferProgressTracker')
 );
 
+// Lazy-loaded: DFY Admin
+const AdminDfyList = lazy(() => import('./components/admin/dfy/DfyEngagementList'));
+const AdminDfyDetail = lazy(() => import('./components/admin/dfy/DfyEngagementDetail'));
+const AdminDfyTemplates = lazy(() => import('./components/admin/dfy/DfyTemplateEditor'));
+
 // Lazy-loaded: Client Portal (DFY)
 const ClientPortalPage = lazy(() => import('./components/client-portal/ClientPortalPage'));
 
@@ -184,6 +189,10 @@ const App: React.FC = () => {
           {/* Intro Offers */}
           <Route path="intro-offers" element={<AdminIntroOfferList />} />
           <Route path="intro-offers/:offerId" element={<AdminIntroOfferDetail />} />
+          {/* DFY Engagements */}
+          <Route path="dfy" element={<AdminDfyList />} />
+          <Route path="dfy/templates" element={<AdminDfyTemplates />} />
+          <Route path="dfy/:engagementId" element={<AdminDfyDetail />} />
           {/* Affiliates */}
           <Route path="affiliates" element={<AdminAffiliatesPage />} />
           {/* Legacy redirects (within layout) */}
