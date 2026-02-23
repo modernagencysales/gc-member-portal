@@ -26,7 +26,7 @@ const LINKEDIN_REGEX = /^https?:\/\/(www\.)?linkedin\.com\/in\/[\w-]+\/?$/i;
 const MAX_FILES = 10;
 const MAX_FILE_SIZE = 25 * 1024 * 1024;
 
-const IntakeForm: React.FC<IntakeFormProps> = ({ clientName, onComplete }) => {
+const IntakeForm: React.FC<IntakeFormProps> = ({ portalSlug, clientName, onComplete }) => {
   const [idealClient, setIdealClient] = useState('');
   const [crmType, setCrmType] = useState('');
   const [crmAccess, setCrmAccess] = useState('');
@@ -110,20 +110,18 @@ const IntakeForm: React.FC<IntakeFormProps> = ({ clientName, onComplete }) => {
     setError('');
 
     try {
-      const formData = new FormData();
-      formData.append('ideal_client', idealClient.trim());
-      formData.append('crm_type', crmType.trim());
-      formData.append('crm_access', crmAccess.trim());
-      formData.append('notetaker_tool', notetakerTool.trim());
-      if (notetakerTool === 'Other') {
-        formData.append('notetaker_other', notetakerOther.trim());
-      }
-      formData.append('linkedin_url', linkedinUrl.trim());
-      for (const file of files) {
-        formData.append('files', file);
-      }
-
-      await submitIntakeForm(formData);
+      await submitIntakeForm(
+        portalSlug,
+        {
+          ideal_client: idealClient.trim(),
+          crm_type: crmType.trim(),
+          crm_access: crmAccess.trim(),
+          notetaker_tool: notetakerTool.trim(),
+          notetaker_other: notetakerOther.trim(),
+          linkedin_url: linkedinUrl.trim(),
+        },
+        files
+      );
       onComplete();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong');

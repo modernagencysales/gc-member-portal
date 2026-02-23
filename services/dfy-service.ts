@@ -275,21 +275,62 @@ export async function fetchAutomationOutput(
 // Submit Intake Form (Client Portal)
 // ============================================
 
-export async function submitIntakeForm(formData: FormData): Promise<void> {
-  const headers: Record<string, string> = {};
-  const token = getPortalToken();
-  if (token) {
-    headers['x-client-portal-token'] = token;
+export async function submitIntakeForm(
+  portalSlug: string,
+  fields: {
+    ideal_client: string;
+    crm_type: string;
+    crm_access: string;
+    notetaker_tool: string;
+    notetaker_other?: string;
+    linkedin_url: string;
+  },
+  files: File[] = []
+): Promise<void> {
+  // Upload files to Supabase Storage first (if any)
+  const uploadedFiles: Array<{ name: string; path: string; size: number; type: string }> = [];
+
+  for (const file of files) {
+    const fileId = globalThis.crypto.randomUUID();
+    const sanitizedName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+    // Use portalSlug as folder prefix (engagement_id not available on client)
+    const storagePath = `${portalSlug}/${fileId}-${sanitizedName}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from('dfy-intake-files')
+      .upload(storagePath, file, { contentType: file.type, upsert: false });
+
+    if (uploadError) {
+      throw new Error(`Failed to upload file "${file.name}"`);
+    }
+
+    uploadedFiles.push({
+      name: file.name,
+      path: storagePath,
+      size: file.size,
+      type: file.type,
+    });
   }
-  // Do NOT set Content-Type — browser sets it with multipart boundary
-  const res = await fetch(`${GTM_SYSTEM_URL}/api/dfy/client/intake`, {
-    method: 'POST',
-    headers,
-    body: formData,
+
+  // Call RPC function (runs via Supabase — no cross-origin call to gtm-system)
+  const { data, error } = await supabase.rpc('submit_dfy_intake', {
+    p_portal_slug: portalSlug,
+    p_ideal_client: fields.ideal_client,
+    p_crm_type: fields.crm_type,
+    p_crm_access: fields.crm_access || null,
+    p_notetaker_tool: fields.notetaker_tool,
+    p_notetaker_other: fields.notetaker_tool === 'Other' ? fields.notetaker_other || null : null,
+    p_linkedin_url: fields.linkedin_url,
+    p_files: uploadedFiles,
   });
-  if (!res.ok) {
-    const error = await res.json().catch(() => ({ error: 'Submission failed' }));
-    throw new Error(error.error || 'Failed to submit intake form');
+
+  if (error) {
+    throw new Error(error.message || 'Submission failed');
+  }
+
+  // RPC returns { success: true } or { error: '...' }
+  if (data?.error) {
+    throw new Error(data.error);
   }
 }
 
