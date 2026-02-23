@@ -121,7 +121,23 @@ const DEFAULT_TEMPLATE: DfyEngagementTemplate = {
       target_day_offset: 35,
     },
   ],
-  deliverables: [],
+  deliverables: [
+    {
+      name: 'LinkedIn Profile Rewrite',
+      description: 'Optimize client LinkedIn profile — headline, about, experience, featured',
+      category: 'content',
+      assignee: 'Team',
+      relative_due_days: 10,
+      milestone: 'Content Engine',
+      priority: 2,
+      depends_on: [],
+      automation_config: {
+        automatable: true,
+        automation_type: 'profile_rewrite',
+        trigger: 'manual',
+      },
+    },
+  ],
 };
 
 // ============================================

@@ -271,6 +271,7 @@ function ManualOnboardModal({
     client_email: '',
     client_company: '',
     client_industry: '',
+    linkedin_url: '',
     monthly_rate_dollars: '',
     communication_preference: 'email',
   });
@@ -298,6 +299,7 @@ function ManualOnboardModal({
         client_email: form.client_email,
         client_company: form.client_company,
         client_industry: form.client_industry || undefined,
+        linkedin_url: form.linkedin_url || undefined,
         monthly_rate: form.monthly_rate_dollars
           ? Math.round(parseFloat(form.monthly_rate_dollars) * 100)
           : undefined,
@@ -388,6 +390,17 @@ function ManualOnboardModal({
               value={form.client_industry}
               onChange={(e) => setForm((f) => ({ ...f, client_industry: e.target.value }))}
               placeholder="B2B SaaS"
+              className={inputClass}
+            />
+          </div>
+
+          <div>
+            <label className={labelClass}>LinkedIn URL</label>
+            <input
+              type="url"
+              value={form.linkedin_url}
+              onChange={(e) => setForm((f) => ({ ...f, linkedin_url: e.target.value }))}
+              placeholder="https://linkedin.com/in/johndoe"
               className={inputClass}
             />
           </div>

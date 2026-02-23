@@ -63,6 +63,8 @@ const DfyEngagementDetail: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [showUpdateForm, setShowUpdateForm] = useState(false);
   const [updateMessage, setUpdateMessage] = useState('');
+  const [editingLinkedIn, setEditingLinkedIn] = useState(false);
+  const [linkedInDraft, setLinkedInDraft] = useState('');
 
   // ---- Queries ----
   const { data: engagement, isLoading: engLoading } = useQuery({
@@ -103,6 +105,7 @@ const DfyEngagementDetail: React.FC = () => {
       status?: DfyEngagementStatus;
       onboarding_checklist?: Record<string, unknown>;
       communication_preference?: DfyCommunicationPreference;
+      linkedin_url?: string | null;
     }) => updateEngagement(engagementId!, data),
     onMutate: async (newData) => {
       await queryClient.cancelQueries({ queryKey: queryKeys.dfyEngagement(engagementId!) });
@@ -307,6 +310,81 @@ const DfyEngagementDetail: React.FC = () => {
             value={engagement.portal_slug}
             href={`/client/${engagement.portal_slug}`}
           />
+
+          {/* LinkedIn URL — editable inline */}
+          <div>
+            <p
+              className={`text-[11px] font-semibold uppercase tracking-wider ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}
+            >
+              LinkedIn URL
+            </p>
+            {editingLinkedIn ? (
+              <input
+                type="url"
+                autoFocus
+                value={linkedInDraft}
+                onChange={(e) => setLinkedInDraft(e.target.value)}
+                onBlur={() => {
+                  const trimmed = linkedInDraft.trim();
+                  const current = engagement.linkedin_url || '';
+                  if (trimmed !== current) {
+                    engagementMutation.mutate({ linkedin_url: trimmed || null });
+                  }
+                  setEditingLinkedIn(false);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') (e.target as HTMLInputElement).blur();
+                  if (e.key === 'Escape') {
+                    setLinkedInDraft(engagement.linkedin_url || '');
+                    setEditingLinkedIn(false);
+                  }
+                }}
+                placeholder="https://linkedin.com/in/..."
+                className={`mt-0.5 w-full text-sm font-medium px-2 py-1 rounded border ${
+                  isDarkMode
+                    ? 'bg-zinc-800 border-zinc-700 text-zinc-200 placeholder:text-zinc-500'
+                    : 'bg-white border-zinc-300 text-zinc-900 placeholder:text-zinc-400'
+                } focus:ring-1 focus:ring-violet-500 focus:border-transparent`}
+              />
+            ) : engagement.linkedin_url ? (
+              <a
+                href={engagement.linkedin_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`text-sm font-medium flex items-center gap-1 mt-0.5 cursor-pointer ${
+                  isDarkMode
+                    ? 'text-violet-400 hover:text-violet-300'
+                    : 'text-violet-600 hover:text-violet-700'
+                }`}
+                onClick={(e) => {
+                  if (e.metaKey || e.ctrlKey) return; // allow cmd+click to open link
+                  e.preventDefault();
+                  setLinkedInDraft(engagement.linkedin_url || '');
+                  setEditingLinkedIn(true);
+                }}
+              >
+                {engagement.linkedin_url
+                  .replace(/^https?:\/\/(www\.)?linkedin\.com\/in\//, '')
+                  .replace(/\/$/, '') || engagement.linkedin_url}
+                <ExternalLink className="w-3 h-3" />
+              </a>
+            ) : (
+              <button
+                onClick={() => {
+                  setLinkedInDraft('');
+                  setEditingLinkedIn(true);
+                }}
+                className={`text-sm mt-0.5 ${
+                  isDarkMode
+                    ? 'text-zinc-500 hover:text-zinc-400'
+                    : 'text-zinc-400 hover:text-zinc-500'
+                }`}
+              >
+                + Add LinkedIn URL
+              </button>
+            )}
+          </div>
+
           <InfoPair
             label="Linear Project"
             value={engagement.linear_project_id ? 'View Project' : '\u2014'}

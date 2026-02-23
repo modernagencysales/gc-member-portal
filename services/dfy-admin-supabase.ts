@@ -8,7 +8,7 @@ import type {
 
 // Column constants — must match DB schema (never select('*'))
 const ADMIN_ENGAGEMENT_COLUMNS =
-  'id, proposal_id, tenant_id, client_name, client_email, client_company, portal_slug, status, monthly_rate, start_date, linear_project_id, slack_channel_id, stripe_subscription_id, onboarding_checklist, unipile_account_id, linkedin_connected_at, communication_preference, created_at';
+  'id, proposal_id, tenant_id, client_name, client_email, client_company, portal_slug, status, monthly_rate, start_date, linear_project_id, slack_channel_id, stripe_subscription_id, onboarding_checklist, linkedin_url, unipile_account_id, linkedin_connected_at, communication_preference, created_at';
 const DELIVERABLE_COLUMNS =
   'id, engagement_id, name, description, category, status, assignee, due_date, sort_order, client_approved_at, client_notes, linear_issue_id, milestone_id, playbook_url, automation_type, automation_status, depends_on, revision_feedback, revision_requested_at, revision_count, created_at';
 const AUTOMATION_RUN_COLUMNS =
@@ -151,6 +151,7 @@ export async function updateEngagement(
     status?: string;
     onboarding_checklist?: Record<string, unknown>;
     communication_preference?: string;
+    linkedin_url?: string | null;
   }
 ) {
   return gtmAdminFetch(`/api/dfy/admin/engagements/${id}`, {
@@ -213,6 +214,7 @@ export async function manualOnboard(data: {
   client_email: string;
   client_company: string;
   client_industry?: string;
+  linkedin_url?: string;
   monthly_rate?: number;
   communication_preference?: string;
 }): Promise<{ success: boolean; engagement_id: string; portal_slug: string }> {

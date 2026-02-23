@@ -44,6 +44,7 @@ export interface DfyAdminEngagement {
   stripe_subscription_id: string | null;
   onboarding_checklist: OnboardingChecklist | null;
   communication_preference: DfyCommunicationPreference;
+  linkedin_url: string | null;
   unipile_account_id: string | null;
   linkedin_connected_at: string | null;
   created_at: string;
