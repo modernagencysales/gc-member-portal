@@ -7,6 +7,8 @@ import { queryKeys } from '../../../lib/queryClient';
 import {
   fetchDfyEngagements,
   fetchAllDeliverables,
+  fetchDfyDeliverables,
+  fetchDfyEngagementById,
   manualOnboard,
 } from '../../../services/dfy-admin-supabase';
 import type { DfyAdminEngagement } from '../../../types/dfy-admin-types';
@@ -217,7 +219,24 @@ const DfyEngagementList: React.FC = () => {
                     key={eng.id}
                     engagement={eng}
                     progress={progressMap[eng.id]}
-                    onClick={() => navigate(`/admin/dfy/${eng.id}`)}
+                    onHover={() => {
+                      queryClient.prefetchQuery({
+                        queryKey: queryKeys.dfyDeliverables(eng.id),
+                        queryFn: () => fetchDfyDeliverables(eng.id),
+                        staleTime: 1000 * 60 * 5,
+                      });
+                    }}
+                    onClick={() => {
+                      // Seed detail cache with list data so detail page renders instantly
+                      queryClient.setQueryData(queryKeys.dfyEngagement(eng.id), eng);
+                      // Background-refresh the full engagement (list data may be stale)
+                      queryClient.prefetchQuery({
+                        queryKey: queryKeys.dfyEngagement(eng.id),
+                        queryFn: () => fetchDfyEngagementById(eng.id),
+                        staleTime: 0,
+                      });
+                      navigate(`/admin/dfy/${eng.id}`);
+                    }}
                   />
                 ))}
               </tbody>
@@ -430,16 +449,19 @@ function EngagementRow({
   engagement,
   progress,
   onClick,
+  onHover,
 }: {
   engagement: DfyAdminEngagement;
   progress?: { done: number; total: number };
   onClick: () => void;
+  onHover: () => void;
 }) {
   const { isDarkMode } = useTheme();
 
   return (
     <tr
       onClick={onClick}
+      onMouseEnter={onHover}
       className={`cursor-pointer transition-colors ${
         isDarkMode
           ? 'hover:bg-zinc-800/50 border-b border-zinc-800 last:border-0'

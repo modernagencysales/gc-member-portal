@@ -213,7 +213,7 @@ const DfyEngagementDetail: React.FC = () => {
   }, [deliverables]);
 
   // ---- Loading / not found ----
-  if (engLoading || delsLoading) {
+  if (engLoading) {
     return (
       <div className="p-8 text-center">
         <div className="w-6 h-6 border-2 border-zinc-300 dark:border-zinc-700 border-t-violet-500 rounded-full animate-spin mx-auto" />
@@ -401,26 +401,39 @@ const DfyEngagementDetail: React.FC = () => {
           </h3>
         </div>
         <div className="divide-y divide-zinc-100 dark:divide-zinc-800">
-          {Array.from(milestoneGroups.entries()).map(([milestoneId, items]) => (
-            <MilestoneSection
-              key={milestoneId || '__ungrouped'}
-              milestoneId={milestoneId}
-              items={items}
-              allDeliverables={deliverables || []}
-              onStatusChange={(id, status) => deliverableMutation.mutate({ id, data: { status } })}
-              onTriggerAutomation={(id) => triggerMutation.mutate(id)}
-              isUpdating={deliverableMutation.isPending}
-              isTriggering={triggerMutation.isPending}
-            />
-          ))}
-          {(!deliverables || deliverables.length === 0) && (
-            <p
-              className={`px-4 py-6 text-sm text-center ${
-                isDarkMode ? 'text-zinc-500' : 'text-zinc-400'
-              }`}
-            >
-              No deliverables yet
-            </p>
+          {delsLoading ? (
+            <div className="px-4 py-6 flex items-center justify-center gap-2">
+              <Loader2 className="w-4 h-4 animate-spin text-violet-500" />
+              <span className={`text-sm ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
+                Loading deliverables...
+              </span>
+            </div>
+          ) : (
+            <>
+              {Array.from(milestoneGroups.entries()).map(([milestoneId, items]) => (
+                <MilestoneSection
+                  key={milestoneId || '__ungrouped'}
+                  milestoneId={milestoneId}
+                  items={items}
+                  allDeliverables={deliverables || []}
+                  onStatusChange={(id, status) =>
+                    deliverableMutation.mutate({ id, data: { status } })
+                  }
+                  onTriggerAutomation={(id) => triggerMutation.mutate(id)}
+                  isUpdating={deliverableMutation.isPending}
+                  isTriggering={triggerMutation.isPending}
+                />
+              ))}
+              {(!deliverables || deliverables.length === 0) && (
+                <p
+                  className={`px-4 py-6 text-sm text-center ${
+                    isDarkMode ? 'text-zinc-500' : 'text-zinc-400'
+                  }`}
+                >
+                  No deliverables yet
+                </p>
+              )}
+            </>
           )}
         </div>
       </div>
