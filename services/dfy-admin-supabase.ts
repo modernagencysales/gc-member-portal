@@ -14,7 +14,7 @@ const DELIVERABLE_COLUMNS =
 const AUTOMATION_RUN_COLUMNS =
   'id, engagement_id, deliverable_id, automation_type, status, trigger_run_id, error_log, started_at, completed_at, created_at';
 const ACTIVITY_COLUMNS =
-  'id, engagement_id, deliverable_id, action, description, actor, metadata, created_at';
+  'id, engagement_id, deliverable_id, action, description, actor, metadata, client_visible, created_at';
 
 // ============================================
 // GTM Admin API helper (x-admin-key auth)
@@ -225,5 +225,12 @@ export async function resendMagicLink(engagementId: string) {
   return gtmAdminFetch(`/api/dfy/client/magic-link`, {
     method: 'POST',
     body: JSON.stringify({ engagement_id: engagementId }),
+  });
+}
+
+export async function postEngagementUpdate(engagementId: string, message: string) {
+  return gtmAdminFetch(`/api/dfy/admin/engagements/${engagementId}/post-update`, {
+    method: 'POST',
+    body: JSON.stringify({ message }),
   });
 }

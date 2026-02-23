@@ -17,6 +17,8 @@ import {
   Loader2,
   Mail,
   MessageSquare,
+  Eye,
+  Send,
 } from 'lucide-react';
 import { useTheme } from '../../../context/ThemeContext';
 import { queryKeys } from '../../../lib/queryClient';
@@ -32,6 +34,7 @@ import {
   retryAutomation,
   syncPlaybooks,
   resendMagicLink,
+  postEngagementUpdate,
 } from '../../../services/dfy-admin-supabase';
 import type {
   DfyAdminEngagement,
@@ -57,6 +60,8 @@ const DfyEngagementDetail: React.FC = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [error, setError] = useState<string | null>(null);
+  const [showUpdateForm, setShowUpdateForm] = useState(false);
+  const [updateMessage, setUpdateMessage] = useState('');
 
   // ---- Queries ----
   const { data: engagement, isLoading: engLoading } = useQuery({
@@ -156,6 +161,17 @@ const DfyEngagementDetail: React.FC = () => {
   const magicLinkMutation = useMutation({
     mutationFn: () => resendMagicLink(engagementId!),
     onSuccess: () => setError(null),
+    onError: (err: Error) => setError(err.message),
+  });
+
+  const postUpdateMutation = useMutation({
+    mutationFn: (message: string) => postEngagementUpdate(engagementId!, message),
+    onSuccess: () => {
+      setError(null);
+      setUpdateMessage('');
+      setShowUpdateForm(false);
+      queryClient.invalidateQueries({ queryKey: queryKeys.dfyActivity(engagementId!) });
+    },
     onError: (err: Error) => setError(err.message),
   });
 
@@ -395,12 +411,65 @@ const DfyEngagementDetail: React.FC = () => {
         }`}
       >
         <div
-          className={`px-4 py-3 border-b ${isDarkMode ? 'border-slate-800' : 'border-slate-200'}`}
+          className={`px-4 py-3 border-b flex items-center justify-between ${isDarkMode ? 'border-slate-800' : 'border-slate-200'}`}
         >
           <h3 className={`text-sm font-semibold ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
             Activity Log
           </h3>
+          <button
+            onClick={() => setShowUpdateForm(!showUpdateForm)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-blue-600 text-white hover:bg-blue-700 transition-colors"
+          >
+            <Send className="w-3 h-3" />
+            Post Update
+          </button>
         </div>
+        {showUpdateForm && (
+          <div
+            className={`px-4 py-3 border-b ${isDarkMode ? 'border-slate-800' : 'border-slate-200'}`}
+          >
+            <textarea
+              value={updateMessage}
+              onChange={(e) => setUpdateMessage(e.target.value)}
+              placeholder="Write an update visible to the client..."
+              rows={2}
+              className={`w-full text-sm px-3 py-2 rounded-lg border ${
+                isDarkMode
+                  ? 'bg-slate-800 border-slate-700 text-slate-200 placeholder:text-slate-500'
+                  : 'bg-white border-slate-300 text-slate-900 placeholder:text-slate-400'
+              } focus:ring-1 focus:ring-blue-500 focus:border-transparent`}
+            />
+            <div className="flex items-center gap-2 mt-2">
+              <button
+                onClick={() =>
+                  updateMessage.trim() && postUpdateMutation.mutate(updateMessage.trim())
+                }
+                disabled={!updateMessage.trim() || postUpdateMutation.isPending}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 transition-colors"
+              >
+                {postUpdateMutation.isPending ? 'Posting...' : 'Send to Client'}
+              </button>
+              <button
+                onClick={() => {
+                  setShowUpdateForm(false);
+                  setUpdateMessage('');
+                }}
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                  isDarkMode
+                    ? 'text-slate-400 hover:bg-slate-800'
+                    : 'text-slate-500 hover:bg-slate-100'
+                }`}
+              >
+                Cancel
+              </button>
+              <span
+                className={`text-[11px] ml-auto ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}
+              >
+                This will appear in the client portal
+              </span>
+            </div>
+          </div>
+        )}
         <div className="divide-y divide-slate-100 dark:divide-slate-800">
           {(activity || []).length === 0 ? (
             <p
@@ -1033,6 +1102,17 @@ function ActivityRow({ entry }: { entry: DfyActivityEntry }) {
           {entry.actor && (
             <span className={`text-xs ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>
               by {entry.actor}
+            </span>
+          )}
+          {entry.client_visible && (
+            <span
+              title="Visible to client"
+              className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-medium ${
+                isDarkMode ? 'bg-green-900/30 text-green-400' : 'bg-green-100 text-green-700'
+              }`}
+            >
+              <Eye className="w-3 h-3" />
+              Client
             </span>
           )}
         </div>
