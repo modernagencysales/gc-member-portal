@@ -305,7 +305,7 @@ const DfyEngagementDetail: React.FC = () => {
           <InfoPair
             label="Portal Link"
             value={engagement.portal_slug}
-            href={`/portal/dfy/${engagement.portal_slug}`}
+            href={`/client/${engagement.portal_slug}`}
           />
           <InfoPair
             label="Linear Project"

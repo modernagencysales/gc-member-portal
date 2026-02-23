@@ -481,7 +481,7 @@ function EngagementRow({
       <td className="px-4 py-3">
         {engagement.portal_slug && (
           <a
-            href={`/portal/dfy/${engagement.portal_slug}`}
+            href={`/client/${engagement.portal_slug}`}
             target="_blank"
             rel="noopener noreferrer"
             onClick={(e) => e.stopPropagation()}
