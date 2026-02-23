@@ -13,6 +13,7 @@ import {
 import DeliverableCard from './DeliverableCard';
 import ActivityTimeline from './ActivityTimeline';
 import ClientDashboard from './ClientDashboard';
+import IntakeForm from './IntakeForm';
 
 // ── Category config ────────────────────────────────────
 const CATEGORIES = ['onboarding', 'content', 'funnel', 'outbound'] as const;
@@ -121,6 +122,16 @@ const ClientPortalPage: React.FC = () => {
     }
   }, [engagement, loadData]);
 
+  // Re-fetch engagement data (used after intake form submission)
+  const reloadEngagement = useCallback(async () => {
+    if (!slug) return;
+    const eng = await getEngagementBySlug(slug);
+    if (eng) {
+      setEngagement(eng);
+      await loadData(eng.id);
+    }
+  }, [slug, loadData]);
+
   // ── Loading state ──────────────────────────────────
   if (loading) {
     return (
@@ -153,6 +164,17 @@ const ClientPortalPage: React.FC = () => {
           </p>
         </div>
       </div>
+    );
+  }
+
+  // ── Intake gate ──────────────────────────────────
+  if (!engagement.intake_submitted_at) {
+    return (
+      <IntakeForm
+        portalSlug={slug!}
+        clientName={engagement.client_name}
+        onComplete={reloadEngagement}
+      />
     );
   }
 

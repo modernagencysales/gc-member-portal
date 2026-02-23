@@ -58,6 +58,8 @@ export interface DfyEngagement {
   > | null;
   unipile_account_id: string | null;
   linkedin_connected_at: string | null;
+  intake_data: Record<string, unknown> | null;
+  intake_submitted_at: string | null;
   created_at: string;
 }
 
@@ -114,7 +116,7 @@ export async function signProposal(
 // ============================================
 
 const DFY_ENGAGEMENT_COLUMNS =
-  'id, proposal_id, client_name, client_email, client_company, portal_slug, status, monthly_rate, start_date, onboarding_checklist, unipile_account_id, linkedin_connected_at, created_at';
+  'id, proposal_id, client_name, client_email, client_company, portal_slug, status, monthly_rate, start_date, onboarding_checklist, unipile_account_id, linkedin_connected_at, intake_data, intake_submitted_at, created_at';
 const DFY_DELIVERABLE_COLUMNS =
   'id, engagement_id, name, description, category, status, assignee, due_date, sort_order, client_approved_at, client_notes, created_at';
 const DFY_ACTIVITY_COLUMNS =
@@ -263,6 +265,32 @@ export async function fetchAutomationOutput(
   });
   if (!res.ok) return null;
   return res.json();
+}
+
+// ============================================
+// Client Metrics (Client Portal)
+// ============================================
+
+// ============================================
+// Submit Intake Form (Client Portal)
+// ============================================
+
+export async function submitIntakeForm(formData: FormData): Promise<void> {
+  const headers: Record<string, string> = {};
+  const token = getPortalToken();
+  if (token) {
+    headers['x-client-portal-token'] = token;
+  }
+  // Do NOT set Content-Type — browser sets it with multipart boundary
+  const res = await fetch(`${GTM_SYSTEM_URL}/api/dfy/client/intake`, {
+    method: 'POST',
+    headers,
+    body: formData,
+  });
+  if (!res.ok) {
+    const error = await res.json().catch(() => ({ error: 'Submission failed' }));
+    throw new Error(error.error || 'Failed to submit intake form');
+  }
 }
 
 // ============================================
