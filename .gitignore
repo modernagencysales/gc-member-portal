@@ -34,3 +34,4 @@ playwright-report/
 coverage/
 .lighthouseci/
 .mcp.json
+.worktrees/
