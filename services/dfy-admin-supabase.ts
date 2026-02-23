@@ -207,6 +207,20 @@ export async function syncPlaybooks(engagementId?: string) {
   });
 }
 
+export async function manualOnboard(data: {
+  client_name: string;
+  client_email: string;
+  client_company: string;
+  client_industry?: string;
+  monthly_rate?: number;
+  communication_preference?: string;
+}): Promise<{ success: boolean; engagement_id: string; portal_slug: string }> {
+  return gtmAdminFetch('/api/dfy/admin/manual-onboard', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+}
+
 export async function resendMagicLink(engagementId: string) {
   return gtmAdminFetch(`/api/dfy/client/magic-link`, {
     method: 'POST',

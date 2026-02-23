@@ -1,10 +1,14 @@
-import React, { useState, useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { Search, Briefcase, RefreshCw, ExternalLink } from 'lucide-react';
+import { Search, Briefcase, RefreshCw, ExternalLink, Plus, X } from 'lucide-react';
 import { useTheme } from '../../../context/ThemeContext';
 import { queryKeys } from '../../../lib/queryClient';
-import { fetchDfyEngagements, fetchAllDeliverables } from '../../../services/dfy-admin-supabase';
+import {
+  fetchDfyEngagements,
+  fetchAllDeliverables,
+  manualOnboard,
+} from '../../../services/dfy-admin-supabase';
 import type { DfyAdminEngagement } from '../../../types/dfy-admin-types';
 import DfyStatusBadge from './DfyStatusBadge';
 
@@ -15,8 +19,10 @@ function formatCurrency(cents: number): string {
 const DfyEngagementList: React.FC = () => {
   const { isDarkMode } = useTheme();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [showOnboardModal, setShowOnboardModal] = useState(false);
 
   const {
     data: engagements,
@@ -67,6 +73,12 @@ const DfyEngagementList: React.FC = () => {
     };
   }, [engagements]);
 
+  const handleOnboardSuccess = (engagementId: string) => {
+    setShowOnboardModal(false);
+    queryClient.invalidateQueries({ queryKey: queryKeys.dfyEngagements() });
+    navigate(`/admin/dfy/${engagementId}`);
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -79,17 +91,26 @@ const DfyEngagementList: React.FC = () => {
             Manage Done-For-You client engagements
           </p>
         </div>
-        <button
-          onClick={() => refetch()}
-          className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-            isDarkMode
-              ? 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'
-              : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
-          }`}
-        >
-          <RefreshCw className="w-4 h-4" />
-          Refresh
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setShowOnboardModal(true)}
+            className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors bg-blue-600 text-white hover:bg-blue-700"
+          >
+            <Plus className="w-4 h-4" />
+            New Client
+          </button>
+          <button
+            onClick={() => refetch()}
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+              isDarkMode
+                ? 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'
+                : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+            }`}
+          >
+            <RefreshCw className="w-4 h-4" />
+            Refresh
+          </button>
+        </div>
       </div>
 
       {/* Stats */}
@@ -206,9 +227,208 @@ const DfyEngagementList: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Manual Onboard Modal */}
+      {showOnboardModal && (
+        <ManualOnboardModal
+          onClose={() => setShowOnboardModal(false)}
+          onSuccess={handleOnboardSuccess}
+        />
+      )}
     </div>
   );
 };
+
+function ManualOnboardModal({
+  onClose,
+  onSuccess,
+}: {
+  onClose: () => void;
+  onSuccess: (engagementId: string) => void;
+}) {
+  const { isDarkMode } = useTheme();
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [form, setForm] = useState({
+    client_name: '',
+    client_email: '',
+    client_company: '',
+    client_industry: '',
+    monthly_rate_dollars: '',
+    communication_preference: 'email',
+  });
+
+  const handleEscape = useCallback(
+    (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && !submitting) onClose();
+    },
+    [onClose, submitting]
+  );
+
+  useEffect(() => {
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [handleEscape]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setSubmitting(true);
+
+    try {
+      const result = await manualOnboard({
+        client_name: form.client_name,
+        client_email: form.client_email,
+        client_company: form.client_company,
+        client_industry: form.client_industry || undefined,
+        monthly_rate: form.monthly_rate_dollars
+          ? Math.round(parseFloat(form.monthly_rate_dollars) * 100)
+          : undefined,
+        communication_preference: form.communication_preference,
+      });
+      onSuccess(result.engagement_id);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to create engagement');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const inputClass = `w-full px-3 py-2 rounded-lg border ${
+    isDarkMode
+      ? 'bg-slate-800 border-slate-700 text-white placeholder:text-slate-500'
+      : 'bg-white border-slate-300 text-slate-900 placeholder:text-slate-400'
+  } focus:ring-2 focus:ring-blue-500 focus:border-transparent`;
+
+  const labelClass = `block text-sm font-medium mb-1 ${isDarkMode ? 'text-slate-300' : 'text-slate-700'}`;
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+      onClick={() => !submitting && onClose()}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className={`w-full max-w-md rounded-xl border p-6 ${
+          isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+        }`}
+      >
+        <div className="flex items-center justify-between mb-4">
+          <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
+            New Client Onboard
+          </h3>
+          <button
+            onClick={onClose}
+            className={`p-1 rounded transition-colors ${
+              isDarkMode ? 'hover:bg-slate-800 text-slate-400' : 'hover:bg-slate-100 text-slate-500'
+            }`}
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className={labelClass}>Client Name *</label>
+            <input
+              type="text"
+              required
+              value={form.client_name}
+              onChange={(e) => setForm((f) => ({ ...f, client_name: e.target.value }))}
+              placeholder="John Doe"
+              className={inputClass}
+            />
+          </div>
+
+          <div>
+            <label className={labelClass}>Client Email *</label>
+            <input
+              type="email"
+              required
+              value={form.client_email}
+              onChange={(e) => setForm((f) => ({ ...f, client_email: e.target.value }))}
+              placeholder="john@example.com"
+              className={inputClass}
+            />
+          </div>
+
+          <div>
+            <label className={labelClass}>Company *</label>
+            <input
+              type="text"
+              required
+              value={form.client_company}
+              onChange={(e) => setForm((f) => ({ ...f, client_company: e.target.value }))}
+              placeholder="Acme Corp"
+              className={inputClass}
+            />
+          </div>
+
+          <div>
+            <label className={labelClass}>Industry</label>
+            <input
+              type="text"
+              value={form.client_industry}
+              onChange={(e) => setForm((f) => ({ ...f, client_industry: e.target.value }))}
+              placeholder="B2B SaaS"
+              className={inputClass}
+            />
+          </div>
+
+          <div>
+            <label className={labelClass}>Monthly Rate ($)</label>
+            <input
+              type="number"
+              min="0"
+              step="0.01"
+              value={form.monthly_rate_dollars}
+              onChange={(e) => setForm((f) => ({ ...f, monthly_rate_dollars: e.target.value }))}
+              placeholder="2500"
+              className={inputClass}
+            />
+          </div>
+
+          <div>
+            <label className={labelClass}>Communication Preference</label>
+            <select
+              value={form.communication_preference}
+              onChange={(e) => setForm((f) => ({ ...f, communication_preference: e.target.value }))}
+              className={inputClass}
+            >
+              <option value="email">Email</option>
+              <option value="slack">Slack</option>
+              <option value="both">Both</option>
+            </select>
+          </div>
+
+          {error && <p className="text-sm text-red-500">{error}</p>}
+
+          <div className="flex justify-end gap-3 pt-2">
+            <button
+              type="button"
+              onClick={onClose}
+              disabled={submitting}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                isDarkMode
+                  ? 'text-slate-300 hover:bg-slate-800'
+                  : 'text-slate-700 hover:bg-slate-100'
+              }`}
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={submitting}
+              className="px-4 py-2 rounded-lg text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 transition-colors"
+            >
+              {submitting ? 'Creating...' : 'Create & Onboard'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
 
 function EngagementRow({
   engagement,
