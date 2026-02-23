@@ -83,6 +83,7 @@ export interface DfyActivityEntry {
   description: string;
   actor: string;
   metadata: Record<string, unknown>;
+  client_visible: boolean;
   created_at: string;
 }
 
@@ -117,7 +118,7 @@ const DFY_ENGAGEMENT_COLUMNS =
 const DFY_DELIVERABLE_COLUMNS =
   'id, engagement_id, name, description, category, status, assignee, due_date, sort_order, client_approved_at, client_notes, created_at';
 const DFY_ACTIVITY_COLUMNS =
-  'id, engagement_id, deliverable_id, action, description, actor, metadata, created_at';
+  'id, engagement_id, deliverable_id, action, description, actor, metadata, client_visible, created_at';
 
 export async function getEngagementBySlug(slug: string): Promise<DfyEngagement | null> {
   const { data, error } = await supabase
@@ -144,6 +145,7 @@ export async function getActivityLog(engagementId: string): Promise<DfyActivityE
     .from('dfy_activity_log')
     .select(DFY_ACTIVITY_COLUMNS)
     .eq('engagement_id', engagementId)
+    .eq('client_visible', true)
     .order('created_at', { ascending: false })
     .limit(50);
   if (error || !data) return [];

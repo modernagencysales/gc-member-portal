@@ -100,6 +100,7 @@ export interface DfyActivityEntry {
   description: string;
   actor: string;
   metadata: Record<string, unknown>;
+  client_visible: boolean;
   created_at: string;
 }
 
