@@ -654,6 +654,15 @@ function OnboardingChecklistSection({
     onUpdate(updated as unknown as Record<string, unknown>);
   };
 
+  const handleNotesBlur = (key: string, value: string) => {
+    commitNotes(key, value);
+    setLocalNotes((prev) => {
+      const next = { ...prev };
+      delete next[key];
+      return next;
+    });
+  };
+
   return (
     <div
       className={`rounded-xl border ${
@@ -736,14 +745,7 @@ function OnboardingChecklistSection({
                     placeholder="Notes..."
                     value={localNotes[key] ?? item.notes ?? ''}
                     onChange={(e) => setLocalNotes((prev) => ({ ...prev, [key]: e.target.value }))}
-                    onBlur={(e) => {
-                      commitNotes(key, e.target.value);
-                      setLocalNotes((prev) => {
-                        const next = { ...prev };
-                        delete next[key];
-                        return next;
-                      });
-                    }}
+                    onBlur={(e) => handleNotesBlur(key, e.target.value)}
                     className={`mt-1 w-full text-xs px-2 py-1 rounded border ${
                       isDarkMode
                         ? 'bg-zinc-800 border-zinc-700 text-zinc-300 placeholder:text-zinc-600'
