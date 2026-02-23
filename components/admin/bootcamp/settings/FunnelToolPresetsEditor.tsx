@@ -98,10 +98,10 @@ const FunnelToolPresetsEditor: React.FC = () => {
   if (presetsLoading || toolsLoading) {
     return (
       <div
-        className={`p-6 rounded-xl border text-center ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}
+        className={`p-6 rounded-xl border text-center ${isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-200'}`}
       >
-        <div className="w-6 h-6 border-2 border-slate-300 border-t-blue-500 rounded-full animate-spin mx-auto" />
-        <p className={`text-sm mt-2 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+        <div className="w-6 h-6 border-2 border-zinc-300 border-t-violet-500 rounded-full animate-spin mx-auto" />
+        <p className={`text-sm mt-2 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
           Loading presets...
         </p>
       </div>
@@ -112,10 +112,10 @@ const FunnelToolPresetsEditor: React.FC = () => {
 
   return (
     <div
-      className={`rounded-xl border overflow-hidden ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}
+      className={`rounded-xl border overflow-hidden ${isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-200'}`}
     >
       <div
-        className={`px-6 py-4 border-b flex items-center justify-between ${isDarkMode ? 'bg-slate-800/50 border-slate-800' : 'bg-slate-50 border-slate-200'}`}
+        className={`px-6 py-4 border-b flex items-center justify-between ${isDarkMode ? 'bg-zinc-800/50 border-zinc-800' : 'bg-zinc-50 border-zinc-200'}`}
       >
         <div className="flex items-center gap-3">
           <Package className={`w-5 h-5 ${isDarkMode ? 'text-violet-400' : 'text-violet-600'}`} />
@@ -125,7 +125,7 @@ const FunnelToolPresetsEditor: React.FC = () => {
           <button
             onClick={handleSave}
             disabled={saveMutation.isPending}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50"
+            className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-violet-600 text-white hover:bg-violet-700 disabled:opacity-50"
           >
             <Save className="w-4 h-4" />
             {saveMutation.isPending ? 'Saving...' : 'Save'}
@@ -134,7 +134,7 @@ const FunnelToolPresetsEditor: React.FC = () => {
       </div>
 
       <div className="p-6 space-y-6">
-        <p className={`text-sm ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+        <p className={`text-sm ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
           Configure which AI tools are available for Sprint + AI Tools users. Each preset can be
           assigned when creating a ThriveCart checkout link via the <code>tool_preset</code>{' '}
           metadata key.
@@ -143,7 +143,7 @@ const FunnelToolPresetsEditor: React.FC = () => {
         {presetEntries.map(([key, preset]) => (
           <div
             key={key}
-            className={`rounded-lg border p-4 space-y-3 ${isDarkMode ? 'border-slate-700 bg-slate-800/30' : 'border-slate-200 bg-slate-50'}`}
+            className={`rounded-lg border p-4 space-y-3 ${isDarkMode ? 'border-zinc-700 bg-zinc-800/30' : 'border-zinc-200 bg-zinc-50'}`}
           >
             <div className="flex items-center justify-between gap-3">
               <input
@@ -152,12 +152,12 @@ const FunnelToolPresetsEditor: React.FC = () => {
                 onChange={(e) => handleUpdatePresetField(key, 'name', e.target.value)}
                 className={`flex-1 px-3 py-1.5 rounded-lg border text-sm font-medium ${
                   isDarkMode
-                    ? 'bg-slate-800 border-slate-700 text-white'
-                    : 'bg-white border-slate-300 text-slate-900'
-                } focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+                    ? 'bg-zinc-800 border-zinc-700 text-white'
+                    : 'bg-white border-zinc-300 text-zinc-900'
+                } focus:ring-2 focus:ring-violet-500 focus:border-transparent`}
               />
               <span
-                className={`text-xs px-2 py-0.5 rounded ${isDarkMode ? 'bg-slate-700 text-slate-400' : 'bg-slate-200 text-slate-500'}`}
+                className={`text-xs px-2 py-0.5 rounded ${isDarkMode ? 'bg-zinc-700 text-zinc-400' : 'bg-zinc-200 text-zinc-500'}`}
               >
                 {key}
               </span>
@@ -178,14 +178,14 @@ const FunnelToolPresetsEditor: React.FC = () => {
               placeholder="Description (optional)"
               className={`w-full px-3 py-1.5 rounded-lg border text-sm ${
                 isDarkMode
-                  ? 'bg-slate-800 border-slate-700 text-white'
-                  : 'bg-white border-slate-300 text-slate-900'
-              } focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+                  ? 'bg-zinc-800 border-zinc-700 text-white'
+                  : 'bg-white border-zinc-300 text-zinc-900'
+              } focus:ring-2 focus:ring-violet-500 focus:border-transparent`}
             />
 
             <div>
               <p
-                className={`text-xs font-medium mb-2 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}
+                className={`text-xs font-medium mb-2 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}
               >
                 Included Tools ({preset.toolSlugs.length})
               </p>
@@ -200,8 +200,8 @@ const FunnelToolPresetsEditor: React.FC = () => {
                         isIncluded
                           ? 'bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300 border border-violet-300 dark:border-violet-700'
                           : isDarkMode
-                            ? 'bg-slate-800 text-slate-400 border border-slate-700 hover:border-slate-600'
-                            : 'bg-white text-slate-500 border border-slate-200 hover:border-slate-300'
+                            ? 'bg-zinc-800 text-zinc-400 border border-zinc-700 hover:border-zinc-600'
+                            : 'bg-white text-zinc-500 border border-zinc-200 hover:border-zinc-300'
                       }`}
                     >
                       <Sparkles size={10} />
@@ -223,9 +223,9 @@ const FunnelToolPresetsEditor: React.FC = () => {
             placeholder="New preset name..."
             className={`flex-1 px-3 py-2 rounded-lg border text-sm ${
               isDarkMode
-                ? 'bg-slate-800 border-slate-700 text-white'
-                : 'bg-white border-slate-300 text-slate-900'
-            } focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+                ? 'bg-zinc-800 border-zinc-700 text-white'
+                : 'bg-white border-zinc-300 text-zinc-900'
+            } focus:ring-2 focus:ring-violet-500 focus:border-transparent`}
             onKeyDown={(e) => e.key === 'Enter' && handleAddPreset()}
           />
           <button

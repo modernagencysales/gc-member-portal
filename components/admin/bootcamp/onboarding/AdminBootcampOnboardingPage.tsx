@@ -140,13 +140,13 @@ const AdminBootcampOnboardingPage: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-xl font-semibold">Onboarding Checklist</h2>
-          <p className={`text-sm mt-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+          <p className={`text-sm mt-1 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
             Configure the onboarding checklist items for new students
           </p>
         </div>
         <button
           onClick={handleAddItem}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-blue-600 text-white hover:bg-blue-700"
+          className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-violet-600 text-white hover:bg-violet-700"
         >
           <Plus className="w-4 h-4" />
           Add Item
@@ -159,7 +159,7 @@ const AdminBootcampOnboardingPage: React.FC = () => {
           <div
             key={group.category}
             className={`px-3 py-1.5 rounded-full text-sm ${
-              isDarkMode ? 'bg-slate-800 text-slate-300' : 'bg-slate-100 text-slate-600'
+              isDarkMode ? 'bg-zinc-800 text-zinc-300' : 'bg-zinc-100 text-zinc-600'
             }`}
           >
             {group.category}: {group.items.length}
@@ -171,11 +171,11 @@ const AdminBootcampOnboardingPage: React.FC = () => {
       {isLoading ? (
         <div
           className={`p-8 rounded-xl border text-center ${
-            isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+            isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-200'
           }`}
         >
-          <div className="w-6 h-6 border-2 border-slate-300 border-t-blue-500 rounded-full animate-spin mx-auto" />
-          <p className={`text-sm mt-2 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+          <div className="w-6 h-6 border-2 border-zinc-300 border-t-violet-500 rounded-full animate-spin mx-auto" />
+          <p className={`text-sm mt-2 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
             Loading checklist...
           </p>
         </div>
@@ -185,26 +185,26 @@ const AdminBootcampOnboardingPage: React.FC = () => {
             <div
               key={group.category}
               className={`rounded-xl border overflow-hidden ${
-                isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+                isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-200'
               }`}
             >
               {/* Category Header */}
               <div
                 className={`px-4 py-3 border-b ${
-                  isDarkMode ? 'bg-slate-800/50 border-slate-800' : 'bg-slate-50 border-slate-200'
+                  isDarkMode ? 'bg-zinc-800/50 border-zinc-800' : 'bg-zinc-50 border-zinc-200'
                 }`}
               >
                 <h3 className="font-medium">{group.category}</h3>
               </div>
 
               {/* Items */}
-              <div className={`divide-y ${isDarkMode ? 'divide-slate-800' : 'divide-slate-200'}`}>
+              <div className={`divide-y ${isDarkMode ? 'divide-zinc-800' : 'divide-zinc-200'}`}>
                 {group.items.map((item, index) => (
                   <div
                     key={item.id}
                     className={`p-4 ${
                       !item.isVisible ? 'opacity-50' : ''
-                    } ${isDarkMode ? 'hover:bg-slate-800/30' : 'hover:bg-slate-50'}`}
+                    } ${isDarkMode ? 'hover:bg-zinc-800/30' : 'hover:bg-zinc-50'}`}
                   >
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1 min-w-0">
@@ -217,8 +217,8 @@ const AdminBootcampOnboardingPage: React.FC = () => {
                               rel="noopener noreferrer"
                               className={`p-1 rounded ${
                                 isDarkMode
-                                  ? 'text-slate-400 hover:text-slate-200'
-                                  : 'text-slate-500 hover:text-slate-700'
+                                  ? 'text-zinc-400 hover:text-zinc-200'
+                                  : 'text-zinc-500 hover:text-zinc-700'
                               }`}
                             >
                               <ExternalLink className="w-3.5 h-3.5" />
@@ -227,18 +227,18 @@ const AdminBootcampOnboardingPage: React.FC = () => {
                         </div>
                         <div
                           className={`flex items-center gap-3 mt-1 text-xs ${
-                            isDarkMode ? 'text-slate-500' : 'text-slate-500'
+                            isDarkMode ? 'text-zinc-500' : 'text-zinc-500'
                           }`}
                         >
                           <span
                             className={`px-2 py-0.5 rounded ${
                               item.isRequired
                                 ? isDarkMode
-                                  ? 'bg-blue-900/30 text-blue-400'
-                                  : 'bg-blue-100 text-blue-700'
+                                  ? 'bg-violet-900/30 text-violet-400'
+                                  : 'bg-violet-100 text-violet-700'
                                 : isDarkMode
-                                  ? 'bg-slate-800'
-                                  : 'bg-slate-100'
+                                  ? 'bg-zinc-800'
+                                  : 'bg-zinc-100'
                             }`}
                           >
                             {item.isRequired ? 'Required' : 'Optional'}
@@ -248,7 +248,7 @@ const AdminBootcampOnboardingPage: React.FC = () => {
                         {item.description && (
                           <p
                             className={`mt-2 text-sm ${
-                              isDarkMode ? 'text-slate-400' : 'text-slate-600'
+                              isDarkMode ? 'text-zinc-400' : 'text-zinc-600'
                             }`}
                           >
                             {item.description}
@@ -262,8 +262,8 @@ const AdminBootcampOnboardingPage: React.FC = () => {
                           onClick={() => handleToggleVisibility(item)}
                           className={`p-1.5 rounded-lg ${
                             isDarkMode
-                              ? 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'
-                              : 'text-slate-500 hover:bg-slate-100 hover:text-slate-700'
+                              ? 'text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200'
+                              : 'text-zinc-500 hover:bg-zinc-100 hover:text-zinc-700'
                           }`}
                           title={item.isVisible ? 'Hide from students' : 'Show to students'}
                         >
@@ -280,8 +280,8 @@ const AdminBootcampOnboardingPage: React.FC = () => {
                           disabled={index === 0}
                           className={`p-1.5 rounded-lg disabled:opacity-30 ${
                             isDarkMode
-                              ? 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'
-                              : 'text-slate-500 hover:bg-slate-100 hover:text-slate-700'
+                              ? 'text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200'
+                              : 'text-zinc-500 hover:bg-zinc-100 hover:text-zinc-700'
                           }`}
                         >
                           <ChevronUp className="w-4 h-4" />
@@ -291,8 +291,8 @@ const AdminBootcampOnboardingPage: React.FC = () => {
                           disabled={index === group.items.length - 1}
                           className={`p-1.5 rounded-lg disabled:opacity-30 ${
                             isDarkMode
-                              ? 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'
-                              : 'text-slate-500 hover:bg-slate-100 hover:text-slate-700'
+                              ? 'text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200'
+                              : 'text-zinc-500 hover:bg-zinc-100 hover:text-zinc-700'
                           }`}
                         >
                           <ChevronDown className="w-4 h-4" />
@@ -303,8 +303,8 @@ const AdminBootcampOnboardingPage: React.FC = () => {
                           onClick={() => handleEditItem(item)}
                           className={`p-1.5 rounded-lg ${
                             isDarkMode
-                              ? 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'
-                              : 'text-slate-500 hover:bg-slate-100 hover:text-slate-700'
+                              ? 'text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200'
+                              : 'text-zinc-500 hover:bg-zinc-100 hover:text-zinc-700'
                           }`}
                         >
                           <Pencil className="w-4 h-4" />

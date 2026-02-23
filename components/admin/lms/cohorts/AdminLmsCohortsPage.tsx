@@ -170,14 +170,14 @@ const AdminLmsCohortsPage: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-xl font-semibold">Courses</h2>
-          <p className={`text-sm mt-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+          <p className={`text-sm mt-1 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
             Manage courses and cohorts
           </p>
         </div>
         <div className="flex items-center gap-2">
           <button
             onClick={() => refetch()}
-            className={`p-2 rounded-lg ${isDarkMode ? 'hover:bg-slate-800' : 'hover:bg-slate-100'}`}
+            className={`p-2 rounded-lg ${isDarkMode ? 'hover:bg-zinc-800' : 'hover:bg-zinc-100'}`}
             title="Refresh"
           >
             <RefreshCw className="w-5 h-5" />
@@ -203,10 +203,10 @@ const AdminLmsCohortsPage: React.FC = () => {
           <div
             key={stat.label}
             className={`p-4 rounded-xl border ${
-              isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+              isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-200'
             }`}
           >
-            <p className={`text-sm ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+            <p className={`text-sm ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
               {stat.label}
             </p>
             <p className="text-2xl font-bold mt-1">{stat.value}</p>
@@ -224,8 +224,8 @@ const AdminLmsCohortsPage: React.FC = () => {
               statusFilter === status
                 ? 'bg-violet-600 text-white'
                 : isDarkMode
-                  ? 'text-slate-400 hover:bg-slate-800'
-                  : 'text-slate-600 hover:bg-slate-100'
+                  ? 'text-zinc-400 hover:bg-zinc-800'
+                  : 'text-zinc-600 hover:bg-zinc-100'
             }`}
           >
             {status}
@@ -235,7 +235,7 @@ const AdminLmsCohortsPage: React.FC = () => {
 
       {/* Search */}
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-400" />
         <input
           type="text"
           placeholder="Search cohorts..."
@@ -243,8 +243,8 @@ const AdminLmsCohortsPage: React.FC = () => {
           onChange={(e) => setSearchQuery(e.target.value)}
           className={`w-full pl-10 pr-4 py-2.5 rounded-lg border ${
             isDarkMode
-              ? 'bg-slate-900 border-slate-700 text-white placeholder:text-slate-500'
-              : 'bg-white border-slate-300 text-slate-900 placeholder:text-slate-400'
+              ? 'bg-zinc-900 border-zinc-700 text-white placeholder:text-zinc-500'
+              : 'bg-white border-zinc-300 text-zinc-900 placeholder:text-zinc-400'
           } focus:ring-2 focus:ring-violet-500 focus:border-transparent`}
         />
       </div>
@@ -253,22 +253,22 @@ const AdminLmsCohortsPage: React.FC = () => {
       {isLoading ? (
         <div
           className={`p-8 rounded-xl border text-center ${
-            isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+            isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-200'
           }`}
         >
-          <div className="w-6 h-6 border-2 border-slate-300 border-t-violet-500 rounded-full animate-spin mx-auto" />
-          <p className={`text-sm mt-2 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+          <div className="w-6 h-6 border-2 border-zinc-300 border-t-violet-500 rounded-full animate-spin mx-auto" />
+          <p className={`text-sm mt-2 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
             Loading cohorts...
           </p>
         </div>
       ) : (
         <div
           className={`rounded-xl border overflow-hidden ${
-            isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+            isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-200'
           }`}
         >
           <table className="w-full">
-            <thead className={`text-xs uppercase ${isDarkMode ? 'bg-slate-800' : 'bg-slate-50'}`}>
+            <thead className={`text-xs uppercase ${isDarkMode ? 'bg-zinc-800' : 'bg-zinc-50'}`}>
               <tr>
                 <th className="px-4 py-3 text-left">Cohort</th>
                 <th className="px-4 py-3 text-left">Description</th>
@@ -278,13 +278,13 @@ const AdminLmsCohortsPage: React.FC = () => {
                 <th className="px-4 py-3 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
+            <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
               {filteredCohorts.length === 0 ? (
                 <tr>
                   <td
                     colSpan={6}
                     className={`px-4 py-8 text-center ${
-                      isDarkMode ? 'text-slate-400' : 'text-slate-500'
+                      isDarkMode ? 'text-zinc-400' : 'text-zinc-500'
                     }`}
                   >
                     {searchQuery ? 'No cohorts match your search' : 'No cohorts yet'}
@@ -294,7 +294,7 @@ const AdminLmsCohortsPage: React.FC = () => {
                 filteredCohorts.map((cohort) => (
                   <tr
                     key={cohort.id}
-                    className={`${isDarkMode ? 'hover:bg-slate-800/50' : 'hover:bg-slate-50'}`}
+                    className={`${isDarkMode ? 'hover:bg-zinc-800/50' : 'hover:bg-zinc-50'}`}
                   >
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
@@ -303,13 +303,13 @@ const AdminLmsCohortsPage: React.FC = () => {
                           <p className="font-medium">{cohort.name}</p>
                           {cohort.sidebarLabel && cohort.sidebarLabel !== cohort.name && (
                             <p
-                              className={`text-xs ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}
+                              className={`text-xs ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}
                             >
                               Sidebar: {cohort.sidebarLabel}
                             </p>
                           )}
                           <p
-                            className={`text-xs ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}
+                            className={`text-xs ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}
                           >
                             Created {cohort.createdAt.toLocaleDateString()}
                           </p>
@@ -318,7 +318,7 @@ const AdminLmsCohortsPage: React.FC = () => {
                     </td>
                     <td className="px-4 py-3">
                       <p
-                        className={`text-sm ${isDarkMode ? 'text-slate-400' : 'text-slate-600'} line-clamp-2`}
+                        className={`text-sm ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'} line-clamp-2`}
                       >
                         {cohort.description || '-'}
                       </p>
@@ -326,14 +326,14 @@ const AdminLmsCohortsPage: React.FC = () => {
                     <td className="px-4 py-3 text-center">
                       <span
                         className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-                          isDarkMode ? 'bg-slate-800 text-slate-400' : 'bg-slate-100 text-slate-600'
+                          isDarkMode ? 'bg-zinc-800 text-zinc-400' : 'bg-zinc-100 text-zinc-600'
                         }`}
                       >
                         {cohort.productType || 'course'}
                       </span>
                       {cohort.thrivecartProductId && (
                         <p
-                          className={`text-xs mt-0.5 ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}
+                          className={`text-xs mt-0.5 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}
                         >
                           {cohort.thrivecartProductId}
                         </p>
@@ -342,15 +342,15 @@ const AdminLmsCohortsPage: React.FC = () => {
                     <td className="px-4 py-3 text-center">
                       {cohort.startDate || cohort.endDate ? (
                         <div className="flex items-center justify-center gap-1 text-xs">
-                          <Calendar className="w-3 h-3 text-slate-400" />
-                          <span className={isDarkMode ? 'text-slate-400' : 'text-slate-600'}>
+                          <Calendar className="w-3 h-3 text-zinc-400" />
+                          <span className={isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}>
                             {cohort.startDate?.toLocaleDateString() || '?'} -{' '}
                             {cohort.endDate?.toLocaleDateString() || '?'}
                           </span>
                         </div>
                       ) : (
                         <span
-                          className={`text-xs ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}
+                          className={`text-xs ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}
                         >
                           No dates set
                         </span>
@@ -363,7 +363,7 @@ const AdminLmsCohortsPage: React.FC = () => {
                             ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
                             : cohort.status === 'Draft'
                               ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400'
-                              : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400'
+                              : 'bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400'
                         }`}
                       >
                         {cohort.status === 'Active' ? (
@@ -385,7 +385,7 @@ const AdminLmsCohortsPage: React.FC = () => {
                             setImportingCohort(cohort);
                           }}
                           className={`p-2 rounded-lg ${
-                            isDarkMode ? 'hover:bg-slate-700' : 'hover:bg-slate-100'
+                            isDarkMode ? 'hover:bg-zinc-700' : 'hover:bg-zinc-100'
                           }`}
                           title="Import CSV"
                         >
@@ -394,7 +394,7 @@ const AdminLmsCohortsPage: React.FC = () => {
                         <button
                           onClick={() => handleManageCurriculum(cohort)}
                           className={`p-2 rounded-lg text-violet-500 ${
-                            isDarkMode ? 'hover:bg-slate-700' : 'hover:bg-slate-100'
+                            isDarkMode ? 'hover:bg-zinc-700' : 'hover:bg-zinc-100'
                           }`}
                           title="Manage Curriculum"
                         >
@@ -403,7 +403,7 @@ const AdminLmsCohortsPage: React.FC = () => {
                         <button
                           onClick={() => setDuplicatingCohort(cohort)}
                           className={`p-2 rounded-lg ${
-                            isDarkMode ? 'hover:bg-slate-700' : 'hover:bg-slate-100'
+                            isDarkMode ? 'hover:bg-zinc-700' : 'hover:bg-zinc-100'
                           }`}
                           title="Duplicate Cohort"
                         >
@@ -412,7 +412,7 @@ const AdminLmsCohortsPage: React.FC = () => {
                         <button
                           onClick={() => handleToggleStatus(cohort)}
                           className={`p-2 rounded-lg ${
-                            isDarkMode ? 'hover:bg-slate-700' : 'hover:bg-slate-100'
+                            isDarkMode ? 'hover:bg-zinc-700' : 'hover:bg-zinc-100'
                           }`}
                           title={cohort.status === 'Active' ? 'Archive' : 'Activate'}
                         >
@@ -425,7 +425,7 @@ const AdminLmsCohortsPage: React.FC = () => {
                         <button
                           onClick={() => handleEditCohort(cohort)}
                           className={`p-2 rounded-lg ${
-                            isDarkMode ? 'hover:bg-slate-700' : 'hover:bg-slate-100'
+                            isDarkMode ? 'hover:bg-zinc-700' : 'hover:bg-zinc-100'
                           }`}
                           title="Edit"
                         >
@@ -434,7 +434,7 @@ const AdminLmsCohortsPage: React.FC = () => {
                         <button
                           onClick={() => setDeletingCohort(cohort)}
                           className={`p-2 rounded-lg text-red-500 ${
-                            isDarkMode ? 'hover:bg-slate-700' : 'hover:bg-slate-100'
+                            isDarkMode ? 'hover:bg-zinc-700' : 'hover:bg-zinc-100'
                           }`}
                           title="Delete"
                         >
@@ -485,10 +485,10 @@ const AdminLmsCohortsPage: React.FC = () => {
       {deletingCohort && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div
-            className={`w-full max-w-md p-6 rounded-xl ${isDarkMode ? 'bg-slate-900' : 'bg-white'}`}
+            className={`w-full max-w-md p-6 rounded-xl ${isDarkMode ? 'bg-zinc-900' : 'bg-white'}`}
           >
             <h3 className="text-lg font-semibold mb-2">Delete Cohort</h3>
-            <p className={`text-sm mb-4 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+            <p className={`text-sm mb-4 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
               Are you sure you want to delete "{deletingCohort.name}"? This will permanently delete
               all weeks, lessons, content items, and action items associated with this cohort. This
               action cannot be undone.
@@ -497,7 +497,7 @@ const AdminLmsCohortsPage: React.FC = () => {
               <button
                 onClick={() => setDeletingCohort(null)}
                 className={`px-4 py-2 rounded-lg text-sm font-medium ${
-                  isDarkMode ? 'hover:bg-slate-800' : 'hover:bg-slate-100'
+                  isDarkMode ? 'hover:bg-zinc-800' : 'hover:bg-zinc-100'
                 }`}
               >
                 Cancel

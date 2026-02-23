@@ -40,6 +40,7 @@ import type {
   DfyAutomationRun,
   OnboardingChecklist,
   DfyCommunicationPreference,
+  DfyEngagementStatus,
 } from '../../../types/dfy-admin-types';
 import {
   DELIVERABLE_STATUS_CONFIGS,
@@ -83,26 +84,45 @@ const DfyEngagementDetail: React.FC = () => {
     enabled: !!engagementId,
   });
 
-  // ---- Mutations ----
-  const invalidateAll = () => {
+  // ---- Manual refresh (for header button) ----
+  const refreshAll = () => {
     queryClient.invalidateQueries({ queryKey: queryKeys.dfyEngagement(engagementId!) });
     queryClient.invalidateQueries({ queryKey: queryKeys.dfyDeliverables(engagementId!) });
     queryClient.invalidateQueries({ queryKey: queryKeys.dfyActivity(engagementId!) });
     queryClient.invalidateQueries({ queryKey: queryKeys.dfyAutomationRuns(engagementId!) });
-    queryClient.invalidateQueries({ queryKey: queryKeys.dfyEngagements() });
   };
 
+  // ---- Mutations ----
   const engagementMutation = useMutation({
     mutationFn: (data: {
-      status?: string;
+      status?: DfyEngagementStatus;
       onboarding_checklist?: Record<string, unknown>;
-      communication_preference?: string;
+      communication_preference?: DfyCommunicationPreference;
     }) => updateEngagement(engagementId!, data),
-    onSuccess: () => {
-      setError(null);
-      invalidateAll();
+    onMutate: async (newData) => {
+      await queryClient.cancelQueries({ queryKey: queryKeys.dfyEngagement(engagementId!) });
+      const previousEngagement = queryClient.getQueryData<DfyAdminEngagement>(
+        queryKeys.dfyEngagement(engagementId!)
+      );
+      queryClient.setQueryData<DfyAdminEngagement | null>(
+        queryKeys.dfyEngagement(engagementId!),
+        (old) => (old ? ({ ...old, ...newData } as DfyAdminEngagement) : old)
+      );
+      return { previousEngagement };
     },
-    onError: (err: Error) => setError(err.message),
+    onError: (err: Error, _newData, context) => {
+      if (context?.previousEngagement) {
+        queryClient.setQueryData(
+          queryKeys.dfyEngagement(engagementId!),
+          context.previousEngagement
+        );
+      }
+      setError(err.message);
+    },
+    onSuccess: () => setError(null),
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.dfyEngagement(engagementId!) });
+    },
   });
 
   const deliverableMutation = useMutation({
@@ -110,7 +130,8 @@ const DfyEngagementDetail: React.FC = () => {
       updateDeliverable(id, data),
     onSuccess: () => {
       setError(null);
-      invalidateAll();
+      queryClient.invalidateQueries({ queryKey: queryKeys.dfyDeliverables(engagementId!) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dfyActivity(engagementId!) });
     },
     onError: (err: Error) => setError(err.message),
   });
@@ -119,7 +140,8 @@ const DfyEngagementDetail: React.FC = () => {
     mutationFn: () => retriggerOnboarding(engagementId!),
     onSuccess: () => {
       setError(null);
-      invalidateAll();
+      queryClient.invalidateQueries({ queryKey: queryKeys.dfyEngagement(engagementId!) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dfyActivity(engagementId!) });
     },
     onError: (err: Error) => setError(err.message),
   });
@@ -148,7 +170,8 @@ const DfyEngagementDetail: React.FC = () => {
     mutationFn: () => syncPlaybooks(engagementId!),
     onSuccess: () => {
       setError(null);
-      invalidateAll();
+      queryClient.invalidateQueries({ queryKey: queryKeys.dfyDeliverables(engagementId!) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dfyActivity(engagementId!) });
     },
     onError: (err: Error) => setError(err.message),
   });
@@ -175,7 +198,7 @@ const DfyEngagementDetail: React.FC = () => {
   if (engLoading || delsLoading) {
     return (
       <div className="p-8 text-center">
-        <div className="w-6 h-6 border-2 border-slate-300 dark:border-slate-700 border-t-blue-500 rounded-full animate-spin mx-auto" />
+        <div className="w-6 h-6 border-2 border-zinc-300 dark:border-zinc-700 border-t-violet-500 rounded-full animate-spin mx-auto" />
       </div>
     );
   }
@@ -183,7 +206,7 @@ const DfyEngagementDetail: React.FC = () => {
   if (!engagement) {
     return (
       <div className="p-8 text-center">
-        <p className={isDarkMode ? 'text-slate-400' : 'text-slate-500'}>Engagement not found</p>
+        <p className={isDarkMode ? 'text-zinc-400' : 'text-zinc-500'}>Engagement not found</p>
       </div>
     );
   }
@@ -195,24 +218,24 @@ const DfyEngagementDetail: React.FC = () => {
         <button
           onClick={() => navigate('/admin/dfy')}
           className={`p-2 rounded-lg transition-colors ${
-            isDarkMode ? 'hover:bg-slate-800' : 'hover:bg-slate-100'
+            isDarkMode ? 'hover:bg-zinc-800' : 'hover:bg-zinc-100'
           }`}
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
         <div className="flex-1">
-          <h2 className={`text-xl font-semibold ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
+          <h2 className={`text-xl font-semibold ${isDarkMode ? 'text-white' : 'text-zinc-900'}`}>
             {engagement.client_name}
           </h2>
-          <p className={`text-sm ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+          <p className={`text-sm ${isDarkMode ? 'text-zinc-400' : 'text-zinc-500'}`}>
             {engagement.client_company}
           </p>
         </div>
         <DfyStatusBadge status={engagement.status} type="engagement" />
         <button
-          onClick={invalidateAll}
+          onClick={refreshAll}
           className={`p-2 rounded-lg transition-colors ${
-            isDarkMode ? 'hover:bg-slate-800 text-slate-400' : 'hover:bg-slate-100 text-slate-500'
+            isDarkMode ? 'hover:bg-zinc-800 text-zinc-400' : 'hover:bg-zinc-100 text-zinc-500'
           }`}
         >
           <RefreshCw className="w-4 h-4" />
@@ -236,12 +259,10 @@ const DfyEngagementDetail: React.FC = () => {
       {/* 2. Overview Card */}
       <div
         className={`rounded-xl border p-6 ${
-          isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+          isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-200'
         }`}
       >
-        <h3
-          className={`text-sm font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}
-        >
+        <h3 className={`text-sm font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-zinc-900'}`}>
           Overview
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -282,7 +303,7 @@ const DfyEngagementDetail: React.FC = () => {
           {/* Communication Preference */}
           <div>
             <p
-              className={`text-[11px] font-semibold uppercase tracking-wider ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}
+              className={`text-[11px] font-semibold uppercase tracking-wider ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}
             >
               Communication
             </p>
@@ -296,8 +317,8 @@ const DfyEngagementDetail: React.FC = () => {
               disabled={engagementMutation.isPending}
               className={`mt-0.5 text-sm font-medium px-2 py-1 rounded border ${
                 isDarkMode
-                  ? 'bg-slate-800 border-slate-700 text-slate-200'
-                  : 'bg-white border-slate-300 text-slate-900'
+                  ? 'bg-zinc-800 border-zinc-700 text-zinc-200'
+                  : 'bg-white border-zinc-300 text-zinc-900'
               } disabled:opacity-50`}
             >
               <option value="email">Email</option>
@@ -308,11 +329,11 @@ const DfyEngagementDetail: React.FC = () => {
         </div>
 
         {/* Resend Magic Link */}
-        <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800">
+        <div className="mt-4 pt-4 border-t border-zinc-100 dark:border-zinc-800">
           <button
             onClick={() => magicLinkMutation.mutate()}
             disabled={magicLinkMutation.isPending}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 disabled:opacity-50 transition-colors"
+            className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium bg-zinc-100 text-zinc-700 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700 disabled:opacity-50 transition-colors"
           >
             <Mail className="w-3.5 h-3.5" />
             {magicLinkMutation.isPending
@@ -353,17 +374,15 @@ const DfyEngagementDetail: React.FC = () => {
       {/* 5. Deliverables (grouped by milestone) */}
       <div
         className={`rounded-xl border ${
-          isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+          isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-200'
         }`}
       >
-        <div
-          className={`px-4 py-3 border-b ${isDarkMode ? 'border-slate-800' : 'border-slate-200'}`}
-        >
-          <h3 className={`text-sm font-semibold ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
+        <div className={`px-4 py-3 border-b ${isDarkMode ? 'border-zinc-800' : 'border-zinc-200'}`}>
+          <h3 className={`text-sm font-semibold ${isDarkMode ? 'text-white' : 'text-zinc-900'}`}>
             Deliverables
           </h3>
         </div>
-        <div className="divide-y divide-slate-100 dark:divide-slate-800">
+        <div className="divide-y divide-zinc-100 dark:divide-zinc-800">
           {Array.from(milestoneGroups.entries()).map(([milestoneId, items]) => (
             <MilestoneSection
               key={milestoneId || '__ungrouped'}
@@ -379,7 +398,7 @@ const DfyEngagementDetail: React.FC = () => {
           {(!deliverables || deliverables.length === 0) && (
             <p
               className={`px-4 py-6 text-sm text-center ${
-                isDarkMode ? 'text-slate-500' : 'text-slate-400'
+                isDarkMode ? 'text-zinc-500' : 'text-zinc-400'
               }`}
             >
               No deliverables yet
@@ -391,21 +410,19 @@ const DfyEngagementDetail: React.FC = () => {
       {/* 6. Activity Log */}
       <div
         className={`rounded-xl border ${
-          isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+          isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-200'
         }`}
       >
-        <div
-          className={`px-4 py-3 border-b ${isDarkMode ? 'border-slate-800' : 'border-slate-200'}`}
-        >
-          <h3 className={`text-sm font-semibold ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
+        <div className={`px-4 py-3 border-b ${isDarkMode ? 'border-zinc-800' : 'border-zinc-200'}`}>
+          <h3 className={`text-sm font-semibold ${isDarkMode ? 'text-white' : 'text-zinc-900'}`}>
             Activity Log
           </h3>
         </div>
-        <div className="divide-y divide-slate-100 dark:divide-slate-800">
+        <div className="divide-y divide-zinc-100 dark:divide-zinc-800">
           {(activity || []).length === 0 ? (
             <p
               className={`px-4 py-6 text-sm text-center ${
-                isDarkMode ? 'text-slate-500' : 'text-slate-400'
+                isDarkMode ? 'text-zinc-500' : 'text-zinc-400'
               }`}
             >
               No activity yet
@@ -437,7 +454,7 @@ function InfoPair({ label, value, href }: { label: string; value: string; href?:
   return (
     <div>
       <p
-        className={`text-[11px] font-semibold uppercase tracking-wider ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}
+        className={`text-[11px] font-semibold uppercase tracking-wider ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}
       >
         {label}
       </p>
@@ -447,7 +464,9 @@ function InfoPair({ label, value, href }: { label: string; value: string; href?:
           target="_blank"
           rel="noopener noreferrer"
           className={`text-sm font-medium flex items-center gap-1 mt-0.5 ${
-            isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-700'
+            isDarkMode
+              ? 'text-violet-400 hover:text-violet-300'
+              : 'text-violet-600 hover:text-violet-700'
           }`}
         >
           {value}
@@ -455,7 +474,7 @@ function InfoPair({ label, value, href }: { label: string; value: string; href?:
         </a>
       ) : (
         <p
-          className={`text-sm font-medium mt-0.5 ${isDarkMode ? 'text-slate-200' : 'text-slate-900'}`}
+          className={`text-sm font-medium mt-0.5 ${isDarkMode ? 'text-zinc-200' : 'text-zinc-900'}`}
         >
           {value}
         </p>
@@ -489,7 +508,7 @@ function ActionButtons({
         <button
           onClick={onRetrigger}
           disabled={isLoading}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 transition-colors"
+          className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-violet-600 text-white hover:bg-violet-700 disabled:opacity-50 transition-colors"
         >
           <RotateCcw className="w-4 h-4" />
           {isLoading ? 'Re-triggering...' : 'Re-trigger Onboarding'}
@@ -540,6 +559,7 @@ function OnboardingChecklistSection({
 }) {
   const { isDarkMode } = useTheme();
   const checklist = engagement.onboarding_checklist as OnboardingChecklist | null;
+  const [localNotes, setLocalNotes] = useState<Record<string, string>>({});
 
   const completedCount = checklist
     ? Object.values(checklist).filter((item) => item.completed).length
@@ -555,8 +575,10 @@ function OnboardingChecklistSection({
     onUpdate(updated as unknown as Record<string, unknown>);
   };
 
-  const updateNotes = (key: string, notes: string) => {
+  const commitNotes = (key: string, notes: string) => {
     if (!checklist) return;
+    const serverNotes = checklist[key]?.notes || '';
+    if (notes === serverNotes) return;
     const updated = { ...checklist, [key]: { ...checklist[key], notes } };
     onUpdate(updated as unknown as Record<string, unknown>);
   };
@@ -564,20 +586,20 @@ function OnboardingChecklistSection({
   return (
     <div
       className={`rounded-xl border ${
-        isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+        isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-200'
       }`}
     >
       <div
         className={`px-4 py-3 border-b flex items-center justify-between ${
-          isDarkMode ? 'border-slate-800' : 'border-slate-200'
+          isDarkMode ? 'border-zinc-800' : 'border-zinc-200'
         }`}
       >
         <div>
-          <h3 className={`text-sm font-semibold ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
+          <h3 className={`text-sm font-semibold ${isDarkMode ? 'text-white' : 'text-zinc-900'}`}>
             Onboarding Checklist
           </h3>
           {checklist && (
-            <p className={`text-xs mt-0.5 ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+            <p className={`text-xs mt-0.5 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-500'}`}>
               {completedCount} of {totalCount} complete
             </p>
           )}
@@ -588,7 +610,7 @@ function OnboardingChecklistSection({
               LinkedIn Connected
             </span>
           ) : (
-            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400">
+            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400">
               LinkedIn Not Connected
             </span>
           )}
@@ -597,13 +619,13 @@ function OnboardingChecklistSection({
       <div className="p-4">
         {!checklist ? (
           <div className="text-center py-4">
-            <p className={`text-sm mb-3 ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+            <p className={`text-sm mb-3 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-500'}`}>
               No checklist initialized for this engagement.
             </p>
             <button
               onClick={onInitialize}
               disabled={isUpdating}
-              className="px-4 py-2 rounded-lg text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 transition-colors"
+              className="px-4 py-2 rounded-lg text-sm font-medium bg-violet-600 text-white hover:bg-violet-700 disabled:opacity-50 transition-colors"
             >
               {isUpdating ? 'Initializing...' : 'Initialize Checklist'}
             </button>
@@ -614,7 +636,7 @@ function OnboardingChecklistSection({
               <div
                 key={key}
                 className={`flex items-start gap-3 p-2 rounded-lg ${
-                  isDarkMode ? 'hover:bg-slate-800/50' : 'hover:bg-slate-50'
+                  isDarkMode ? 'hover:bg-zinc-800/50' : 'hover:bg-zinc-50'
                 }`}
               >
                 <input
@@ -622,18 +644,18 @@ function OnboardingChecklistSection({
                   checked={item.completed}
                   onChange={() => toggleItem(key)}
                   disabled={isUpdating}
-                  className="mt-1 w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                  className="mt-1 w-4 h-4 rounded border-zinc-300 text-violet-600 focus:ring-violet-500"
                 />
                 <div className="flex-1 min-w-0">
                   <p
                     className={`text-sm font-medium ${
                       item.completed
                         ? isDarkMode
-                          ? 'text-slate-500 line-through'
-                          : 'text-slate-400 line-through'
+                          ? 'text-zinc-500 line-through'
+                          : 'text-zinc-400 line-through'
                         : isDarkMode
-                          ? 'text-slate-200'
-                          : 'text-slate-900'
+                          ? 'text-zinc-200'
+                          : 'text-zinc-900'
                     }`}
                   >
                     {item.label}
@@ -641,14 +663,21 @@ function OnboardingChecklistSection({
                   <input
                     type="text"
                     placeholder="Notes..."
-                    value={item.notes || ''}
-                    onChange={(e) => updateNotes(key, e.target.value)}
-                    onBlur={(e) => updateNotes(key, e.target.value)}
+                    value={localNotes[key] ?? item.notes ?? ''}
+                    onChange={(e) => setLocalNotes((prev) => ({ ...prev, [key]: e.target.value }))}
+                    onBlur={(e) => {
+                      commitNotes(key, e.target.value);
+                      setLocalNotes((prev) => {
+                        const next = { ...prev };
+                        delete next[key];
+                        return next;
+                      });
+                    }}
                     className={`mt-1 w-full text-xs px-2 py-1 rounded border ${
                       isDarkMode
-                        ? 'bg-slate-800 border-slate-700 text-slate-300 placeholder:text-slate-600'
-                        : 'bg-slate-50 border-slate-200 text-slate-700 placeholder:text-slate-400'
-                    } focus:ring-1 focus:ring-blue-500 focus:border-transparent`}
+                        ? 'bg-zinc-800 border-zinc-700 text-zinc-300 placeholder:text-zinc-600'
+                        : 'bg-zinc-50 border-zinc-200 text-zinc-700 placeholder:text-zinc-400'
+                    } focus:ring-1 focus:ring-violet-500 focus:border-transparent`}
                   />
                 </div>
               </div>
@@ -691,7 +720,7 @@ function MilestoneSection({
       <button
         onClick={() => setExpanded(!expanded)}
         className={`flex items-center gap-2 w-full text-left mb-3 ${
-          isDarkMode ? 'text-slate-300' : 'text-slate-700'
+          isDarkMode ? 'text-zinc-300' : 'text-zinc-700'
         }`}
       >
         {expanded ? (
@@ -700,13 +729,13 @@ function MilestoneSection({
           <ChevronRight className="w-4 h-4 flex-shrink-0" />
         )}
         <h4 className="text-xs font-semibold uppercase tracking-wider flex-1">{label}</h4>
-        <span className={`text-[11px] ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>
+        <span className={`text-[11px] ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
           {completedCount}/{totalCount}
         </span>
       </button>
 
       {/* Progress bar */}
-      <div className={`h-1.5 rounded-full mb-3 ${isDarkMode ? 'bg-slate-800' : 'bg-slate-200'}`}>
+      <div className={`h-1.5 rounded-full mb-3 ${isDarkMode ? 'bg-zinc-800' : 'bg-zinc-200'}`}>
         <div
           className="h-full rounded-full bg-green-500 transition-all duration-300"
           style={{ width: `${progressPct}%` }}
@@ -742,7 +771,7 @@ function AutomationStatusBadge({ status }: { status: string }) {
     },
     running: {
       label: 'Running',
-      classes: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
+      classes: 'bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400',
       spinning: true,
     },
     completed: {
@@ -802,12 +831,12 @@ function DeliverableRow({
   return (
     <div
       className={`flex items-center justify-between p-3 rounded-lg ${
-        isDarkMode ? 'bg-slate-800/30' : 'bg-slate-50'
+        isDarkMode ? 'bg-zinc-800/30' : 'bg-zinc-50'
       }`}
     >
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap">
-          <p className={`text-sm font-medium ${isDarkMode ? 'text-slate-200' : 'text-slate-900'}`}>
+          <p className={`text-sm font-medium ${isDarkMode ? 'text-zinc-200' : 'text-zinc-900'}`}>
             {deliverable.name}
           </p>
           <AutomationStatusBadge status={deliverable.automation_status} />
@@ -841,7 +870,7 @@ function DeliverableRow({
           )}
         </div>
         <div
-          className={`flex items-center gap-3 text-[11px] mt-0.5 ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}
+          className={`flex items-center gap-3 text-[11px] mt-0.5 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}
         >
           {deliverable.assignee && <span>Assignee: {deliverable.assignee}</span>}
           {deliverable.due_date && (
@@ -860,8 +889,8 @@ function DeliverableRow({
               rel="noopener noreferrer"
               className={`flex items-center gap-0.5 ${
                 isDarkMode
-                  ? 'text-blue-400 hover:text-blue-300'
-                  : 'text-blue-600 hover:text-blue-700'
+                  ? 'text-violet-400 hover:text-violet-300'
+                  : 'text-violet-600 hover:text-violet-700'
               }`}
             >
               Linear
@@ -909,8 +938,8 @@ function DeliverableRow({
           disabled={isUpdating}
           className={`text-xs px-2 py-1.5 rounded-lg border ${
             isDarkMode
-              ? 'bg-slate-800 border-slate-700 text-slate-300'
-              : 'bg-white border-slate-300 text-slate-700'
+              ? 'bg-zinc-800 border-zinc-700 text-zinc-300'
+              : 'bg-white border-zinc-300 text-zinc-700'
           } disabled:opacity-50`}
         >
           {statuses.map((s) => (
@@ -938,7 +967,7 @@ function AutomationHistoryPanel({
 
   const statusColors: Record<string, string> = {
     pending: isDarkMode ? 'bg-yellow-900/30 text-yellow-400' : 'bg-yellow-100 text-yellow-700',
-    running: isDarkMode ? 'bg-blue-900/30 text-blue-400' : 'bg-blue-100 text-blue-700',
+    running: isDarkMode ? 'bg-violet-900/30 text-violet-400' : 'bg-violet-100 text-violet-700',
     completed: isDarkMode ? 'bg-green-900/30 text-green-400' : 'bg-green-100 text-green-700',
     failed: isDarkMode ? 'bg-red-900/30 text-red-400' : 'bg-red-100 text-red-700',
   };
@@ -946,22 +975,22 @@ function AutomationHistoryPanel({
   return (
     <div
       className={`rounded-xl border ${
-        isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+        isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-200'
       }`}
     >
       <button
         onClick={() => setExpanded(!expanded)}
         className={`w-full px-4 py-3 flex items-center justify-between border-b ${
-          isDarkMode ? 'border-slate-800' : 'border-slate-200'
+          isDarkMode ? 'border-zinc-800' : 'border-zinc-200'
         }`}
       >
-        <h3 className={`text-sm font-semibold ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
+        <h3 className={`text-sm font-semibold ${isDarkMode ? 'text-white' : 'text-zinc-900'}`}>
           Automation History ({runs.length})
         </h3>
         {expanded ? (
-          <ChevronDown className={`w-4 h-4 ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`} />
+          <ChevronDown className={`w-4 h-4 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-500'}`} />
         ) : (
-          <ChevronRight className={`w-4 h-4 ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`} />
+          <ChevronRight className={`w-4 h-4 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-500'}`} />
         )}
       </button>
       {expanded && (
@@ -970,12 +999,12 @@ function AutomationHistoryPanel({
             <div
               key={run.id}
               className={`flex items-center justify-between p-3 rounded-lg ${
-                isDarkMode ? 'bg-slate-800/30' : 'bg-slate-50'
+                isDarkMode ? 'bg-zinc-800/30' : 'bg-zinc-50'
               }`}
             >
               <div className="flex items-center gap-2 flex-wrap flex-1 min-w-0">
                 <span
-                  className={`text-sm font-medium ${isDarkMode ? 'text-slate-200' : 'text-slate-900'}`}
+                  className={`text-sm font-medium ${isDarkMode ? 'text-zinc-200' : 'text-zinc-900'}`}
                 >
                   {run.automation_type}
                 </span>
@@ -986,7 +1015,7 @@ function AutomationHistoryPanel({
                 >
                   {run.status}
                 </span>
-                <span className={`text-xs ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>
+                <span className={`text-xs ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
                   {run.created_at ? new Date(run.created_at).toLocaleDateString() : ''}
                 </span>
                 {run.error_log && (
@@ -1025,23 +1054,23 @@ function ActivityRow({ entry }: { entry: DfyActivityEntry }) {
         <div className="flex items-center gap-2">
           <span
             className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold uppercase tracking-wide ${
-              isDarkMode ? 'bg-slate-800 text-slate-300' : 'bg-slate-100 text-slate-600'
+              isDarkMode ? 'bg-zinc-800 text-zinc-300' : 'bg-zinc-100 text-zinc-600'
             }`}
           >
             {entry.action}
           </span>
           {entry.actor && (
-            <span className={`text-xs ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>
+            <span className={`text-xs ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
               by {entry.actor}
             </span>
           )}
         </div>
-        <p className={`text-sm mt-1 ${isDarkMode ? 'text-slate-300' : 'text-slate-700'}`}>
+        <p className={`text-sm mt-1 ${isDarkMode ? 'text-zinc-300' : 'text-zinc-700'}`}>
           {entry.description}
         </p>
       </div>
       <span
-        className={`text-[11px] flex-shrink-0 ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}
+        className={`text-[11px] flex-shrink-0 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}
       >
         {new Date(entry.created_at).toLocaleString()}
       </span>

@@ -78,11 +78,11 @@ const LmsCohortModal: React.FC<LmsCohortModalProps> = ({
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
       <div
-        className={`w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-xl ${isDarkMode ? 'bg-slate-900' : 'bg-white'} shadow-xl`}
+        className={`w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-xl ${isDarkMode ? 'bg-zinc-900' : 'bg-white'} shadow-xl`}
       >
         <div
           className={`flex items-center justify-between px-6 py-4 border-b ${
-            isDarkMode ? 'border-slate-800' : 'border-slate-200'
+            isDarkMode ? 'border-zinc-800' : 'border-zinc-200'
           }`}
         >
           <h3 className="text-lg font-semibold">
@@ -90,7 +90,7 @@ const LmsCohortModal: React.FC<LmsCohortModalProps> = ({
           </h3>
           <button
             onClick={onClose}
-            className={`p-2 rounded-lg ${isDarkMode ? 'hover:bg-slate-800' : 'hover:bg-slate-100'}`}
+            className={`p-2 rounded-lg ${isDarkMode ? 'hover:bg-zinc-800' : 'hover:bg-zinc-100'}`}
           >
             <X className="w-5 h-5" />
           </button>
@@ -101,7 +101,7 @@ const LmsCohortModal: React.FC<LmsCohortModalProps> = ({
           <div>
             <label
               className={`block text-sm font-medium mb-1.5 ${
-                isDarkMode ? 'text-slate-300' : 'text-slate-700'
+                isDarkMode ? 'text-zinc-300' : 'text-zinc-700'
               }`}
             >
               Cohort Name *
@@ -114,8 +114,8 @@ const LmsCohortModal: React.FC<LmsCohortModalProps> = ({
               required
               className={`w-full px-4 py-2.5 rounded-lg border ${
                 isDarkMode
-                  ? 'bg-slate-800 border-slate-700 text-white placeholder:text-slate-500'
-                  : 'bg-white border-slate-300 text-slate-900 placeholder:text-slate-400'
+                  ? 'bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500'
+                  : 'bg-white border-zinc-300 text-zinc-900 placeholder:text-zinc-400'
               } focus:ring-2 focus:ring-violet-500 focus:border-transparent`}
             />
           </div>
@@ -124,7 +124,7 @@ const LmsCohortModal: React.FC<LmsCohortModalProps> = ({
           <div>
             <label
               className={`block text-sm font-medium mb-1.5 ${
-                isDarkMode ? 'text-slate-300' : 'text-slate-700'
+                isDarkMode ? 'text-zinc-300' : 'text-zinc-700'
               }`}
             >
               Description
@@ -136,8 +136,8 @@ const LmsCohortModal: React.FC<LmsCohortModalProps> = ({
               rows={3}
               className={`w-full px-4 py-2.5 rounded-lg border ${
                 isDarkMode
-                  ? 'bg-slate-800 border-slate-700 text-white placeholder:text-slate-500'
-                  : 'bg-white border-slate-300 text-slate-900 placeholder:text-slate-400'
+                  ? 'bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500'
+                  : 'bg-white border-zinc-300 text-zinc-900 placeholder:text-zinc-400'
               } focus:ring-2 focus:ring-violet-500 focus:border-transparent resize-none`}
             />
           </div>
@@ -146,7 +146,7 @@ const LmsCohortModal: React.FC<LmsCohortModalProps> = ({
           <div>
             <label
               className={`block text-sm font-medium mb-1.5 ${
-                isDarkMode ? 'text-slate-300' : 'text-slate-700'
+                isDarkMode ? 'text-zinc-300' : 'text-zinc-700'
               }`}
             >
               Status
@@ -158,8 +158,8 @@ const LmsCohortModal: React.FC<LmsCohortModalProps> = ({
               }
               className={`w-full px-4 py-2.5 rounded-lg border ${
                 isDarkMode
-                  ? 'bg-slate-800 border-slate-700 text-white'
-                  : 'bg-white border-slate-300 text-slate-900'
+                  ? 'bg-zinc-800 border-zinc-700 text-white'
+                  : 'bg-white border-zinc-300 text-zinc-900'
               } focus:ring-2 focus:ring-violet-500 focus:border-transparent`}
             >
               <option value="Active">Active</option>
@@ -172,7 +172,7 @@ const LmsCohortModal: React.FC<LmsCohortModalProps> = ({
             <div>
               <label
                 className={`block text-sm font-medium mb-1.5 ${
-                  isDarkMode ? 'text-slate-300' : 'text-slate-700'
+                  isDarkMode ? 'text-zinc-300' : 'text-zinc-700'
                 }`}
               >
                 Start Date
@@ -183,15 +183,15 @@ const LmsCohortModal: React.FC<LmsCohortModalProps> = ({
                 onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
                 className={`w-full px-4 py-2.5 rounded-lg border ${
                   isDarkMode
-                    ? 'bg-slate-800 border-slate-700 text-white'
-                    : 'bg-white border-slate-300 text-slate-900'
+                    ? 'bg-zinc-800 border-zinc-700 text-white'
+                    : 'bg-white border-zinc-300 text-zinc-900'
                 } focus:ring-2 focus:ring-violet-500 focus:border-transparent`}
               />
             </div>
             <div>
               <label
                 className={`block text-sm font-medium mb-1.5 ${
-                  isDarkMode ? 'text-slate-300' : 'text-slate-700'
+                  isDarkMode ? 'text-zinc-300' : 'text-zinc-700'
                 }`}
               >
                 End Date
@@ -202,8 +202,8 @@ const LmsCohortModal: React.FC<LmsCohortModalProps> = ({
                 onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
                 className={`w-full px-4 py-2.5 rounded-lg border ${
                   isDarkMode
-                    ? 'bg-slate-800 border-slate-700 text-white'
-                    : 'bg-white border-slate-300 text-slate-900'
+                    ? 'bg-zinc-800 border-zinc-700 text-white'
+                    : 'bg-white border-zinc-300 text-zinc-900'
                 } focus:ring-2 focus:ring-violet-500 focus:border-transparent`}
               />
             </div>
@@ -211,15 +211,13 @@ const LmsCohortModal: React.FC<LmsCohortModalProps> = ({
 
           {/* Presentation Section */}
           <div
-            className={`border rounded-lg ${isDarkMode ? 'border-slate-700' : 'border-slate-200'}`}
+            className={`border rounded-lg ${isDarkMode ? 'border-zinc-700' : 'border-zinc-200'}`}
           >
             <button
               type="button"
               onClick={() => setShowPresentation(!showPresentation)}
               className={`w-full flex items-center justify-between px-4 py-3 text-sm font-medium ${
-                isDarkMode
-                  ? 'text-slate-300 hover:bg-slate-800'
-                  : 'text-slate-700 hover:bg-slate-50'
+                isDarkMode ? 'text-zinc-300 hover:bg-zinc-800' : 'text-zinc-700 hover:bg-zinc-50'
               } rounded-lg`}
             >
               Sidebar & Presentation
@@ -234,7 +232,7 @@ const LmsCohortModal: React.FC<LmsCohortModalProps> = ({
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label
-                      className={`block text-xs font-medium mb-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}
+                      className={`block text-xs font-medium mb-1 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}
                     >
                       Sidebar Label
                     </label>
@@ -245,14 +243,14 @@ const LmsCohortModal: React.FC<LmsCohortModalProps> = ({
                       placeholder="Display name in sidebar"
                       className={`w-full px-3 py-2 rounded-lg border text-sm ${
                         isDarkMode
-                          ? 'bg-slate-800 border-slate-700 text-white placeholder:text-slate-500'
-                          : 'bg-white border-slate-300 text-slate-900 placeholder:text-slate-400'
+                          ? 'bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500'
+                          : 'bg-white border-zinc-300 text-zinc-900 placeholder:text-zinc-400'
                       } focus:ring-2 focus:ring-violet-500 focus:border-transparent`}
                     />
                   </div>
                   <div>
                     <label
-                      className={`block text-xs font-medium mb-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}
+                      className={`block text-xs font-medium mb-1 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}
                     >
                       Icon (emoji)
                     </label>
@@ -263,15 +261,15 @@ const LmsCohortModal: React.FC<LmsCohortModalProps> = ({
                       placeholder="e.g. 🚀"
                       className={`w-full px-3 py-2 rounded-lg border text-sm ${
                         isDarkMode
-                          ? 'bg-slate-800 border-slate-700 text-white placeholder:text-slate-500'
-                          : 'bg-white border-slate-300 text-slate-900 placeholder:text-slate-400'
+                          ? 'bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500'
+                          : 'bg-white border-zinc-300 text-zinc-900 placeholder:text-zinc-400'
                       } focus:ring-2 focus:ring-violet-500 focus:border-transparent`}
                     />
                   </div>
                 </div>
                 <div>
                   <label
-                    className={`block text-xs font-medium mb-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}
+                    className={`block text-xs font-medium mb-1 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}
                   >
                     Sort Order
                   </label>
@@ -283,8 +281,8 @@ const LmsCohortModal: React.FC<LmsCohortModalProps> = ({
                     }
                     className={`w-24 px-3 py-2 rounded-lg border text-sm ${
                       isDarkMode
-                        ? 'bg-slate-800 border-slate-700 text-white'
-                        : 'bg-white border-slate-300 text-slate-900'
+                        ? 'bg-zinc-800 border-zinc-700 text-white'
+                        : 'bg-white border-zinc-300 text-zinc-900'
                     } focus:ring-2 focus:ring-violet-500 focus:border-transparent`}
                   />
                 </div>
@@ -294,15 +292,13 @@ const LmsCohortModal: React.FC<LmsCohortModalProps> = ({
 
           {/* Product Section */}
           <div
-            className={`border rounded-lg ${isDarkMode ? 'border-slate-700' : 'border-slate-200'}`}
+            className={`border rounded-lg ${isDarkMode ? 'border-zinc-700' : 'border-zinc-200'}`}
           >
             <button
               type="button"
               onClick={() => setShowProduct(!showProduct)}
               className={`w-full flex items-center justify-between px-4 py-3 text-sm font-medium ${
-                isDarkMode
-                  ? 'text-slate-300 hover:bg-slate-800'
-                  : 'text-slate-700 hover:bg-slate-50'
+                isDarkMode ? 'text-zinc-300 hover:bg-zinc-800' : 'text-zinc-700 hover:bg-zinc-50'
               } rounded-lg`}
             >
               Product & Billing
@@ -317,7 +313,7 @@ const LmsCohortModal: React.FC<LmsCohortModalProps> = ({
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label
-                      className={`block text-xs font-medium mb-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}
+                      className={`block text-xs font-medium mb-1 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}
                     >
                       Product Type
                     </label>
@@ -326,8 +322,8 @@ const LmsCohortModal: React.FC<LmsCohortModalProps> = ({
                       onChange={(e) => setFormData({ ...formData, productType: e.target.value })}
                       className={`w-full px-3 py-2 rounded-lg border text-sm ${
                         isDarkMode
-                          ? 'bg-slate-800 border-slate-700 text-white'
-                          : 'bg-white border-slate-300 text-slate-900'
+                          ? 'bg-zinc-800 border-zinc-700 text-white'
+                          : 'bg-white border-zinc-300 text-zinc-900'
                       } focus:ring-2 focus:ring-violet-500 focus:border-transparent`}
                     >
                       <option value="course">Course</option>
@@ -338,7 +334,7 @@ const LmsCohortModal: React.FC<LmsCohortModalProps> = ({
                   </div>
                   <div>
                     <label
-                      className={`block text-xs font-medium mb-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}
+                      className={`block text-xs font-medium mb-1 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}
                     >
                       ThriveCart Product ID
                     </label>
@@ -351,8 +347,8 @@ const LmsCohortModal: React.FC<LmsCohortModalProps> = ({
                       placeholder="e.g., tc_course_27"
                       className={`w-full px-3 py-2 rounded-lg border text-sm ${
                         isDarkMode
-                          ? 'bg-slate-800 border-slate-700 text-white placeholder:text-slate-500'
-                          : 'bg-white border-slate-300 text-slate-900 placeholder:text-slate-400'
+                          ? 'bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500'
+                          : 'bg-white border-zinc-300 text-zinc-900 placeholder:text-zinc-400'
                       } focus:ring-2 focus:ring-violet-500 focus:border-transparent`}
                     />
                   </div>
@@ -363,15 +359,13 @@ const LmsCohortModal: React.FC<LmsCohortModalProps> = ({
 
           {/* Onboarding Section */}
           <div
-            className={`border rounded-lg ${isDarkMode ? 'border-slate-700' : 'border-slate-200'}`}
+            className={`border rounded-lg ${isDarkMode ? 'border-zinc-700' : 'border-zinc-200'}`}
           >
             <button
               type="button"
               onClick={() => setShowOnboarding(!showOnboarding)}
               className={`w-full flex items-center justify-between px-4 py-3 text-sm font-medium ${
-                isDarkMode
-                  ? 'text-slate-300 hover:bg-slate-800'
-                  : 'text-slate-700 hover:bg-slate-50'
+                isDarkMode ? 'text-zinc-300 hover:bg-zinc-800' : 'text-zinc-700 hover:bg-zinc-50'
               } rounded-lg`}
             >
               Onboarding Configuration
@@ -397,9 +391,9 @@ const LmsCohortModal: React.FC<LmsCohortModalProps> = ({
                         onboardingConfig: { ...current, enabled: e.target.checked },
                       });
                     }}
-                    className="rounded border-slate-300 text-violet-600 focus:ring-violet-500"
+                    className="rounded border-zinc-300 text-violet-600 focus:ring-violet-500"
                   />
-                  <span className={`text-sm ${isDarkMode ? 'text-slate-300' : 'text-slate-700'}`}>
+                  <span className={`text-sm ${isDarkMode ? 'text-zinc-300' : 'text-zinc-700'}`}>
                     Enable per-course onboarding
                   </span>
                 </label>
@@ -408,7 +402,7 @@ const LmsCohortModal: React.FC<LmsCohortModalProps> = ({
                   <>
                     <div>
                       <label
-                        className={`block text-xs font-medium mb-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}
+                        className={`block text-xs font-medium mb-1 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}
                       >
                         Welcome Message
                       </label>
@@ -427,15 +421,15 @@ const LmsCohortModal: React.FC<LmsCohortModalProps> = ({
                         rows={2}
                         className={`w-full px-3 py-2 rounded-lg border text-sm ${
                           isDarkMode
-                            ? 'bg-slate-800 border-slate-700 text-white placeholder:text-slate-500'
-                            : 'bg-white border-slate-300 text-slate-900 placeholder:text-slate-400'
+                            ? 'bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500'
+                            : 'bg-white border-zinc-300 text-zinc-900 placeholder:text-zinc-400'
                         } focus:ring-2 focus:ring-violet-500 focus:border-transparent resize-none`}
                       />
                     </div>
 
                     <div>
                       <label
-                        className={`block text-xs font-medium mb-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}
+                        className={`block text-xs font-medium mb-1 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}
                       >
                         Welcome Video URL
                       </label>
@@ -454,8 +448,8 @@ const LmsCohortModal: React.FC<LmsCohortModalProps> = ({
                         placeholder="YouTube or Loom URL"
                         className={`w-full px-3 py-2 rounded-lg border text-sm ${
                           isDarkMode
-                            ? 'bg-slate-800 border-slate-700 text-white placeholder:text-slate-500'
-                            : 'bg-white border-slate-300 text-slate-900 placeholder:text-slate-400'
+                            ? 'bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500'
+                            : 'bg-white border-zinc-300 text-zinc-900 placeholder:text-zinc-400'
                         } focus:ring-2 focus:ring-violet-500 focus:border-transparent`}
                       />
                     </div>
@@ -473,11 +467,9 @@ const LmsCohortModal: React.FC<LmsCohortModalProps> = ({
                             },
                           })
                         }
-                        className="rounded border-slate-300 text-violet-600 focus:ring-violet-500"
+                        className="rounded border-zinc-300 text-violet-600 focus:ring-violet-500"
                       />
-                      <span
-                        className={`text-sm ${isDarkMode ? 'text-slate-300' : 'text-slate-700'}`}
-                      >
+                      <span className={`text-sm ${isDarkMode ? 'text-zinc-300' : 'text-zinc-700'}`}>
                         Include survey step
                       </span>
                     </label>
@@ -495,11 +487,9 @@ const LmsCohortModal: React.FC<LmsCohortModalProps> = ({
                             },
                           })
                         }
-                        className="rounded border-slate-300 text-violet-600 focus:ring-violet-500"
+                        className="rounded border-zinc-300 text-violet-600 focus:ring-violet-500"
                       />
-                      <span
-                        className={`text-sm ${isDarkMode ? 'text-slate-300' : 'text-slate-700'}`}
-                      >
+                      <span className={`text-sm ${isDarkMode ? 'text-zinc-300' : 'text-zinc-700'}`}>
                         Include Cal.com booking step
                       </span>
                     </label>
@@ -507,7 +497,7 @@ const LmsCohortModal: React.FC<LmsCohortModalProps> = ({
                     {formData.onboardingConfig?.calcomEnabled && (
                       <div>
                         <label
-                          className={`block text-xs font-medium mb-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}
+                          className={`block text-xs font-medium mb-1 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}
                         >
                           Cal.com Booking URL
                         </label>
@@ -526,8 +516,8 @@ const LmsCohortModal: React.FC<LmsCohortModalProps> = ({
                           placeholder="https://cal.com/your-link"
                           className={`w-full px-3 py-2 rounded-lg border text-sm ${
                             isDarkMode
-                              ? 'bg-slate-800 border-slate-700 text-white placeholder:text-slate-500'
-                              : 'bg-white border-slate-300 text-slate-900 placeholder:text-slate-400'
+                              ? 'bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500'
+                              : 'bg-white border-zinc-300 text-zinc-900 placeholder:text-zinc-400'
                           } focus:ring-2 focus:ring-violet-500 focus:border-transparent`}
                         />
                       </div>
@@ -535,7 +525,7 @@ const LmsCohortModal: React.FC<LmsCohortModalProps> = ({
 
                     <div>
                       <label
-                        className={`block text-xs font-medium mb-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}
+                        className={`block text-xs font-medium mb-1 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}
                       >
                         Onboarding Steps (comma-separated)
                       </label>
@@ -557,12 +547,12 @@ const LmsCohortModal: React.FC<LmsCohortModalProps> = ({
                         placeholder="welcome, video, survey, booking, complete"
                         className={`w-full px-3 py-2 rounded-lg border text-sm ${
                           isDarkMode
-                            ? 'bg-slate-800 border-slate-700 text-white placeholder:text-slate-500'
-                            : 'bg-white border-slate-300 text-slate-900 placeholder:text-slate-400'
+                            ? 'bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500'
+                            : 'bg-white border-zinc-300 text-zinc-900 placeholder:text-zinc-400'
                         } focus:ring-2 focus:ring-violet-500 focus:border-transparent`}
                       />
                       <p
-                        className={`text-xs mt-1 ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}
+                        className={`text-xs mt-1 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}
                       >
                         Available: welcome, video, survey, booking, complete
                       </p>
@@ -579,7 +569,7 @@ const LmsCohortModal: React.FC<LmsCohortModalProps> = ({
               type="button"
               onClick={onClose}
               className={`px-4 py-2 rounded-lg text-sm font-medium ${
-                isDarkMode ? 'hover:bg-slate-800' : 'hover:bg-slate-100'
+                isDarkMode ? 'hover:bg-zinc-800' : 'hover:bg-zinc-100'
               }`}
             >
               Cancel

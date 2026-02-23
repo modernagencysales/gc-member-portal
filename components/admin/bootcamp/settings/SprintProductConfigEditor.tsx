@@ -82,10 +82,10 @@ const SprintProductConfigEditor: React.FC = () => {
   if (configLoading || toolsLoading || cohortsLoading || !localConfig) {
     return (
       <div
-        className={`p-6 rounded-xl border text-center ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}
+        className={`p-6 rounded-xl border text-center ${isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-200'}`}
       >
-        <div className="w-6 h-6 border-2 border-slate-300 border-t-blue-500 rounded-full animate-spin mx-auto" />
-        <p className={`text-sm mt-2 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+        <div className="w-6 h-6 border-2 border-zinc-300 border-t-violet-500 rounded-full animate-spin mx-auto" />
+        <p className={`text-sm mt-2 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
           Loading sprint product config...
         </p>
       </div>
@@ -94,10 +94,10 @@ const SprintProductConfigEditor: React.FC = () => {
 
   return (
     <div
-      className={`rounded-xl border overflow-hidden ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}
+      className={`rounded-xl border overflow-hidden ${isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-200'}`}
     >
       <div
-        className={`px-6 py-4 border-b flex items-center justify-between ${isDarkMode ? 'bg-slate-800/50 border-slate-800' : 'bg-slate-50 border-slate-200'}`}
+        className={`px-6 py-4 border-b flex items-center justify-between ${isDarkMode ? 'bg-zinc-800/50 border-zinc-800' : 'bg-zinc-50 border-zinc-200'}`}
       >
         <div className="flex items-center gap-3">
           <ShoppingCart className={`w-5 h-5 ${isDarkMode ? 'text-green-400' : 'text-green-600'}`} />
@@ -107,7 +107,7 @@ const SprintProductConfigEditor: React.FC = () => {
           <button
             onClick={handleSave}
             disabled={saveMutation.isPending}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50"
+            className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-violet-600 text-white hover:bg-violet-700 disabled:opacity-50"
           >
             <Save className="w-4 h-4" />
             {saveMutation.isPending ? 'Saving...' : 'Save'}
@@ -116,7 +116,7 @@ const SprintProductConfigEditor: React.FC = () => {
       </div>
 
       <div className="p-6 space-y-6">
-        <p className={`text-sm ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+        <p className={`text-sm ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
           Automatically create student accounts when customers purchase the 30-Day LinkedIn Sprint
           via Stripe.
         </p>
@@ -125,7 +125,7 @@ const SprintProductConfigEditor: React.FC = () => {
         <div className="flex items-start justify-between gap-4">
           <div>
             <label className="font-medium">Enabled</label>
-            <p className={`text-sm mt-0.5 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+            <p className={`text-sm mt-0.5 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
               When enabled, Stripe purchases auto-create student accounts with the configured
               products
             </p>
@@ -140,14 +140,14 @@ const SprintProductConfigEditor: React.FC = () => {
               }}
               className="sr-only peer"
             />
-            <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-slate-600 peer-checked:bg-green-600"></div>
+            <div className="w-11 h-6 bg-zinc-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-violet-300 dark:peer-focus:ring-violet-800 rounded-full peer dark:bg-zinc-700 peer-checked:after:tranzinc-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-zinc-600 peer-checked:bg-green-600"></div>
           </label>
         </div>
 
         {/* Sprint Product section */}
         <div>
           <p
-            className={`text-sm font-medium mb-3 ${isDarkMode ? 'text-slate-300' : 'text-slate-700'}`}
+            className={`text-sm font-medium mb-3 ${isDarkMode ? 'text-zinc-300' : 'text-zinc-700'}`}
           >
             Sprint Product
           </p>
@@ -157,7 +157,7 @@ const SprintProductConfigEditor: React.FC = () => {
             <div>
               <label className="font-medium">Stripe Product ID</label>
               <p
-                className={`text-sm mt-0.5 mb-3 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}
+                className={`text-sm mt-0.5 mb-3 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}
               >
                 The Stripe product ID for the Sprint course
               </p>
@@ -180,9 +180,9 @@ const SprintProductConfigEditor: React.FC = () => {
                 placeholder="prod_..."
                 className={`w-72 px-4 py-2.5 rounded-lg border ${
                   isDarkMode
-                    ? 'bg-slate-800 border-slate-700 text-white'
-                    : 'bg-white border-slate-300 text-slate-900'
-                } focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+                    ? 'bg-zinc-800 border-zinc-700 text-white'
+                    : 'bg-white border-zinc-300 text-zinc-900'
+                } focus:ring-2 focus:ring-violet-500 focus:border-transparent`}
               />
             </div>
 
@@ -190,7 +190,7 @@ const SprintProductConfigEditor: React.FC = () => {
             <div>
               <label className="font-medium">Cohort</label>
               <p
-                className={`text-sm mt-0.5 mb-3 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}
+                className={`text-sm mt-0.5 mb-3 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}
               >
                 LMS cohort to enroll students in
               </p>
@@ -211,9 +211,9 @@ const SprintProductConfigEditor: React.FC = () => {
                 }}
                 className={`w-72 px-4 py-2.5 rounded-lg border ${
                   isDarkMode
-                    ? 'bg-slate-800 border-slate-700 text-white'
-                    : 'bg-white border-slate-300 text-slate-900'
-                } focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+                    ? 'bg-zinc-800 border-zinc-700 text-white'
+                    : 'bg-white border-zinc-300 text-zinc-900'
+                } focus:ring-2 focus:ring-violet-500 focus:border-transparent`}
               >
                 <option value="">Select a cohort...</option>
                 {(cohorts || []).map((cohort) => (
@@ -228,7 +228,7 @@ const SprintProductConfigEditor: React.FC = () => {
             <div>
               <label className="font-medium">Access Level</label>
               <p
-                className={`text-sm mt-0.5 mb-3 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}
+                className={`text-sm mt-0.5 mb-3 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}
               >
                 Access level assigned to new student accounts
               </p>
@@ -249,9 +249,9 @@ const SprintProductConfigEditor: React.FC = () => {
                 }}
                 className={`w-48 px-4 py-2.5 rounded-lg border ${
                   isDarkMode
-                    ? 'bg-slate-800 border-slate-700 text-white'
-                    : 'bg-white border-slate-300 text-slate-900'
-                } focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+                    ? 'bg-zinc-800 border-zinc-700 text-white'
+                    : 'bg-white border-zinc-300 text-zinc-900'
+                } focus:ring-2 focus:ring-violet-500 focus:border-transparent`}
               >
                 {ACCESS_LEVELS.map((level) => (
                   <option key={level} value={level}>
@@ -266,16 +266,14 @@ const SprintProductConfigEditor: React.FC = () => {
         {/* DM Kit section */}
         <div>
           <p
-            className={`text-sm font-medium mb-3 ${isDarkMode ? 'text-slate-300' : 'text-slate-700'}`}
+            className={`text-sm font-medium mb-3 ${isDarkMode ? 'text-zinc-300' : 'text-zinc-700'}`}
           >
             DM Kit
           </p>
 
           <div>
             <label className="font-medium">Stripe Product ID</label>
-            <p
-              className={`text-sm mt-0.5 mb-3 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}
-            >
+            <p className={`text-sm mt-0.5 mb-3 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
               The Stripe product ID for the DM Conversion Kit
             </p>
             <input
@@ -297,9 +295,9 @@ const SprintProductConfigEditor: React.FC = () => {
               placeholder="prod_..."
               className={`w-72 px-4 py-2.5 rounded-lg border ${
                 isDarkMode
-                  ? 'bg-slate-800 border-slate-700 text-white'
-                  : 'bg-white border-slate-300 text-slate-900'
-              } focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+                  ? 'bg-zinc-800 border-zinc-700 text-white'
+                  : 'bg-white border-zinc-300 text-zinc-900'
+              } focus:ring-2 focus:ring-violet-500 focus:border-transparent`}
             />
           </div>
         </div>
@@ -307,7 +305,7 @@ const SprintProductConfigEditor: React.FC = () => {
         {/* GPT Suite section */}
         <div>
           <p
-            className={`text-sm font-medium mb-3 ${isDarkMode ? 'text-slate-300' : 'text-slate-700'}`}
+            className={`text-sm font-medium mb-3 ${isDarkMode ? 'text-zinc-300' : 'text-zinc-700'}`}
           >
             GPT Suite
           </p>
@@ -317,7 +315,7 @@ const SprintProductConfigEditor: React.FC = () => {
             <div>
               <label className="font-medium">Stripe Product ID</label>
               <p
-                className={`text-sm mt-0.5 mb-3 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}
+                className={`text-sm mt-0.5 mb-3 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}
               >
                 The Stripe product ID for the GPT Suite add-on
               </p>
@@ -340,9 +338,9 @@ const SprintProductConfigEditor: React.FC = () => {
                 placeholder="prod_..."
                 className={`w-72 px-4 py-2.5 rounded-lg border ${
                   isDarkMode
-                    ? 'bg-slate-800 border-slate-700 text-white'
-                    : 'bg-white border-slate-300 text-slate-900'
-                } focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+                    ? 'bg-zinc-800 border-zinc-700 text-white'
+                    : 'bg-white border-zinc-300 text-zinc-900'
+                } focus:ring-2 focus:ring-violet-500 focus:border-transparent`}
               />
             </div>
 
@@ -350,7 +348,7 @@ const SprintProductConfigEditor: React.FC = () => {
             <div>
               <label className="font-medium">Access Duration (days)</label>
               <p
-                className={`text-sm mt-0.5 mb-3 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}
+                className={`text-sm mt-0.5 mb-3 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}
               >
                 Number of days the GPT Suite access remains active
               </p>
@@ -374,9 +372,9 @@ const SprintProductConfigEditor: React.FC = () => {
                 }}
                 className={`w-32 px-4 py-2.5 rounded-lg border ${
                   isDarkMode
-                    ? 'bg-slate-800 border-slate-700 text-white'
-                    : 'bg-white border-slate-300 text-slate-900'
-                } focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+                    ? 'bg-zinc-800 border-zinc-700 text-white'
+                    : 'bg-white border-zinc-300 text-zinc-900'
+                } focus:ring-2 focus:ring-violet-500 focus:border-transparent`}
               />
             </div>
 
@@ -384,7 +382,7 @@ const SprintProductConfigEditor: React.FC = () => {
             <div>
               <label className="font-medium">Credits per Tool</label>
               <p
-                className={`text-sm mt-0.5 mb-3 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}
+                className={`text-sm mt-0.5 mb-3 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}
               >
                 Number of credits granted for each selected AI tool
               </p>
@@ -408,16 +406,16 @@ const SprintProductConfigEditor: React.FC = () => {
                 }}
                 className={`w-32 px-4 py-2.5 rounded-lg border ${
                   isDarkMode
-                    ? 'bg-slate-800 border-slate-700 text-white'
-                    : 'bg-white border-slate-300 text-slate-900'
-                } focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+                    ? 'bg-zinc-800 border-zinc-700 text-white'
+                    : 'bg-white border-zinc-300 text-zinc-900'
+                } focus:ring-2 focus:ring-violet-500 focus:border-transparent`}
               />
             </div>
 
             {/* Tool selection */}
             <div>
               <p
-                className={`text-sm font-medium mb-2 ${isDarkMode ? 'text-slate-300' : 'text-slate-700'}`}
+                className={`text-sm font-medium mb-2 ${isDarkMode ? 'text-zinc-300' : 'text-zinc-700'}`}
               >
                 Tools to Grant ({localConfig.products.gptSuite.toolSlugs.length} selected)
               </p>
@@ -432,8 +430,8 @@ const SprintProductConfigEditor: React.FC = () => {
                         isIncluded
                           ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 border border-green-300 dark:border-green-700'
                           : isDarkMode
-                            ? 'bg-slate-800 text-slate-400 border border-slate-700 hover:border-slate-600'
-                            : 'bg-white text-slate-500 border border-slate-200 hover:border-slate-300'
+                            ? 'bg-zinc-800 text-zinc-400 border border-zinc-700 hover:border-zinc-600'
+                            : 'bg-white text-zinc-500 border border-zinc-200 hover:border-zinc-300'
                       }`}
                     >
                       <Sparkles size={10} />

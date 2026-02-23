@@ -216,7 +216,7 @@ const BlueprintDetailPanel: React.FC<BlueprintDetailPanelProps> = ({
             <select
               value={recommendedOffer}
               onChange={(e) => setRecommendedOffer(e.target.value as RecommendedOffer)}
-              className="w-full px-3 py-2.5 bg-zinc-800 border border-zinc-700 rounded-lg text-sm text-zinc-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2.5 bg-zinc-800 border border-zinc-700 rounded-lg text-sm text-zinc-300 focus:ring-2 focus:ring-violet-500 focus:border-transparent"
             >
               {(Object.entries(RECOMMENDED_OFFER_LABELS) as [RecommendedOffer, string][]).map(
                 ([value, label]) => (
@@ -238,7 +238,7 @@ const BlueprintDetailPanel: React.FC<BlueprintDetailPanelProps> = ({
               onChange={(e) => setPersonalNote(e.target.value)}
               placeholder="Add a personal note for this prospect..."
               rows={3}
-              className="w-full px-3 py-2.5 bg-zinc-800 border border-zinc-700 rounded-lg text-sm text-zinc-300 placeholder:text-zinc-500 resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2.5 bg-zinc-800 border border-zinc-700 rounded-lg text-sm text-zinc-300 placeholder:text-zinc-500 resize-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
             />
           </div>
 
@@ -308,7 +308,7 @@ const BlueprintDetailPanel: React.FC<BlueprintDetailPanelProps> = ({
           <button
             onClick={handleSave}
             disabled={isSaving || !hasChanges}
-            className="w-full px-4 py-2.5 rounded-lg font-medium bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="w-full px-4 py-2.5 rounded-lg font-medium bg-violet-600 text-white hover:bg-violet-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {isSaving ? (
               <span className="flex items-center justify-center gap-2">

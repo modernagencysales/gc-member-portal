@@ -91,13 +91,13 @@ const UnifiedAdminSidebar: React.FC<UnifiedAdminSidebarProps> = ({ isOpen, onClo
       <aside
         className={`fixed lg:static inset-y-0 left-0 z-50 w-64 transform transition-transform duration-300 lg:translate-x-0 ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
-        } ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'} border-r`}
+        } ${isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-200'} border-r`}
       >
         <div className="flex flex-col h-full">
           {/* Header */}
           <div
             className={`h-16 flex items-center justify-between px-4 border-b ${
-              isDarkMode ? 'border-slate-800' : 'border-slate-200'
+              isDarkMode ? 'border-zinc-800' : 'border-zinc-200'
             }`}
           >
             <div className="flex items-center gap-2">
@@ -107,7 +107,7 @@ const UnifiedAdminSidebar: React.FC<UnifiedAdminSidebarProps> = ({ isOpen, onClo
             <button
               onClick={onClose}
               className={`lg:hidden p-2 rounded-lg ${
-                isDarkMode ? 'hover:bg-slate-800' : 'hover:bg-slate-100'
+                isDarkMode ? 'hover:bg-zinc-800' : 'hover:bg-zinc-100'
               }`}
             >
               <X className="w-5 h-5" />
@@ -120,7 +120,7 @@ const UnifiedAdminSidebar: React.FC<UnifiedAdminSidebarProps> = ({ isOpen, onClo
               <div key={section.label}>
                 <p
                   className={`text-[10px] font-semibold uppercase tracking-wider mb-2 px-3 ${
-                    isDarkMode ? 'text-slate-500' : 'text-slate-400'
+                    isDarkMode ? 'text-zinc-500' : 'text-zinc-400'
                   }`}
                 >
                   {section.label}
@@ -139,8 +139,8 @@ const UnifiedAdminSidebar: React.FC<UnifiedAdminSidebarProps> = ({ isOpen, onClo
                               ? 'bg-amber-900/30 text-amber-400'
                               : 'bg-amber-100 text-amber-700'
                             : isDarkMode
-                              ? 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'
-                              : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                              ? 'text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200'
+                              : 'text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900'
                         }`
                       }
                     >
@@ -154,13 +154,13 @@ const UnifiedAdminSidebar: React.FC<UnifiedAdminSidebarProps> = ({ isOpen, onClo
           </nav>
 
           {/* Back to Portal */}
-          <div className={`p-4 border-t ${isDarkMode ? 'border-slate-800' : 'border-slate-200'}`}>
+          <div className={`p-4 border-t ${isDarkMode ? 'border-zinc-800' : 'border-zinc-200'}`}>
             <button
               onClick={() => navigate('/portal')}
               className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
                 isDarkMode
-                  ? 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'
-                  : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                  ? 'text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200'
+                  : 'text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900'
               }`}
             >
               <ArrowLeft className="w-5 h-5" />

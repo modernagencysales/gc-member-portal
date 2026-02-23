@@ -95,13 +95,13 @@ const GenerateBlueprintModal: React.FC<GenerateBlueprintModalProps> = ({
       {/* Modal */}
       <div
         className={`relative w-full max-w-md rounded-2xl shadow-xl ${
-          isDarkMode ? 'bg-slate-900' : 'bg-white'
+          isDarkMode ? 'bg-zinc-900' : 'bg-white'
         }`}
       >
         {/* Header */}
         <div
           className={`flex items-center justify-between p-6 border-b ${
-            isDarkMode ? 'border-slate-800' : 'border-slate-200'
+            isDarkMode ? 'border-zinc-800' : 'border-zinc-200'
           }`}
         >
           <div className="flex items-center gap-2">
@@ -110,7 +110,7 @@ const GenerateBlueprintModal: React.FC<GenerateBlueprintModalProps> = ({
           </div>
           <button
             onClick={handleClose}
-            className={`p-2 rounded-lg ${isDarkMode ? 'hover:bg-slate-800' : 'hover:bg-slate-100'}`}
+            className={`p-2 rounded-lg ${isDarkMode ? 'hover:bg-zinc-800' : 'hover:bg-zinc-100'}`}
           >
             <X className="w-5 h-5" />
           </button>
@@ -123,9 +123,9 @@ const GenerateBlueprintModal: React.FC<GenerateBlueprintModalProps> = ({
               <Sparkles className="w-6 h-6 text-green-600 dark:text-green-400" />
             </div>
             <h3 className="text-lg font-semibold mb-2">Blueprint Generation Started</h3>
-            <p className={`text-sm mb-6 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+            <p className={`text-sm mb-6 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
               Blueprint generation has been triggered for{' '}
-              <span className="font-medium text-slate-900 dark:text-white">
+              <span className="font-medium text-zinc-900 dark:text-white">
                 {studentName || studentEmail}
               </span>
               . It will be automatically linked once complete.
@@ -140,9 +140,9 @@ const GenerateBlueprintModal: React.FC<GenerateBlueprintModalProps> = ({
         ) : (
           /* Form */
           <form onSubmit={handleSubmit} className="p-6 space-y-4">
-            <p className={`text-sm ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+            <p className={`text-sm ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
               Generate a LinkedIn Authority Blueprint for{' '}
-              <span className="font-medium text-slate-900 dark:text-white">
+              <span className="font-medium text-zinc-900 dark:text-white">
                 {studentName || studentEmail}
               </span>
               .
@@ -158,8 +158,8 @@ const GenerateBlueprintModal: React.FC<GenerateBlueprintModalProps> = ({
                   disabled
                   className={`w-full px-4 py-2.5 rounded-lg border ${
                     isDarkMode
-                      ? 'bg-slate-800/50 border-slate-700 text-slate-400'
-                      : 'bg-slate-50 border-slate-300 text-slate-500'
+                      ? 'bg-zinc-800/50 border-zinc-700 text-zinc-400'
+                      : 'bg-zinc-50 border-zinc-300 text-zinc-500'
                   }`}
                 />
               </div>
@@ -171,8 +171,8 @@ const GenerateBlueprintModal: React.FC<GenerateBlueprintModalProps> = ({
                   disabled
                   className={`w-full px-4 py-2.5 rounded-lg border ${
                     isDarkMode
-                      ? 'bg-slate-800/50 border-slate-700 text-slate-400'
-                      : 'bg-slate-50 border-slate-300 text-slate-500'
+                      ? 'bg-zinc-800/50 border-zinc-700 text-zinc-400'
+                      : 'bg-zinc-50 border-zinc-300 text-zinc-500'
                   }`}
                 />
               </div>
@@ -189,8 +189,8 @@ const GenerateBlueprintModal: React.FC<GenerateBlueprintModalProps> = ({
                 onChange={(e) => setLinkedinUrl(e.target.value)}
                 className={`w-full px-4 py-2.5 rounded-lg border ${
                   isDarkMode
-                    ? 'bg-slate-800 border-slate-700 text-white placeholder:text-slate-500'
-                    : 'bg-white border-slate-300 text-slate-900 placeholder:text-slate-400'
+                    ? 'bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500'
+                    : 'bg-white border-zinc-300 text-zinc-900 placeholder:text-zinc-400'
                 } focus:ring-2 focus:ring-violet-500 focus:border-transparent`}
               />
             </div>
@@ -199,7 +199,7 @@ const GenerateBlueprintModal: React.FC<GenerateBlueprintModalProps> = ({
             <div>
               <label className="block text-sm font-medium mb-1.5">
                 Business Type{' '}
-                <span className={`font-normal ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>
+                <span className={`font-normal ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
                   (optional)
                 </span>
               </label>
@@ -210,8 +210,8 @@ const GenerateBlueprintModal: React.FC<GenerateBlueprintModalProps> = ({
                 onChange={(e) => setBusinessType(e.target.value)}
                 className={`w-full px-4 py-2.5 rounded-lg border ${
                   isDarkMode
-                    ? 'bg-slate-800 border-slate-700 text-white placeholder:text-slate-500'
-                    : 'bg-white border-slate-300 text-slate-900 placeholder:text-slate-400'
+                    ? 'bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500'
+                    : 'bg-white border-zinc-300 text-zinc-900 placeholder:text-zinc-400'
                 } focus:ring-2 focus:ring-violet-500 focus:border-transparent`}
               />
             </div>
@@ -235,9 +235,7 @@ const GenerateBlueprintModal: React.FC<GenerateBlueprintModalProps> = ({
                 type="button"
                 onClick={handleClose}
                 className={`px-4 py-2 rounded-lg font-medium ${
-                  isDarkMode
-                    ? 'text-slate-400 hover:bg-slate-800'
-                    : 'text-slate-600 hover:bg-slate-100'
+                  isDarkMode ? 'text-zinc-400 hover:bg-zinc-800' : 'text-zinc-600 hover:bg-zinc-100'
                 }`}
               >
                 Cancel

@@ -117,26 +117,24 @@ const AIToolModal: React.FC<AIToolModalProps> = ({
   if (!isOpen) return null;
 
   const inputClass = `w-full px-4 py-2.5 rounded-lg border ${
-    isDarkMode
-      ? 'bg-slate-800 border-slate-700 text-white'
-      : 'bg-white border-slate-300 text-slate-900'
-  } focus:ring-2 focus:ring-blue-500 focus:border-transparent`;
+    isDarkMode ? 'bg-zinc-800 border-zinc-700 text-white' : 'bg-white border-zinc-300 text-zinc-900'
+  } focus:ring-2 focus:ring-violet-500 focus:border-transparent`;
 
   const labelClass = `block text-sm font-medium mb-2 ${
-    isDarkMode ? 'text-slate-300' : 'text-slate-700'
+    isDarkMode ? 'text-zinc-300' : 'text-zinc-700'
   }`;
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div
         className={`w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-xl ${
-          isDarkMode ? 'bg-slate-900' : 'bg-white'
+          isDarkMode ? 'bg-zinc-900' : 'bg-white'
         }`}
       >
         {/* Header */}
         <div
           className={`flex items-center justify-between px-6 py-4 border-b sticky top-0 ${
-            isDarkMode ? 'border-slate-800 bg-slate-900' : 'border-slate-200 bg-white'
+            isDarkMode ? 'border-zinc-800 bg-zinc-900' : 'border-zinc-200 bg-white'
           }`}
         >
           <h3 className="text-lg font-semibold">
@@ -144,7 +142,7 @@ const AIToolModal: React.FC<AIToolModalProps> = ({
           </h3>
           <button
             onClick={onClose}
-            className={`p-2 rounded-lg ${isDarkMode ? 'hover:bg-slate-800' : 'hover:bg-slate-100'}`}
+            className={`p-2 rounded-lg ${isDarkMode ? 'hover:bg-zinc-800' : 'hover:bg-zinc-100'}`}
           >
             <X className="w-5 h-5" />
           </button>
@@ -177,7 +175,7 @@ const AIToolModal: React.FC<AIToolModalProps> = ({
                 title="Lowercase letters, numbers, and hyphens only"
                 required
               />
-              <p className={`text-xs mt-1 ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>
+              <p className={`text-xs mt-1 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
                 Used in lesson URLs: ai-tool:{formData.slug || 'your-slug'}
               </p>
             </div>
@@ -216,7 +214,7 @@ const AIToolModal: React.FC<AIToolModalProps> = ({
                   </option>
                 ))}
               </datalist>
-              <p className={`text-xs mt-1 ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>
+              <p className={`text-xs mt-1 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
                 Sidebar group — pick existing or type a new one
               </p>
             </div>
@@ -233,7 +231,7 @@ const AIToolModal: React.FC<AIToolModalProps> = ({
               rows={6}
               required
             />
-            <p className={`text-xs mt-1 ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>
+            <p className={`text-xs mt-1 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
               Instructions that define the AI's personality and behavior
             </p>
           </div>
@@ -248,7 +246,7 @@ const AIToolModal: React.FC<AIToolModalProps> = ({
               placeholder="Hi! I'm here to help you craft compelling messages. What would you like to write today?"
               rows={3}
             />
-            <p className={`text-xs mt-1 ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>
+            <p className={`text-xs mt-1 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
               First message shown to users when they open the chat
             </p>
           </div>
@@ -298,7 +296,7 @@ const AIToolModal: React.FC<AIToolModalProps> = ({
                 <div key={index} className="flex items-center gap-2">
                   <span
                     className={`flex-1 px-3 py-2 rounded-lg text-sm ${
-                      isDarkMode ? 'bg-slate-800' : 'bg-slate-100'
+                      isDarkMode ? 'bg-zinc-800' : 'bg-zinc-100'
                     }`}
                   >
                     {prompt}
@@ -330,13 +328,13 @@ const AIToolModal: React.FC<AIToolModalProps> = ({
                   type="button"
                   onClick={handleAddPrompt}
                   disabled={!newPrompt.trim()}
-                  className="p-2.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50"
+                  className="p-2.5 rounded-lg bg-violet-600 text-white hover:bg-violet-700 disabled:opacity-50"
                 >
                   <Plus className="w-5 h-5" />
                 </button>
               </div>
             </div>
-            <p className={`text-xs mt-1 ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>
+            <p className={`text-xs mt-1 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
               Quick prompts shown to users to start a conversation
             </p>
           </div>
@@ -350,9 +348,9 @@ const AIToolModal: React.FC<AIToolModalProps> = ({
                 onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
                 className="sr-only peer"
               />
-              <div className="w-11 h-6 bg-slate-300 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-500 rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+              <div className="w-11 h-6 bg-zinc-300 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-violet-500 rounded-full peer dark:bg-zinc-700 peer-checked:after:tranzinc-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-violet-600"></div>
             </label>
-            <span className={`text-sm ${isDarkMode ? 'text-slate-300' : 'text-slate-700'}`}>
+            <span className={`text-sm ${isDarkMode ? 'text-zinc-300' : 'text-zinc-700'}`}>
               Active (tool is available to students)
             </span>
           </div>
@@ -360,14 +358,14 @@ const AIToolModal: React.FC<AIToolModalProps> = ({
           {/* Actions */}
           <div
             className={`flex justify-end gap-2 pt-4 border-t ${
-              isDarkMode ? 'border-slate-800' : 'border-slate-200'
+              isDarkMode ? 'border-zinc-800' : 'border-zinc-200'
             }`}
           >
             <button
               type="button"
               onClick={onClose}
               className={`px-4 py-2 rounded-lg text-sm font-medium ${
-                isDarkMode ? 'hover:bg-slate-800' : 'hover:bg-slate-100'
+                isDarkMode ? 'hover:bg-zinc-800' : 'hover:bg-zinc-100'
               }`}
             >
               Cancel
@@ -380,7 +378,7 @@ const AIToolModal: React.FC<AIToolModalProps> = ({
                 !formData.slug.trim() ||
                 !formData.systemPrompt.trim()
               }
-              className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50"
+              className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-violet-600 text-white hover:bg-violet-700 disabled:opacity-50"
             >
               {isLoading && <Loader2 className="w-4 h-4 animate-spin" />}
               {initialData ? 'Save Changes' : 'Create AI Tool'}

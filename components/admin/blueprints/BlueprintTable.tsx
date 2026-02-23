@@ -57,7 +57,7 @@ const BlueprintTable: React.FC<BlueprintTableProps> = ({ prospects, onRowClick, 
   return (
     <div
       className={`rounded-xl border overflow-hidden ${
-        isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-slate-200'
+        isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-200'
       }`}
     >
       <div className="overflow-x-auto">
@@ -65,40 +65,40 @@ const BlueprintTable: React.FC<BlueprintTableProps> = ({ prospects, onRowClick, 
           <thead>
             <tr
               className={`border-b ${
-                isDarkMode ? 'bg-zinc-800/50 border-zinc-800' : 'bg-slate-50 border-slate-200'
+                isDarkMode ? 'bg-zinc-800/50 border-zinc-800' : 'bg-zinc-50 border-zinc-200'
               }`}
             >
-              <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wide">
+              <th className="px-4 py-3 text-left text-xs font-medium text-zinc-500 uppercase tracking-wide">
                 Name
               </th>
-              <th className="px-4 py-3 text-center text-xs font-medium text-slate-500 uppercase tracking-wide">
+              <th className="px-4 py-3 text-center text-xs font-medium text-zinc-500 uppercase tracking-wide">
                 Score
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wide">
+              <th className="px-4 py-3 text-left text-xs font-medium text-zinc-500 uppercase tracking-wide">
                 Status
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wide">
+              <th className="px-4 py-3 text-left text-xs font-medium text-zinc-500 uppercase tracking-wide">
                 Offer
               </th>
-              <th className="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wide">
+              <th className="px-4 py-3 text-right text-xs font-medium text-zinc-500 uppercase tracking-wide">
                 Actions
               </th>
             </tr>
           </thead>
-          <tbody className={`divide-y ${isDarkMode ? 'divide-zinc-800' : 'divide-slate-200'}`}>
+          <tbody className={`divide-y ${isDarkMode ? 'divide-zinc-800' : 'divide-zinc-200'}`}>
             {prospects.map((prospect) => (
               <tr
                 key={prospect.id}
                 onClick={() => onRowClick(prospect)}
-                className={`cursor-pointer ${isDarkMode ? 'hover:bg-zinc-800' : 'hover:bg-slate-50'}`}
+                className={`cursor-pointer ${isDarkMode ? 'hover:bg-zinc-800' : 'hover:bg-zinc-50'}`}
               >
                 {/* Name */}
                 <td className="px-4 py-3">
                   <div>
-                    <div className="font-medium text-slate-900 dark:text-white">
+                    <div className="font-medium text-zinc-900 dark:text-white">
                       {getProspectDisplayName(prospect)}
                     </div>
-                    <div className="text-sm text-slate-500 dark:text-slate-400">
+                    <div className="text-sm text-zinc-500 dark:text-zinc-400">
                       {prospect.email || 'No email'}
                     </div>
                   </div>
@@ -119,7 +119,7 @@ const BlueprintTable: React.FC<BlueprintTableProps> = ({ prospects, onRowClick, 
                       {prospect.authorityScore}
                     </span>
                   ) : (
-                    <span className="text-slate-400 dark:text-slate-500">--</span>
+                    <span className="text-zinc-400 dark:text-zinc-500">--</span>
                   )}
                 </td>
 
@@ -153,8 +153,8 @@ const BlueprintTable: React.FC<BlueprintTableProps> = ({ prospects, onRowClick, 
                         onClick={(e) => handleCopyClick(e, prospect)}
                         className={`p-2 rounded-lg ${
                           isDarkMode
-                            ? 'text-slate-400 hover:bg-zinc-800 hover:text-slate-200'
-                            : 'text-slate-500 hover:bg-slate-100 hover:text-slate-700'
+                            ? 'text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200'
+                            : 'text-zinc-500 hover:bg-zinc-100 hover:text-zinc-700'
                         }`}
                         title="Copy Blueprint URL"
                       >
@@ -168,8 +168,8 @@ const BlueprintTable: React.FC<BlueprintTableProps> = ({ prospects, onRowClick, 
                       }}
                       className={`p-2 rounded-lg ${
                         isDarkMode
-                          ? 'text-slate-400 hover:bg-zinc-800 hover:text-slate-200'
-                          : 'text-slate-500 hover:bg-slate-100 hover:text-slate-700'
+                          ? 'text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200'
+                          : 'text-zinc-500 hover:bg-zinc-100 hover:text-zinc-700'
                       }`}
                       title="View Details"
                     >
@@ -185,7 +185,7 @@ const BlueprintTable: React.FC<BlueprintTableProps> = ({ prospects, onRowClick, 
 
       {prospects.length === 0 && (
         <div className="p-8 text-center">
-          <p className={`text-sm ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+          <p className={`text-sm ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
             No blueprints found
           </p>
         </div>

@@ -230,14 +230,14 @@ const AdminStudentsPage: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-xl font-semibold">Student Roster</h2>
-          <p className={`text-sm mt-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+          <p className={`text-sm mt-1 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
             Manage bootcamp students and track onboarding progress
           </p>
         </div>
         <div className="flex items-center gap-2">
           <button
             onClick={() => refetch()}
-            className={`p-2 rounded-lg ${isDarkMode ? 'hover:bg-slate-800' : 'hover:bg-slate-100'}`}
+            className={`p-2 rounded-lg ${isDarkMode ? 'hover:bg-zinc-800' : 'hover:bg-zinc-100'}`}
             title="Refresh"
           >
             <RefreshCw className="w-5 h-5" />
@@ -246,8 +246,8 @@ const AdminStudentsPage: React.FC = () => {
             onClick={() => setShowCsvImport(true)}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium border ${
               isDarkMode
-                ? 'border-slate-700 hover:bg-slate-800 text-slate-300'
-                : 'border-slate-300 hover:bg-slate-50 text-slate-700'
+                ? 'border-zinc-700 hover:bg-zinc-800 text-zinc-300'
+                : 'border-zinc-300 hover:bg-zinc-50 text-zinc-700'
             }`}
           >
             <Upload className="w-4 h-4" />
@@ -255,7 +255,7 @@ const AdminStudentsPage: React.FC = () => {
           </button>
           <button
             onClick={handleAddStudent}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-blue-600 text-white hover:bg-blue-700"
+            className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-violet-600 text-white hover:bg-violet-700"
           >
             <Plus className="w-4 h-4" />
             Add Student
@@ -274,10 +274,10 @@ const AdminStudentsPage: React.FC = () => {
           <div
             key={stat.label}
             className={`p-4 rounded-xl border ${
-              isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+              isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-200'
             }`}
           >
-            <p className={`text-sm ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+            <p className={`text-sm ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
               {stat.label}
             </p>
             <p className="text-2xl font-bold mt-1">{stat.value}</p>
@@ -288,7 +288,7 @@ const AdminStudentsPage: React.FC = () => {
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="flex-1 relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-400" />
           <input
             type="text"
             placeholder="Search by name, email, or company..."
@@ -296,21 +296,21 @@ const AdminStudentsPage: React.FC = () => {
             onChange={(e) => setSearchQuery(e.target.value)}
             className={`w-full pl-10 pr-4 py-2.5 rounded-lg border ${
               isDarkMode
-                ? 'bg-slate-900 border-slate-700 text-white placeholder:text-slate-500'
-                : 'bg-white border-slate-300 text-slate-900 placeholder:text-slate-400'
-            } focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+                ? 'bg-zinc-900 border-zinc-700 text-white placeholder:text-zinc-500'
+                : 'bg-white border-zinc-300 text-zinc-900 placeholder:text-zinc-400'
+            } focus:ring-2 focus:ring-violet-500 focus:border-transparent`}
           />
         </div>
         <div className="flex items-center gap-2">
-          <Filter className="w-5 h-5 text-slate-400" />
+          <Filter className="w-5 h-5 text-zinc-400" />
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
             className={`px-4 py-2.5 rounded-lg border ${
               isDarkMode
-                ? 'bg-slate-900 border-slate-700 text-white'
-                : 'bg-white border-slate-300 text-slate-900'
-            } focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+                ? 'bg-zinc-900 border-zinc-700 text-white'
+                : 'bg-white border-zinc-300 text-zinc-900'
+            } focus:ring-2 focus:ring-violet-500 focus:border-transparent`}
           >
             <option value="all">All Status</option>
             <option value="Onboarding">Onboarding</option>
@@ -326,7 +326,7 @@ const AdminStudentsPage: React.FC = () => {
       {selectedIds.size > 0 && (
         <div
           className={`flex items-center gap-4 p-4 rounded-xl border ${
-            isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-blue-50 border-blue-200'
+            isDarkMode ? 'bg-zinc-800 border-zinc-700' : 'bg-violet-50 border-violet-200'
           }`}
         >
           <span className="text-sm font-medium">{selectedIds.size} selected</span>
@@ -334,7 +334,7 @@ const AdminStudentsPage: React.FC = () => {
           <button
             onClick={() => setSelectedIds(new Set())}
             className={`px-3 py-1.5 rounded-lg text-sm font-medium ${
-              isDarkMode ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'
+              isDarkMode ? 'text-zinc-400 hover:text-white' : 'text-zinc-600 hover:text-zinc-900'
             }`}
           >
             Clear selection
@@ -346,11 +346,11 @@ const AdminStudentsPage: React.FC = () => {
       {isLoading ? (
         <div
           className={`p-8 rounded-xl border text-center ${
-            isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+            isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-200'
           }`}
         >
-          <div className="w-6 h-6 border-2 border-slate-300 border-t-blue-500 rounded-full animate-spin mx-auto" />
-          <p className={`text-sm mt-2 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+          <div className="w-6 h-6 border-2 border-zinc-300 border-t-violet-500 rounded-full animate-spin mx-auto" />
+          <p className={`text-sm mt-2 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
             Loading students...
           </p>
         </div>

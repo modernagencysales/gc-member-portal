@@ -77,14 +77,14 @@ const AdminToolsPage: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-xl font-semibold">Manage Tools</h2>
-          <p className={`text-sm mt-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+          <p className={`text-sm mt-1 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
             Add, edit, or remove tool access for members
           </p>
         </div>
         {selectedMemberId && (
           <button
             onClick={handleAddTool}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-blue-600 text-white hover:bg-blue-700"
+            className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-violet-600 text-white hover:bg-violet-700"
           >
             <Plus className="w-4 h-4" />
             Add Tool
@@ -95,7 +95,7 @@ const AdminToolsPage: React.FC = () => {
       {/* Member Select */}
       <div
         className={`p-4 rounded-xl border ${
-          isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+          isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-200'
         }`}
       >
         <MemberSelect value={selectedMemberId} onChange={setSelectedMemberId} />
@@ -105,13 +105,13 @@ const AdminToolsPage: React.FC = () => {
       {selectedMemberId && (
         <div
           className={`rounded-xl border overflow-hidden ${
-            isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+            isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-200'
           }`}
         >
           {isLoadingTools ? (
             <div className="p-8 text-center">
-              <div className="w-6 h-6 border-2 border-slate-300 border-t-blue-500 rounded-full animate-spin mx-auto" />
-              <p className={`text-sm mt-2 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+              <div className="w-6 h-6 border-2 border-zinc-300 border-t-violet-500 rounded-full animate-spin mx-auto" />
+              <p className={`text-sm mt-2 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
                 Loading tools...
               </p>
             </div>
@@ -119,51 +119,49 @@ const AdminToolsPage: React.FC = () => {
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className={isDarkMode ? 'bg-slate-800/50' : 'bg-slate-50'}>
+                  <tr className={isDarkMode ? 'bg-zinc-800/50' : 'bg-zinc-50'}>
                     <th
                       className={`px-4 py-3 text-left text-xs font-medium uppercase tracking-wider ${
-                        isDarkMode ? 'text-slate-400' : 'text-slate-500'
+                        isDarkMode ? 'text-zinc-400' : 'text-zinc-500'
                       }`}
                     >
                       Tool
                     </th>
                     <th
                       className={`px-4 py-3 text-left text-xs font-medium uppercase tracking-wider ${
-                        isDarkMode ? 'text-slate-400' : 'text-slate-500'
+                        isDarkMode ? 'text-zinc-400' : 'text-zinc-500'
                       }`}
                     >
                       Status
                     </th>
                     <th
                       className={`px-4 py-3 text-left text-xs font-medium uppercase tracking-wider ${
-                        isDarkMode ? 'text-slate-400' : 'text-slate-500'
+                        isDarkMode ? 'text-zinc-400' : 'text-zinc-500'
                       }`}
                     >
                       Username
                     </th>
                     <th
                       className={`px-4 py-3 text-left text-xs font-medium uppercase tracking-wider ${
-                        isDarkMode ? 'text-slate-400' : 'text-slate-500'
+                        isDarkMode ? 'text-zinc-400' : 'text-zinc-500'
                       }`}
                     >
                       Access Type
                     </th>
                     <th
                       className={`px-4 py-3 text-right text-xs font-medium uppercase tracking-wider ${
-                        isDarkMode ? 'text-slate-400' : 'text-slate-500'
+                        isDarkMode ? 'text-zinc-400' : 'text-zinc-500'
                       }`}
                     >
                       Actions
                     </th>
                   </tr>
                 </thead>
-                <tbody
-                  className={`divide-y ${isDarkMode ? 'divide-slate-800' : 'divide-slate-200'}`}
-                >
+                <tbody className={`divide-y ${isDarkMode ? 'divide-zinc-800' : 'divide-zinc-200'}`}>
                   {tools.map((tool) => (
                     <tr
                       key={tool.id}
-                      className={isDarkMode ? 'hover:bg-slate-800/50' : 'hover:bg-slate-50'}
+                      className={isDarkMode ? 'hover:bg-zinc-800/50' : 'hover:bg-zinc-50'}
                     >
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2">
@@ -175,8 +173,8 @@ const AdminToolsPage: React.FC = () => {
                               rel="noopener noreferrer"
                               className={`p-1 rounded ${
                                 isDarkMode
-                                  ? 'text-slate-400 hover:text-slate-200'
-                                  : 'text-slate-500 hover:text-slate-700'
+                                  ? 'text-zinc-400 hover:text-zinc-200'
+                                  : 'text-zinc-500 hover:text-zinc-700'
                               }`}
                             >
                               <ExternalLink className="w-3.5 h-3.5" />
@@ -188,12 +186,12 @@ const AdminToolsPage: React.FC = () => {
                         <StatusBadge status={tool.status} />
                       </td>
                       <td
-                        className={`px-4 py-3 text-sm ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}
+                        className={`px-4 py-3 text-sm ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}
                       >
                         {tool.username || '-'}
                       </td>
                       <td
-                        className={`px-4 py-3 text-sm ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}
+                        className={`px-4 py-3 text-sm ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}
                       >
                         {tool.accessType}
                       </td>
@@ -203,8 +201,8 @@ const AdminToolsPage: React.FC = () => {
                             onClick={() => handleEditTool(tool)}
                             className={`p-1.5 rounded-lg ${
                               isDarkMode
-                                ? 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'
-                                : 'text-slate-500 hover:bg-slate-100 hover:text-slate-700'
+                                ? 'text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200'
+                                : 'text-zinc-500 hover:bg-zinc-100 hover:text-zinc-700'
                             }`}
                           >
                             <Pencil className="w-4 h-4" />
@@ -228,12 +226,12 @@ const AdminToolsPage: React.FC = () => {
             </div>
           ) : (
             <div className="p-8 text-center">
-              <p className={isDarkMode ? 'text-slate-400' : 'text-slate-600'}>
+              <p className={isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}>
                 No tools configured for this member
               </p>
               <button
                 onClick={handleAddTool}
-                className="mt-4 text-sm font-medium text-blue-500 hover:text-blue-600"
+                className="mt-4 text-sm font-medium text-violet-500 hover:text-violet-600"
               >
                 Add first tool
               </button>
@@ -246,10 +244,10 @@ const AdminToolsPage: React.FC = () => {
       {!selectedMemberId && (
         <div
           className={`p-8 rounded-xl border text-center ${
-            isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+            isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-200'
           }`}
         >
-          <p className={isDarkMode ? 'text-slate-400' : 'text-slate-600'}>
+          <p className={isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}>
             Select a member to manage their tools
           </p>
         </div>

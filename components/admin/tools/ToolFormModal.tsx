@@ -82,12 +82,12 @@ const ToolFormModal: React.FC<ToolFormModalProps> = ({
 
   const inputClass = `w-full px-3 py-2 rounded-lg border text-sm ${
     isDarkMode
-      ? 'bg-slate-800 border-slate-700 text-slate-100'
-      : 'bg-white border-slate-300 text-slate-900'
-  } focus:outline-none focus:ring-2 focus:ring-blue-500`;
+      ? 'bg-zinc-800 border-zinc-700 text-zinc-100'
+      : 'bg-white border-zinc-300 text-zinc-900'
+  } focus:outline-none focus:ring-2 focus:ring-violet-500`;
 
   const labelClass = `block text-sm font-medium mb-1 ${
-    isDarkMode ? 'text-slate-300' : 'text-slate-700'
+    isDarkMode ? 'text-zinc-300' : 'text-zinc-700'
   }`;
 
   return (
@@ -96,18 +96,18 @@ const ToolFormModal: React.FC<ToolFormModalProps> = ({
 
       <div
         className={`relative w-full max-w-lg mx-4 rounded-xl shadow-xl max-h-[90vh] overflow-y-auto ${
-          isDarkMode ? 'bg-slate-900' : 'bg-white'
+          isDarkMode ? 'bg-zinc-900' : 'bg-white'
         }`}
       >
         <div
           className={`sticky top-0 flex items-center justify-between p-4 border-b ${
-            isDarkMode ? 'border-slate-800 bg-slate-900' : 'border-slate-200 bg-white'
+            isDarkMode ? 'border-zinc-800 bg-zinc-900' : 'border-zinc-200 bg-white'
           }`}
         >
           <h3 className="text-lg font-semibold">{initialData ? 'Edit Tool' : 'Add Tool'}</h3>
           <button
             onClick={onClose}
-            className={`p-1 rounded-lg ${isDarkMode ? 'hover:bg-slate-800' : 'hover:bg-slate-100'}`}
+            className={`p-1 rounded-lg ${isDarkMode ? 'hover:bg-zinc-800' : 'hover:bg-zinc-100'}`}
           >
             <X className="w-5 h-5" />
           </button>
@@ -166,8 +166,8 @@ const ToolFormModal: React.FC<ToolFormModalProps> = ({
                   onClick={() => setShowPassword(!showPassword)}
                   className={`absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded ${
                     isDarkMode
-                      ? 'text-slate-400 hover:text-slate-200'
-                      : 'text-slate-500 hover:text-slate-700'
+                      ? 'text-zinc-400 hover:text-zinc-200'
+                      : 'text-zinc-500 hover:text-zinc-700'
                   }`}
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -233,7 +233,7 @@ const ToolFormModal: React.FC<ToolFormModalProps> = ({
 
           <div
             className={`flex justify-end gap-3 pt-4 border-t ${
-              isDarkMode ? 'border-slate-800' : 'border-slate-200'
+              isDarkMode ? 'border-zinc-800' : 'border-zinc-200'
             }`}
           >
             <button
@@ -242,8 +242,8 @@ const ToolFormModal: React.FC<ToolFormModalProps> = ({
               disabled={isLoading}
               className={`px-4 py-2 rounded-lg text-sm font-medium ${
                 isDarkMode
-                  ? 'bg-slate-800 text-slate-300 hover:bg-slate-700'
-                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                  ? 'bg-zinc-800 text-zinc-300 hover:bg-zinc-700'
+                  : 'bg-zinc-100 text-zinc-700 hover:bg-zinc-200'
               }`}
             >
               Cancel
@@ -251,7 +251,7 @@ const ToolFormModal: React.FC<ToolFormModalProps> = ({
             <button
               type="submit"
               disabled={isLoading}
-              className="px-4 py-2 rounded-lg text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50"
+              className="px-4 py-2 rounded-lg text-sm font-medium bg-violet-600 text-white hover:bg-violet-700 disabled:opacity-50"
             >
               {isLoading ? 'Saving...' : initialData ? 'Update Tool' : 'Add Tool'}
             </button>

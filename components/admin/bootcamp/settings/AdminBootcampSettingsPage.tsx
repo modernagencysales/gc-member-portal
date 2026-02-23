@@ -56,11 +56,11 @@ const AdminBootcampSettingsPage: React.FC = () => {
     return (
       <div
         className={`p-8 rounded-xl border text-center ${
-          isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+          isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-200'
         }`}
       >
-        <div className="w-6 h-6 border-2 border-slate-300 border-t-blue-500 rounded-full animate-spin mx-auto" />
-        <p className={`text-sm mt-2 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+        <div className="w-6 h-6 border-2 border-zinc-300 border-t-violet-500 rounded-full animate-spin mx-auto" />
+        <p className={`text-sm mt-2 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
           Loading settings...
         </p>
       </div>
@@ -73,7 +73,7 @@ const AdminBootcampSettingsPage: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-xl font-semibold">Bootcamp Settings</h2>
-          <p className={`text-sm mt-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+          <p className={`text-sm mt-1 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
             Configure onboarding flow and automation settings
           </p>
         </div>
@@ -81,7 +81,7 @@ const AdminBootcampSettingsPage: React.FC = () => {
           <button
             onClick={handleSave}
             disabled={updateMutation.isPending}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50"
+            className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-violet-600 text-white hover:bg-violet-700 disabled:opacity-50"
           >
             <Save className="w-4 h-4" />
             {updateMutation.isPending ? 'Saving...' : 'Save Changes'}
@@ -93,15 +93,15 @@ const AdminBootcampSettingsPage: React.FC = () => {
         {/* Onboarding Settings */}
         <div
           className={`rounded-xl border overflow-hidden ${
-            isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+            isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-200'
           }`}
         >
           <div
             className={`px-6 py-4 border-b flex items-center gap-3 ${
-              isDarkMode ? 'bg-slate-800/50 border-slate-800' : 'bg-slate-50 border-slate-200'
+              isDarkMode ? 'bg-zinc-800/50 border-zinc-800' : 'bg-zinc-50 border-zinc-200'
             }`}
           >
-            <Settings className={`w-5 h-5 ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`} />
+            <Settings className={`w-5 h-5 ${isDarkMode ? 'text-violet-400' : 'text-violet-600'}`} />
             <h3 className="font-semibold">Onboarding Flow</h3>
           </div>
           <div className="p-6 space-y-6">
@@ -119,9 +119,7 @@ const AdminBootcampSettingsPage: React.FC = () => {
                 </div>
                 <div>
                   <label className="font-medium">Show AI Tools Section</label>
-                  <p
-                    className={`text-sm mt-0.5 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}
-                  >
+                  <p className={`text-sm mt-0.5 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
                     Display the AI tools showcase during onboarding
                   </p>
                 </div>
@@ -133,7 +131,7 @@ const AdminBootcampSettingsPage: React.FC = () => {
                   onChange={(e) => handleChange('aiToolsVisible', e.target.checked)}
                   className="sr-only peer"
                 />
-                <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-slate-600 peer-checked:bg-blue-600"></div>
+                <div className="w-11 h-6 bg-zinc-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-violet-300 dark:peer-focus:ring-violet-800 rounded-full peer dark:bg-zinc-700 peer-checked:after:tranzinc-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-zinc-600 peer-checked:bg-violet-600"></div>
               </label>
             </div>
 
@@ -149,9 +147,7 @@ const AdminBootcampSettingsPage: React.FC = () => {
                 </div>
                 <div>
                   <label className="font-medium">Intro Video URL</label>
-                  <p
-                    className={`text-sm mt-0.5 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}
-                  >
+                  <p className={`text-sm mt-0.5 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
                     YouTube or Loom video shown during onboarding
                   </p>
                 </div>
@@ -165,9 +161,9 @@ const AdminBootcampSettingsPage: React.FC = () => {
                 placeholder="https://youtube.com/watch?v=..."
                 className={`w-full px-4 py-2.5 rounded-lg border ${
                   isDarkMode
-                    ? 'bg-slate-800 border-slate-700 text-white'
-                    : 'bg-white border-slate-300 text-slate-900'
-                } focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+                    ? 'bg-zinc-800 border-zinc-700 text-white'
+                    : 'bg-white border-zinc-300 text-zinc-900'
+                } focus:ring-2 focus:ring-violet-500 focus:border-transparent`}
               />
             </div>
 
@@ -175,7 +171,7 @@ const AdminBootcampSettingsPage: React.FC = () => {
             <div>
               <label className="font-medium">Welcome Message</label>
               <p
-                className={`text-sm mt-0.5 mb-3 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}
+                className={`text-sm mt-0.5 mb-3 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}
               >
                 Custom message displayed on the welcome screen
               </p>
@@ -190,9 +186,9 @@ const AdminBootcampSettingsPage: React.FC = () => {
                 rows={3}
                 className={`w-full px-4 py-2.5 rounded-lg border resize-none ${
                   isDarkMode
-                    ? 'bg-slate-800 border-slate-700 text-white'
-                    : 'bg-white border-slate-300 text-slate-900'
-                } focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+                    ? 'bg-zinc-800 border-zinc-700 text-white'
+                    : 'bg-white border-zinc-300 text-zinc-900'
+                } focus:ring-2 focus:ring-violet-500 focus:border-transparent`}
               />
             </div>
           </div>
@@ -201,12 +197,12 @@ const AdminBootcampSettingsPage: React.FC = () => {
         {/* AI Tools Page Customization */}
         <div
           className={`rounded-xl border overflow-hidden ${
-            isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+            isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-200'
           }`}
         >
           <div
             className={`px-6 py-4 border-b flex items-center gap-3 ${
-              isDarkMode ? 'bg-slate-800/50 border-slate-800' : 'bg-slate-50 border-slate-200'
+              isDarkMode ? 'bg-zinc-800/50 border-zinc-800' : 'bg-zinc-50 border-zinc-200'
             }`}
           >
             <Bot className={`w-5 h-5 ${isDarkMode ? 'text-purple-400' : 'text-purple-600'}`} />
@@ -217,7 +213,7 @@ const AdminBootcampSettingsPage: React.FC = () => {
             <div>
               <label className="font-medium">Page Title</label>
               <p
-                className={`text-sm mt-0.5 mb-3 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}
+                className={`text-sm mt-0.5 mb-3 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}
               >
                 Main heading displayed on the AI Tools page
               </p>
@@ -230,9 +226,9 @@ const AdminBootcampSettingsPage: React.FC = () => {
                 placeholder="Your AI-Powered Toolkit"
                 className={`w-full px-4 py-2.5 rounded-lg border ${
                   isDarkMode
-                    ? 'bg-slate-800 border-slate-700 text-white'
-                    : 'bg-white border-slate-300 text-slate-900'
-                } focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+                    ? 'bg-zinc-800 border-zinc-700 text-white'
+                    : 'bg-white border-zinc-300 text-zinc-900'
+                } focus:ring-2 focus:ring-violet-500 focus:border-transparent`}
               />
             </div>
 
@@ -240,7 +236,7 @@ const AdminBootcampSettingsPage: React.FC = () => {
             <div>
               <label className="font-medium">Page Subtitle</label>
               <p
-                className={`text-sm mt-0.5 mb-3 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}
+                className={`text-sm mt-0.5 mb-3 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}
               >
                 Description text shown below the title
               </p>
@@ -255,9 +251,9 @@ const AdminBootcampSettingsPage: React.FC = () => {
                 rows={2}
                 className={`w-full px-4 py-2.5 rounded-lg border resize-none ${
                   isDarkMode
-                    ? 'bg-slate-800 border-slate-700 text-white'
-                    : 'bg-white border-slate-300 text-slate-900'
-                } focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+                    ? 'bg-zinc-800 border-zinc-700 text-white'
+                    : 'bg-white border-zinc-300 text-zinc-900'
+                } focus:ring-2 focus:ring-violet-500 focus:border-transparent`}
               />
             </div>
 
@@ -265,7 +261,7 @@ const AdminBootcampSettingsPage: React.FC = () => {
             <div>
               <label className="font-medium">Info Box Title</label>
               <p
-                className={`text-sm mt-0.5 mb-3 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}
+                className={`text-sm mt-0.5 mb-3 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}
               >
                 Title for the info box at the bottom
               </p>
@@ -280,9 +276,9 @@ const AdminBootcampSettingsPage: React.FC = () => {
                 placeholder="Full Access Included"
                 className={`w-full px-4 py-2.5 rounded-lg border ${
                   isDarkMode
-                    ? 'bg-slate-800 border-slate-700 text-white'
-                    : 'bg-white border-slate-300 text-slate-900'
-                } focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+                    ? 'bg-zinc-800 border-zinc-700 text-white'
+                    : 'bg-white border-zinc-300 text-zinc-900'
+                } focus:ring-2 focus:ring-violet-500 focus:border-transparent`}
               />
             </div>
 
@@ -290,7 +286,7 @@ const AdminBootcampSettingsPage: React.FC = () => {
             <div>
               <label className="font-medium">Info Box Text</label>
               <p
-                className={`text-sm mt-0.5 mb-3 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}
+                className={`text-sm mt-0.5 mb-3 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}
               >
                 Description text shown in the info box
               </p>
@@ -305,9 +301,9 @@ const AdminBootcampSettingsPage: React.FC = () => {
                 rows={2}
                 className={`w-full px-4 py-2.5 rounded-lg border resize-none ${
                   isDarkMode
-                    ? 'bg-slate-800 border-slate-700 text-white'
-                    : 'bg-white border-slate-300 text-slate-900'
-                } focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+                    ? 'bg-zinc-800 border-zinc-700 text-white'
+                    : 'bg-white border-zinc-300 text-zinc-900'
+                } focus:ring-2 focus:ring-violet-500 focus:border-transparent`}
               />
             </div>
           </div>
@@ -328,40 +324,40 @@ const AdminBootcampSettingsPage: React.FC = () => {
         {/* Manual Tracking Info */}
         <div
           className={`rounded-xl border overflow-hidden ${
-            isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+            isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-200'
           }`}
         >
           <div
             className={`px-6 py-4 border-b flex items-center gap-3 ${
-              isDarkMode ? 'bg-slate-800/50 border-slate-800' : 'bg-slate-50 border-slate-200'
+              isDarkMode ? 'bg-zinc-800/50 border-zinc-800' : 'bg-zinc-50 border-zinc-200'
             }`}
           >
-            <Info className={`w-5 h-5 ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`} />
+            <Info className={`w-5 h-5 ${isDarkMode ? 'text-violet-400' : 'text-violet-600'}`} />
             <h3 className="font-semibold">Slack & Calendar Tracking</h3>
           </div>
           <div className="p-6">
             <div
               className={`p-4 rounded-lg border ${
-                isDarkMode ? 'bg-blue-900/20 border-blue-800' : 'bg-blue-50 border-blue-200'
+                isDarkMode ? 'bg-violet-900/20 border-violet-800' : 'bg-violet-50 border-violet-200'
               }`}
             >
-              <p className={`text-sm ${isDarkMode ? 'text-slate-300' : 'text-slate-700'}`}>
+              <p className={`text-sm ${isDarkMode ? 'text-zinc-300' : 'text-zinc-700'}`}>
                 In the current version, Slack invites and Calendar additions are tracked manually.
                 Use the buttons in the Student Roster to mark when you've manually:
               </p>
               <ul
-                className={`mt-3 space-y-2 text-sm ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}
+                className={`mt-3 space-y-2 text-sm ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}
               >
                 <li className="flex items-center gap-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-purple-500"></span>
                   Invited a student to your Slack workspace
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-violet-500"></span>
                   Added a student to your Google Calendar events
                 </li>
               </ul>
-              <p className={`mt-4 text-xs ${isDarkMode ? 'text-slate-500' : 'text-slate-500'}`}>
+              <p className={`mt-4 text-xs ${isDarkMode ? 'text-zinc-500' : 'text-zinc-500'}`}>
                 Automated integrations coming in v2.
               </p>
             </div>

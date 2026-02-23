@@ -56,35 +56,33 @@ const BulkEditModal: React.FC<BulkEditModalProps> = ({
   if (!isOpen) return null;
 
   const inputClass = `w-full px-4 py-2.5 rounded-lg border ${
-    isDarkMode
-      ? 'bg-slate-800 border-slate-700 text-white'
-      : 'bg-white border-slate-300 text-slate-900'
-  } focus:ring-2 focus:ring-blue-500 focus:border-transparent`;
+    isDarkMode ? 'bg-zinc-800 border-zinc-700 text-white' : 'bg-white border-zinc-300 text-zinc-900'
+  } focus:ring-2 focus:ring-violet-500 focus:border-transparent`;
 
   const labelClass = `block text-sm font-medium mb-2 ${
-    isDarkMode ? 'text-slate-300' : 'text-slate-700'
+    isDarkMode ? 'text-zinc-300' : 'text-zinc-700'
   }`;
 
   const canSubmit = updateModel || updateTokens;
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className={`w-full max-w-md rounded-xl ${isDarkMode ? 'bg-slate-900' : 'bg-white'}`}>
+      <div className={`w-full max-w-md rounded-xl ${isDarkMode ? 'bg-zinc-900' : 'bg-white'}`}>
         {/* Header */}
         <div
           className={`flex items-center justify-between px-6 py-4 border-b ${
-            isDarkMode ? 'border-slate-800' : 'border-slate-200'
+            isDarkMode ? 'border-zinc-800' : 'border-zinc-200'
           }`}
         >
           <div>
             <h3 className="text-lg font-semibold">Bulk Edit AI Tools</h3>
-            <p className={`text-sm mt-0.5 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+            <p className={`text-sm mt-0.5 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
               Update {selectedCount} selected tool{selectedCount !== 1 ? 's' : ''}
             </p>
           </div>
           <button
             onClick={handleClose}
-            className={`p-2 rounded-lg ${isDarkMode ? 'hover:bg-slate-800' : 'hover:bg-slate-100'}`}
+            className={`p-2 rounded-lg ${isDarkMode ? 'hover:bg-zinc-800' : 'hover:bg-zinc-100'}`}
           >
             <X className="w-5 h-5" />
           </button>
@@ -92,15 +90,15 @@ const BulkEditModal: React.FC<BulkEditModalProps> = ({
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-6 space-y-5">
-          <p className={`text-sm ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+          <p className={`text-sm ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
             Select which fields to update. Only checked fields will be changed.
           </p>
 
           {/* Model Selection */}
           <div
             className={`p-4 rounded-lg border ${
-              isDarkMode ? 'border-slate-700' : 'border-slate-200'
-            } ${updateModel ? (isDarkMode ? 'bg-slate-800/50' : 'bg-blue-50/50') : ''}`}
+              isDarkMode ? 'border-zinc-700' : 'border-zinc-200'
+            } ${updateModel ? (isDarkMode ? 'bg-zinc-800/50' : 'bg-violet-50/50') : ''}`}
           >
             <div className="flex items-center gap-3 mb-3">
               <input
@@ -108,11 +106,11 @@ const BulkEditModal: React.FC<BulkEditModalProps> = ({
                 id="updateModel"
                 checked={updateModel}
                 onChange={(e) => setUpdateModel(e.target.checked)}
-                className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                className="w-4 h-4 rounded border-zinc-300 text-violet-600 focus:ring-violet-500"
               />
               <label
                 htmlFor="updateModel"
-                className={`text-sm font-medium ${isDarkMode ? 'text-slate-200' : 'text-slate-800'}`}
+                className={`text-sm font-medium ${isDarkMode ? 'text-zinc-200' : 'text-zinc-800'}`}
               >
                 Update Model
               </label>
@@ -137,8 +135,8 @@ const BulkEditModal: React.FC<BulkEditModalProps> = ({
           {/* Max Tokens Selection */}
           <div
             className={`p-4 rounded-lg border ${
-              isDarkMode ? 'border-slate-700' : 'border-slate-200'
-            } ${updateTokens ? (isDarkMode ? 'bg-slate-800/50' : 'bg-blue-50/50') : ''}`}
+              isDarkMode ? 'border-zinc-700' : 'border-zinc-200'
+            } ${updateTokens ? (isDarkMode ? 'bg-zinc-800/50' : 'bg-violet-50/50') : ''}`}
           >
             <div className="flex items-center gap-3 mb-3">
               <input
@@ -146,11 +144,11 @@ const BulkEditModal: React.FC<BulkEditModalProps> = ({
                 id="updateTokens"
                 checked={updateTokens}
                 onChange={(e) => setUpdateTokens(e.target.checked)}
-                className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                className="w-4 h-4 rounded border-zinc-300 text-violet-600 focus:ring-violet-500"
               />
               <label
                 htmlFor="updateTokens"
-                className={`text-sm font-medium ${isDarkMode ? 'text-slate-200' : 'text-slate-800'}`}
+                className={`text-sm font-medium ${isDarkMode ? 'text-zinc-200' : 'text-zinc-800'}`}
               >
                 Update Max Tokens
               </label>
@@ -171,7 +169,7 @@ const BulkEditModal: React.FC<BulkEditModalProps> = ({
                 max={64000}
                 disabled={!updateTokens}
               />
-              <p className={`text-xs mt-1 ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>
+              <p className={`text-xs mt-1 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
                 Range: 256 - 64,000
               </p>
             </div>
@@ -180,14 +178,14 @@ const BulkEditModal: React.FC<BulkEditModalProps> = ({
           {/* Actions */}
           <div
             className={`flex justify-end gap-2 pt-4 border-t ${
-              isDarkMode ? 'border-slate-800' : 'border-slate-200'
+              isDarkMode ? 'border-zinc-800' : 'border-zinc-200'
             }`}
           >
             <button
               type="button"
               onClick={handleClose}
               className={`px-4 py-2 rounded-lg text-sm font-medium ${
-                isDarkMode ? 'hover:bg-slate-800' : 'hover:bg-slate-100'
+                isDarkMode ? 'hover:bg-zinc-800' : 'hover:bg-zinc-100'
               }`}
             >
               Cancel
@@ -195,7 +193,7 @@ const BulkEditModal: React.FC<BulkEditModalProps> = ({
             <button
               type="submit"
               disabled={isLoading || !canSubmit}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50"
+              className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-violet-600 text-white hover:bg-violet-700 disabled:opacity-50"
             >
               {isLoading && <Loader2 className="w-4 h-4 animate-spin" />}
               Update {selectedCount} Tool{selectedCount !== 1 ? 's' : ''}

@@ -48,32 +48,32 @@ const NewOfferModal: React.FC<NewOfferModalProps> = ({ onClose, onSuccess }) => 
 
   const inputClass = `w-full px-3 py-2 rounded-lg border ${
     isDarkMode
-      ? 'bg-slate-800 border-slate-700 text-white placeholder:text-slate-500'
-      : 'bg-white border-slate-300 text-slate-900 placeholder:text-slate-400'
-  } focus:ring-2 focus:ring-blue-500 focus:border-transparent`;
+      ? 'bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500'
+      : 'bg-white border-zinc-300 text-zinc-900 placeholder:text-zinc-400'
+  } focus:ring-2 focus:ring-violet-500 focus:border-transparent`;
 
-  const labelClass = `block text-sm font-medium mb-1 ${isDarkMode ? 'text-slate-300' : 'text-slate-700'}`;
+  const labelClass = `block text-sm font-medium mb-1 ${isDarkMode ? 'text-zinc-300' : 'text-zinc-700'}`;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
       <div
         className={`relative w-full max-w-md mx-4 rounded-xl shadow-xl ${
-          isDarkMode ? 'bg-slate-900 border border-slate-800' : 'bg-white'
+          isDarkMode ? 'bg-zinc-900 border border-zinc-800' : 'bg-white'
         }`}
       >
         {/* Header */}
         <div
           className={`flex items-center justify-between px-6 py-4 border-b ${
-            isDarkMode ? 'border-slate-800' : 'border-slate-200'
+            isDarkMode ? 'border-zinc-800' : 'border-zinc-200'
           }`}
         >
-          <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
+          <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-zinc-900'}`}>
             New Intro Offer
           </h3>
           <button
             onClick={onClose}
             className={`p-1 rounded-lg ${
-              isDarkMode ? 'hover:bg-slate-800 text-slate-400' : 'hover:bg-slate-100 text-slate-500'
+              isDarkMode ? 'hover:bg-zinc-800 text-zinc-400' : 'hover:bg-zinc-100 text-zinc-500'
             }`}
           >
             <X className="w-5 h-5" />
@@ -153,9 +153,7 @@ const NewOfferModal: React.FC<NewOfferModalProps> = ({ onClose, onSuccess }) => 
               type="button"
               onClick={onClose}
               className={`px-4 py-2 rounded-lg text-sm font-medium ${
-                isDarkMode
-                  ? 'text-slate-400 hover:bg-slate-800'
-                  : 'text-slate-600 hover:bg-slate-100'
+                isDarkMode ? 'text-zinc-400 hover:bg-zinc-800' : 'text-zinc-600 hover:bg-zinc-100'
               }`}
             >
               Cancel
@@ -163,7 +161,7 @@ const NewOfferModal: React.FC<NewOfferModalProps> = ({ onClose, onSuccess }) => 
             <button
               type="submit"
               disabled={isSubmitting}
-              className="px-4 py-2 rounded-lg text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-4 py-2 rounded-lg text-sm font-medium bg-violet-600 text-white hover:bg-violet-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSubmitting ? 'Creating...' : 'Create Offer'}
             </button>

@@ -20,16 +20,16 @@ const MemberSelect: React.FC<MemberSelectProps> = ({ value, onChange }) => {
 
   return (
     <div className="flex items-center gap-3">
-      <Users className={`w-5 h-5 ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`} />
+      <Users className={`w-5 h-5 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-500'}`} />
       <select
         value={value || ''}
         onChange={(e) => onChange(e.target.value || null)}
         disabled={isLoading}
         className={`flex-1 px-3 py-2 rounded-lg border text-sm ${
           isDarkMode
-            ? 'bg-slate-800 border-slate-700 text-slate-100'
-            : 'bg-white border-slate-300 text-slate-900'
-        } focus:outline-none focus:ring-2 focus:ring-blue-500`}
+            ? 'bg-zinc-800 border-zinc-700 text-zinc-100'
+            : 'bg-white border-zinc-300 text-zinc-900'
+        } focus:outline-none focus:ring-2 focus:ring-violet-500`}
       >
         <option value="">Select a member...</option>
         {members?.map((member) => (

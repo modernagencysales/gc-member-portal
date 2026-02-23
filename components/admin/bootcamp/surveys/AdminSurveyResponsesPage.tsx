@@ -147,7 +147,6 @@ const AdminSurveyResponsesPage: React.FC = () => {
       .map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(','))
       .join('\n');
 
-    // eslint-disable-next-line no-undef
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -174,14 +173,14 @@ const AdminSurveyResponsesPage: React.FC = () => {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold">Survey Responses</h1>
-          <p className={`text-sm ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+          <p className={`text-sm ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
             {studentsWithSurveys.length} completed surveys
           </p>
         </div>
         <button
           onClick={exportToCSV}
           className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium ${
-            isDarkMode ? 'bg-slate-800 hover:bg-slate-700' : 'bg-slate-100 hover:bg-slate-200'
+            isDarkMode ? 'bg-zinc-800 hover:bg-zinc-700' : 'bg-zinc-100 hover:bg-zinc-200'
           }`}
         >
           <Download className="w-4 h-4" />
@@ -193,8 +192,8 @@ const AdminSurveyResponsesPage: React.FC = () => {
       <div className="mb-6">
         <div className="relative max-w-md">
           <Search
-            className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${
-              isDarkMode ? 'text-slate-500' : 'text-slate-400'
+            className={`absolute left-3 top-1/2 -tranzinc-y-1/2 w-4 h-4 ${
+              isDarkMode ? 'text-zinc-500' : 'text-zinc-400'
             }`}
           />
           <input
@@ -204,9 +203,9 @@ const AdminSurveyResponsesPage: React.FC = () => {
             placeholder="Search by name, email, company, or industry..."
             className={`w-full pl-10 pr-4 py-2 rounded-lg border ${
               isDarkMode
-                ? 'bg-slate-800 border-slate-700 text-white placeholder:text-slate-500'
-                : 'bg-white border-slate-200 text-slate-900 placeholder:text-slate-400'
-            } focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+                ? 'bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500'
+                : 'bg-white border-zinc-200 text-zinc-900 placeholder:text-zinc-400'
+            } focus:ring-2 focus:ring-violet-500 focus:border-transparent`}
           />
         </div>
       </div>
@@ -215,15 +214,15 @@ const AdminSurveyResponsesPage: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <div
           className={`p-4 rounded-lg border ${
-            isDarkMode ? 'bg-slate-800/50 border-slate-700' : 'bg-white border-slate-200'
+            isDarkMode ? 'bg-zinc-800/50 border-zinc-700' : 'bg-white border-zinc-200'
           }`}
         >
           <div className="flex items-center gap-3">
-            <div className={`p-2 rounded-lg ${isDarkMode ? 'bg-blue-900/30' : 'bg-blue-100'}`}>
-              <Users className={`w-5 h-5 ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`} />
+            <div className={`p-2 rounded-lg ${isDarkMode ? 'bg-violet-900/30' : 'bg-violet-100'}`}>
+              <Users className={`w-5 h-5 ${isDarkMode ? 'text-violet-400' : 'text-violet-600'}`} />
             </div>
             <div>
-              <p className={`text-sm ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+              <p className={`text-sm ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
                 Total Responses
               </p>
               <p className="text-2xl font-bold">{studentsWithSurveys.length}</p>
@@ -233,7 +232,7 @@ const AdminSurveyResponsesPage: React.FC = () => {
 
         <div
           className={`p-4 rounded-lg border ${
-            isDarkMode ? 'bg-slate-800/50 border-slate-700' : 'bg-white border-slate-200'
+            isDarkMode ? 'bg-zinc-800/50 border-zinc-700' : 'bg-white border-zinc-200'
           }`}
         >
           <div className="flex items-center gap-3">
@@ -243,7 +242,7 @@ const AdminSurveyResponsesPage: React.FC = () => {
               />
             </div>
             <div>
-              <p className={`text-sm ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+              <p className={`text-sm ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
                 Unique Companies
               </p>
               <p className="text-2xl font-bold">
@@ -255,7 +254,7 @@ const AdminSurveyResponsesPage: React.FC = () => {
 
         <div
           className={`p-4 rounded-lg border ${
-            isDarkMode ? 'bg-slate-800/50 border-slate-700' : 'bg-white border-slate-200'
+            isDarkMode ? 'bg-zinc-800/50 border-zinc-700' : 'bg-white border-zinc-200'
           }`}
         >
           <div className="flex items-center gap-3">
@@ -263,7 +262,7 @@ const AdminSurveyResponsesPage: React.FC = () => {
               <Target className={`w-5 h-5 ${isDarkMode ? 'text-green-400' : 'text-green-600'}`} />
             </div>
             <div>
-              <p className={`text-sm ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+              <p className={`text-sm ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
                 Industries
               </p>
               <p className="text-2xl font-bold">
@@ -277,17 +276,17 @@ const AdminSurveyResponsesPage: React.FC = () => {
       {/* Table */}
       <div
         className={`rounded-lg border overflow-hidden ${
-          isDarkMode ? 'border-slate-700' : 'border-slate-200'
+          isDarkMode ? 'border-zinc-700' : 'border-zinc-200'
         }`}
       >
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className={isDarkMode ? 'bg-slate-800' : 'bg-slate-50'}>
+              <tr className={isDarkMode ? 'bg-zinc-800' : 'bg-zinc-50'}>
                 <th
                   onClick={() => handleSort('name')}
                   className={`px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider cursor-pointer hover:bg-opacity-80 ${
-                    isDarkMode ? 'text-slate-400' : 'text-slate-600'
+                    isDarkMode ? 'text-zinc-400' : 'text-zinc-600'
                   }`}
                 >
                   <div className="flex items-center gap-1">
@@ -298,7 +297,7 @@ const AdminSurveyResponsesPage: React.FC = () => {
                 <th
                   onClick={() => handleSort('company')}
                   className={`px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider cursor-pointer hover:bg-opacity-80 ${
-                    isDarkMode ? 'text-slate-400' : 'text-slate-600'
+                    isDarkMode ? 'text-zinc-400' : 'text-zinc-600'
                   }`}
                 >
                   <div className="flex items-center gap-1">
@@ -309,7 +308,7 @@ const AdminSurveyResponsesPage: React.FC = () => {
                 <th
                   onClick={() => handleSort('industry')}
                   className={`px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider cursor-pointer hover:bg-opacity-80 ${
-                    isDarkMode ? 'text-slate-400' : 'text-slate-600'
+                    isDarkMode ? 'text-zinc-400' : 'text-zinc-600'
                   }`}
                 >
                   <div className="flex items-center gap-1">
@@ -319,7 +318,7 @@ const AdminSurveyResponsesPage: React.FC = () => {
                 </th>
                 <th
                   className={`px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider ${
-                    isDarkMode ? 'text-slate-400' : 'text-slate-600'
+                    isDarkMode ? 'text-zinc-400' : 'text-zinc-600'
                   }`}
                 >
                   Experience
@@ -327,7 +326,7 @@ const AdminSurveyResponsesPage: React.FC = () => {
                 <th
                   onClick={() => handleSort('completedAt')}
                   className={`px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider cursor-pointer hover:bg-opacity-80 ${
-                    isDarkMode ? 'text-slate-400' : 'text-slate-600'
+                    isDarkMode ? 'text-zinc-400' : 'text-zinc-600'
                   }`}
                 >
                   <div className="flex items-center gap-1">
@@ -337,25 +336,23 @@ const AdminSurveyResponsesPage: React.FC = () => {
                 </th>
                 <th
                   className={`px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider ${
-                    isDarkMode ? 'text-slate-400' : 'text-slate-600'
+                    isDarkMode ? 'text-zinc-400' : 'text-zinc-600'
                   }`}
                 >
                   Actions
                 </th>
               </tr>
             </thead>
-            <tbody
-              className={isDarkMode ? 'divide-y divide-slate-700' : 'divide-y divide-slate-200'}
-            >
+            <tbody className={isDarkMode ? 'divide-y divide-zinc-700' : 'divide-y divide-zinc-200'}>
               {sortedStudents.map((student) => (
                 <tr
                   key={student.id}
-                  className={isDarkMode ? 'hover:bg-slate-800/50' : 'hover:bg-slate-50'}
+                  className={isDarkMode ? 'hover:bg-zinc-800/50' : 'hover:bg-zinc-50'}
                 >
                   <td className="px-4 py-3">
                     <div>
                       <p className="font-medium">{student.name || 'No name'}</p>
-                      <p className={`text-sm ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+                      <p className={`text-sm ${isDarkMode ? 'text-zinc-400' : 'text-zinc-500'}`}>
                         {student.email}
                       </p>
                     </div>
@@ -364,9 +361,7 @@ const AdminSurveyResponsesPage: React.FC = () => {
                     <div>
                       <p className="font-medium">{student.survey.companyName || '-'}</p>
                       {student.survey.companySize && (
-                        <p
-                          className={`text-sm ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}
-                        >
+                        <p className={`text-sm ${isDarkMode ? 'text-zinc-400' : 'text-zinc-500'}`}>
                           {student.survey.companySize} employees
                         </p>
                       )}
@@ -375,7 +370,7 @@ const AdminSurveyResponsesPage: React.FC = () => {
                   <td className="px-4 py-3">
                     <span
                       className={`inline-block px-2 py-1 rounded text-xs font-medium ${
-                        isDarkMode ? 'bg-slate-700 text-slate-300' : 'bg-slate-100 text-slate-700'
+                        isDarkMode ? 'bg-zinc-700 text-zinc-300' : 'bg-zinc-100 text-zinc-700'
                       }`}
                     >
                       {student.survey.industry || '-'}
@@ -390,18 +385,18 @@ const AdminSurveyResponsesPage: React.FC = () => {
                             : 'bg-green-100 text-green-700'
                           : student.survey.linkedinExperience === 'Intermediate'
                             ? isDarkMode
-                              ? 'bg-blue-900/30 text-blue-400'
-                              : 'bg-blue-100 text-blue-700'
+                              ? 'bg-violet-900/30 text-violet-400'
+                              : 'bg-violet-100 text-violet-700'
                             : isDarkMode
-                              ? 'bg-slate-700 text-slate-300'
-                              : 'bg-slate-100 text-slate-700'
+                              ? 'bg-zinc-700 text-zinc-300'
+                              : 'bg-zinc-100 text-zinc-700'
                       }`}
                     >
                       {student.survey.linkedinExperience || '-'}
                     </span>
                   </td>
                   <td className="px-4 py-3">
-                    <span className={`text-sm ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+                    <span className={`text-sm ${isDarkMode ? 'text-zinc-400' : 'text-zinc-500'}`}>
                       {student.survey.completedAt
                         ? new Date(student.survey.completedAt).toLocaleDateString()
                         : '-'}
@@ -416,7 +411,7 @@ const AdminSurveyResponsesPage: React.FC = () => {
                         })
                       }
                       className={`p-2 rounded-lg ${
-                        isDarkMode ? 'hover:bg-slate-700' : 'hover:bg-slate-100'
+                        isDarkMode ? 'hover:bg-zinc-700' : 'hover:bg-zinc-100'
                       }`}
                       title="View full survey"
                     >
@@ -431,7 +426,7 @@ const AdminSurveyResponsesPage: React.FC = () => {
 
         {sortedStudents.length === 0 && (
           <div className="p-8 text-center">
-            <p className={isDarkMode ? 'text-slate-400' : 'text-slate-500'}>
+            <p className={isDarkMode ? 'text-zinc-400' : 'text-zinc-500'}>
               {searchTerm ? 'No surveys match your search' : 'No completed surveys yet'}
             </p>
           </div>

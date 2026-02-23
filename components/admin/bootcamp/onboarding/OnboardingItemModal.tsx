@@ -75,13 +75,13 @@ const OnboardingItemModal: React.FC<OnboardingItemModalProps> = ({
       {/* Modal */}
       <div
         className={`relative w-full max-w-lg rounded-2xl shadow-xl ${
-          isDarkMode ? 'bg-slate-900' : 'bg-white'
+          isDarkMode ? 'bg-zinc-900' : 'bg-white'
         }`}
       >
         {/* Header */}
         <div
           className={`flex items-center justify-between p-6 border-b ${
-            isDarkMode ? 'border-slate-800' : 'border-slate-200'
+            isDarkMode ? 'border-zinc-800' : 'border-zinc-200'
           }`}
         >
           <h2 className="text-lg font-semibold">
@@ -89,7 +89,7 @@ const OnboardingItemModal: React.FC<OnboardingItemModalProps> = ({
           </h2>
           <button
             onClick={onClose}
-            className={`p-2 rounded-lg ${isDarkMode ? 'hover:bg-slate-800' : 'hover:bg-slate-100'}`}
+            className={`p-2 rounded-lg ${isDarkMode ? 'hover:bg-zinc-800' : 'hover:bg-zinc-100'}`}
           >
             <X className="w-5 h-5" />
           </button>
@@ -107,9 +107,9 @@ const OnboardingItemModal: React.FC<OnboardingItemModalProps> = ({
               placeholder="e.g., Watch the welcome video"
               className={`w-full px-4 py-2.5 rounded-lg border ${
                 isDarkMode
-                  ? 'bg-slate-800 border-slate-700 text-white'
-                  : 'bg-white border-slate-300 text-slate-900'
-              } focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+                  ? 'bg-zinc-800 border-zinc-700 text-white'
+                  : 'bg-white border-zinc-300 text-zinc-900'
+              } focus:ring-2 focus:ring-violet-500 focus:border-transparent`}
             />
           </div>
 
@@ -126,9 +126,9 @@ const OnboardingItemModal: React.FC<OnboardingItemModalProps> = ({
                 }
                 className={`w-full px-4 py-2.5 rounded-lg border ${
                   isDarkMode
-                    ? 'bg-slate-800 border-slate-700 text-white'
-                    : 'bg-white border-slate-300 text-slate-900'
-                } focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+                    ? 'bg-zinc-800 border-zinc-700 text-white'
+                    : 'bg-white border-zinc-300 text-zinc-900'
+                } focus:ring-2 focus:ring-violet-500 focus:border-transparent`}
               >
                 {BOOTCAMP_ONBOARDING_CATEGORIES.map((category) => (
                   <option key={category} value={category}>
@@ -147,9 +147,9 @@ const OnboardingItemModal: React.FC<OnboardingItemModalProps> = ({
                 }
                 className={`w-full px-4 py-2.5 rounded-lg border ${
                   isDarkMode
-                    ? 'bg-slate-800 border-slate-700 text-white'
-                    : 'bg-white border-slate-300 text-slate-900'
-                } focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+                    ? 'bg-zinc-800 border-zinc-700 text-white'
+                    : 'bg-white border-zinc-300 text-zinc-900'
+                } focus:ring-2 focus:ring-violet-500 focus:border-transparent`}
               />
             </div>
           </div>
@@ -163,9 +163,9 @@ const OnboardingItemModal: React.FC<OnboardingItemModalProps> = ({
               placeholder="Optional description of this task"
               className={`w-full px-4 py-2.5 rounded-lg border resize-none ${
                 isDarkMode
-                  ? 'bg-slate-800 border-slate-700 text-white'
-                  : 'bg-white border-slate-300 text-slate-900'
-              } focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+                  ? 'bg-zinc-800 border-zinc-700 text-white'
+                  : 'bg-white border-zinc-300 text-zinc-900'
+              } focus:ring-2 focus:ring-violet-500 focus:border-transparent`}
             />
           </div>
 
@@ -178,9 +178,9 @@ const OnboardingItemModal: React.FC<OnboardingItemModalProps> = ({
               placeholder="https://youtube.com/..."
               className={`w-full px-4 py-2.5 rounded-lg border ${
                 isDarkMode
-                  ? 'bg-slate-800 border-slate-700 text-white'
-                  : 'bg-white border-slate-300 text-slate-900'
-              } focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+                  ? 'bg-zinc-800 border-zinc-700 text-white'
+                  : 'bg-white border-zinc-300 text-zinc-900'
+              } focus:ring-2 focus:ring-violet-500 focus:border-transparent`}
             />
           </div>
 
@@ -193,9 +193,9 @@ const OnboardingItemModal: React.FC<OnboardingItemModalProps> = ({
               placeholder="https://..."
               className={`w-full px-4 py-2.5 rounded-lg border ${
                 isDarkMode
-                  ? 'bg-slate-800 border-slate-700 text-white'
-                  : 'bg-white border-slate-300 text-slate-900'
-              } focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+                  ? 'bg-zinc-800 border-zinc-700 text-white'
+                  : 'bg-white border-zinc-300 text-zinc-900'
+              } focus:ring-2 focus:ring-violet-500 focus:border-transparent`}
             />
           </div>
 
@@ -206,7 +206,7 @@ const OnboardingItemModal: React.FC<OnboardingItemModalProps> = ({
                 type="checkbox"
                 checked={formData.isRequired}
                 onChange={(e) => setFormData({ ...formData, isRequired: e.target.checked })}
-                className="rounded border-slate-300 dark:border-slate-600 text-blue-600 focus:ring-blue-500"
+                className="rounded border-zinc-300 dark:border-zinc-600 text-violet-600 focus:ring-violet-500"
               />
               <span className="text-sm">Required</span>
             </label>
@@ -215,7 +215,7 @@ const OnboardingItemModal: React.FC<OnboardingItemModalProps> = ({
                 type="checkbox"
                 checked={formData.isVisible}
                 onChange={(e) => setFormData({ ...formData, isVisible: e.target.checked })}
-                className="rounded border-slate-300 dark:border-slate-600 text-blue-600 focus:ring-blue-500"
+                className="rounded border-zinc-300 dark:border-zinc-600 text-violet-600 focus:ring-violet-500"
               />
               <span className="text-sm">Visible to students</span>
             </label>
@@ -227,9 +227,7 @@ const OnboardingItemModal: React.FC<OnboardingItemModalProps> = ({
               type="button"
               onClick={onClose}
               className={`px-4 py-2 rounded-lg font-medium ${
-                isDarkMode
-                  ? 'text-slate-400 hover:bg-slate-800'
-                  : 'text-slate-600 hover:bg-slate-100'
+                isDarkMode ? 'text-zinc-400 hover:bg-zinc-800' : 'text-zinc-600 hover:bg-zinc-100'
               }`}
             >
               Cancel
@@ -237,7 +235,7 @@ const OnboardingItemModal: React.FC<OnboardingItemModalProps> = ({
             <button
               type="submit"
               disabled={isLoading}
-              className="px-4 py-2 rounded-lg font-medium bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50"
+              className="px-4 py-2 rounded-lg font-medium bg-violet-600 text-white hover:bg-violet-700 disabled:opacity-50"
             >
               {isLoading ? 'Saving...' : initialData ? 'Update' : 'Create'}
             </button>

@@ -30,14 +30,14 @@ const StudentSurveyModal: React.FC<StudentSurveyModalProps> = ({
   };
 
   const renderList = (items?: string[]) => {
-    if (!items || items.length === 0) return <span className="text-slate-400">None</span>;
+    if (!items || items.length === 0) return <span className="text-zinc-400">None</span>;
     return (
       <div className="flex flex-wrap gap-1.5">
         {items.map((item) => (
           <span
             key={item}
             className={`px-2 py-0.5 rounded text-xs ${
-              isDarkMode ? 'bg-slate-700 text-slate-300' : 'bg-slate-100 text-slate-700'
+              isDarkMode ? 'bg-zinc-700 text-zinc-300' : 'bg-zinc-100 text-zinc-700'
             }`}
           >
             {item}
@@ -55,26 +55,26 @@ const StudentSurveyModal: React.FC<StudentSurveyModalProps> = ({
       {/* Modal */}
       <div
         className={`relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl shadow-xl ${
-          isDarkMode ? 'bg-slate-900' : 'bg-white'
+          isDarkMode ? 'bg-zinc-900' : 'bg-white'
         }`}
       >
         {/* Header */}
         <div
           className={`sticky top-0 flex items-center justify-between p-6 border-b ${
-            isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+            isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-200'
           }`}
         >
           <div>
             <h2 className="text-lg font-semibold">Survey Responses</h2>
             {studentName && (
-              <p className={`text-sm ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+              <p className={`text-sm ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
                 {studentName}
               </p>
             )}
           </div>
           <button
             onClick={onClose}
-            className={`p-2 rounded-lg ${isDarkMode ? 'hover:bg-slate-800' : 'hover:bg-slate-100'}`}
+            className={`p-2 rounded-lg ${isDarkMode ? 'hover:bg-zinc-800' : 'hover:bg-zinc-100'}`}
           >
             <X className="w-5 h-5" />
           </button>
@@ -85,11 +85,11 @@ const StudentSurveyModal: React.FC<StudentSurveyModalProps> = ({
           {/* Completion Info */}
           <div
             className={`flex items-center gap-2 px-4 py-3 rounded-lg ${
-              isDarkMode ? 'bg-slate-800' : 'bg-slate-50'
+              isDarkMode ? 'bg-zinc-800' : 'bg-zinc-50'
             }`}
           >
-            <Calendar className="w-4 h-4 text-slate-500" />
-            <span className={`text-sm ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+            <Calendar className="w-4 h-4 text-zinc-500" />
+            <span className={`text-sm ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
               Completed: {formatDate(survey.completedAt)}
             </span>
           </div>
@@ -97,14 +97,16 @@ const StudentSurveyModal: React.FC<StudentSurveyModalProps> = ({
           {/* Business Basics */}
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <Building2 className={`w-5 h-5 ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`} />
+              <Building2
+                className={`w-5 h-5 ${isDarkMode ? 'text-violet-400' : 'text-violet-600'}`}
+              />
               <h3 className="font-semibold">Business Basics</h3>
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label
                   className={`text-xs uppercase tracking-wide ${
-                    isDarkMode ? 'text-slate-500' : 'text-slate-400'
+                    isDarkMode ? 'text-zinc-500' : 'text-zinc-400'
                   }`}
                 >
                   Company
@@ -114,7 +116,7 @@ const StudentSurveyModal: React.FC<StudentSurveyModalProps> = ({
               <div>
                 <label
                   className={`text-xs uppercase tracking-wide ${
-                    isDarkMode ? 'text-slate-500' : 'text-slate-400'
+                    isDarkMode ? 'text-zinc-500' : 'text-zinc-400'
                   }`}
                 >
                   Website
@@ -125,7 +127,7 @@ const StudentSurveyModal: React.FC<StudentSurveyModalProps> = ({
                       href={survey.website}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-blue-500 hover:underline"
+                      className="text-violet-500 hover:underline"
                     >
                       {survey.website}
                     </a>
@@ -137,7 +139,7 @@ const StudentSurveyModal: React.FC<StudentSurveyModalProps> = ({
               <div>
                 <label
                   className={`text-xs uppercase tracking-wide ${
-                    isDarkMode ? 'text-slate-500' : 'text-slate-400'
+                    isDarkMode ? 'text-zinc-500' : 'text-zinc-400'
                   }`}
                 >
                   Industry
@@ -147,7 +149,7 @@ const StudentSurveyModal: React.FC<StudentSurveyModalProps> = ({
               <div>
                 <label
                   className={`text-xs uppercase tracking-wide ${
-                    isDarkMode ? 'text-slate-500' : 'text-slate-400'
+                    isDarkMode ? 'text-zinc-500' : 'text-zinc-400'
                   }`}
                 >
                   Company Size
@@ -157,7 +159,7 @@ const StudentSurveyModal: React.FC<StudentSurveyModalProps> = ({
               <div className="col-span-2">
                 <label
                   className={`text-xs uppercase tracking-wide ${
-                    isDarkMode ? 'text-slate-500' : 'text-slate-400'
+                    isDarkMode ? 'text-zinc-500' : 'text-zinc-400'
                   }`}
                 >
                   Role/Title
@@ -177,7 +179,7 @@ const StudentSurveyModal: React.FC<StudentSurveyModalProps> = ({
               <div>
                 <label
                   className={`text-xs uppercase tracking-wide ${
-                    isDarkMode ? 'text-slate-500' : 'text-slate-400'
+                    isDarkMode ? 'text-zinc-500' : 'text-zinc-400'
                   }`}
                 >
                   Primary Goal
@@ -187,7 +189,7 @@ const StudentSurveyModal: React.FC<StudentSurveyModalProps> = ({
               <div>
                 <label
                   className={`text-xs uppercase tracking-wide ${
-                    isDarkMode ? 'text-slate-500' : 'text-slate-400'
+                    isDarkMode ? 'text-zinc-500' : 'text-zinc-400'
                   }`}
                 >
                   LinkedIn Experience
@@ -197,7 +199,7 @@ const StudentSurveyModal: React.FC<StudentSurveyModalProps> = ({
               <div>
                 <label
                   className={`text-xs uppercase tracking-wide ${
-                    isDarkMode ? 'text-slate-500' : 'text-slate-400'
+                    isDarkMode ? 'text-zinc-500' : 'text-zinc-400'
                   }`}
                 >
                   Biggest Challenges
@@ -217,7 +219,7 @@ const StudentSurveyModal: React.FC<StudentSurveyModalProps> = ({
               <div>
                 <label
                   className={`text-xs uppercase tracking-wide ${
-                    isDarkMode ? 'text-slate-500' : 'text-slate-400'
+                    isDarkMode ? 'text-zinc-500' : 'text-zinc-400'
                   }`}
                 >
                   Target Audience
@@ -227,7 +229,7 @@ const StudentSurveyModal: React.FC<StudentSurveyModalProps> = ({
               <div>
                 <label
                   className={`text-xs uppercase tracking-wide ${
-                    isDarkMode ? 'text-slate-500' : 'text-slate-400'
+                    isDarkMode ? 'text-zinc-500' : 'text-zinc-400'
                   }`}
                 >
                   Monthly Outreach Volume
@@ -237,7 +239,7 @@ const StudentSurveyModal: React.FC<StudentSurveyModalProps> = ({
               <div>
                 <label
                   className={`text-xs uppercase tracking-wide ${
-                    isDarkMode ? 'text-slate-500' : 'text-slate-400'
+                    isDarkMode ? 'text-zinc-500' : 'text-zinc-400'
                   }`}
                 >
                   Current Lead Gen Methods
@@ -247,7 +249,7 @@ const StudentSurveyModal: React.FC<StudentSurveyModalProps> = ({
               <div>
                 <label
                   className={`text-xs uppercase tracking-wide ${
-                    isDarkMode ? 'text-slate-500' : 'text-slate-400'
+                    isDarkMode ? 'text-zinc-500' : 'text-zinc-400'
                   }`}
                 >
                   Tools Currently Using
@@ -261,13 +263,13 @@ const StudentSurveyModal: React.FC<StudentSurveyModalProps> = ({
         {/* Footer */}
         <div
           className={`sticky bottom-0 p-4 border-t ${
-            isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+            isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-200'
           }`}
         >
           <button
             onClick={onClose}
             className={`w-full px-4 py-2 rounded-lg font-medium ${
-              isDarkMode ? 'bg-slate-800 hover:bg-slate-700' : 'bg-slate-100 hover:bg-slate-200'
+              isDarkMode ? 'bg-zinc-800 hover:bg-zinc-700' : 'bg-zinc-100 hover:bg-zinc-200'
             }`}
           >
             Close

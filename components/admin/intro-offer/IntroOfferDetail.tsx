@@ -21,9 +21,9 @@ function StatusBadge({ status }: { status: string }) {
   const config = STATUS_CONFIGS[status] || { label: status, color: 'slate' };
 
   const colorMap: Record<string, { light: string; dark: string }> = {
-    slate: { light: 'bg-slate-100 text-slate-700', dark: 'bg-slate-800 text-slate-300' },
+    slate: { light: 'bg-zinc-100 text-zinc-700', dark: 'bg-zinc-800 text-zinc-300' },
     green: { light: 'bg-green-100 text-green-700', dark: 'bg-green-900/30 text-green-400' },
-    blue: { light: 'bg-blue-100 text-blue-700', dark: 'bg-blue-900/30 text-blue-400' },
+    blue: { light: 'bg-violet-100 text-violet-700', dark: 'bg-violet-900/30 text-violet-400' },
     yellow: { light: 'bg-yellow-100 text-yellow-700', dark: 'bg-yellow-900/30 text-yellow-400' },
     purple: { light: 'bg-purple-100 text-purple-700', dark: 'bg-purple-900/30 text-purple-400' },
     emerald: {
@@ -94,7 +94,7 @@ const IntroOfferDetail: React.FC = () => {
   if (offerLoading || delsLoading) {
     return (
       <div className="p-8 text-center">
-        <div className="w-6 h-6 border-2 border-slate-300 dark:border-slate-700 border-t-blue-500 rounded-full animate-spin mx-auto" />
+        <div className="w-6 h-6 border-2 border-zinc-300 dark:border-zinc-700 border-t-violet-500 rounded-full animate-spin mx-auto" />
       </div>
     );
   }
@@ -102,7 +102,7 @@ const IntroOfferDetail: React.FC = () => {
   if (!offer) {
     return (
       <div className="p-8 text-center">
-        <p className={isDarkMode ? 'text-slate-400' : 'text-slate-500'}>Offer not found</p>
+        <p className={isDarkMode ? 'text-zinc-400' : 'text-zinc-500'}>Offer not found</p>
       </div>
     );
   }
@@ -116,16 +116,16 @@ const IntroOfferDetail: React.FC = () => {
         <button
           onClick={() => navigate('/admin/intro-offers')}
           className={`p-2 rounded-lg transition-colors ${
-            isDarkMode ? 'hover:bg-slate-800' : 'hover:bg-slate-100'
+            isDarkMode ? 'hover:bg-zinc-800' : 'hover:bg-zinc-100'
           }`}
         >
           <ArrowLeft className="w-5 h-5" />
         </button>
         <div className="flex-1">
-          <h2 className={`text-xl font-semibold ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
+          <h2 className={`text-xl font-semibold ${isDarkMode ? 'text-white' : 'text-zinc-900'}`}>
             {leadName || 'Intro Offer'}
           </h2>
-          <p className={`text-sm ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+          <p className={`text-sm ${isDarkMode ? 'text-zinc-400' : 'text-zinc-500'}`}>
             {offer.id} · Created {new Date(offer.createdAt).toLocaleDateString()}
           </p>
         </div>
@@ -133,7 +133,7 @@ const IntroOfferDetail: React.FC = () => {
         <button
           onClick={refreshAll}
           className={`p-2 rounded-lg transition-colors ${
-            isDarkMode ? 'hover:bg-slate-800 text-slate-400' : 'hover:bg-slate-100 text-slate-500'
+            isDarkMode ? 'hover:bg-zinc-800 text-zinc-400' : 'hover:bg-zinc-100 text-zinc-500'
           }`}
         >
           <RefreshCw className="w-4 h-4" />
@@ -159,7 +159,7 @@ const IntroOfferDetail: React.FC = () => {
         {offer.status === 'interview_pending' && (
           <button
             onClick={() => setShowInterviewForm(true)}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-blue-600 text-white hover:bg-blue-700"
+            className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-violet-600 text-white hover:bg-violet-700"
           >
             Enter Interview Data
           </button>
@@ -201,17 +201,15 @@ const IntroOfferDetail: React.FC = () => {
       {/* Deliverables */}
       <div
         className={`rounded-xl border ${
-          isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+          isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-200'
         }`}
       >
-        <div
-          className={`px-4 py-3 border-b ${isDarkMode ? 'border-slate-800' : 'border-slate-200'}`}
-        >
-          <h3 className={`text-sm font-semibold ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
+        <div className={`px-4 py-3 border-b ${isDarkMode ? 'border-zinc-800' : 'border-zinc-200'}`}>
+          <h3 className={`text-sm font-semibold ${isDarkMode ? 'text-white' : 'text-zinc-900'}`}>
             Deliverables
           </h3>
         </div>
-        <div className="divide-y divide-slate-100 dark:divide-slate-800">
+        <div className="divide-y divide-zinc-100 dark:divide-zinc-800">
           {(deliverables || []).map((d) => (
             <DeliverableRow
               key={d.id}
@@ -224,7 +222,7 @@ const IntroOfferDetail: React.FC = () => {
           {(!deliverables || deliverables.length === 0) && (
             <p
               className={`px-4 py-6 text-sm text-center ${
-                isDarkMode ? 'text-slate-500' : 'text-slate-400'
+                isDarkMode ? 'text-zinc-500' : 'text-zinc-400'
               }`}
             >
               No deliverables yet
@@ -237,19 +235,19 @@ const IntroOfferDetail: React.FC = () => {
       {offer.interviewData && (
         <div
           className={`rounded-xl border ${
-            isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+            isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-200'
           }`}
         >
           <div
-            className={`px-4 py-3 border-b ${isDarkMode ? 'border-slate-800' : 'border-slate-200'}`}
+            className={`px-4 py-3 border-b ${isDarkMode ? 'border-zinc-800' : 'border-zinc-200'}`}
           >
-            <h3 className={`text-sm font-semibold ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
+            <h3 className={`text-sm font-semibold ${isDarkMode ? 'text-white' : 'text-zinc-900'}`}>
               Interview Data
             </h3>
           </div>
           <pre
             className={`px-4 py-3 text-xs overflow-x-auto ${
-              isDarkMode ? 'text-slate-300' : 'text-slate-700'
+              isDarkMode ? 'text-zinc-300' : 'text-zinc-700'
             }`}
           >
             {JSON.stringify(offer.interviewData, null, 2)}
@@ -276,10 +274,10 @@ function DeliverableRow({
   return (
     <div className="flex items-center justify-between px-4 py-3">
       <div>
-        <p className={`text-sm font-medium ${isDarkMode ? 'text-slate-200' : 'text-slate-900'}`}>
+        <p className={`text-sm font-medium ${isDarkMode ? 'text-zinc-200' : 'text-zinc-900'}`}>
           {deliverable.title || DELIVERABLE_LABELS[deliverable.type] || deliverable.type}
         </p>
-        <p className={`text-[11px] ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>
+        <p className={`text-[11px] ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
           {deliverable.type} · Order #{deliverable.deliveryOrder}
         </p>
       </div>

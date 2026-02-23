@@ -20,19 +20,19 @@ const EnrollmentConfigEditor: React.FC = () => {
     return (
       <div
         className={`rounded-xl border overflow-hidden ${
-          isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+          isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-200'
         }`}
       >
         <div
           className={`px-6 py-4 border-b flex items-center gap-3 ${
-            isDarkMode ? 'bg-slate-800/50 border-slate-800' : 'bg-slate-50 border-slate-200'
+            isDarkMode ? 'bg-zinc-800/50 border-zinc-800' : 'bg-zinc-50 border-zinc-200'
           }`}
         >
           <Users className={`w-5 h-5 ${isDarkMode ? 'text-violet-400' : 'text-violet-600'}`} />
           <h3 className="font-semibold">Enrollment Config</h3>
         </div>
         <div className="p-6 text-center">
-          <div className="w-6 h-6 border-2 border-slate-300 border-t-violet-500 rounded-full animate-spin mx-auto" />
+          <div className="w-6 h-6 border-2 border-zinc-300 border-t-violet-500 rounded-full animate-spin mx-auto" />
         </div>
       </div>
     );
@@ -42,19 +42,19 @@ const EnrollmentConfigEditor: React.FC = () => {
     return (
       <div
         className={`rounded-xl border overflow-hidden ${
-          isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+          isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-200'
         }`}
       >
         <div
           className={`px-6 py-4 border-b flex items-center gap-3 ${
-            isDarkMode ? 'bg-slate-800/50 border-slate-800' : 'bg-slate-50 border-slate-200'
+            isDarkMode ? 'bg-zinc-800/50 border-zinc-800' : 'bg-zinc-50 border-zinc-200'
           }`}
         >
           <Users className={`w-5 h-5 ${isDarkMode ? 'text-violet-400' : 'text-violet-600'}`} />
           <h3 className="font-semibold">Enrollment Config</h3>
         </div>
         <div className="p-6">
-          <p className={`text-sm ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+          <p className={`text-sm ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
             No enrollment configuration found. Create one in the database with key
             "enrollment_config".
           </p>
@@ -68,12 +68,12 @@ const EnrollmentConfigEditor: React.FC = () => {
   return (
     <div
       className={`rounded-xl border overflow-hidden ${
-        isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+        isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-200'
       }`}
     >
       <div
         className={`px-6 py-4 border-b flex items-center gap-3 ${
-          isDarkMode ? 'bg-slate-800/50 border-slate-800' : 'bg-slate-50 border-slate-200'
+          isDarkMode ? 'bg-zinc-800/50 border-zinc-800' : 'bg-zinc-50 border-zinc-200'
         }`}
       >
         <Users className={`w-5 h-5 ${isDarkMode ? 'text-violet-400' : 'text-violet-600'}`} />
@@ -84,14 +84,14 @@ const EnrollmentConfigEditor: React.FC = () => {
           <div
             key={key}
             className={`p-4 rounded-lg border ${
-              isDarkMode ? 'bg-slate-800/50 border-slate-700' : 'bg-slate-50 border-slate-200'
+              isDarkMode ? 'bg-zinc-800/50 border-zinc-700' : 'bg-zinc-50 border-zinc-200'
             }`}
           >
             <div className="flex items-center justify-between mb-3">
               <h4 className="font-medium">{product.name}</h4>
               <span
                 className={`text-xs px-2 py-0.5 rounded ${
-                  isDarkMode ? 'bg-slate-700 text-slate-300' : 'bg-slate-200 text-slate-600'
+                  isDarkMode ? 'bg-zinc-700 text-zinc-300' : 'bg-zinc-200 text-zinc-600'
                 }`}
               >
                 {key}
@@ -100,27 +100,25 @@ const EnrollmentConfigEditor: React.FC = () => {
 
             <div className="space-y-3 text-sm">
               <div className="flex items-center justify-between">
-                <span className={isDarkMode ? 'text-slate-400' : 'text-slate-600'}>
+                <span className={isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}>
                   Active Cohort
                 </span>
                 <span className="font-medium">{product.activeCohortName}</span>
               </div>
 
               <div className="flex items-center justify-between">
-                <span className={isDarkMode ? 'text-slate-400' : 'text-slate-600'}>
-                  Invite Code
-                </span>
+                <span className={isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}>Invite Code</span>
                 <div className="flex items-center gap-2">
                   <code
                     className={`px-2 py-0.5 rounded text-xs font-mono ${
-                      isDarkMode ? 'bg-slate-700' : 'bg-slate-200'
+                      isDarkMode ? 'bg-zinc-700' : 'bg-zinc-200'
                     }`}
                   >
                     {product.activeInviteCode}
                   </code>
                   <button
                     onClick={() => copyToClipboard(product.activeInviteCode)}
-                    className={`p-1 rounded ${isDarkMode ? 'hover:bg-slate-700' : 'hover:bg-slate-200'}`}
+                    className={`p-1 rounded ${isDarkMode ? 'hover:bg-zinc-700' : 'hover:bg-zinc-200'}`}
                     title="Copy code"
                   >
                     <Copy className="w-3 h-3" />
@@ -129,13 +127,13 @@ const EnrollmentConfigEditor: React.FC = () => {
               </div>
 
               <div className="flex items-center justify-between">
-                <span className={isDarkMode ? 'text-slate-400' : 'text-slate-600'}>
+                <span className={isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}>
                   Registration URL
                 </span>
                 <div className="flex items-center gap-2">
                   <code
                     className={`px-2 py-0.5 rounded text-xs font-mono max-w-[300px] truncate ${
-                      isDarkMode ? 'bg-slate-700' : 'bg-slate-200'
+                      isDarkMode ? 'bg-zinc-700' : 'bg-zinc-200'
                     }`}
                   >
                     /bootcamp/register?code={product.activeInviteCode}
@@ -146,7 +144,7 @@ const EnrollmentConfigEditor: React.FC = () => {
                         `https://modernagencysales.com/bootcamp/register?code=${product.activeInviteCode}`
                       )
                     }
-                    className={`p-1 rounded ${isDarkMode ? 'hover:bg-slate-700' : 'hover:bg-slate-200'}`}
+                    className={`p-1 rounded ${isDarkMode ? 'hover:bg-zinc-700' : 'hover:bg-zinc-200'}`}
                     title="Copy full URL"
                   >
                     <Copy className="w-3 h-3" />
@@ -155,13 +153,13 @@ const EnrollmentConfigEditor: React.FC = () => {
               </div>
 
               <div className="flex items-center justify-between">
-                <span className={isDarkMode ? 'text-slate-400' : 'text-slate-600'}>
+                <span className={isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}>
                   Permanent Join URL
                 </span>
                 <div className="flex items-center gap-2">
                   <code
                     className={`px-2 py-0.5 rounded text-xs font-mono ${
-                      isDarkMode ? 'bg-slate-700' : 'bg-slate-200'
+                      isDarkMode ? 'bg-zinc-700' : 'bg-zinc-200'
                     }`}
                   >
                     /bootcamp/join?product={key}
@@ -170,7 +168,7 @@ const EnrollmentConfigEditor: React.FC = () => {
                     onClick={() =>
                       copyToClipboard(`https://modernagencysales.com/bootcamp/join?product=${key}`)
                     }
-                    className={`p-1 rounded ${isDarkMode ? 'hover:bg-slate-700' : 'hover:bg-slate-200'}`}
+                    className={`p-1 rounded ${isDarkMode ? 'hover:bg-zinc-700' : 'hover:bg-zinc-200'}`}
                     title="Copy full URL"
                   >
                     <Copy className="w-3 h-3" />
@@ -179,7 +177,7 @@ const EnrollmentConfigEditor: React.FC = () => {
                     href={`https://modernagencysales.com/bootcamp/join?product=${key}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`p-1 rounded ${isDarkMode ? 'hover:bg-slate-700' : 'hover:bg-slate-200'}`}
+                    className={`p-1 rounded ${isDarkMode ? 'hover:bg-zinc-700' : 'hover:bg-zinc-200'}`}
                     title="Open link"
                   >
                     <ExternalLink className="w-3 h-3" />
@@ -191,7 +189,7 @@ const EnrollmentConfigEditor: React.FC = () => {
         ))}
 
         {config.lastRotatedAt && (
-          <p className={`text-xs ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>
+          <p className={`text-xs ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
             Last rotated: {new Date(config.lastRotatedAt).toLocaleString()}
             {config.lastRotatedBy && ` by ${config.lastRotatedBy}`}
           </p>

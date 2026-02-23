@@ -52,19 +52,19 @@ const CohortModal: React.FC<CohortModalProps> = ({
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
       <div
         className={`w-full max-w-md rounded-xl overflow-hidden ${
-          isDarkMode ? 'bg-slate-900' : 'bg-white'
+          isDarkMode ? 'bg-zinc-900' : 'bg-white'
         }`}
       >
         {/* Header */}
         <div
           className={`flex items-center justify-between px-6 py-4 border-b ${
-            isDarkMode ? 'border-slate-800' : 'border-slate-200'
+            isDarkMode ? 'border-zinc-800' : 'border-zinc-200'
           }`}
         >
           <h3 className="text-lg font-semibold">{initialData ? 'Edit Cohort' : 'Create Cohort'}</h3>
           <button
             onClick={onClose}
-            className={`p-2 rounded-lg ${isDarkMode ? 'hover:bg-slate-800' : 'hover:bg-slate-100'}`}
+            className={`p-2 rounded-lg ${isDarkMode ? 'hover:bg-zinc-800' : 'hover:bg-zinc-100'}`}
           >
             <X className="w-5 h-5" />
           </button>
@@ -75,7 +75,7 @@ const CohortModal: React.FC<CohortModalProps> = ({
           <div>
             <label
               className={`block text-sm font-medium mb-2 ${
-                isDarkMode ? 'text-slate-300' : 'text-slate-700'
+                isDarkMode ? 'text-zinc-300' : 'text-zinc-700'
               }`}
             >
               Name *
@@ -86,9 +86,9 @@ const CohortModal: React.FC<CohortModalProps> = ({
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               className={`w-full px-4 py-2.5 rounded-lg border ${
                 isDarkMode
-                  ? 'bg-slate-800 border-slate-700 text-white'
-                  : 'bg-white border-slate-300 text-slate-900'
-              } focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+                  ? 'bg-zinc-800 border-zinc-700 text-white'
+                  : 'bg-white border-zinc-300 text-zinc-900'
+              } focus:ring-2 focus:ring-violet-500 focus:border-transparent`}
               placeholder="January 2026 Cohort"
               required
             />
@@ -97,7 +97,7 @@ const CohortModal: React.FC<CohortModalProps> = ({
           <div>
             <label
               className={`block text-sm font-medium mb-2 ${
-                isDarkMode ? 'text-slate-300' : 'text-slate-700'
+                isDarkMode ? 'text-zinc-300' : 'text-zinc-700'
               }`}
             >
               Description
@@ -107,9 +107,9 @@ const CohortModal: React.FC<CohortModalProps> = ({
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               className={`w-full px-4 py-2.5 rounded-lg border ${
                 isDarkMode
-                  ? 'bg-slate-800 border-slate-700 text-white'
-                  : 'bg-white border-slate-300 text-slate-900'
-              } focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+                  ? 'bg-zinc-800 border-zinc-700 text-white'
+                  : 'bg-white border-zinc-300 text-zinc-900'
+              } focus:ring-2 focus:ring-violet-500 focus:border-transparent`}
               placeholder="Optional description for this cohort"
               rows={3}
             />
@@ -118,7 +118,7 @@ const CohortModal: React.FC<CohortModalProps> = ({
           <div>
             <label
               className={`block text-sm font-medium mb-2 ${
-                isDarkMode ? 'text-slate-300' : 'text-slate-700'
+                isDarkMode ? 'text-zinc-300' : 'text-zinc-700'
               }`}
             >
               Status
@@ -130,9 +130,9 @@ const CohortModal: React.FC<CohortModalProps> = ({
               }
               className={`w-full px-4 py-2.5 rounded-lg border ${
                 isDarkMode
-                  ? 'bg-slate-800 border-slate-700 text-white'
-                  : 'bg-white border-slate-300 text-slate-900'
-              } focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+                  ? 'bg-zinc-800 border-zinc-700 text-white'
+                  : 'bg-white border-zinc-300 text-zinc-900'
+              } focus:ring-2 focus:ring-violet-500 focus:border-transparent`}
             >
               <option value="Active">Active</option>
               <option value="Archived">Archived</option>
@@ -145,7 +145,7 @@ const CohortModal: React.FC<CohortModalProps> = ({
               type="button"
               onClick={onClose}
               className={`px-4 py-2 rounded-lg text-sm font-medium ${
-                isDarkMode ? 'hover:bg-slate-800' : 'hover:bg-slate-100'
+                isDarkMode ? 'hover:bg-zinc-800' : 'hover:bg-zinc-100'
               }`}
             >
               Cancel
@@ -153,7 +153,7 @@ const CohortModal: React.FC<CohortModalProps> = ({
             <button
               type="submit"
               disabled={isLoading || !formData.name.trim()}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50"
+              className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-violet-600 text-white hover:bg-violet-700 disabled:opacity-50"
             >
               {isLoading && <Loader2 className="w-4 h-4 animate-spin" />}
               {initialData ? 'Save Changes' : 'Create Cohort'}

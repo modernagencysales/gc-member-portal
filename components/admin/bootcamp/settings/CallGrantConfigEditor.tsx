@@ -64,10 +64,10 @@ const CallGrantConfigEditor: React.FC = () => {
   if (configLoading || toolsLoading || !localConfig) {
     return (
       <div
-        className={`p-6 rounded-xl border text-center ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}
+        className={`p-6 rounded-xl border text-center ${isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-200'}`}
       >
-        <div className="w-6 h-6 border-2 border-slate-300 border-t-blue-500 rounded-full animate-spin mx-auto" />
-        <p className={`text-sm mt-2 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+        <div className="w-6 h-6 border-2 border-zinc-300 border-t-violet-500 rounded-full animate-spin mx-auto" />
+        <p className={`text-sm mt-2 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
           Loading call grant config...
         </p>
       </div>
@@ -76,10 +76,10 @@ const CallGrantConfigEditor: React.FC = () => {
 
   return (
     <div
-      className={`rounded-xl border overflow-hidden ${isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'}`}
+      className={`rounded-xl border overflow-hidden ${isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-200'}`}
     >
       <div
-        className={`px-6 py-4 border-b flex items-center justify-between ${isDarkMode ? 'bg-slate-800/50 border-slate-800' : 'bg-slate-50 border-slate-200'}`}
+        className={`px-6 py-4 border-b flex items-center justify-between ${isDarkMode ? 'bg-zinc-800/50 border-zinc-800' : 'bg-zinc-50 border-zinc-200'}`}
       >
         <div className="flex items-center gap-3">
           <Phone className={`w-5 h-5 ${isDarkMode ? 'text-green-400' : 'text-green-600'}`} />
@@ -89,7 +89,7 @@ const CallGrantConfigEditor: React.FC = () => {
           <button
             onClick={handleSave}
             disabled={saveMutation.isPending}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50"
+            className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-violet-600 text-white hover:bg-violet-700 disabled:opacity-50"
           >
             <Save className="w-4 h-4" />
             {saveMutation.isPending ? 'Saving...' : 'Save'}
@@ -98,7 +98,7 @@ const CallGrantConfigEditor: React.FC = () => {
       </div>
 
       <div className="p-6 space-y-6">
-        <p className={`text-sm ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+        <p className={`text-sm ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
           Automatically grant AI tool credits when prospects attend a sales call. A student account
           is created at meeting end time with the configured tools and credits.
         </p>
@@ -107,7 +107,7 @@ const CallGrantConfigEditor: React.FC = () => {
         <div className="flex items-start justify-between gap-4">
           <div>
             <label className="font-medium">Enabled</label>
-            <p className={`text-sm mt-0.5 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+            <p className={`text-sm mt-0.5 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
               When enabled, attending a call auto-creates a student account with AI tool credits
             </p>
           </div>
@@ -121,14 +121,14 @@ const CallGrantConfigEditor: React.FC = () => {
               }}
               className="sr-only peer"
             />
-            <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-slate-600 peer-checked:bg-green-600"></div>
+            <div className="w-11 h-6 bg-zinc-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-violet-300 dark:peer-focus:ring-violet-800 rounded-full peer dark:bg-zinc-700 peer-checked:after:tranzinc-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-zinc-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-zinc-600 peer-checked:bg-green-600"></div>
           </label>
         </div>
 
         {/* Credits per tool */}
         <div>
           <label className="font-medium">Credits per Tool</label>
-          <p className={`text-sm mt-0.5 mb-3 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+          <p className={`text-sm mt-0.5 mb-3 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
             Number of credits granted for each selected AI tool
           </p>
           <input
@@ -142,16 +142,16 @@ const CallGrantConfigEditor: React.FC = () => {
             }}
             className={`w-32 px-4 py-2.5 rounded-lg border ${
               isDarkMode
-                ? 'bg-slate-800 border-slate-700 text-white'
-                : 'bg-white border-slate-300 text-slate-900'
-            } focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+                ? 'bg-zinc-800 border-zinc-700 text-white'
+                : 'bg-white border-zinc-300 text-zinc-900'
+            } focus:ring-2 focus:ring-violet-500 focus:border-transparent`}
           />
         </div>
 
         {/* Access level */}
         <div>
           <label className="font-medium">Access Level</label>
-          <p className={`text-sm mt-0.5 mb-3 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+          <p className={`text-sm mt-0.5 mb-3 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
             Access level assigned to new student accounts
           </p>
           <select
@@ -165,9 +165,9 @@ const CallGrantConfigEditor: React.FC = () => {
             }}
             className={`w-48 px-4 py-2.5 rounded-lg border ${
               isDarkMode
-                ? 'bg-slate-800 border-slate-700 text-white'
-                : 'bg-white border-slate-300 text-slate-900'
-            } focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+                ? 'bg-zinc-800 border-zinc-700 text-white'
+                : 'bg-white border-zinc-300 text-zinc-900'
+            } focus:ring-2 focus:ring-violet-500 focus:border-transparent`}
           >
             {ACCESS_LEVELS.map((level) => (
               <option key={level} value={level}>
@@ -180,7 +180,7 @@ const CallGrantConfigEditor: React.FC = () => {
         {/* Access duration */}
         <div>
           <label className="font-medium">Access Duration (Days)</label>
-          <p className={`text-sm mt-0.5 mb-3 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+          <p className={`text-sm mt-0.5 mb-3 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
             How many days the student has access before it expires. Set to 0 for unlimited.
           </p>
           <input
@@ -194,16 +194,16 @@ const CallGrantConfigEditor: React.FC = () => {
             }}
             className={`w-32 px-4 py-2.5 rounded-lg border ${
               isDarkMode
-                ? 'bg-slate-800 border-slate-700 text-white'
-                : 'bg-white border-slate-300 text-slate-900'
-            } focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+                ? 'bg-zinc-800 border-zinc-700 text-white'
+                : 'bg-white border-zinc-300 text-zinc-900'
+            } focus:ring-2 focus:ring-violet-500 focus:border-transparent`}
           />
         </div>
 
         {/* Tool selection */}
         <div>
           <p
-            className={`text-sm font-medium mb-2 ${isDarkMode ? 'text-slate-300' : 'text-slate-700'}`}
+            className={`text-sm font-medium mb-2 ${isDarkMode ? 'text-zinc-300' : 'text-zinc-700'}`}
           >
             Tools to Grant ({localConfig.toolSlugs.length} selected)
           </p>
@@ -218,8 +218,8 @@ const CallGrantConfigEditor: React.FC = () => {
                     isIncluded
                       ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 border border-green-300 dark:border-green-700'
                       : isDarkMode
-                        ? 'bg-slate-800 text-slate-400 border border-slate-700 hover:border-slate-600'
-                        : 'bg-white text-slate-500 border border-slate-200 hover:border-slate-300'
+                        ? 'bg-zinc-800 text-zinc-400 border border-zinc-700 hover:border-zinc-600'
+                        : 'bg-white text-zinc-500 border border-zinc-200 hover:border-zinc-300'
                   }`}
                 >
                   <Sparkles size={10} />

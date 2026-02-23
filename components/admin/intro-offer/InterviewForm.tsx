@@ -103,18 +103,18 @@ const InterviewForm: React.FC<InterviewFormProps> = ({ offerId, onClose, onSucce
 
   const inputClass = `w-full px-3 py-2 rounded-lg border text-sm ${
     isDarkMode
-      ? 'bg-slate-800 border-slate-700 text-white placeholder:text-slate-500'
-      : 'bg-white border-slate-300 text-slate-900 placeholder:text-slate-400'
-  } focus:ring-2 focus:ring-blue-500 focus:border-transparent`;
+      ? 'bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500'
+      : 'bg-white border-zinc-300 text-zinc-900 placeholder:text-zinc-400'
+  } focus:ring-2 focus:ring-violet-500 focus:border-transparent`;
 
   const textareaClass = `${inputClass} resize-none`;
 
   const labelClass = `block text-sm font-medium mb-1 ${
-    isDarkMode ? 'text-slate-300' : 'text-slate-700'
+    isDarkMode ? 'text-zinc-300' : 'text-zinc-700'
   }`;
 
   const sectionClass = `space-y-4 pb-6 mb-6 border-b ${
-    isDarkMode ? 'border-slate-700' : 'border-slate-200'
+    isDarkMode ? 'border-zinc-700' : 'border-zinc-200'
   }`;
 
   return (
@@ -122,21 +122,21 @@ const InterviewForm: React.FC<InterviewFormProps> = ({ offerId, onClose, onSucce
       <div className="fixed inset-0 bg-black/50" onClick={onClose} />
       <div
         className={`relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl shadow-xl ${
-          isDarkMode ? 'bg-slate-900' : 'bg-white'
+          isDarkMode ? 'bg-zinc-900' : 'bg-white'
         }`}
       >
         {/* Header */}
         <div
           className={`sticky top-0 z-10 flex items-center justify-between px-6 py-4 border-b ${
-            isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+            isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-200'
           }`}
         >
-          <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
+          <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-zinc-900'}`}>
             Interview Data
           </h3>
           <button
             onClick={onClose}
-            className={`p-2 rounded-lg ${isDarkMode ? 'hover:bg-slate-800' : 'hover:bg-slate-100'}`}
+            className={`p-2 rounded-lg ${isDarkMode ? 'hover:bg-zinc-800' : 'hover:bg-zinc-100'}`}
           >
             <X className="w-5 h-5" />
           </button>
@@ -147,7 +147,7 @@ const InterviewForm: React.FC<InterviewFormProps> = ({ offerId, onClose, onSucce
           <div className={sectionClass}>
             <h4
               className={`text-sm font-semibold uppercase tracking-wider ${
-                isDarkMode ? 'text-slate-400' : 'text-slate-500'
+                isDarkMode ? 'text-zinc-400' : 'text-zinc-500'
               }`}
             >
               Ideal Customer Profile
@@ -212,7 +212,7 @@ const InterviewForm: React.FC<InterviewFormProps> = ({ offerId, onClose, onSucce
           <div className={sectionClass}>
             <h4
               className={`text-sm font-semibold uppercase tracking-wider ${
-                isDarkMode ? 'text-slate-400' : 'text-slate-500'
+                isDarkMode ? 'text-zinc-400' : 'text-zinc-500'
               }`}
             >
               Content Preferences
@@ -263,7 +263,7 @@ const InterviewForm: React.FC<InterviewFormProps> = ({ offerId, onClose, onSucce
           <div className={sectionClass}>
             <h4
               className={`text-sm font-semibold uppercase tracking-wider ${
-                isDarkMode ? 'text-slate-400' : 'text-slate-500'
+                isDarkMode ? 'text-zinc-400' : 'text-zinc-500'
               }`}
             >
               Lead Magnet
@@ -312,7 +312,7 @@ const InterviewForm: React.FC<InterviewFormProps> = ({ offerId, onClose, onSucce
           <div className="space-y-4 pb-4">
             <h4
               className={`text-sm font-semibold uppercase tracking-wider ${
-                isDarkMode ? 'text-slate-400' : 'text-slate-500'
+                isDarkMode ? 'text-zinc-400' : 'text-zinc-500'
               }`}
             >
               Outreach
@@ -366,9 +366,7 @@ const InterviewForm: React.FC<InterviewFormProps> = ({ offerId, onClose, onSucce
               type="button"
               onClick={onClose}
               className={`px-4 py-2 rounded-lg text-sm font-medium ${
-                isDarkMode
-                  ? 'text-slate-400 hover:bg-slate-800'
-                  : 'text-slate-600 hover:bg-slate-100'
+                isDarkMode ? 'text-zinc-400 hover:bg-zinc-800' : 'text-zinc-600 hover:bg-zinc-100'
               }`}
             >
               Cancel
@@ -376,7 +374,7 @@ const InterviewForm: React.FC<InterviewFormProps> = ({ offerId, onClose, onSucce
             <button
               type="submit"
               disabled={submitting}
-              className="px-4 py-2 rounded-lg text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50"
+              className="px-4 py-2 rounded-lg text-sm font-medium bg-violet-600 text-white hover:bg-violet-700 disabled:opacity-50"
             >
               {submitting ? 'Submitting...' : 'Submit & Start Fulfillment'}
             </button>

@@ -39,11 +39,11 @@ const LmsDuplicateCohortModal: React.FC<LmsDuplicateCohortModalProps> = ({
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
       <div
-        className={`w-full max-w-lg rounded-xl ${isDarkMode ? 'bg-slate-900' : 'bg-white'} shadow-xl`}
+        className={`w-full max-w-lg rounded-xl ${isDarkMode ? 'bg-zinc-900' : 'bg-white'} shadow-xl`}
       >
         <div
           className={`flex items-center justify-between px-6 py-4 border-b ${
-            isDarkMode ? 'border-slate-800' : 'border-slate-200'
+            isDarkMode ? 'border-zinc-800' : 'border-zinc-200'
           }`}
         >
           <div className="flex items-center gap-2">
@@ -52,7 +52,7 @@ const LmsDuplicateCohortModal: React.FC<LmsDuplicateCohortModalProps> = ({
           </div>
           <button
             onClick={onClose}
-            className={`p-2 rounded-lg ${isDarkMode ? 'hover:bg-slate-800' : 'hover:bg-slate-100'}`}
+            className={`p-2 rounded-lg ${isDarkMode ? 'hover:bg-zinc-800' : 'hover:bg-zinc-100'}`}
           >
             <X className="w-5 h-5" />
           </button>
@@ -61,12 +61,10 @@ const LmsDuplicateCohortModal: React.FC<LmsDuplicateCohortModalProps> = ({
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {/* Info Box */}
           <div
-            className={`p-4 rounded-lg flex gap-3 ${
-              isDarkMode ? 'bg-slate-800/50' : 'bg-slate-50'
-            }`}
+            className={`p-4 rounded-lg flex gap-3 ${isDarkMode ? 'bg-zinc-800/50' : 'bg-zinc-50'}`}
           >
             <AlertCircle className="w-5 h-5 text-violet-500 shrink-0 mt-0.5" />
-            <div className={`text-sm ${isDarkMode ? 'text-slate-300' : 'text-slate-600'}`}>
+            <div className={`text-sm ${isDarkMode ? 'text-zinc-300' : 'text-zinc-600'}`}>
               <p className="font-medium mb-1">This will create a complete copy of:</p>
               <ul className="list-disc list-inside space-y-0.5 text-xs">
                 <li>All weeks and their settings</li>
@@ -85,7 +83,7 @@ const LmsDuplicateCohortModal: React.FC<LmsDuplicateCohortModalProps> = ({
           <div>
             <label
               className={`block text-sm font-medium mb-1.5 ${
-                isDarkMode ? 'text-slate-300' : 'text-slate-700'
+                isDarkMode ? 'text-zinc-300' : 'text-zinc-700'
               }`}
             >
               Source Cohort
@@ -93,8 +91,8 @@ const LmsDuplicateCohortModal: React.FC<LmsDuplicateCohortModalProps> = ({
             <div
               className={`px-4 py-2.5 rounded-lg border ${
                 isDarkMode
-                  ? 'bg-slate-800/50 border-slate-700 text-slate-400'
-                  : 'bg-slate-50 border-slate-300 text-slate-500'
+                  ? 'bg-zinc-800/50 border-zinc-700 text-zinc-400'
+                  : 'bg-zinc-50 border-zinc-300 text-zinc-500'
               }`}
             >
               {sourceCohort.name}
@@ -105,7 +103,7 @@ const LmsDuplicateCohortModal: React.FC<LmsDuplicateCohortModalProps> = ({
           <div>
             <label
               className={`block text-sm font-medium mb-1.5 ${
-                isDarkMode ? 'text-slate-300' : 'text-slate-700'
+                isDarkMode ? 'text-zinc-300' : 'text-zinc-700'
               }`}
             >
               New Cohort Name *
@@ -118,8 +116,8 @@ const LmsDuplicateCohortModal: React.FC<LmsDuplicateCohortModalProps> = ({
               required
               className={`w-full px-4 py-2.5 rounded-lg border ${
                 isDarkMode
-                  ? 'bg-slate-800 border-slate-700 text-white placeholder:text-slate-500'
-                  : 'bg-white border-slate-300 text-slate-900 placeholder:text-slate-400'
+                  ? 'bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500'
+                  : 'bg-white border-zinc-300 text-zinc-900 placeholder:text-zinc-400'
               } focus:ring-2 focus:ring-violet-500 focus:border-transparent`}
             />
           </div>
@@ -128,7 +126,7 @@ const LmsDuplicateCohortModal: React.FC<LmsDuplicateCohortModalProps> = ({
           <div>
             <label
               className={`block text-sm font-medium mb-1.5 ${
-                isDarkMode ? 'text-slate-300' : 'text-slate-700'
+                isDarkMode ? 'text-zinc-300' : 'text-zinc-700'
               }`}
             >
               Description
@@ -140,8 +138,8 @@ const LmsDuplicateCohortModal: React.FC<LmsDuplicateCohortModalProps> = ({
               rows={2}
               className={`w-full px-4 py-2.5 rounded-lg border ${
                 isDarkMode
-                  ? 'bg-slate-800 border-slate-700 text-white placeholder:text-slate-500'
-                  : 'bg-white border-slate-300 text-slate-900 placeholder:text-slate-400'
+                  ? 'bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500'
+                  : 'bg-white border-zinc-300 text-zinc-900 placeholder:text-zinc-400'
               } focus:ring-2 focus:ring-violet-500 focus:border-transparent resize-none`}
             />
           </div>
@@ -152,7 +150,7 @@ const LmsDuplicateCohortModal: React.FC<LmsDuplicateCohortModalProps> = ({
               type="button"
               onClick={onClose}
               className={`px-4 py-2 rounded-lg text-sm font-medium ${
-                isDarkMode ? 'hover:bg-slate-800' : 'hover:bg-slate-100'
+                isDarkMode ? 'hover:bg-zinc-800' : 'hover:bg-zinc-100'
               }`}
             >
               Cancel

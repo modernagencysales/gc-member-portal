@@ -197,7 +197,7 @@ const TextContentEditor: React.FC<{
     <div>
       <div className="flex items-center justify-between mb-1.5">
         <label
-          className={`block text-sm font-medium ${isDarkMode ? 'text-slate-300' : 'text-slate-700'}`}
+          className={`block text-sm font-medium ${isDarkMode ? 'text-zinc-300' : 'text-zinc-700'}`}
         >
           Text Content *
         </label>
@@ -208,8 +208,8 @@ const TextContentEditor: React.FC<{
             showPreview
               ? 'bg-violet-600 text-white'
               : isDarkMode
-                ? 'text-slate-400 hover:bg-slate-800'
-                : 'text-slate-500 hover:bg-slate-100'
+                ? 'text-zinc-400 hover:bg-zinc-800'
+                : 'text-zinc-500 hover:bg-zinc-100'
           }`}
         >
           <Eye className="w-3.5 h-3.5" />
@@ -221,8 +221,8 @@ const TextContentEditor: React.FC<{
         <div
           className={`w-full min-h-[300px] max-h-[60vh] overflow-y-auto px-6 py-4 rounded-lg border text-sm document-content ${
             isDarkMode
-              ? 'bg-slate-800 border-slate-700 text-slate-200'
-              : 'bg-white border-slate-300 text-slate-800'
+              ? 'bg-zinc-800 border-zinc-700 text-zinc-200'
+              : 'bg-white border-zinc-300 text-zinc-800'
           }`}
         >
           <ReactMarkdown remarkPlugins={[remarkBreaks, remarkGfm]}>
@@ -234,7 +234,7 @@ const TextContentEditor: React.FC<{
           {/* Toolbar */}
           <div
             className={`flex items-center gap-0.5 px-2 py-1.5 rounded-t-lg border border-b-0 ${
-              isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-slate-50 border-slate-300'
+              isDarkMode ? 'bg-zinc-800 border-zinc-700' : 'bg-zinc-50 border-zinc-300'
             }`}
           >
             {toolbarButtons.map((btn, i) => (
@@ -245,8 +245,8 @@ const TextContentEditor: React.FC<{
                 title={btn.title}
                 className={`p-1.5 rounded ${
                   isDarkMode
-                    ? 'text-slate-400 hover:bg-slate-700 hover:text-slate-200'
-                    : 'text-slate-500 hover:bg-slate-200 hover:text-slate-700'
+                    ? 'text-zinc-400 hover:bg-zinc-700 hover:text-zinc-200'
+                    : 'text-zinc-500 hover:bg-zinc-200 hover:text-zinc-700'
                 }`}
               >
                 {btn.icon}
@@ -263,14 +263,14 @@ const TextContentEditor: React.FC<{
             required={required}
             className={`w-full px-4 py-3 rounded-b-lg border ${
               isDarkMode
-                ? 'bg-slate-800 border-slate-700 text-white placeholder:text-slate-500'
-                : 'bg-white border-slate-300 text-slate-900 placeholder:text-slate-400'
+                ? 'bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500'
+                : 'bg-white border-zinc-300 text-zinc-900 placeholder:text-zinc-400'
             } focus:ring-2 focus:ring-violet-500 focus:border-transparent resize-y font-mono text-sm min-h-[200px]`}
           />
         </>
       )}
       <div className="flex items-center gap-2 mt-1.5">
-        <p className={`text-xs flex-1 ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>
+        <p className={`text-xs flex-1 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
           Supports Markdown: **bold**, *italic*, ## headings, - lists, [links](url), --- dividers
         </p>
         <input
@@ -286,8 +286,8 @@ const TextContentEditor: React.FC<{
           disabled={importing}
           className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-colors ${
             isDarkMode
-              ? 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'
-              : 'text-slate-500 hover:bg-slate-100 hover:text-slate-700'
+              ? 'text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200'
+              : 'text-zinc-500 hover:bg-zinc-100 hover:text-zinc-700'
           } ${importing ? 'opacity-50 cursor-wait' : ''}`}
         >
           <Upload className="w-3.5 h-3.5" />
@@ -388,12 +388,12 @@ const LmsContentItemModal: React.FC<LmsContentItemModalProps> = ({
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div
         className={`w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-xl ${
-          isDarkMode ? 'bg-slate-900' : 'bg-white'
+          isDarkMode ? 'bg-zinc-900' : 'bg-white'
         } shadow-xl`}
       >
         <div
           className={`sticky top-0 flex items-center justify-between px-6 py-4 border-b ${
-            isDarkMode ? 'border-slate-800 bg-slate-900' : 'border-slate-200 bg-white'
+            isDarkMode ? 'border-zinc-800 bg-zinc-900' : 'border-zinc-200 bg-white'
           }`}
         >
           <h3 className="text-lg font-semibold">
@@ -401,7 +401,7 @@ const LmsContentItemModal: React.FC<LmsContentItemModalProps> = ({
           </h3>
           <button
             onClick={onClose}
-            className={`p-2 rounded-lg ${isDarkMode ? 'hover:bg-slate-800' : 'hover:bg-slate-100'}`}
+            className={`p-2 rounded-lg ${isDarkMode ? 'hover:bg-zinc-800' : 'hover:bg-zinc-100'}`}
           >
             <X className="w-5 h-5" />
           </button>
@@ -412,7 +412,7 @@ const LmsContentItemModal: React.FC<LmsContentItemModalProps> = ({
           <div>
             <label
               className={`block text-sm font-medium mb-1.5 ${
-                isDarkMode ? 'text-slate-300' : 'text-slate-700'
+                isDarkMode ? 'text-zinc-300' : 'text-zinc-700'
               }`}
             >
               Content Type *
@@ -429,8 +429,8 @@ const LmsContentItemModal: React.FC<LmsContentItemModalProps> = ({
                         ? 'border-violet-500 bg-violet-900/30 text-violet-400'
                         : 'border-violet-500 bg-violet-50 text-violet-700'
                       : isDarkMode
-                        ? 'border-slate-700 hover:border-slate-600 text-slate-400'
-                        : 'border-slate-200 hover:border-slate-300 text-slate-600'
+                        ? 'border-zinc-700 hover:border-zinc-600 text-zinc-400'
+                        : 'border-zinc-200 hover:border-zinc-300 text-zinc-600'
                   }`}
                 >
                   {option.icon}
@@ -444,7 +444,7 @@ const LmsContentItemModal: React.FC<LmsContentItemModalProps> = ({
           <div>
             <label
               className={`block text-sm font-medium mb-1.5 ${
-                isDarkMode ? 'text-slate-300' : 'text-slate-700'
+                isDarkMode ? 'text-zinc-300' : 'text-zinc-700'
               }`}
             >
               Title *
@@ -457,8 +457,8 @@ const LmsContentItemModal: React.FC<LmsContentItemModalProps> = ({
               required
               className={`w-full px-4 py-2.5 rounded-lg border ${
                 isDarkMode
-                  ? 'bg-slate-800 border-slate-700 text-white placeholder:text-slate-500'
-                  : 'bg-white border-slate-300 text-slate-900 placeholder:text-slate-400'
+                  ? 'bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500'
+                  : 'bg-white border-zinc-300 text-zinc-900 placeholder:text-zinc-400'
               } focus:ring-2 focus:ring-violet-500 focus:border-transparent`}
             />
           </div>
@@ -468,7 +468,7 @@ const LmsContentItemModal: React.FC<LmsContentItemModalProps> = ({
             <div>
               <label
                 className={`block text-sm font-medium mb-1.5 ${
-                  isDarkMode ? 'text-slate-300' : 'text-slate-700'
+                  isDarkMode ? 'text-zinc-300' : 'text-zinc-700'
                 }`}
               >
                 {formData.contentType === 'video'
@@ -504,11 +504,11 @@ const LmsContentItemModal: React.FC<LmsContentItemModalProps> = ({
                 required={showUrlField}
                 className={`w-full px-4 py-2.5 rounded-lg border ${
                   isDarkMode
-                    ? 'bg-slate-800 border-slate-700 text-white placeholder:text-slate-500'
-                    : 'bg-white border-slate-300 text-slate-900 placeholder:text-slate-400'
+                    ? 'bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500'
+                    : 'bg-white border-zinc-300 text-zinc-900 placeholder:text-zinc-400'
                 } focus:ring-2 focus:ring-violet-500 focus:border-transparent`}
               />
-              <p className={`text-xs mt-1 ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>
+              <p className={`text-xs mt-1 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
                 URLs are automatically normalized for embedding
               </p>
             </div>
@@ -519,7 +519,7 @@ const LmsContentItemModal: React.FC<LmsContentItemModalProps> = ({
             <div>
               <label
                 className={`block text-sm font-medium mb-1.5 ${
-                  isDarkMode ? 'text-slate-300' : 'text-slate-700'
+                  isDarkMode ? 'text-zinc-300' : 'text-zinc-700'
                 }`}
               >
                 AI Tool Slug *
@@ -532,11 +532,11 @@ const LmsContentItemModal: React.FC<LmsContentItemModalProps> = ({
                 required={showAiToolField}
                 className={`w-full px-4 py-2.5 rounded-lg border ${
                   isDarkMode
-                    ? 'bg-slate-800 border-slate-700 text-white placeholder:text-slate-500'
-                    : 'bg-white border-slate-300 text-slate-900 placeholder:text-slate-400'
+                    ? 'bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500'
+                    : 'bg-white border-zinc-300 text-zinc-900 placeholder:text-zinc-400'
                 } focus:ring-2 focus:ring-violet-500 focus:border-transparent`}
               />
-              <p className={`text-xs mt-1 ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>
+              <p className={`text-xs mt-1 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
                 Enter the slug of the AI tool from your AI Tools configuration
               </p>
             </div>
@@ -555,14 +555,12 @@ const LmsContentItemModal: React.FC<LmsContentItemModalProps> = ({
           {/* Credentials Fields */}
           {showCredentialsFields && (
             <div
-              className={`p-4 rounded-lg space-y-3 ${
-                isDarkMode ? 'bg-slate-800/50' : 'bg-slate-50'
-              }`}
+              className={`p-4 rounded-lg space-y-3 ${isDarkMode ? 'bg-zinc-800/50' : 'bg-zinc-50'}`}
             >
               <div className="flex items-center gap-2 mb-2">
                 <Key className="w-4 h-4 text-amber-500" />
                 <span
-                  className={`text-sm font-medium ${isDarkMode ? 'text-slate-300' : 'text-slate-700'}`}
+                  className={`text-sm font-medium ${isDarkMode ? 'text-zinc-300' : 'text-zinc-700'}`}
                 >
                   Credential Details
                 </span>
@@ -571,7 +569,7 @@ const LmsContentItemModal: React.FC<LmsContentItemModalProps> = ({
               <div>
                 <label
                   className={`block text-xs font-medium mb-1 ${
-                    isDarkMode ? 'text-slate-400' : 'text-slate-600'
+                    isDarkMode ? 'text-zinc-400' : 'text-zinc-600'
                   }`}
                 >
                   Login URL
@@ -588,8 +586,8 @@ const LmsContentItemModal: React.FC<LmsContentItemModalProps> = ({
                   placeholder="https://app.example.com/login"
                   className={`w-full px-3 py-2 rounded-lg border text-sm ${
                     isDarkMode
-                      ? 'bg-slate-800 border-slate-700 text-white placeholder:text-slate-500'
-                      : 'bg-white border-slate-300 text-slate-900 placeholder:text-slate-400'
+                      ? 'bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500'
+                      : 'bg-white border-zinc-300 text-zinc-900 placeholder:text-zinc-400'
                   } focus:ring-2 focus:ring-violet-500 focus:border-transparent`}
                 />
               </div>
@@ -598,7 +596,7 @@ const LmsContentItemModal: React.FC<LmsContentItemModalProps> = ({
                 <div>
                   <label
                     className={`block text-xs font-medium mb-1 ${
-                      isDarkMode ? 'text-slate-400' : 'text-slate-600'
+                      isDarkMode ? 'text-zinc-400' : 'text-zinc-600'
                     }`}
                   >
                     Username / Email
@@ -615,15 +613,15 @@ const LmsContentItemModal: React.FC<LmsContentItemModalProps> = ({
                     placeholder="user@example.com"
                     className={`w-full px-3 py-2 rounded-lg border text-sm ${
                       isDarkMode
-                        ? 'bg-slate-800 border-slate-700 text-white placeholder:text-slate-500'
-                        : 'bg-white border-slate-300 text-slate-900 placeholder:text-slate-400'
+                        ? 'bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500'
+                        : 'bg-white border-zinc-300 text-zinc-900 placeholder:text-zinc-400'
                     } focus:ring-2 focus:ring-violet-500 focus:border-transparent`}
                   />
                 </div>
                 <div>
                   <label
                     className={`block text-xs font-medium mb-1 ${
-                      isDarkMode ? 'text-slate-400' : 'text-slate-600'
+                      isDarkMode ? 'text-zinc-400' : 'text-zinc-600'
                     }`}
                   >
                     Password
@@ -640,8 +638,8 @@ const LmsContentItemModal: React.FC<LmsContentItemModalProps> = ({
                     placeholder="••••••••"
                     className={`w-full px-3 py-2 rounded-lg border text-sm font-mono ${
                       isDarkMode
-                        ? 'bg-slate-800 border-slate-700 text-white placeholder:text-slate-500'
-                        : 'bg-white border-slate-300 text-slate-900 placeholder:text-slate-400'
+                        ? 'bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500'
+                        : 'bg-white border-zinc-300 text-zinc-900 placeholder:text-zinc-400'
                     } focus:ring-2 focus:ring-violet-500 focus:border-transparent`}
                   />
                 </div>
@@ -650,7 +648,7 @@ const LmsContentItemModal: React.FC<LmsContentItemModalProps> = ({
               <div>
                 <label
                   className={`block text-xs font-medium mb-1 ${
-                    isDarkMode ? 'text-slate-400' : 'text-slate-600'
+                    isDarkMode ? 'text-zinc-400' : 'text-zinc-600'
                   }`}
                 >
                   Notes
@@ -667,8 +665,8 @@ const LmsContentItemModal: React.FC<LmsContentItemModalProps> = ({
                   rows={2}
                   className={`w-full px-3 py-2 rounded-lg border text-sm ${
                     isDarkMode
-                      ? 'bg-slate-800 border-slate-700 text-white placeholder:text-slate-500'
-                      : 'bg-white border-slate-300 text-slate-900 placeholder:text-slate-400'
+                      ? 'bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500'
+                      : 'bg-white border-zinc-300 text-zinc-900 placeholder:text-zinc-400'
                   } focus:ring-2 focus:ring-violet-500 focus:border-transparent resize-none`}
                 />
               </div>
@@ -688,7 +686,7 @@ const LmsContentItemModal: React.FC<LmsContentItemModalProps> = ({
           <div>
             <label
               className={`block text-sm font-medium mb-1.5 ${
-                isDarkMode ? 'text-slate-300' : 'text-slate-700'
+                isDarkMode ? 'text-zinc-300' : 'text-zinc-700'
               }`}
             >
               Description
@@ -700,8 +698,8 @@ const LmsContentItemModal: React.FC<LmsContentItemModalProps> = ({
               rows={2}
               className={`w-full px-4 py-2.5 rounded-lg border ${
                 isDarkMode
-                  ? 'bg-slate-800 border-slate-700 text-white placeholder:text-slate-500'
-                  : 'bg-white border-slate-300 text-slate-900 placeholder:text-slate-400'
+                  ? 'bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500'
+                  : 'bg-white border-zinc-300 text-zinc-900 placeholder:text-zinc-400'
               } focus:ring-2 focus:ring-violet-500 focus:border-transparent resize-none`}
             />
           </div>
@@ -713,11 +711,11 @@ const LmsContentItemModal: React.FC<LmsContentItemModalProps> = ({
               id="contentVisible"
               checked={formData.isVisible}
               onChange={(e) => setFormData({ ...formData, isVisible: e.target.checked })}
-              className="w-4 h-4 text-violet-600 border-slate-300 rounded focus:ring-violet-500"
+              className="w-4 h-4 text-violet-600 border-zinc-300 rounded focus:ring-violet-500"
             />
             <label
               htmlFor="contentVisible"
-              className={`text-sm ${isDarkMode ? 'text-slate-300' : 'text-slate-700'}`}
+              className={`text-sm ${isDarkMode ? 'text-zinc-300' : 'text-zinc-700'}`}
             >
               Visible to students
             </label>
@@ -729,7 +727,7 @@ const LmsContentItemModal: React.FC<LmsContentItemModalProps> = ({
               type="button"
               onClick={onClose}
               className={`px-4 py-2 rounded-lg text-sm font-medium ${
-                isDarkMode ? 'hover:bg-slate-800' : 'hover:bg-slate-100'
+                isDarkMode ? 'hover:bg-zinc-800' : 'hover:bg-zinc-100'
               }`}
             >
               Cancel

@@ -6,7 +6,12 @@ import { BootcampAccessLevel, BootcampCohort, ToolGrant } from '../../../../type
 import { AITool } from '../../../../types/chat-types';
 import { fetchActiveAITools } from '../../../../services/chat-supabase';
 
-const ACCESS_LEVELS = ['Lead Magnet', 'Sprint + AI Tools', 'Curriculum Only', 'Full Access'] as const;
+const ACCESS_LEVELS = [
+  'Lead Magnet',
+  'Sprint + AI Tools',
+  'Curriculum Only',
+  'Full Access',
+] as const;
 
 interface GenerateCodeModalProps {
   isOpen: boolean;
@@ -117,34 +122,32 @@ const GenerateCodeModal: React.FC<GenerateCodeModalProps> = ({
   if (!isOpen) return null;
 
   const inputClasses = `w-full px-4 py-2.5 rounded-lg border ${
-    isDarkMode
-      ? 'bg-slate-800 border-slate-700 text-white'
-      : 'bg-white border-slate-300 text-slate-900'
-  } focus:ring-2 focus:ring-blue-500 focus:border-transparent`;
+    isDarkMode ? 'bg-zinc-800 border-zinc-700 text-white' : 'bg-white border-zinc-300 text-zinc-900'
+  } focus:ring-2 focus:ring-violet-500 focus:border-transparent`;
 
   const labelClasses = `block text-sm font-medium mb-2 ${
-    isDarkMode ? 'text-slate-300' : 'text-slate-700'
+    isDarkMode ? 'text-zinc-300' : 'text-zinc-700'
   }`;
 
-  const hintClasses = `text-xs mt-1 ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`;
+  const hintClasses = `text-xs mt-1 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`;
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
       <div
         className={`w-full max-w-md rounded-xl overflow-hidden max-h-[90vh] flex flex-col ${
-          isDarkMode ? 'bg-slate-900' : 'bg-white'
+          isDarkMode ? 'bg-zinc-900' : 'bg-white'
         }`}
       >
         {/* Header */}
         <div
           className={`flex items-center justify-between px-6 py-4 border-b ${
-            isDarkMode ? 'border-slate-800' : 'border-slate-200'
+            isDarkMode ? 'border-zinc-800' : 'border-zinc-200'
           }`}
         >
           <h3 className="text-lg font-semibold">Generate Invite Codes</h3>
           <button
             onClick={onClose}
-            className={`p-2 rounded-lg ${isDarkMode ? 'hover:bg-slate-800' : 'hover:bg-slate-100'}`}
+            className={`p-2 rounded-lg ${isDarkMode ? 'hover:bg-zinc-800' : 'hover:bg-zinc-100'}`}
           >
             <X className="w-5 h-5" />
           </button>
@@ -192,7 +195,7 @@ const GenerateCodeModal: React.FC<GenerateCodeModalProps> = ({
           {/* 3. Tool Grants section */}
           <div
             className={`p-4 rounded-lg border ${
-              isDarkMode ? 'bg-slate-800/50 border-slate-700' : 'bg-slate-50 border-slate-200'
+              isDarkMode ? 'bg-zinc-800/50 border-zinc-700' : 'bg-zinc-50 border-zinc-200'
             }`}
           >
             <label className={labelClasses}>Tool Grants (Optional)</label>
@@ -200,7 +203,7 @@ const GenerateCodeModal: React.FC<GenerateCodeModalProps> = ({
             <div className="mb-3">
               <label
                 className={`block text-xs font-medium mb-1 ${
-                  isDarkMode ? 'text-slate-400' : 'text-slate-500'
+                  isDarkMode ? 'text-zinc-400' : 'text-zinc-500'
                 }`}
               >
                 Credits per Tool
@@ -218,16 +221,16 @@ const GenerateCodeModal: React.FC<GenerateCodeModalProps> = ({
                 }
                 className={`w-24 px-3 py-1.5 rounded-lg border text-sm ${
                   isDarkMode
-                    ? 'bg-slate-800 border-slate-600 text-white'
-                    : 'bg-white border-slate-300 text-slate-900'
-                } focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+                    ? 'bg-zinc-800 border-zinc-600 text-white'
+                    : 'bg-white border-zinc-300 text-zinc-900'
+                } focus:ring-2 focus:ring-violet-500 focus:border-transparent`}
               />
             </div>
 
             <div>
               <label
                 className={`block text-xs font-medium mb-2 ${
-                  isDarkMode ? 'text-slate-400' : 'text-slate-500'
+                  isDarkMode ? 'text-zinc-400' : 'text-zinc-500'
                 }`}
               >
                 Select Tools
@@ -235,7 +238,7 @@ const GenerateCodeModal: React.FC<GenerateCodeModalProps> = ({
               {isLoadingTools ? (
                 <div className="flex items-center gap-2 py-2">
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  <span className={`text-sm ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+                  <span className={`text-sm ${isDarkMode ? 'text-zinc-400' : 'text-zinc-500'}`}>
                     Loading tools...
                   </span>
                 </div>
@@ -245,21 +248,21 @@ const GenerateCodeModal: React.FC<GenerateCodeModalProps> = ({
                     <label
                       key={tool.slug}
                       className={`flex items-center gap-2 text-sm cursor-pointer ${
-                        isDarkMode ? 'text-slate-300' : 'text-slate-700'
+                        isDarkMode ? 'text-zinc-300' : 'text-zinc-700'
                       }`}
                     >
                       <input
                         type="checkbox"
                         checked={formData.selectedToolSlugs.includes(tool.slug)}
                         onChange={() => handleToolToggle(tool.slug)}
-                        className="rounded border-slate-400"
+                        className="rounded border-zinc-400"
                       />
                       {tool.name}
                     </label>
                   ))}
                 </div>
               ) : (
-                <p className={`text-sm ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>
+                <p className={`text-sm ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
                   No active tools available
                 </p>
               )}
@@ -336,7 +339,7 @@ const GenerateCodeModal: React.FC<GenerateCodeModalProps> = ({
               type="button"
               onClick={onClose}
               className={`px-4 py-2 rounded-lg text-sm font-medium ${
-                isDarkMode ? 'hover:bg-slate-800' : 'hover:bg-slate-100'
+                isDarkMode ? 'hover:bg-zinc-800' : 'hover:bg-zinc-100'
               }`}
             >
               Cancel
@@ -344,7 +347,7 @@ const GenerateCodeModal: React.FC<GenerateCodeModalProps> = ({
             <button
               type="submit"
               disabled={isLoading || !formData.cohortId}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50"
+              className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-violet-600 text-white hover:bg-violet-700 disabled:opacity-50"
             >
               {isLoading && <Loader2 className="w-4 h-4 animate-spin" />}
               Generate {formData.count} Code{formData.count > 1 ? 's' : ''}

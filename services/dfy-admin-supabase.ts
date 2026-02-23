@@ -123,7 +123,8 @@ export async function fetchAutomationRuns(engagementId: string): Promise<DfyAuto
     .from('dfy_automation_runs')
     .select(AUTOMATION_RUN_COLUMNS)
     .eq('engagement_id', engagementId)
-    .order('created_at', { ascending: false });
+    .order('created_at', { ascending: false })
+    .limit(50);
 
   if (error) throw new Error(error.message);
   return (data || []) as DfyAutomationRun[];

@@ -23,7 +23,7 @@ export const queryClient = new QueryClient({
       },
 
       // Refetch configuration
-      refetchOnWindowFocus: true,
+      refetchOnWindowFocus: false,
       refetchOnReconnect: true,
     },
     mutations: {

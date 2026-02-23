@@ -141,28 +141,28 @@ const AdminBlueprintsPage: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-xl font-semibold">Blueprints</h2>
-          <p className={`text-sm mt-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+          <p className={`text-sm mt-1 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
             Manage LinkedIn Authority Blueprint prospects
           </p>
         </div>
         <div className="flex items-center gap-2">
           <button
             onClick={() => refetch()}
-            className={`p-2 rounded-lg ${isDarkMode ? 'hover:bg-slate-800' : 'hover:bg-slate-100'}`}
+            className={`p-2 rounded-lg ${isDarkMode ? 'hover:bg-zinc-800' : 'hover:bg-zinc-100'}`}
             title="Refresh"
           >
             <RefreshCw className="w-5 h-5" />
           </button>
           <button
             onClick={handleOpenContentEditor}
-            className={`p-2 rounded-lg ${isDarkMode ? 'hover:bg-slate-800' : 'hover:bg-slate-100'}`}
+            className={`p-2 rounded-lg ${isDarkMode ? 'hover:bg-zinc-800' : 'hover:bg-zinc-100'}`}
             title="Content Editor"
           >
             <FileText className="w-5 h-5" />
           </button>
           <button
             onClick={handleOpenSettings}
-            className={`p-2 rounded-lg ${isDarkMode ? 'hover:bg-slate-800' : 'hover:bg-slate-100'}`}
+            className={`p-2 rounded-lg ${isDarkMode ? 'hover:bg-zinc-800' : 'hover:bg-zinc-100'}`}
             title="Settings"
           >
             <Settings className="w-5 h-5" />
@@ -181,10 +181,10 @@ const AdminBlueprintsPage: React.FC = () => {
           <div
             key={stat.label}
             className={`p-4 rounded-xl border ${
-              isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-slate-200'
+              isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-200'
             }`}
           >
-            <p className={`text-sm ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+            <p className={`text-sm ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
               {stat.label}
             </p>
             <p className="text-2xl font-bold mt-1">{stat.value}</p>
@@ -195,7 +195,7 @@ const AdminBlueprintsPage: React.FC = () => {
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="flex-1 relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-400" />
           <input
             type="text"
             placeholder="Search by name or email..."
@@ -203,21 +203,21 @@ const AdminBlueprintsPage: React.FC = () => {
             onChange={(e) => setSearchQuery(e.target.value)}
             className={`w-full pl-10 pr-4 py-2.5 rounded-lg border ${
               isDarkMode
-                ? 'bg-zinc-900 border-zinc-700 text-white placeholder:text-slate-500'
-                : 'bg-white border-slate-300 text-slate-900 placeholder:text-slate-400'
-            } focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+                ? 'bg-zinc-900 border-zinc-700 text-white placeholder:text-zinc-500'
+                : 'bg-white border-zinc-300 text-zinc-900 placeholder:text-zinc-400'
+            } focus:ring-2 focus:ring-violet-500 focus:border-transparent`}
           />
         </div>
         <div className="flex items-center gap-2">
-          <Filter className="w-5 h-5 text-slate-400" />
+          <Filter className="w-5 h-5 text-zinc-400" />
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value as StatusFilter)}
             className={`px-4 py-2.5 rounded-lg border ${
               isDarkMode
                 ? 'bg-zinc-900 border-zinc-700 text-white'
-                : 'bg-white border-slate-300 text-slate-900'
-            } focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+                : 'bg-white border-zinc-300 text-zinc-900'
+            } focus:ring-2 focus:ring-violet-500 focus:border-transparent`}
           >
             <option value="all">All Status</option>
             <option value="complete">Complete</option>
@@ -230,8 +230,8 @@ const AdminBlueprintsPage: React.FC = () => {
             className={`px-4 py-2.5 rounded-lg border ${
               isDarkMode
                 ? 'bg-zinc-900 border-zinc-700 text-white'
-                : 'bg-white border-slate-300 text-slate-900'
-            } focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+                : 'bg-white border-zinc-300 text-zinc-900'
+            } focus:ring-2 focus:ring-violet-500 focus:border-transparent`}
           >
             <option value="all">All Offers</option>
             <option value="unlocked">Unlocked</option>
@@ -244,11 +244,11 @@ const AdminBlueprintsPage: React.FC = () => {
       {isLoading ? (
         <div
           className={`p-8 rounded-xl border text-center ${
-            isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-slate-200'
+            isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-200'
           }`}
         >
-          <div className="w-6 h-6 border-2 border-slate-300 border-t-blue-500 rounded-full animate-spin mx-auto" />
-          <p className={`text-sm mt-2 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+          <div className="w-6 h-6 border-2 border-zinc-300 border-t-violet-500 rounded-full animate-spin mx-auto" />
+          <p className={`text-sm mt-2 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
             Loading blueprints...
           </p>
         </div>

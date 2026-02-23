@@ -11,9 +11,9 @@ interface Props {
 }
 
 const colorMap: Record<string, { light: string; dark: string }> = {
-  slate: { light: 'bg-slate-100 text-slate-700', dark: 'bg-slate-800 text-slate-300' },
+  slate: { light: 'bg-zinc-100 text-zinc-700', dark: 'bg-zinc-800 text-zinc-300' },
   green: { light: 'bg-green-100 text-green-700', dark: 'bg-green-900/30 text-green-400' },
-  blue: { light: 'bg-blue-100 text-blue-700', dark: 'bg-blue-900/30 text-blue-400' },
+  blue: { light: 'bg-violet-100 text-violet-700', dark: 'bg-violet-900/30 text-violet-400' },
   yellow: { light: 'bg-yellow-100 text-yellow-700', dark: 'bg-yellow-900/30 text-yellow-400' },
   purple: { light: 'bg-purple-100 text-purple-700', dark: 'bg-purple-900/30 text-purple-400' },
   emerald: { light: 'bg-emerald-100 text-emerald-700', dark: 'bg-emerald-900/30 text-emerald-400' },

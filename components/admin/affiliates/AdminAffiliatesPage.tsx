@@ -18,12 +18,12 @@ type Tab = 'applications' | 'affiliates' | 'referrals' | 'payouts' | 'assets';
 const statusBadge = (status: string) => {
   const styles: Record<string, string> = {
     pending: 'bg-amber-500/10 text-amber-500',
-    approved: 'bg-blue-500/10 text-blue-500',
+    approved: 'bg-violet-500/10 text-violet-500',
     active: 'bg-green-500/10 text-green-500',
     rejected: 'bg-red-500/10 text-red-500',
     suspended: 'bg-zinc-500/10 text-zinc-500',
     clicked: 'bg-zinc-500/10 text-zinc-400',
-    enrolled: 'bg-blue-500/10 text-blue-500',
+    enrolled: 'bg-violet-500/10 text-violet-500',
     paying: 'bg-amber-500/10 text-amber-500',
     paid_in_full: 'bg-green-500/10 text-green-500',
     commission_paid: 'bg-emerald-500/10 text-emerald-500',

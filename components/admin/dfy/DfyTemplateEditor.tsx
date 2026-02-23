@@ -41,6 +41,24 @@ const AUTOMATION_TYPES = Object.keys(AUTOMATION_TYPE_LABELS) as DfyAutomationTyp
 const AUTOMATION_TRIGGERS = Object.keys(AUTOMATION_TRIGGER_LABELS) as DfyAutomationTrigger[];
 const PRIORITIES = [0, 1, 2, 3, 4] as const;
 
+const CATEGORY_COLORS: Record<DfyCategory, { light: string; dark: string }> = {
+  onboarding: {
+    light: 'bg-emerald-50 text-emerald-700',
+    dark: 'bg-emerald-900/30 text-emerald-400',
+  },
+  content: { light: 'bg-sky-50 text-sky-700', dark: 'bg-sky-900/30 text-sky-400' },
+  funnel: { light: 'bg-amber-50 text-amber-700', dark: 'bg-amber-900/30 text-amber-400' },
+  outbound: { light: 'bg-rose-50 text-rose-700', dark: 'bg-rose-900/30 text-rose-400' },
+};
+
+const PRIORITY_COLORS: Record<number, { light: string; dark: string }> = {
+  0: { light: 'bg-zinc-100 text-zinc-500', dark: 'bg-zinc-800 text-zinc-500' },
+  1: { light: 'bg-red-50 text-red-700', dark: 'bg-red-900/30 text-red-400' },
+  2: { light: 'bg-orange-50 text-orange-700', dark: 'bg-orange-900/30 text-orange-400' },
+  3: { light: 'bg-violet-50 text-violet-700', dark: 'bg-violet-900/30 text-violet-400' },
+  4: { light: 'bg-zinc-100 text-zinc-600', dark: 'bg-zinc-800 text-zinc-400' },
+};
+
 const TEMPLATE_OPTIONS = [
   { slug: 'standard', label: 'Standard' },
   { slug: 'filmmaker', label: 'Filmmaker' },
@@ -140,8 +158,8 @@ const DfyTemplateEditor: React.FC = () => {
   // Collapsible milestones
   const [collapsedMilestones, setCollapsedMilestones] = useState<Set<number>>(new Set());
 
-  // Expanded deliverable details
-  const [expandedDeliverables, setExpandedDeliverables] = useState<Set<number>>(new Set());
+  // Expanded deliverable (single-accordion)
+  const [expandedDeliverable, setExpandedDeliverable] = useState<number | null>(null);
 
   // Fetch template by slug
   const { data: templateData, isLoading } = useQuery({
@@ -286,9 +304,9 @@ const DfyTemplateEditor: React.FC = () => {
   };
 
   // ---- Deliverable helpers ----
-  const addDeliverable = () => {
-    setDeliverables((prev) => [...prev, { ...DEFAULT_DELIVERABLE }]);
-    setExpandedDeliverables((prev) => new Set([...prev, deliverables.length]));
+  const addDeliverable = (milestone?: string) => {
+    setDeliverables((prev) => [...prev, { ...DEFAULT_DELIVERABLE, milestone: milestone || '' }]);
+    setExpandedDeliverable(deliverables.length);
     setHasChanges(true);
   };
 
@@ -302,13 +320,11 @@ const DfyTemplateEditor: React.FC = () => {
         depends_on: d.depends_on?.filter((dep) => dep !== removed.name),
       }))
     );
-    setExpandedDeliverables((prev) => {
-      const next = new Set<number>();
-      prev.forEach((i) => {
-        if (i < index) next.add(i);
-        else if (i > index) next.add(i - 1);
-      });
-      return next;
+    setExpandedDeliverable((prev) => {
+      if (prev === null) return null;
+      if (prev === index) return null;
+      if (prev > index) return prev - 1;
+      return prev;
     });
     setHasChanges(true);
   };
@@ -355,12 +371,7 @@ const DfyTemplateEditor: React.FC = () => {
   };
 
   const toggleDeliverable = (index: number) => {
-    setExpandedDeliverables((prev) => {
-      const next = new Set(prev);
-      if (next.has(index)) next.delete(index);
-      else next.add(index);
-      return next;
-    });
+    setExpandedDeliverable((prev) => (prev === index ? null : index));
   };
 
   // ---- Dependency preview ----
@@ -412,31 +423,52 @@ const DfyTemplateEditor: React.FC = () => {
     return lines.join('\n');
   }, [milestones, deliverables]);
 
-  // ---- Rendering helpers ----
-  const inputClass = `w-full px-3 py-2 rounded-lg border text-sm ${
-    isDarkMode
-      ? 'bg-slate-800 border-slate-700 text-white placeholder:text-slate-600'
-      : 'bg-white border-slate-300 text-slate-900 placeholder:text-slate-400'
-  } focus:ring-1 focus:ring-blue-500 focus:border-transparent`;
+  // ---- Group deliverables by milestone ----
+  const groupedDeliverables = useMemo(() => {
+    const milestoneNames = milestones.map((m) => m.name);
+    const groups = new Map<
+      string,
+      { deliverable: DfyDeliverableTemplateV2; globalIndex: number }[]
+    >();
 
-  const selectClass = `w-full px-3 py-2 rounded-lg border text-sm ${
-    isDarkMode
-      ? 'bg-slate-800 border-slate-700 text-white'
-      : 'bg-white border-slate-300 text-slate-900'
-  } focus:ring-1 focus:ring-blue-500 focus:border-transparent`;
+    // Initialize groups in milestone order
+    for (const name of milestoneNames) {
+      groups.set(name, []);
+    }
+    groups.set('Ungrouped', []);
 
-  const labelClass = `block text-[11px] font-semibold uppercase tracking-wider mb-1 ${
-    isDarkMode ? 'text-slate-500' : 'text-slate-400'
+    for (let i = 0; i < deliverables.length; i++) {
+      const d = deliverables[i];
+      const key = d.milestone && milestoneNames.includes(d.milestone) ? d.milestone : 'Ungrouped';
+      groups.get(key)!.push({ deliverable: d, globalIndex: i });
+    }
+
+    return groups;
+  }, [milestones, deliverables]);
+
+  // ---- Rendering helpers (matches magnetlab design system) ----
+  const inputClass = `w-full h-9 px-3 py-1 rounded-md border bg-transparent text-sm shadow-sm transition-colors ${
+    isDarkMode
+      ? 'border-zinc-700 text-zinc-100 placeholder:text-zinc-500'
+      : 'border-zinc-300 text-zinc-900 placeholder:text-zinc-400'
+  } focus:outline-none focus:ring-1 focus:ring-violet-500`;
+
+  const selectClass = `w-full h-9 px-3 py-1 rounded-md border bg-transparent text-sm shadow-sm transition-colors ${
+    isDarkMode ? 'border-zinc-700 text-zinc-100' : 'border-zinc-300 text-zinc-900'
+  } focus:outline-none focus:ring-1 focus:ring-violet-500`;
+
+  const labelClass = `block text-sm font-medium mb-1 ${
+    isDarkMode ? 'text-zinc-400' : 'text-zinc-600'
   }`;
 
-  const cardClass = `rounded-xl border ${
-    isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+  const cardClass = `rounded-xl border shadow ${
+    isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-200'
   }`;
 
   if (isLoading) {
     return (
       <div className="p-8 text-center">
-        <div className="w-6 h-6 border-2 border-slate-300 dark:border-slate-700 border-t-blue-500 rounded-full animate-spin mx-auto" />
+        <div className="w-6 h-6 border-2 border-zinc-300 dark:border-zinc-700 border-t-violet-500 rounded-full animate-spin mx-auto" />
       </div>
     );
   }
@@ -446,10 +478,10 @@ const DfyTemplateEditor: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className={`text-xl font-semibold ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
+          <h2 className={`text-xl font-bold ${isDarkMode ? 'text-zinc-100' : 'text-zinc-900'}`}>
             Engagement Template
           </h2>
-          <p className={`text-sm mt-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+          <p className={`text-sm mt-1 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-500'}`}>
             Configure milestone-based templates with automation for DFY engagements
           </p>
         </div>
@@ -461,10 +493,8 @@ const DfyTemplateEditor: React.FC = () => {
               setSelectedSlug(e.target.value);
               setHasChanges(false);
             }}
-            className={`px-3 py-2 rounded-lg border text-sm font-medium ${
-              isDarkMode
-                ? 'bg-slate-800 border-slate-700 text-white'
-                : 'bg-white border-slate-300 text-slate-900'
+            className={`px-3 py-1 h-9 rounded-md border bg-transparent text-sm font-medium shadow-sm ${
+              isDarkMode ? 'border-zinc-700 text-zinc-100' : 'border-zinc-300 text-zinc-900'
             }`}
           >
             {TEMPLATE_OPTIONS.map((opt) => (
@@ -476,7 +506,7 @@ const DfyTemplateEditor: React.FC = () => {
           <button
             onClick={() => saveMutation.mutate()}
             disabled={!hasChanges || saveMutation.isPending}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 transition-colors"
+            className="inline-flex items-center gap-2 h-9 px-4 py-2 rounded-md text-sm font-medium bg-violet-600 text-white shadow hover:bg-violet-500 disabled:pointer-events-none disabled:opacity-50 transition-colors"
           >
             <Save className="w-4 h-4" />
             {saveMutation.isPending ? 'Saving...' : 'Save Template'}
@@ -513,13 +543,13 @@ const DfyTemplateEditor: React.FC = () => {
       {templateData === null && !hasChanges && (
         <div className={cardClass}>
           <div className="p-8 text-center">
-            <p className={`text-sm mb-3 ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+            <p className={`text-sm mb-3 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-500'}`}>
               No template found for "{TEMPLATE_OPTIONS.find((o) => o.slug === selectedSlug)?.label}
               ".
             </p>
             <button
               onClick={handleCreateFromDefault}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 transition-colors mx-auto"
+              className="inline-flex items-center gap-2 h-9 px-4 py-2 rounded-md text-sm font-medium bg-violet-600 text-white shadow hover:bg-violet-500 transition-colors mx-auto"
             >
               <Plus className="w-4 h-4" />
               Create from Default Template
@@ -552,12 +582,12 @@ const DfyTemplateEditor: React.FC = () => {
           <div className="flex gap-1">
             <button
               onClick={() => setActiveTab('edit')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              className={`inline-flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                 activeTab === 'edit'
-                  ? 'bg-blue-600 text-white'
+                  ? 'bg-violet-600 text-white'
                   : isDarkMode
-                    ? 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'
-                    : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                    ? 'text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200'
+                    : 'text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900'
               }`}
             >
               <Settings className="w-4 h-4" />
@@ -565,12 +595,12 @@ const DfyTemplateEditor: React.FC = () => {
             </button>
             <button
               onClick={() => setActiveTab('preview')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+              className={`inline-flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                 activeTab === 'preview'
-                  ? 'bg-blue-600 text-white'
+                  ? 'bg-violet-600 text-white'
                   : isDarkMode
-                    ? 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'
-                    : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                    ? 'text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200'
+                    : 'text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900'
               }`}
             >
               <Eye className="w-4 h-4" />
@@ -582,10 +612,10 @@ const DfyTemplateEditor: React.FC = () => {
             /* ---- Preview Tab ---- */
             <div className={cardClass}>
               <div
-                className={`px-4 py-3 border-b ${isDarkMode ? 'border-slate-800' : 'border-slate-200'}`}
+                className={`px-4 py-3 border-b ${isDarkMode ? 'border-zinc-800' : 'border-zinc-200'}`}
               >
                 <h3
-                  className={`text-sm font-semibold ${isDarkMode ? 'text-white' : 'text-slate-900'}`}
+                  className={`text-sm font-semibold ${isDarkMode ? 'text-zinc-100' : 'text-zinc-900'}`}
                 >
                   Dependency Graph
                 </h3>
@@ -594,13 +624,13 @@ const DfyTemplateEditor: React.FC = () => {
                 {previewText ? (
                   <pre
                     className={`text-sm font-mono whitespace-pre-wrap leading-relaxed ${
-                      isDarkMode ? 'text-slate-300' : 'text-slate-700'
+                      isDarkMode ? 'text-zinc-300' : 'text-zinc-700'
                     }`}
                   >
                     {previewText}
                   </pre>
                 ) : (
-                  <p className={`text-sm ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>
+                  <p className={`text-sm ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
                     Add milestones and deliverables to see the dependency graph.
                   </p>
                 )}
@@ -613,26 +643,26 @@ const DfyTemplateEditor: React.FC = () => {
               <div className={cardClass}>
                 <div
                   className={`px-4 py-3 border-b flex items-center justify-between ${
-                    isDarkMode ? 'border-slate-800' : 'border-slate-200'
+                    isDarkMode ? 'border-zinc-800' : 'border-zinc-200'
                   }`}
                 >
                   <div className="flex items-center gap-2">
-                    <Layers className="w-4 h-4 text-blue-500" />
+                    <Layers className="w-4 h-4 text-violet-500" />
                     <h3
-                      className={`text-sm font-semibold ${isDarkMode ? 'text-white' : 'text-slate-900'}`}
+                      className={`text-sm font-semibold ${isDarkMode ? 'text-zinc-100' : 'text-zinc-900'}`}
                     >
                       Milestones
                     </h3>
-                    <span className={`text-xs ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>
+                    <span className={`text-xs ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
                       ({milestones.length})
                     </span>
                   </div>
                   <button
                     onClick={addMilestone}
-                    className={`flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium transition-colors ${
+                    className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium transition-colors ${
                       isDarkMode
-                        ? 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'
-                        : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                        ? 'text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200'
+                        : 'text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900'
                     }`}
                   >
                     <Plus className="w-3 h-3" />
@@ -642,12 +672,12 @@ const DfyTemplateEditor: React.FC = () => {
 
                 {milestones.length === 0 ? (
                   <div className="p-6 text-center">
-                    <p className={`text-sm ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+                    <p className={`text-sm ${isDarkMode ? 'text-zinc-400' : 'text-zinc-500'}`}>
                       No milestones. Click "Add Milestone" to start.
                     </p>
                   </div>
                 ) : (
-                  <div className="divide-y divide-slate-100 dark:divide-slate-800">
+                  <div className="divide-y divide-zinc-100 dark:divide-zinc-800">
                     {milestones.map((ms, msIndex) => (
                       <div key={msIndex} className="p-4">
                         <div className="flex items-start gap-3">
@@ -658,8 +688,8 @@ const DfyTemplateEditor: React.FC = () => {
                               disabled={msIndex === 0}
                               className={`p-1 rounded transition-colors disabled:opacity-20 ${
                                 isDarkMode
-                                  ? 'text-slate-400 hover:bg-slate-800'
-                                  : 'text-slate-400 hover:bg-slate-100'
+                                  ? 'text-zinc-400 hover:bg-zinc-800'
+                                  : 'text-zinc-400 hover:bg-zinc-100'
                               }`}
                             >
                               <ChevronUp className="w-3 h-3" />
@@ -669,8 +699,8 @@ const DfyTemplateEditor: React.FC = () => {
                               disabled={msIndex === milestones.length - 1}
                               className={`p-1 rounded transition-colors disabled:opacity-20 ${
                                 isDarkMode
-                                  ? 'text-slate-400 hover:bg-slate-800'
-                                  : 'text-slate-400 hover:bg-slate-100'
+                                  ? 'text-zinc-400 hover:bg-zinc-800'
+                                  : 'text-zinc-400 hover:bg-zinc-100'
                               }`}
                             >
                               <ChevronDown className="w-3 h-3" />
@@ -682,8 +712,8 @@ const DfyTemplateEditor: React.FC = () => {
                             onClick={() => toggleMilestone(msIndex)}
                             className={`p-1 rounded transition-colors mt-1 ${
                               isDarkMode
-                                ? 'text-slate-400 hover:bg-slate-800'
-                                : 'text-slate-400 hover:bg-slate-100'
+                                ? 'text-zinc-400 hover:bg-zinc-800'
+                                : 'text-zinc-400 hover:bg-zinc-100'
                             }`}
                           >
                             <ChevronRight
@@ -736,7 +766,7 @@ const DfyTemplateEditor: React.FC = () => {
                               </div>
                               <div className="flex items-end">
                                 <span
-                                  className={`text-xs ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}
+                                  className={`text-xs ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}
                                 >
                                   Week {Math.ceil(ms.target_day_offset / 7)} &middot;{' '}
                                   {deliverables.filter((d) => d.milestone === ms.name).length}{' '}
@@ -756,14 +786,14 @@ const DfyTemplateEditor: React.FC = () => {
                                       key={i}
                                       className={`text-xs px-2 py-1 rounded ${
                                         isDarkMode
-                                          ? 'text-slate-400 bg-slate-800/50'
-                                          : 'text-slate-500 bg-slate-50'
+                                          ? 'text-zinc-400 bg-zinc-800/50'
+                                          : 'text-zinc-500 bg-zinc-50'
                                       }`}
                                     >
                                       {d.name || '(untitled)'}
                                       {d.automation_config.automatable &&
                                         d.automation_config.automation_type && (
-                                          <span className="ml-1 text-blue-400">[AUTO]</span>
+                                          <span className="ml-1 text-violet-400">[AUTO]</span>
                                         )}
                                     </div>
                                   ))}
@@ -774,10 +804,10 @@ const DfyTemplateEditor: React.FC = () => {
                           {/* Remove */}
                           <button
                             onClick={() => removeMilestone(msIndex)}
-                            className={`p-2 rounded-lg transition-colors mt-1 ${
+                            className={`p-2 rounded-md transition-colors mt-1 ${
                               isDarkMode
-                                ? 'text-slate-500 hover:bg-red-900/20 hover:text-red-400'
-                                : 'text-slate-400 hover:bg-red-50 hover:text-red-600'
+                                ? 'text-zinc-500 hover:bg-red-900/20 hover:text-red-400'
+                                : 'text-zinc-400 hover:bg-red-50 hover:text-red-600'
                             }`}
                             title="Remove milestone"
                           >
@@ -790,29 +820,29 @@ const DfyTemplateEditor: React.FC = () => {
                 )}
               </div>
 
-              {/* Deliverables Section */}
+              {/* Deliverables Section — grouped by milestone */}
               <div className={cardClass}>
                 <div
                   className={`px-4 py-3 border-b flex items-center justify-between ${
-                    isDarkMode ? 'border-slate-800' : 'border-slate-200'
+                    isDarkMode ? 'border-zinc-800' : 'border-zinc-200'
                   }`}
                 >
                   <div className="flex items-center gap-2">
                     <h3
-                      className={`text-sm font-semibold ${isDarkMode ? 'text-white' : 'text-slate-900'}`}
+                      className={`text-sm font-semibold ${isDarkMode ? 'text-zinc-100' : 'text-zinc-900'}`}
                     >
                       Deliverables
                     </h3>
-                    <span className={`text-xs ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>
+                    <span className={`text-xs ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
                       ({deliverables.length})
                     </span>
                   </div>
                   <button
-                    onClick={addDeliverable}
-                    className={`flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-medium transition-colors ${
+                    onClick={() => addDeliverable()}
+                    className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium transition-colors ${
                       isDarkMode
-                        ? 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'
-                        : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                        ? 'text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200'
+                        : 'text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900'
                     }`}
                   >
                     <Plus className="w-3 h-3" />
@@ -822,358 +852,497 @@ const DfyTemplateEditor: React.FC = () => {
 
                 {deliverables.length === 0 ? (
                   <div className="p-6 text-center">
-                    <p className={`text-sm ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+                    <p className={`text-sm ${isDarkMode ? 'text-zinc-400' : 'text-zinc-500'}`}>
                       No deliverables. Click "Add Deliverable" to start.
                     </p>
                   </div>
                 ) : (
-                  <div className="divide-y divide-slate-100 dark:divide-slate-800">
-                    {deliverables.map((row, index) => (
-                      <div key={index} className="p-4">
-                        <div className="flex items-start gap-3">
-                          {/* Reorder */}
-                          <div className="flex flex-col gap-0.5 pt-1">
-                            <button
-                              onClick={() => moveDeliverable(index, 'up')}
-                              disabled={index === 0}
-                              className={`p-1 rounded transition-colors disabled:opacity-20 ${
-                                isDarkMode
-                                  ? 'text-slate-400 hover:bg-slate-800'
-                                  : 'text-slate-400 hover:bg-slate-100'
-                              }`}
-                            >
-                              <ChevronUp className="w-3 h-3" />
-                            </button>
-                            <button
-                              onClick={() => moveDeliverable(index, 'down')}
-                              disabled={index === deliverables.length - 1}
-                              className={`p-1 rounded transition-colors disabled:opacity-20 ${
-                                isDarkMode
-                                  ? 'text-slate-400 hover:bg-slate-800'
-                                  : 'text-slate-400 hover:bg-slate-100'
-                              }`}
-                            >
-                              <ChevronDown className="w-3 h-3" />
-                            </button>
-                          </div>
+                  <div>
+                    {Array.from(groupedDeliverables.entries()).map(([groupName, items]) => {
+                      if (items.length === 0 && groupName === 'Ungrouped') return null;
+                      const isUngrouped = groupName === 'Ungrouped';
 
-                          {/* Expand toggle */}
-                          <button
-                            onClick={() => toggleDeliverable(index)}
-                            className={`p-1 rounded transition-colors mt-1 ${
+                      return (
+                        <div key={groupName}>
+                          {/* Group header */}
+                          <div
+                            className={`px-4 py-2 flex items-center justify-between ${
                               isDarkMode
-                                ? 'text-slate-400 hover:bg-slate-800'
-                                : 'text-slate-400 hover:bg-slate-100'
+                                ? 'bg-zinc-800/50 border-b border-zinc-800'
+                                : 'bg-zinc-50 border-b border-zinc-200'
                             }`}
                           >
-                            <ChevronRight
-                              className={`w-4 h-4 transition-transform ${
-                                expandedDeliverables.has(index) ? 'rotate-90' : ''
-                              }`}
-                            />
-                          </button>
-
-                          {/* Main fields */}
-                          <div className="flex-1 space-y-3">
-                            {/* Row 1: core fields */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
-                              <div>
-                                <label className={labelClass}>Name</label>
-                                <input
-                                  type="text"
-                                  value={row.name}
-                                  onChange={(e) => updateDeliverable(index, 'name', e.target.value)}
-                                  placeholder="Deliverable name"
-                                  className={inputClass}
-                                />
-                              </div>
-                              <div>
-                                <label className={labelClass}>Description</label>
-                                <input
-                                  type="text"
-                                  value={row.description}
-                                  onChange={(e) =>
-                                    updateDeliverable(index, 'description', e.target.value)
-                                  }
-                                  placeholder="Brief description"
-                                  className={inputClass}
-                                />
-                              </div>
-                              <div>
-                                <label className={labelClass}>Category</label>
-                                <select
-                                  value={row.category}
-                                  onChange={(e) =>
-                                    updateDeliverable(index, 'category', e.target.value)
-                                  }
-                                  className={selectClass}
-                                >
-                                  {CATEGORIES.map((cat) => (
-                                    <option key={cat} value={cat}>
-                                      {CATEGORY_LABELS[cat]}
-                                    </option>
-                                  ))}
-                                </select>
-                              </div>
-                              <div>
-                                <label className={labelClass}>Assignee</label>
-                                <input
-                                  type="text"
-                                  value={row.assignee}
-                                  onChange={(e) =>
-                                    updateDeliverable(index, 'assignee', e.target.value)
-                                  }
-                                  placeholder="e.g. Team"
-                                  className={inputClass}
-                                />
-                              </div>
-                              <div>
-                                <label className={labelClass}>Due (days)</label>
-                                <input
-                                  type="number"
-                                  min={0}
-                                  value={row.relative_due_days}
-                                  onChange={(e) =>
-                                    updateDeliverable(
-                                      index,
-                                      'relative_due_days',
-                                      parseInt(e.target.value, 10) || 0
-                                    )
-                                  }
-                                  className={inputClass}
-                                />
-                              </div>
+                            <div className="flex items-center gap-2">
+                              <span
+                                className={`text-xs font-semibold uppercase tracking-wider ${isDarkMode ? 'text-zinc-400' : 'text-zinc-500'}`}
+                              >
+                                {groupName}
+                              </span>
+                              <span
+                                className={`text-xs ${isDarkMode ? 'text-zinc-600' : 'text-zinc-400'}`}
+                              >
+                                ({items.length})
+                              </span>
                             </div>
-
-                            {/* Row 2: milestone + priority (always visible) */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
-                              <div>
-                                <label className={labelClass}>Milestone</label>
-                                <select
-                                  value={row.milestone}
-                                  onChange={(e) =>
-                                    updateDeliverable(index, 'milestone', e.target.value)
-                                  }
-                                  className={selectClass}
-                                >
-                                  <option value="">(None)</option>
-                                  {milestones.map((ms) => (
-                                    <option key={ms.name} value={ms.name}>
-                                      {ms.name}
-                                    </option>
-                                  ))}
-                                </select>
-                              </div>
-                              <div>
-                                <label className={labelClass}>Priority</label>
-                                <select
-                                  value={row.priority}
-                                  onChange={(e) =>
-                                    updateDeliverable(
-                                      index,
-                                      'priority',
-                                      parseInt(e.target.value, 10)
-                                    )
-                                  }
-                                  className={selectClass}
-                                >
-                                  {PRIORITIES.map((p) => (
-                                    <option key={p} value={p}>
-                                      {PRIORITY_LABELS[p]}
-                                    </option>
-                                  ))}
-                                </select>
-                              </div>
-                              {/* Automation badge (summary) */}
-                              <div className="flex items-end gap-2 col-span-2">
-                                {row.automation_config.automatable && (
-                                  <span
-                                    className={`text-xs px-2 py-1 rounded ${
-                                      isDarkMode
-                                        ? 'bg-blue-900/30 text-blue-400'
-                                        : 'bg-blue-50 text-blue-700'
-                                    }`}
-                                  >
-                                    AUTO: {row.automation_config.automation_type || 'not set'}
-                                  </span>
-                                )}
-                                {(row.depends_on?.length ?? 0) > 0 && (
-                                  <span
-                                    className={`text-xs px-2 py-1 rounded ${
-                                      isDarkMode
-                                        ? 'bg-purple-900/30 text-purple-400'
-                                        : 'bg-purple-50 text-purple-700'
-                                    }`}
-                                  >
-                                    {row.depends_on!.length} dep
-                                    {row.depends_on!.length !== 1 ? 's' : ''}
-                                  </span>
-                                )}
-                              </div>
-                            </div>
-
-                            {/* Expanded: Dependencies, Playbook, Automation */}
-                            {expandedDeliverables.has(index) && (
-                              <div
-                                className={`p-3 rounded-lg space-y-3 ${
-                                  isDarkMode ? 'bg-slate-800/50' : 'bg-slate-50'
+                            {!isUngrouped && (
+                              <button
+                                onClick={() => addDeliverable(groupName)}
+                                className={`flex items-center gap-1 px-1.5 py-0.5 rounded text-[11px] font-medium transition-colors ${
+                                  isDarkMode
+                                    ? 'text-zinc-500 hover:bg-zinc-700 hover:text-zinc-300'
+                                    : 'text-zinc-400 hover:bg-zinc-200 hover:text-zinc-700'
                                 }`}
                               >
-                                {/* Dependencies */}
-                                <div>
-                                  <label className={labelClass}>Dependencies</label>
-                                  <div className="flex flex-wrap gap-2 mt-1">
-                                    {deliverables
-                                      .filter((_, i) => i !== index)
-                                      .map((other) => {
-                                        if (!other.name) return null;
-                                        const isSelected =
-                                          row.depends_on?.includes(other.name) ?? false;
-                                        return (
-                                          <label
-                                            key={other.name}
-                                            className={`flex items-center gap-1.5 px-2 py-1 rounded text-xs cursor-pointer transition-colors ${
-                                              isSelected
-                                                ? isDarkMode
-                                                  ? 'bg-purple-900/30 text-purple-300'
-                                                  : 'bg-purple-100 text-purple-700'
-                                                : isDarkMode
-                                                  ? 'bg-slate-700 text-slate-400 hover:bg-slate-600'
-                                                  : 'bg-slate-200 text-slate-600 hover:bg-slate-300'
-                                            }`}
-                                          >
-                                            <input
-                                              type="checkbox"
-                                              checked={isSelected}
-                                              onChange={(e) => {
-                                                const current = row.depends_on || [];
-                                                const updated = e.target.checked
-                                                  ? [...current, other.name]
-                                                  : current.filter((d) => d !== other.name);
-                                                updateDeliverable(index, 'depends_on', updated);
-                                              }}
-                                              className="w-3 h-3 rounded border-slate-300 text-purple-600 focus:ring-purple-500"
-                                            />
-                                            {other.name}
-                                          </label>
-                                        );
-                                      })}
-                                    {deliverables.filter(
-                                      (_, i) => i !== index && deliverables[i].name
-                                    ).length === 0 && (
-                                      <span
-                                        className={`text-xs ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}
+                                <Plus className="w-3 h-3" />
+                                Add
+                              </button>
+                            )}
+                          </div>
+
+                          {/* Deliverable rows */}
+                          <div
+                            className={`divide-y ${isDarkMode ? 'divide-zinc-800' : 'divide-zinc-100'}`}
+                          >
+                            {items.map(({ deliverable: row, globalIndex: index }) => {
+                              const isExpanded = expandedDeliverable === index;
+                              const catColors =
+                                CATEGORY_COLORS[row.category] || CATEGORY_COLORS.onboarding;
+                              const priColors = PRIORITY_COLORS[row.priority] || PRIORITY_COLORS[3];
+
+                              return (
+                                <div key={index}>
+                                  {/* Compact collapsed row */}
+                                  <div
+                                    className={`px-4 py-2 flex items-center gap-2 cursor-pointer transition-colors ${
+                                      isExpanded
+                                        ? isDarkMode
+                                          ? 'bg-zinc-800/30'
+                                          : 'bg-violet-50/50'
+                                        : isDarkMode
+                                          ? 'hover:bg-zinc-800/20'
+                                          : 'hover:bg-zinc-50'
+                                    }`}
+                                    onClick={() => toggleDeliverable(index)}
+                                  >
+                                    {/* Reorder arrows */}
+                                    <div
+                                      className="flex flex-col gap-0"
+                                      onClick={(e) => e.stopPropagation()}
+                                    >
+                                      <button
+                                        onClick={() => moveDeliverable(index, 'up')}
+                                        disabled={index === 0}
+                                        className={`p-0.5 rounded transition-colors disabled:opacity-20 ${
+                                          isDarkMode
+                                            ? 'text-zinc-500 hover:bg-zinc-700'
+                                            : 'text-zinc-400 hover:bg-zinc-200'
+                                        }`}
                                       >
-                                        No other named deliverables to depend on
+                                        <ChevronUp className="w-3 h-3" />
+                                      </button>
+                                      <button
+                                        onClick={() => moveDeliverable(index, 'down')}
+                                        disabled={index === deliverables.length - 1}
+                                        className={`p-0.5 rounded transition-colors disabled:opacity-20 ${
+                                          isDarkMode
+                                            ? 'text-zinc-500 hover:bg-zinc-700'
+                                            : 'text-zinc-400 hover:bg-zinc-200'
+                                        }`}
+                                      >
+                                        <ChevronDown className="w-3 h-3" />
+                                      </button>
+                                    </div>
+
+                                    {/* Expand chevron */}
+                                    <ChevronRight
+                                      className={`w-4 h-4 shrink-0 transition-transform ${
+                                        isExpanded ? 'rotate-90' : ''
+                                      } ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}
+                                    />
+
+                                    {/* Name */}
+                                    <span
+                                      className={`text-sm font-medium truncate min-w-0 flex-1 ${
+                                        isDarkMode ? 'text-zinc-200' : 'text-zinc-800'
+                                      }`}
+                                    >
+                                      {row.name || '(untitled)'}
+                                    </span>
+
+                                    {/* Category badge */}
+                                    <span
+                                      className={`text-[11px] font-medium px-2 py-0.5 rounded-md shrink-0 ${
+                                        isDarkMode ? catColors.dark : catColors.light
+                                      }`}
+                                    >
+                                      {CATEGORY_LABELS[row.category]}
+                                    </span>
+
+                                    {/* Assignee */}
+                                    <span
+                                      className={`text-xs shrink-0 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}
+                                    >
+                                      {row.assignee}
+                                    </span>
+
+                                    {/* Due days */}
+                                    <span
+                                      className={`text-[11px] font-medium px-2 py-0.5 rounded-md shrink-0 ${
+                                        isDarkMode
+                                          ? 'bg-zinc-800 text-zinc-400'
+                                          : 'bg-zinc-100 text-zinc-600'
+                                      }`}
+                                    >
+                                      Day {row.relative_due_days}
+                                    </span>
+
+                                    {/* Priority badge */}
+                                    {row.priority > 0 && (
+                                      <span
+                                        className={`text-[11px] font-medium px-2 py-0.5 rounded-md shrink-0 ${
+                                          isDarkMode ? priColors.dark : priColors.light
+                                        }`}
+                                      >
+                                        P{row.priority} {PRIORITY_LABELS[row.priority]}
                                       </span>
                                     )}
-                                  </div>
-                                </div>
 
-                                {/* Playbook URL */}
-                                <div>
-                                  <label className={labelClass}>Playbook URL</label>
-                                  <input
-                                    type="url"
-                                    value={row.playbook_url || ''}
-                                    onChange={(e) =>
-                                      updateDeliverable(index, 'playbook_url', e.target.value)
-                                    }
-                                    placeholder="https://dwy-playbook.vercel.app/..."
-                                    className={inputClass}
-                                  />
-                                </div>
-
-                                {/* Automation Config */}
-                                <div>
-                                  <label className={labelClass}>Automation</label>
-                                  <div className="space-y-2 mt-1">
-                                    <label className="flex items-center gap-2 cursor-pointer">
-                                      <input
-                                        type="checkbox"
-                                        checked={row.automation_config.automatable}
-                                        onChange={(e) =>
-                                          updateDeliverable(
-                                            index,
-                                            'automation_config.automatable',
-                                            e.target.checked
-                                          )
-                                        }
-                                        className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
-                                      />
-                                      <span
-                                        className={`text-sm ${isDarkMode ? 'text-slate-300' : 'text-slate-700'}`}
-                                      >
-                                        Automatable
-                                      </span>
-                                    </label>
-
+                                    {/* Automation icon */}
                                     {row.automation_config.automatable && (
-                                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 ml-6">
+                                      <span
+                                        className={`text-[11px] px-1.5 py-0.5 rounded shrink-0 ${
+                                          isDarkMode
+                                            ? 'bg-violet-900/30 text-violet-400'
+                                            : 'bg-violet-50 text-violet-600'
+                                        }`}
+                                        title={`AUTO: ${row.automation_config.automation_type || 'not set'}`}
+                                      >
+                                        AUTO
+                                      </span>
+                                    )}
+
+                                    {/* Dependency icon */}
+                                    {(row.depends_on?.length ?? 0) > 0 && (
+                                      <span
+                                        className={`text-[11px] px-1.5 py-0.5 rounded shrink-0 ${
+                                          isDarkMode
+                                            ? 'bg-purple-900/30 text-purple-400'
+                                            : 'bg-purple-50 text-purple-600'
+                                        }`}
+                                        title={`Depends on: ${row.depends_on!.join(', ')}`}
+                                      >
+                                        {row.depends_on!.length} dep
+                                        {row.depends_on!.length !== 1 ? 's' : ''}
+                                      </span>
+                                    )}
+
+                                    {/* Remove button */}
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        removeDeliverable(index);
+                                      }}
+                                      className={`p-1 rounded transition-colors shrink-0 ${
+                                        isDarkMode
+                                          ? 'text-zinc-600 hover:bg-red-900/20 hover:text-red-400'
+                                          : 'text-zinc-300 hover:bg-red-50 hover:text-red-600'
+                                      }`}
+                                      title="Remove deliverable"
+                                    >
+                                      <X className="w-3.5 h-3.5" />
+                                    </button>
+                                  </div>
+
+                                  {/* Expanded edit form */}
+                                  {isExpanded && (
+                                    <div
+                                      className={`px-4 py-4 space-y-4 ${
+                                        isDarkMode
+                                          ? 'bg-zinc-800/20 border-b border-zinc-800'
+                                          : 'bg-zinc-50/50 border-b border-zinc-200'
+                                      }`}
+                                    >
+                                      {/* Row 1: core fields */}
+                                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
                                         <div>
-                                          <label className={labelClass}>Automation Type</label>
-                                          <select
-                                            value={row.automation_config.automation_type || ''}
+                                          <label className={labelClass}>Name</label>
+                                          <input
+                                            type="text"
+                                            value={row.name}
+                                            onChange={(e) =>
+                                              updateDeliverable(index, 'name', e.target.value)
+                                            }
+                                            placeholder="Deliverable name"
+                                            className={inputClass}
+                                          />
+                                        </div>
+                                        <div>
+                                          <label className={labelClass}>Description</label>
+                                          <input
+                                            type="text"
+                                            value={row.description}
                                             onChange={(e) =>
                                               updateDeliverable(
                                                 index,
-                                                'automation_config.automation_type',
-                                                e.target.value || undefined
+                                                'description',
+                                                e.target.value
                                               )
+                                            }
+                                            placeholder="Brief description"
+                                            className={inputClass}
+                                          />
+                                        </div>
+                                        <div>
+                                          <label className={labelClass}>Category</label>
+                                          <select
+                                            value={row.category}
+                                            onChange={(e) =>
+                                              updateDeliverable(index, 'category', e.target.value)
                                             }
                                             className={selectClass}
                                           >
-                                            <option value="">Select type...</option>
-                                            {AUTOMATION_TYPES.map((t) => (
-                                              <option key={t} value={t}>
-                                                {AUTOMATION_TYPE_LABELS[t]}
+                                            {CATEGORIES.map((cat) => (
+                                              <option key={cat} value={cat}>
+                                                {CATEGORY_LABELS[cat]}
                                               </option>
                                             ))}
                                           </select>
                                         </div>
                                         <div>
-                                          <label className={labelClass}>Trigger</label>
-                                          <select
-                                            value={row.automation_config.trigger}
+                                          <label className={labelClass}>Assignee</label>
+                                          <input
+                                            type="text"
+                                            value={row.assignee}
+                                            onChange={(e) =>
+                                              updateDeliverable(index, 'assignee', e.target.value)
+                                            }
+                                            placeholder="e.g. Team"
+                                            className={inputClass}
+                                          />
+                                        </div>
+                                        <div>
+                                          <label className={labelClass}>Due (days)</label>
+                                          <input
+                                            type="number"
+                                            min={0}
+                                            value={row.relative_due_days}
                                             onChange={(e) =>
                                               updateDeliverable(
                                                 index,
-                                                'automation_config.trigger',
-                                                e.target.value
+                                                'relative_due_days',
+                                                parseInt(e.target.value, 10) || 0
+                                              )
+                                            }
+                                            className={inputClass}
+                                          />
+                                        </div>
+                                      </div>
+
+                                      {/* Row 2: milestone + priority */}
+                                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+                                        <div>
+                                          <label className={labelClass}>Milestone</label>
+                                          <select
+                                            value={row.milestone}
+                                            onChange={(e) =>
+                                              updateDeliverable(index, 'milestone', e.target.value)
+                                            }
+                                            className={selectClass}
+                                          >
+                                            <option value="">(None)</option>
+                                            {milestones.map((ms) => (
+                                              <option key={ms.name} value={ms.name}>
+                                                {ms.name}
+                                              </option>
+                                            ))}
+                                          </select>
+                                        </div>
+                                        <div>
+                                          <label className={labelClass}>Priority</label>
+                                          <select
+                                            value={row.priority}
+                                            onChange={(e) =>
+                                              updateDeliverable(
+                                                index,
+                                                'priority',
+                                                parseInt(e.target.value, 10)
                                               )
                                             }
                                             className={selectClass}
                                           >
-                                            {AUTOMATION_TRIGGERS.map((t) => (
-                                              <option key={t} value={t}>
-                                                {AUTOMATION_TRIGGER_LABELS[t]}
+                                            {PRIORITIES.map((p) => (
+                                              <option key={p} value={p}>
+                                                {PRIORITY_LABELS[p]}
                                               </option>
                                             ))}
                                           </select>
                                         </div>
                                       </div>
-                                    )}
-                                  </div>
-                                </div>
-                              </div>
-                            )}
-                          </div>
 
-                          {/* Remove button */}
-                          <button
-                            onClick={() => removeDeliverable(index)}
-                            className={`p-2 rounded-lg transition-colors mt-5 ${
-                              isDarkMode
-                                ? 'text-slate-500 hover:bg-red-900/20 hover:text-red-400'
-                                : 'text-slate-400 hover:bg-red-50 hover:text-red-600'
-                            }`}
-                            title="Remove deliverable"
-                          >
-                            <X className="w-4 h-4" />
-                          </button>
+                                      {/* Detail fields: Dependencies, Playbook, Automation */}
+                                      <div
+                                        className={`p-3 rounded-md space-y-3 ${
+                                          isDarkMode ? 'bg-zinc-800/50' : 'bg-zinc-100/80'
+                                        }`}
+                                      >
+                                        {/* Dependencies */}
+                                        <div>
+                                          <label className={labelClass}>Dependencies</label>
+                                          <div className="flex flex-wrap gap-2 mt-1">
+                                            {deliverables
+                                              .filter((_, i) => i !== index)
+                                              .map((other) => {
+                                                if (!other.name) return null;
+                                                const isSelected =
+                                                  row.depends_on?.includes(other.name) ?? false;
+                                                return (
+                                                  <label
+                                                    key={other.name}
+                                                    className={`flex items-center gap-1.5 px-2 py-1 rounded text-xs cursor-pointer transition-colors ${
+                                                      isSelected
+                                                        ? isDarkMode
+                                                          ? 'bg-purple-900/30 text-purple-300'
+                                                          : 'bg-purple-100 text-purple-700'
+                                                        : isDarkMode
+                                                          ? 'bg-zinc-700 text-zinc-400 hover:bg-zinc-600'
+                                                          : 'bg-zinc-200 text-zinc-600 hover:bg-zinc-300'
+                                                    }`}
+                                                  >
+                                                    <input
+                                                      type="checkbox"
+                                                      checked={isSelected}
+                                                      onChange={(e) => {
+                                                        const current = row.depends_on || [];
+                                                        const updated = e.target.checked
+                                                          ? [...current, other.name]
+                                                          : current.filter((d) => d !== other.name);
+                                                        updateDeliverable(
+                                                          index,
+                                                          'depends_on',
+                                                          updated
+                                                        );
+                                                      }}
+                                                      className="w-3 h-3 rounded border-zinc-300 text-violet-600 focus:ring-violet-500"
+                                                    />
+                                                    {other.name}
+                                                  </label>
+                                                );
+                                              })}
+                                            {deliverables.filter(
+                                              (_, i) => i !== index && deliverables[i].name
+                                            ).length === 0 && (
+                                              <span
+                                                className={`text-xs ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}
+                                              >
+                                                No other named deliverables to depend on
+                                              </span>
+                                            )}
+                                          </div>
+                                        </div>
+
+                                        {/* Playbook URL */}
+                                        <div>
+                                          <label className={labelClass}>Playbook URL</label>
+                                          <input
+                                            type="url"
+                                            value={row.playbook_url || ''}
+                                            onChange={(e) =>
+                                              updateDeliverable(
+                                                index,
+                                                'playbook_url',
+                                                e.target.value
+                                              )
+                                            }
+                                            placeholder="https://dwy-playbook.vercel.app/..."
+                                            className={inputClass}
+                                          />
+                                        </div>
+
+                                        {/* Automation Config */}
+                                        <div>
+                                          <label className={labelClass}>Automation</label>
+                                          <div className="space-y-2 mt-1">
+                                            <label className="flex items-center gap-2 cursor-pointer">
+                                              <input
+                                                type="checkbox"
+                                                checked={row.automation_config.automatable}
+                                                onChange={(e) =>
+                                                  updateDeliverable(
+                                                    index,
+                                                    'automation_config.automatable',
+                                                    e.target.checked
+                                                  )
+                                                }
+                                                className="w-4 h-4 rounded border-zinc-300 text-violet-600 focus:ring-violet-500"
+                                              />
+                                              <span
+                                                className={`text-sm ${isDarkMode ? 'text-zinc-300' : 'text-zinc-700'}`}
+                                              >
+                                                Automatable
+                                              </span>
+                                            </label>
+
+                                            {row.automation_config.automatable && (
+                                              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 ml-6">
+                                                <div>
+                                                  <label className={labelClass}>
+                                                    Automation Type
+                                                  </label>
+                                                  <select
+                                                    value={
+                                                      row.automation_config.automation_type || ''
+                                                    }
+                                                    onChange={(e) =>
+                                                      updateDeliverable(
+                                                        index,
+                                                        'automation_config.automation_type',
+                                                        e.target.value || undefined
+                                                      )
+                                                    }
+                                                    className={selectClass}
+                                                  >
+                                                    <option value="">Select type...</option>
+                                                    {AUTOMATION_TYPES.map((t) => (
+                                                      <option key={t} value={t}>
+                                                        {AUTOMATION_TYPE_LABELS[t]}
+                                                      </option>
+                                                    ))}
+                                                  </select>
+                                                </div>
+                                                <div>
+                                                  <label className={labelClass}>Trigger</label>
+                                                  <select
+                                                    value={row.automation_config.trigger}
+                                                    onChange={(e) =>
+                                                      updateDeliverable(
+                                                        index,
+                                                        'automation_config.trigger',
+                                                        e.target.value
+                                                      )
+                                                    }
+                                                    className={selectClass}
+                                                  >
+                                                    {AUTOMATION_TRIGGERS.map((t) => (
+                                                      <option key={t} value={t}>
+                                                        {AUTOMATION_TRIGGER_LABELS[t]}
+                                                      </option>
+                                                    ))}
+                                                  </select>
+                                                </div>
+                                              </div>
+                                            )}
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                              );
+                            })}
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 )}
               </div>
@@ -1188,7 +1357,7 @@ const DfyTemplateEditor: React.FC = () => {
           <button
             onClick={() => saveMutation.mutate()}
             disabled={!hasChanges || saveMutation.isPending}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 transition-colors"
+            className="inline-flex items-center gap-2 h-9 px-4 py-2 rounded-md text-sm font-medium bg-violet-600 text-white shadow hover:bg-violet-500 disabled:pointer-events-none disabled:opacity-50 transition-colors"
           >
             <Save className="w-4 h-4" />
             {saveMutation.isPending ? 'Saving...' : 'Save Template'}

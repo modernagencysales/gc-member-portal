@@ -80,15 +80,15 @@ const SortableToolRow: React.FC<SortableToolRowProps> = ({
     <tr
       ref={setNodeRef}
       style={style}
-      className={`${isDarkMode ? 'hover:bg-slate-800/50' : 'hover:bg-slate-50'} ${
-        isSelected ? (isDarkMode ? 'bg-blue-900/20' : 'bg-blue-50') : ''
+      className={`${isDarkMode ? 'hover:bg-zinc-800/50' : 'hover:bg-zinc-50'} ${
+        isSelected ? (isDarkMode ? 'bg-violet-900/20' : 'bg-violet-50') : ''
       }`}
     >
       <td className="px-2 py-3">
         <button
           {...attributes}
           {...listeners}
-          className="p-1 cursor-grab active:cursor-grabbing text-slate-400 hover:text-slate-600"
+          className="p-1 cursor-grab active:cursor-grabbing text-zinc-400 hover:text-zinc-600"
         >
           <GripVertical className="w-4 h-4" />
         </button>
@@ -98,7 +98,7 @@ const SortableToolRow: React.FC<SortableToolRowProps> = ({
           type="checkbox"
           checked={isSelected}
           onChange={onSelect}
-          className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+          className="w-4 h-4 rounded border-zinc-300 text-violet-600 focus:ring-violet-500"
         />
       </td>
       <td className="px-4 py-3">
@@ -112,7 +112,7 @@ const SortableToolRow: React.FC<SortableToolRowProps> = ({
           </div>
           <div>
             <p className="font-medium">{tool.name}</p>
-            <p className={`text-xs ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>
+            <p className={`text-xs ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
               {tool.description || 'No description'}
             </p>
           </div>
@@ -122,7 +122,7 @@ const SortableToolRow: React.FC<SortableToolRowProps> = ({
         <button
           onClick={onCopySlug}
           className={`flex items-center gap-2 px-2 py-1 rounded text-xs font-mono ${
-            isDarkMode ? 'bg-slate-800 hover:bg-slate-700' : 'bg-slate-100 hover:bg-slate-200'
+            isDarkMode ? 'bg-zinc-800 hover:bg-zinc-700' : 'bg-zinc-100 hover:bg-zinc-200'
           }`}
           title="Click to copy embed URL"
         >
@@ -137,16 +137,16 @@ const SortableToolRow: React.FC<SortableToolRowProps> = ({
             {formatCategoryLabel(tool.category!)}
           </span>
         ) : (
-          <span className={`text-xs ${isDarkMode ? 'text-slate-600' : 'text-slate-400'}`}>—</span>
+          <span className={`text-xs ${isDarkMode ? 'text-zinc-600' : 'text-zinc-400'}`}>—</span>
         )}
       </td>
       <td className="px-4 py-3">
-        <span className={`text-sm ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+        <span className={`text-sm ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
           {tool.model.replace('claude-', '')}
         </span>
       </td>
       <td className="px-4 py-3">
-        <span className={`text-sm ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+        <span className={`text-sm ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
           {tool.maxTokens.toLocaleString()}
         </span>
       </td>
@@ -155,7 +155,7 @@ const SortableToolRow: React.FC<SortableToolRowProps> = ({
           className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
             tool.isActive
               ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
-              : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400'
+              : 'bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400'
           }`}
         >
           {tool.isActive ? <CheckCircle className="w-3 h-3" /> : <XCircle className="w-3 h-3" />}
@@ -166,14 +166,14 @@ const SortableToolRow: React.FC<SortableToolRowProps> = ({
         <div className="flex items-center justify-end gap-1">
           <button
             onClick={onToggleActive}
-            className={`p-2 rounded-lg ${isDarkMode ? 'hover:bg-slate-700' : 'hover:bg-slate-100'}`}
+            className={`p-2 rounded-lg ${isDarkMode ? 'hover:bg-zinc-700' : 'hover:bg-zinc-100'}`}
             title={tool.isActive ? 'Deactivate' : 'Activate'}
           >
             {tool.isActive ? <XCircle className="w-4 h-4" /> : <CheckCircle className="w-4 h-4" />}
           </button>
           <button
             onClick={onEdit}
-            className={`p-2 rounded-lg ${isDarkMode ? 'hover:bg-slate-700' : 'hover:bg-slate-100'}`}
+            className={`p-2 rounded-lg ${isDarkMode ? 'hover:bg-zinc-700' : 'hover:bg-zinc-100'}`}
             title="Edit"
           >
             <Edit2 className="w-4 h-4" />
@@ -181,7 +181,7 @@ const SortableToolRow: React.FC<SortableToolRowProps> = ({
           <button
             onClick={onDelete}
             className={`p-2 rounded-lg text-red-500 ${
-              isDarkMode ? 'hover:bg-slate-700' : 'hover:bg-slate-100'
+              isDarkMode ? 'hover:bg-zinc-700' : 'hover:bg-zinc-100'
             }`}
             title="Delete"
           >
@@ -371,14 +371,14 @@ const AdminAIToolsPage: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-xl font-semibold">AI Tools</h2>
-          <p className={`text-sm mt-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+          <p className={`text-sm mt-1 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
             Manage custom AI chatbot tools for lessons
           </p>
         </div>
         <div className="flex items-center gap-2">
           <button
             onClick={() => refetch()}
-            className={`p-2 rounded-lg ${isDarkMode ? 'hover:bg-slate-800' : 'hover:bg-slate-100'}`}
+            className={`p-2 rounded-lg ${isDarkMode ? 'hover:bg-zinc-800' : 'hover:bg-zinc-100'}`}
             title="Refresh"
           >
             <RefreshCw className="w-5 h-5" />
@@ -394,7 +394,7 @@ const AdminAIToolsPage: React.FC = () => {
           )}
           <button
             onClick={handleAddTool}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-blue-600 text-white hover:bg-blue-700"
+            className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-violet-600 text-white hover:bg-violet-700"
           >
             <Plus className="w-4 h-4" />
             Add AI Tool
@@ -405,17 +405,17 @@ const AdminAIToolsPage: React.FC = () => {
       {/* Stats */}
       <div className="grid grid-cols-3 gap-4">
         {[
-          { label: 'Total Tools', value: stats.total, color: 'blue' },
+          { label: 'Total Tools', value: stats.total, color: 'violet' },
           { label: 'Active', value: stats.active, color: 'green' },
-          { label: 'Inactive', value: stats.inactive, color: 'slate' },
+          { label: 'Inactive', value: stats.inactive, color: 'zinc' },
         ].map((stat) => (
           <div
             key={stat.label}
             className={`p-4 rounded-xl border ${
-              isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+              isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-200'
             }`}
           >
-            <p className={`text-sm ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+            <p className={`text-sm ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
               {stat.label}
             </p>
             <p className="text-2xl font-bold mt-1">{stat.value}</p>
@@ -425,7 +425,7 @@ const AdminAIToolsPage: React.FC = () => {
 
       {/* Search */}
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+        <Search className="absolute left-3 top-1/2 -tranzinc-y-1/2 w-5 h-5 text-zinc-400" />
         <input
           type="text"
           placeholder="Search AI tools..."
@@ -433,9 +433,9 @@ const AdminAIToolsPage: React.FC = () => {
           onChange={(e) => setSearchQuery(e.target.value)}
           className={`w-full pl-10 pr-4 py-2.5 rounded-lg border ${
             isDarkMode
-              ? 'bg-slate-900 border-slate-700 text-white placeholder:text-slate-500'
-              : 'bg-white border-slate-300 text-slate-900 placeholder:text-slate-400'
-          } focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+              ? 'bg-zinc-900 border-zinc-700 text-white placeholder:text-zinc-500'
+              : 'bg-white border-zinc-300 text-zinc-900 placeholder:text-zinc-400'
+          } focus:ring-2 focus:ring-violet-500 focus:border-transparent`}
         />
       </div>
 
@@ -443,11 +443,11 @@ const AdminAIToolsPage: React.FC = () => {
       {isLoading ? (
         <div
           className={`p-8 rounded-xl border text-center ${
-            isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+            isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-200'
           }`}
         >
-          <div className="w-6 h-6 border-2 border-slate-300 border-t-blue-500 rounded-full animate-spin mx-auto" />
-          <p className={`text-sm mt-2 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+          <div className="w-6 h-6 border-2 border-zinc-300 border-t-violet-500 rounded-full animate-spin mx-auto" />
+          <p className={`text-sm mt-2 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
             Loading AI tools...
           </p>
         </div>
@@ -455,11 +455,11 @@ const AdminAIToolsPage: React.FC = () => {
         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
           <div
             className={`rounded-xl border overflow-hidden ${
-              isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+              isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-200'
             }`}
           >
             <table className="w-full">
-              <thead className={`text-xs uppercase ${isDarkMode ? 'bg-slate-800' : 'bg-slate-50'}`}>
+              <thead className={`text-xs uppercase ${isDarkMode ? 'bg-zinc-800' : 'bg-zinc-50'}`}>
                 <tr>
                   <th className="px-2 py-3 w-8"></th>
                   <th className="px-2 py-3 text-left w-10">
@@ -469,7 +469,7 @@ const AdminAIToolsPage: React.FC = () => {
                         filteredTools.length > 0 && selectedToolIds.size === filteredTools.length
                       }
                       onChange={handleSelectAll}
-                      className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                      className="w-4 h-4 rounded border-zinc-300 text-violet-600 focus:ring-violet-500"
                     />
                   </th>
                   <th className="px-4 py-3 text-left">Tool</th>
@@ -485,13 +485,13 @@ const AdminAIToolsPage: React.FC = () => {
                 items={filteredTools.map((t) => t.id)}
                 strategy={verticalListSortingStrategy}
               >
-                <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
+                <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
                   {filteredTools.length === 0 ? (
                     <tr>
                       <td
                         colSpan={9}
                         className={`px-4 py-8 text-center ${
-                          isDarkMode ? 'text-slate-400' : 'text-slate-500'
+                          isDarkMode ? 'text-zinc-400' : 'text-zinc-500'
                         }`}
                       >
                         {searchQuery ? 'No AI tools match your search' : 'No AI tools yet'}
@@ -537,10 +537,10 @@ const AdminAIToolsPage: React.FC = () => {
       {deletingTool && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div
-            className={`w-full max-w-md p-6 rounded-xl ${isDarkMode ? 'bg-slate-900' : 'bg-white'}`}
+            className={`w-full max-w-md p-6 rounded-xl ${isDarkMode ? 'bg-zinc-900' : 'bg-white'}`}
           >
             <h3 className="text-lg font-semibold mb-2">Delete AI Tool</h3>
-            <p className={`text-sm mb-4 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+            <p className={`text-sm mb-4 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
               Are you sure you want to delete "{deletingTool.name}"? This will also delete all
               associated conversations and messages. This action cannot be undone.
             </p>
@@ -548,7 +548,7 @@ const AdminAIToolsPage: React.FC = () => {
               <button
                 onClick={() => setDeletingTool(null)}
                 className={`px-4 py-2 rounded-lg text-sm font-medium ${
-                  isDarkMode ? 'hover:bg-slate-800' : 'hover:bg-slate-100'
+                  isDarkMode ? 'hover:bg-zinc-800' : 'hover:bg-zinc-100'
                 }`}
               >
                 Cancel

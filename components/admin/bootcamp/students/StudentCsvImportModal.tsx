@@ -370,7 +370,7 @@ const StudentCsvImportModal: React.FC<StudentCsvImportModalProps> = ({ isOpen, o
                 </p>
                 <button
                   onClick={handleDownloadSample}
-                  className="mt-2 inline-flex items-center gap-1.5 text-blue-500 hover:text-blue-400 text-sm"
+                  className="mt-2 inline-flex items-center gap-1.5 text-violet-500 hover:text-violet-400 text-sm"
                 >
                   <Download className="w-3.5 h-3.5" />
                   Download sample CSV
@@ -384,8 +384,8 @@ const StudentCsvImportModal: React.FC<StudentCsvImportModalProps> = ({ isOpen, o
                 onClick={() => fileInputRef.current?.click()}
                 className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-colors ${
                   isDarkMode
-                    ? 'border-zinc-700 hover:border-blue-500 hover:bg-zinc-800/50'
-                    : 'border-zinc-300 hover:border-blue-500 hover:bg-blue-50/50'
+                    ? 'border-zinc-700 hover:border-violet-500 hover:bg-zinc-800/50'
+                    : 'border-zinc-300 hover:border-violet-500 hover:bg-violet-50/50'
                 }`}
               >
                 <Upload className="w-8 h-8 mx-auto mb-2 text-zinc-400" />
@@ -414,12 +414,12 @@ const StudentCsvImportModal: React.FC<StudentCsvImportModalProps> = ({ isOpen, o
                   isDarkMode
                     ? 'bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-600'
                     : 'bg-white border-zinc-300 text-zinc-900 placeholder:text-zinc-400'
-                } focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+                } focus:ring-2 focus:ring-violet-500 focus:border-transparent`}
               />
               {csvText.trim() && (
                 <button
                   onClick={handlePaste}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700"
+                  className="px-4 py-2 bg-violet-600 text-white rounded-lg text-sm hover:bg-violet-700"
                 >
                   Parse CSV
                 </button>
@@ -536,12 +536,12 @@ const StudentCsvImportModal: React.FC<StudentCsvImportModalProps> = ({ isOpen, o
           {status === 'importing' && (
             <div className="space-y-3 py-4">
               <div className="flex items-center gap-3">
-                <Loader2 className="w-5 h-5 animate-spin text-blue-500" />
+                <Loader2 className="w-5 h-5 animate-spin text-violet-500" />
                 <span className="font-medium">Importing...</span>
               </div>
               <div className="w-full bg-zinc-200 dark:bg-zinc-700 rounded-full h-2">
                 <div
-                  className="bg-blue-500 h-2 rounded-full transition-all"
+                  className="bg-violet-500 h-2 rounded-full transition-all"
                   style={{
                     width: `${progress.total ? (progress.current / progress.total) * 100 : 0}%`,
                   }}
@@ -617,7 +617,7 @@ const StudentCsvImportModal: React.FC<StudentCsvImportModalProps> = ({ isOpen, o
               </button>
               <button
                 onClick={handleImport}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700 flex items-center gap-2"
+                className="px-4 py-2 bg-violet-600 text-white rounded-lg text-sm hover:bg-violet-700 flex items-center gap-2"
               >
                 <FileText className="w-4 h-4" />
                 Import {updateExisting ? preview?.students.length : preview?.newCount} students
@@ -627,7 +627,7 @@ const StudentCsvImportModal: React.FC<StudentCsvImportModalProps> = ({ isOpen, o
           {status === 'done' && (
             <button
               onClick={handleClose}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700"
+              className="px-4 py-2 bg-violet-600 text-white rounded-lg text-sm hover:bg-violet-700"
             >
               Done
             </button>
@@ -635,7 +635,7 @@ const StudentCsvImportModal: React.FC<StudentCsvImportModalProps> = ({ isOpen, o
           {status === 'error' && (
             <button
               onClick={reset}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700"
+              className="px-4 py-2 bg-violet-600 text-white rounded-lg text-sm hover:bg-violet-700"
             >
               Try again
             </button>

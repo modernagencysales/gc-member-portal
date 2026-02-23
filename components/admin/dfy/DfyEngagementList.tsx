@@ -84,17 +84,17 @@ const DfyEngagementList: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className={`text-xl font-semibold ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
+          <h2 className={`text-xl font-semibold ${isDarkMode ? 'text-white' : 'text-zinc-900'}`}>
             DFY Engagements
           </h2>
-          <p className={`text-sm mt-1 ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+          <p className={`text-sm mt-1 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
             Manage Done-For-You client engagements
           </p>
         </div>
         <div className="flex items-center gap-2">
           <button
             onClick={() => setShowOnboardModal(true)}
-            className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors bg-blue-600 text-white hover:bg-blue-700"
+            className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors bg-violet-600 text-white hover:bg-violet-700"
           >
             <Plus className="w-4 h-4" />
             New Client
@@ -103,8 +103,8 @@ const DfyEngagementList: React.FC = () => {
             onClick={() => refetch()}
             className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
               isDarkMode
-                ? 'text-slate-400 hover:bg-slate-800 hover:text-slate-200'
-                : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
+                ? 'text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200'
+                : 'text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900'
             }`}
           >
             <RefreshCw className="w-4 h-4" />
@@ -124,15 +124,13 @@ const DfyEngagementList: React.FC = () => {
           <div
             key={stat.label}
             className={`p-4 rounded-xl border ${
-              isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+              isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-200'
             }`}
           >
-            <p className={`text-sm ${isDarkMode ? 'text-slate-400' : 'text-slate-600'}`}>
+            <p className={`text-sm ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
               {stat.label}
             </p>
-            <p
-              className={`text-2xl font-bold mt-1 ${isDarkMode ? 'text-white' : 'text-slate-900'}`}
-            >
+            <p className={`text-2xl font-bold mt-1 ${isDarkMode ? 'text-white' : 'text-zinc-900'}`}>
               {stat.value}
             </p>
           </div>
@@ -142,7 +140,7 @@ const DfyEngagementList: React.FC = () => {
       {/* Search + Filter */}
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="flex-1 relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-400" />
           <input
             type="text"
             placeholder="Search by name, company, or email..."
@@ -150,9 +148,9 @@ const DfyEngagementList: React.FC = () => {
             onChange={(e) => setSearchQuery(e.target.value)}
             className={`w-full pl-10 pr-4 py-2.5 rounded-lg border ${
               isDarkMode
-                ? 'bg-slate-900 border-slate-700 text-white placeholder:text-slate-500'
-                : 'bg-white border-slate-300 text-slate-900 placeholder:text-slate-400'
-            } focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+                ? 'bg-zinc-900 border-zinc-700 text-white placeholder:text-zinc-500'
+                : 'bg-white border-zinc-300 text-zinc-900 placeholder:text-zinc-400'
+            } focus:ring-2 focus:ring-violet-500 focus:border-transparent`}
           />
         </div>
         <select
@@ -160,8 +158,8 @@ const DfyEngagementList: React.FC = () => {
           onChange={(e) => setStatusFilter(e.target.value)}
           className={`px-4 py-2.5 rounded-lg border ${
             isDarkMode
-              ? 'bg-slate-900 border-slate-700 text-white'
-              : 'bg-white border-slate-300 text-slate-900'
+              ? 'bg-zinc-900 border-zinc-700 text-white'
+              : 'bg-white border-zinc-300 text-zinc-900'
           }`}
         >
           <option value="all">All Statuses</option>
@@ -176,19 +174,19 @@ const DfyEngagementList: React.FC = () => {
       {/* Table */}
       <div
         className={`rounded-xl border overflow-hidden ${
-          isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+          isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-200'
         }`}
       >
         {isLoading ? (
           <div className="p-8 text-center">
-            <div className="w-6 h-6 border-2 border-slate-300 dark:border-slate-700 border-t-blue-500 rounded-full animate-spin mx-auto" />
+            <div className="w-6 h-6 border-2 border-zinc-300 dark:border-zinc-700 border-t-violet-500 rounded-full animate-spin mx-auto" />
           </div>
         ) : filteredEngagements.length === 0 ? (
           <div className="p-8 text-center">
             <Briefcase
-              className={`w-8 h-8 mx-auto mb-2 ${isDarkMode ? 'text-slate-600' : 'text-slate-300'}`}
+              className={`w-8 h-8 mx-auto mb-2 ${isDarkMode ? 'text-zinc-600' : 'text-zinc-300'}`}
             />
-            <p className={`text-sm ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+            <p className={`text-sm ${isDarkMode ? 'text-zinc-400' : 'text-zinc-500'}`}>
               No engagements found
             </p>
           </div>
@@ -197,14 +195,14 @@ const DfyEngagementList: React.FC = () => {
             <table className="w-full">
               <thead>
                 <tr
-                  className={isDarkMode ? 'border-b border-slate-800' : 'border-b border-slate-200'}
+                  className={isDarkMode ? 'border-b border-zinc-800' : 'border-b border-zinc-200'}
                 >
                   {['Client', 'Status', 'Monthly Rate', 'Start Date', 'Progress', ''].map(
                     (header) => (
                       <th
                         key={header || 'actions'}
                         className={`px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider ${
-                          isDarkMode ? 'text-slate-500' : 'text-slate-400'
+                          isDarkMode ? 'text-zinc-500' : 'text-zinc-400'
                         }`}
                       >
                         {header}
@@ -296,11 +294,11 @@ function ManualOnboardModal({
 
   const inputClass = `w-full px-3 py-2 rounded-lg border ${
     isDarkMode
-      ? 'bg-slate-800 border-slate-700 text-white placeholder:text-slate-500'
-      : 'bg-white border-slate-300 text-slate-900 placeholder:text-slate-400'
-  } focus:ring-2 focus:ring-blue-500 focus:border-transparent`;
+      ? 'bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500'
+      : 'bg-white border-zinc-300 text-zinc-900 placeholder:text-zinc-400'
+  } focus:ring-2 focus:ring-violet-500 focus:border-transparent`;
 
-  const labelClass = `block text-sm font-medium mb-1 ${isDarkMode ? 'text-slate-300' : 'text-slate-700'}`;
+  const labelClass = `block text-sm font-medium mb-1 ${isDarkMode ? 'text-zinc-300' : 'text-zinc-700'}`;
 
   return (
     <div
@@ -310,17 +308,17 @@ function ManualOnboardModal({
       <div
         onClick={(e) => e.stopPropagation()}
         className={`w-full max-w-md rounded-xl border p-6 ${
-          isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+          isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-200'
         }`}
       >
         <div className="flex items-center justify-between mb-4">
-          <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
+          <h3 className={`text-lg font-semibold ${isDarkMode ? 'text-white' : 'text-zinc-900'}`}>
             New Client Onboard
           </h3>
           <button
             onClick={onClose}
             className={`p-1 rounded transition-colors ${
-              isDarkMode ? 'hover:bg-slate-800 text-slate-400' : 'hover:bg-slate-100 text-slate-500'
+              isDarkMode ? 'hover:bg-zinc-800 text-zinc-400' : 'hover:bg-zinc-100 text-zinc-500'
             }`}
           >
             <X className="w-5 h-5" />
@@ -409,9 +407,7 @@ function ManualOnboardModal({
               onClick={onClose}
               disabled={submitting}
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                isDarkMode
-                  ? 'text-slate-300 hover:bg-slate-800'
-                  : 'text-slate-700 hover:bg-slate-100'
+                isDarkMode ? 'text-zinc-300 hover:bg-zinc-800' : 'text-zinc-700 hover:bg-zinc-100'
               }`}
             >
               Cancel
@@ -419,7 +415,7 @@ function ManualOnboardModal({
             <button
               type="submit"
               disabled={submitting}
-              className="px-4 py-2 rounded-lg text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50 transition-colors"
+              className="px-4 py-2 rounded-lg text-sm font-medium bg-violet-600 text-white hover:bg-violet-700 disabled:opacity-50 transition-colors"
             >
               {submitting ? 'Creating...' : 'Create & Onboard'}
             </button>
@@ -446,15 +442,15 @@ function EngagementRow({
       onClick={onClick}
       className={`cursor-pointer transition-colors ${
         isDarkMode
-          ? 'hover:bg-slate-800/50 border-b border-slate-800 last:border-0'
-          : 'hover:bg-slate-50 border-b border-slate-100 last:border-0'
+          ? 'hover:bg-zinc-800/50 border-b border-zinc-800 last:border-0'
+          : 'hover:bg-zinc-50 border-b border-zinc-100 last:border-0'
       }`}
     >
       <td className="px-4 py-3">
-        <p className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-slate-900'}`}>
+        <p className={`text-sm font-medium ${isDarkMode ? 'text-white' : 'text-zinc-900'}`}>
           {engagement.client_name}
         </p>
-        <p className={`text-[11px] ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>
+        <p className={`text-[11px] ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
           {engagement.client_company}
         </p>
       </td>
@@ -462,22 +458,22 @@ function EngagementRow({
         <DfyStatusBadge status={engagement.status} type="engagement" />
       </td>
       <td className="px-4 py-3">
-        <span className={`text-sm ${isDarkMode ? 'text-slate-300' : 'text-slate-600'}`}>
+        <span className={`text-sm ${isDarkMode ? 'text-zinc-300' : 'text-zinc-600'}`}>
           {formatCurrency(engagement.monthly_rate)}/mo
         </span>
       </td>
       <td className="px-4 py-3">
-        <span className={`text-sm ${isDarkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+        <span className={`text-sm ${isDarkMode ? 'text-zinc-400' : 'text-zinc-500'}`}>
           {engagement.start_date ? new Date(engagement.start_date).toLocaleDateString() : '\u2014'}
         </span>
       </td>
       <td className="px-4 py-3">
         {progress ? (
-          <span className={`text-sm ${isDarkMode ? 'text-slate-300' : 'text-slate-600'}`}>
+          <span className={`text-sm ${isDarkMode ? 'text-zinc-300' : 'text-zinc-600'}`}>
             {progress.done}/{progress.total}
           </span>
         ) : (
-          <span className={`text-sm ${isDarkMode ? 'text-slate-500' : 'text-slate-400'}`}>
+          <span className={`text-sm ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
             &mdash;
           </span>
         )}
@@ -491,8 +487,8 @@ function EngagementRow({
             onClick={(e) => e.stopPropagation()}
             className={`inline-flex items-center p-1 rounded transition-colors ${
               isDarkMode
-                ? 'text-slate-400 hover:text-blue-400'
-                : 'text-slate-400 hover:text-blue-600'
+                ? 'text-zinc-400 hover:text-violet-400'
+                : 'text-zinc-400 hover:text-violet-600'
             }`}
             title="Open client portal"
           >

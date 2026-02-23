@@ -103,13 +103,13 @@ const StudentModal: React.FC<StudentModalProps> = ({
       {/* Modal */}
       <div
         className={`relative w-full max-w-lg max-h-[90vh] flex flex-col rounded-2xl shadow-xl ${
-          isDarkMode ? 'bg-slate-900' : 'bg-white'
+          isDarkMode ? 'bg-zinc-900' : 'bg-white'
         }`}
       >
         {/* Header */}
         <div
           className={`flex items-center justify-between p-6 border-b shrink-0 ${
-            isDarkMode ? 'border-slate-800' : 'border-slate-200'
+            isDarkMode ? 'border-zinc-800' : 'border-zinc-200'
           }`}
         >
           <h2 className="text-lg font-semibold">
@@ -117,7 +117,7 @@ const StudentModal: React.FC<StudentModalProps> = ({
           </h2>
           <button
             onClick={onClose}
-            className={`p-2 rounded-lg ${isDarkMode ? 'hover:bg-slate-800' : 'hover:bg-slate-100'}`}
+            className={`p-2 rounded-lg ${isDarkMode ? 'hover:bg-zinc-800' : 'hover:bg-zinc-100'}`}
           >
             <X className="w-5 h-5" />
           </button>
@@ -135,9 +135,9 @@ const StudentModal: React.FC<StudentModalProps> = ({
               disabled={!!initialData}
               className={`w-full px-4 py-2.5 rounded-lg border ${
                 isDarkMode
-                  ? 'bg-slate-800 border-slate-700 text-white disabled:bg-slate-800/50'
-                  : 'bg-white border-slate-300 text-slate-900 disabled:bg-slate-50'
-              } focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+                  ? 'bg-zinc-800 border-zinc-700 text-white disabled:bg-zinc-800/50'
+                  : 'bg-white border-zinc-300 text-zinc-900 disabled:bg-zinc-50'
+              } focus:ring-2 focus:ring-violet-500 focus:border-transparent`}
             />
           </div>
 
@@ -150,9 +150,9 @@ const StudentModal: React.FC<StudentModalProps> = ({
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 className={`w-full px-4 py-2.5 rounded-lg border ${
                   isDarkMode
-                    ? 'bg-slate-800 border-slate-700 text-white'
-                    : 'bg-white border-slate-300 text-slate-900'
-                } focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+                    ? 'bg-zinc-800 border-zinc-700 text-white'
+                    : 'bg-white border-zinc-300 text-zinc-900'
+                } focus:ring-2 focus:ring-violet-500 focus:border-transparent`}
               />
             </div>
             <div>
@@ -163,9 +163,9 @@ const StudentModal: React.FC<StudentModalProps> = ({
                 onChange={(e) => setFormData({ ...formData, company: e.target.value })}
                 className={`w-full px-4 py-2.5 rounded-lg border ${
                   isDarkMode
-                    ? 'bg-slate-800 border-slate-700 text-white'
-                    : 'bg-white border-slate-300 text-slate-900'
-                } focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+                    ? 'bg-zinc-800 border-zinc-700 text-white'
+                    : 'bg-white border-zinc-300 text-zinc-900'
+                } focus:ring-2 focus:ring-violet-500 focus:border-transparent`}
               />
             </div>
           </div>
@@ -174,24 +174,24 @@ const StudentModal: React.FC<StudentModalProps> = ({
             <label className="block text-sm font-medium mb-1.5">Enrolled Courses</label>
             <div
               className={`rounded-lg border p-3 space-y-2 max-h-40 overflow-y-auto ${
-                isDarkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-300'
+                isDarkMode ? 'bg-zinc-800 border-zinc-700' : 'bg-white border-zinc-300'
               }`}
             >
               {cohorts.length === 0 ? (
-                <p className="text-sm text-slate-500">No active courses</p>
+                <p className="text-sm text-zinc-500">No active courses</p>
               ) : (
                 cohorts.map((cohort) => (
                   <label
                     key={cohort.id}
                     className={`flex items-center gap-2.5 p-1.5 rounded cursor-pointer ${
-                      isDarkMode ? 'hover:bg-slate-700' : 'hover:bg-slate-50'
+                      isDarkMode ? 'hover:bg-zinc-700' : 'hover:bg-zinc-50'
                     }`}
                   >
                     <input
                       type="checkbox"
                       checked={selectedCohortIds.has(cohort.id)}
                       onChange={() => toggleCohort(cohort.id)}
-                      className="rounded border-slate-300 dark:border-slate-600 text-blue-600 focus:ring-blue-500"
+                      className="rounded border-zinc-300 dark:border-zinc-600 text-violet-600 focus:ring-violet-500"
                     />
                     <span className="text-sm">{cohort.name}</span>
                   </label>
@@ -209,9 +209,9 @@ const StudentModal: React.FC<StudentModalProps> = ({
               }
               className={`w-full px-4 py-2.5 rounded-lg border ${
                 isDarkMode
-                  ? 'bg-slate-800 border-slate-700 text-white'
-                  : 'bg-white border-slate-300 text-slate-900'
-              } focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+                  ? 'bg-zinc-800 border-zinc-700 text-white'
+                  : 'bg-white border-zinc-300 text-zinc-900'
+              } focus:ring-2 focus:ring-violet-500 focus:border-transparent`}
             >
               {STATUS_OPTIONS.map((status) => (
                 <option key={status} value={status}>
@@ -233,9 +233,9 @@ const StudentModal: React.FC<StudentModalProps> = ({
               }
               className={`w-full px-4 py-2.5 rounded-lg border ${
                 isDarkMode
-                  ? 'bg-slate-800 border-slate-700 text-white'
-                  : 'bg-white border-slate-300 text-slate-900'
-              } focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+                  ? 'bg-zinc-800 border-zinc-700 text-white'
+                  : 'bg-white border-zinc-300 text-zinc-900'
+              } focus:ring-2 focus:ring-violet-500 focus:border-transparent`}
             >
               <option value="Full Access">Full Access</option>
               <option value="Sprint + AI Tools">Sprint + AI Tools</option>
@@ -252,9 +252,9 @@ const StudentModal: React.FC<StudentModalProps> = ({
               rows={3}
               className={`w-full px-4 py-2.5 rounded-lg border resize-none ${
                 isDarkMode
-                  ? 'bg-slate-800 border-slate-700 text-white'
-                  : 'bg-white border-slate-300 text-slate-900'
-              } focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
+                  ? 'bg-zinc-800 border-zinc-700 text-white'
+                  : 'bg-white border-zinc-300 text-zinc-900'
+              } focus:ring-2 focus:ring-violet-500 focus:border-transparent`}
             />
           </div>
 
@@ -264,9 +264,7 @@ const StudentModal: React.FC<StudentModalProps> = ({
               type="button"
               onClick={onClose}
               className={`px-4 py-2 rounded-lg font-medium ${
-                isDarkMode
-                  ? 'text-slate-400 hover:bg-slate-800'
-                  : 'text-slate-600 hover:bg-slate-100'
+                isDarkMode ? 'text-zinc-400 hover:bg-zinc-800' : 'text-zinc-600 hover:bg-zinc-100'
               }`}
             >
               Cancel
@@ -274,7 +272,7 @@ const StudentModal: React.FC<StudentModalProps> = ({
             <button
               type="submit"
               disabled={isLoading}
-              className="px-4 py-2 rounded-lg font-medium bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50"
+              className="px-4 py-2 rounded-lg font-medium bg-violet-600 text-white hover:bg-violet-700 disabled:opacity-50"
             >
               {isLoading ? 'Saving...' : initialData ? 'Update' : 'Create'}
             </button>

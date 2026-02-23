@@ -59,7 +59,7 @@ const UnifiedAdminLayout: React.FC = () => {
   return (
     <div
       className={`flex h-screen overflow-hidden transition-colors duration-300 ${
-        isDarkMode ? 'bg-slate-950 text-slate-100' : 'bg-slate-50 text-slate-900'
+        isDarkMode ? 'bg-zinc-950 text-zinc-100' : 'bg-zinc-50 text-zinc-900'
       }`}
     >
       <UnifiedAdminSidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
@@ -67,14 +67,14 @@ const UnifiedAdminLayout: React.FC = () => {
       <div className="flex-1 flex flex-col overflow-hidden">
         <header
           className={`h-16 flex items-center justify-between px-4 md:px-6 border-b ${
-            isDarkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'
+            isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-200'
           }`}
         >
           <div className="flex items-center gap-4">
             <button
               onClick={() => setSidebarOpen(true)}
               className={`lg:hidden p-2 rounded-lg ${
-                isDarkMode ? 'hover:bg-slate-800' : 'hover:bg-slate-100'
+                isDarkMode ? 'hover:bg-zinc-800' : 'hover:bg-zinc-100'
               }`}
             >
               <Menu className="w-5 h-5" />
@@ -92,7 +92,7 @@ const UnifiedAdminLayout: React.FC = () => {
 
         <main
           className={`flex-1 overflow-y-auto transition-colors ${
-            isDarkMode ? 'bg-slate-950' : 'bg-slate-50'
+            isDarkMode ? 'bg-zinc-950' : 'bg-zinc-50'
           }`}
         >
           <div className="p-4 md:p-6 lg:p-8 max-w-7xl mx-auto">
