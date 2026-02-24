@@ -151,6 +151,14 @@ const ClientPortalPage: React.FC = () => {
     }
   }, [slug, loadData]);
 
+  // Optimistic handler for intake wizard completion (avoids race condition on reload)
+  const handleIntakeComplete = useCallback(async () => {
+    // Optimistically show processing state
+    setEngagement((prev) => (prev ? { ...prev, intake_status: 'submitted' as const } : prev));
+    // Also reload from DB after a short delay to get server state
+    setTimeout(() => reloadEngagement(), 2000);
+  }, [reloadEngagement]);
+
   // ── Loading state ──────────────────────────────────
   if (loading) {
     return (
@@ -193,7 +201,7 @@ const ClientPortalPage: React.FC = () => {
         portalSlug={slug!}
         clientName={engagement.client_name}
         blueprintProspectId={engagement.blueprint_prospect_id}
-        onComplete={reloadEngagement}
+        onComplete={handleIntakeComplete}
       />
     );
   }

@@ -4,6 +4,7 @@ import { SUGGESTED_DOCUMENTS } from '../../../types/dfy-intake-types';
 const MAX_FILES = 10;
 const MAX_FILE_SIZE = 25 * 1024 * 1024; // 25MB
 const ACCEPTED_TYPES = '.pdf,.docx,.txt,.mp3,.mp4,.wav,.pptx';
+const ALLOWED_EXTENSIONS = new Set(['.pdf', '.docx', '.txt', '.mp3', '.mp4', '.wav', '.pptx']);
 
 interface StepDataDumpProps {
   files: File[];
@@ -38,6 +39,11 @@ const StepDataDump: React.FC<StepDataDumpProps> = ({
         if (files.length + valid.length >= MAX_FILES) {
           errors.push(`Maximum ${MAX_FILES} files allowed. Some files were skipped.`);
           break;
+        }
+        const ext = '.' + f.name.split('.').pop()?.toLowerCase();
+        if (!ext || !ALLOWED_EXTENSIONS.has(ext)) {
+          errors.push(`"${f.name}" is not a supported file type.`);
+          continue;
         }
         if (f.size > MAX_FILE_SIZE) {
           errors.push(`"${f.name}" exceeds 25MB and was skipped.`);

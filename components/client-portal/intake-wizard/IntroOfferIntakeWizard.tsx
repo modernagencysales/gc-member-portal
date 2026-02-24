@@ -90,6 +90,22 @@ const IntroOfferIntakeWizard: React.FC<IntroOfferIntakeWizardProps> = ({
     };
   }, [blueprintProspectId, blueprintLoaded]);
 
+  const canAdvance = (): boolean => {
+    const linkedinRe = /linkedin\.com\/in\//i;
+    switch (currentStep) {
+      case 0: {
+        const valid = data.bestClientUrls.filter((e) => e.url.trim() && linkedinRe.test(e.url));
+        return valid.length >= 2;
+      }
+      case 1: {
+        const valid = data.dreamClientUrls.filter((e) => e.url.trim() && linkedinRe.test(e.url));
+        return valid.length >= 2;
+      }
+      default:
+        return true;
+    }
+  };
+
   const goBack = () => {
     if (currentStep > 0) {
       setCurrentStep(currentStep - 1);
@@ -98,7 +114,7 @@ const IntroOfferIntakeWizard: React.FC<IntroOfferIntakeWizardProps> = ({
   };
 
   const goForward = () => {
-    if (!isLastStep) {
+    if (!isLastStep && canAdvance()) {
       setCurrentStep(currentStep + 1);
       setError(null);
     }
@@ -264,7 +280,12 @@ const IntroOfferIntakeWizard: React.FC<IntroOfferIntakeWizardProps> = ({
           ) : (
             <button
               onClick={goForward}
-              className="inline-flex items-center gap-1.5 px-5 py-2.5 text-sm font-medium rounded-lg bg-violet-500 hover:bg-violet-600 text-white shadow-lg shadow-violet-500/25 transition-all"
+              disabled={!canAdvance()}
+              className={`inline-flex items-center gap-1.5 px-5 py-2.5 text-sm font-medium rounded-lg shadow-lg transition-all ${
+                canAdvance()
+                  ? 'bg-violet-500 hover:bg-violet-600 text-white shadow-violet-500/25'
+                  : 'bg-violet-300 dark:bg-violet-800 text-white/70 cursor-not-allowed shadow-none'
+              }`}
             >
               Continue
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
