@@ -9,16 +9,17 @@ import {
   Gift,
   ArrowRight,
   CheckCircle2,
+  ExternalLink,
 } from 'lucide-react';
 import { DFY_OFFER } from './dfy-offer-data';
-import { FAQAccordionItem, ValueStackRow, TestimonialInline, SenjaEmbed } from './offer-components';
+import { FAQAccordionItem, TestimonialInline, SenjaEmbed } from './offer-components';
 import ThemeToggle from './ThemeToggle';
 
 // ============================================
-// Stripe URL
+// Cal.com Booking URL
 // ============================================
 
-const STRIPE_URL = import.meta.env.VITE_STRIPE_INTRO_OFFER_URL || '';
+const BOOKING_URL = import.meta.env.VITE_CALCOM_BOOKING_URL || '';
 
 // ============================================
 // Inline CTA Component
@@ -27,7 +28,7 @@ const STRIPE_URL = import.meta.env.VITE_STRIPE_INTRO_OFFER_URL || '';
 const DFYCta: React.FC<{ variant?: 'primary' | 'secondary' }> = ({ variant = 'primary' }) => {
   const isPrimary = variant === 'primary';
 
-  if (!STRIPE_URL) {
+  if (!BOOKING_URL) {
     return (
       <div className="flex justify-center">
         <button
@@ -43,7 +44,7 @@ const DFYCta: React.FC<{ variant?: 'primary' | 'secondary' }> = ({ variant = 'pr
   return (
     <div className="flex justify-center">
       <a
-        href={STRIPE_URL}
+        href={BOOKING_URL}
         target="_blank"
         rel="noopener noreferrer"
         className={`inline-block px-8 py-4 rounded-lg font-semibold text-center transition-colors ${
@@ -68,12 +69,6 @@ const DFYOfferPage: React.FC = () => {
   const offer = DFY_OFFER;
   const t = offer.testimonials;
 
-  // Value stack total
-  const valueTotal = offer.valueItems.reduce((sum, item) => {
-    const num = parseInt(item.soloValue.replace(/[^0-9]/g, ''), 10);
-    return sum + (isNaN(num) ? 0 : num);
-  }, 0);
-
   return (
     <div className="min-h-screen bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 font-sans">
       <ThemeToggle />
@@ -83,11 +78,11 @@ const DFYOfferPage: React.FC = () => {
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-violet-50 border border-violet-200 dark:bg-violet-500/10 dark:border-violet-500/20 mb-6">
             <Rocket className="w-4 h-4 text-violet-400" />
             <span className="text-sm font-medium text-violet-600 dark:text-violet-300">
-              One-Time Offer
+              Done-For-You System
             </span>
           </div>
 
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-zinc-900 dark:text-zinc-100 leading-tight mb-6 whitespace-pre-line">
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-zinc-900 dark:text-zinc-100 leading-tight mb-6">
             {offer.headline}
           </h1>
 
@@ -124,6 +119,32 @@ const DFYOfferPage: React.FC = () => {
             </p>
           </section>
 
+          {/* ===== ABOUT TIM (CREDIBILITY) — moved up ===== */}
+          <section className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm dark:shadow-none p-6 sm:p-8">
+            <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mb-4">Why Tim?</h2>
+            <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed mb-6">
+              {offer.aboutTimBlurb}
+            </p>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              <div className="text-center">
+                <p className="text-2xl font-bold text-violet-600 dark:text-violet-400">$4.7M</p>
+                <p className="text-xs text-zinc-600 dark:text-zinc-400">Agency Revenue</p>
+              </div>
+              <div className="text-center">
+                <p className="text-2xl font-bold text-violet-600 dark:text-violet-400">20K+</p>
+                <p className="text-xs text-zinc-600 dark:text-zinc-400">Opted-in Leads</p>
+              </div>
+              <div className="text-center">
+                <p className="text-2xl font-bold text-violet-600 dark:text-violet-400">$200K+</p>
+                <p className="text-xs text-zinc-600 dark:text-zinc-400">LTV Deals Closed</p>
+              </div>
+              <div className="text-center">
+                <p className="text-2xl font-bold text-violet-600 dark:text-violet-400">300+</p>
+                <p className="text-xs text-zinc-600 dark:text-zinc-400">Systems Built</p>
+              </div>
+            </div>
+          </section>
+
           {/* ===== SOLUTION SECTION ===== */}
           <section>
             <h2 className="text-3xl font-bold text-zinc-900 dark:text-zinc-100 mb-4">
@@ -135,7 +156,7 @@ const DFYOfferPage: React.FC = () => {
 
             <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm dark:shadow-none p-6 sm:p-8">
               <h3 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100 mb-6">
-                When we're done, you will have:
+                When we&rsquo;re done, you will have:
               </h3>
               <div className="space-y-4">
                 {offer.solutionBullets.map((bullet, i) => (
@@ -152,6 +173,82 @@ const DFYOfferPage: React.FC = () => {
 
           {/* ===== TESTIMONIAL #2 ===== */}
           {t[1] && <TestimonialInline testimonial={t[1]} />}
+
+          {/* ===== EXAMPLE LEAD MAGNET ===== */}
+          <section>
+            <h2 className="text-3xl font-bold text-zinc-900 dark:text-zinc-100 mb-2">
+              See What We Build
+            </h2>
+            <p className="text-zinc-600 dark:text-zinc-400 mb-8">
+              Here&rsquo;s a live example of the system in action — the same lead magnet, funnel,
+              and content page we build for DFY clients.
+            </p>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <a
+                href="https://www.magnetlab.app/p/modernagencysales/from-zero-to-47m-my-complete-linkedin-only-agency-"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group p-6 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl hover:border-violet-400 dark:hover:border-violet-500/40 transition-colors"
+              >
+                <div className="w-10 h-10 rounded-lg bg-violet-100 dark:bg-violet-500/10 flex items-center justify-center mb-4">
+                  <Rocket size={20} className="text-violet-600 dark:text-violet-400" />
+                </div>
+                <h3 className="font-semibold text-zinc-900 dark:text-white mb-1 flex items-center gap-2">
+                  Opt-In Page
+                  <ExternalLink
+                    size={14}
+                    className="text-zinc-400 group-hover:text-violet-400 transition-colors"
+                  />
+                </h3>
+                <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                  Where prospects land and enter their email to get the lead magnet
+                </p>
+              </a>
+
+              <a
+                href="https://www.magnetlab.app/p/modernagencysales/from-zero-to-47m-my-complete-linkedin-only-agency-/content"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group p-6 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl hover:border-violet-400 dark:hover:border-violet-500/40 transition-colors"
+              >
+                <div className="w-10 h-10 rounded-lg bg-violet-100 dark:bg-violet-500/10 flex items-center justify-center mb-4">
+                  <Gift size={20} className="text-violet-600 dark:text-violet-400" />
+                </div>
+                <h3 className="font-semibold text-zinc-900 dark:text-white mb-1 flex items-center gap-2">
+                  Lead Magnet Content
+                  <ExternalLink
+                    size={14}
+                    className="text-zinc-400 group-hover:text-violet-400 transition-colors"
+                  />
+                </h3>
+                <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                  The actual deliverable — 6 sections of high-value, actionable content
+                </p>
+              </a>
+
+              <a
+                href="https://www.magnetlab.app/p/modernagencysales/from-zero-to-47m-my-complete-linkedin-only-agency-/thankyou"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group p-6 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl hover:border-violet-400 dark:hover:border-violet-500/40 transition-colors"
+              >
+                <div className="w-10 h-10 rounded-lg bg-violet-100 dark:bg-violet-500/10 flex items-center justify-center mb-4">
+                  <CheckCircle2 size={20} className="text-violet-600 dark:text-violet-400" />
+                </div>
+                <h3 className="font-semibold text-zinc-900 dark:text-white mb-1 flex items-center gap-2">
+                  Thank-You Page
+                  <ExternalLink
+                    size={14}
+                    className="text-zinc-400 group-hover:text-violet-400 transition-colors"
+                  />
+                </h3>
+                <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                  Qualification survey + video + calendar booking — this is where calls get booked
+                </p>
+              </a>
+            </div>
+          </section>
 
           {/* ===== DELIVERABLES GRID ===== */}
           <section>
@@ -180,16 +277,14 @@ const DFYOfferPage: React.FC = () => {
                 </div>
               ))}
             </div>
-          </section>
 
-          {/* ===== BONUSES ===== */}
-          <section>
-            <div className="border border-violet-200 dark:border-violet-500/20 rounded-xl p-6 sm:p-8 bg-violet-50/50 dark:bg-violet-500/5">
-              <div className="flex items-center gap-2 mb-6">
-                <Gift size={20} className="text-violet-500" />
-                <h2 className="text-2xl font-bold text-violet-700 dark:text-violet-300">
-                  Bonus — Included Free
-                </h2>
+            {/* Bonuses inline */}
+            <div className="mt-4 border border-violet-200 dark:border-violet-500/20 rounded-xl p-6 bg-violet-50/50 dark:bg-violet-500/5">
+              <div className="flex items-center gap-2 mb-4">
+                <Gift size={18} className="text-violet-500" />
+                <h3 className="text-lg font-bold text-violet-700 dark:text-violet-300">
+                  Also Included
+                </h3>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {offer.bonuses.map((item) => (
@@ -258,32 +353,6 @@ const DFYOfferPage: React.FC = () => {
             <DFYCta variant="secondary" />
           </section>
 
-          {/* ===== VALUE STACK ===== */}
-          <section>
-            <h2 className="text-3xl font-bold text-zinc-900 dark:text-zinc-100 mb-2">
-              Everything You Get
-            </h2>
-            <p className="text-zinc-600 dark:text-zinc-400 mb-8">
-              Here&rsquo;s what&rsquo;s included in the DFY package:
-            </p>
-
-            <div className="space-y-3 mb-6">
-              {offer.valueItems.map((item, i) => (
-                <ValueStackRow key={i} label={item.label} soloValue={item.soloValue} />
-              ))}
-            </div>
-
-            <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm dark:shadow-none p-6 text-center">
-              <p className="text-zinc-600 dark:text-zinc-400 mb-1">
-                Total value: <span className="line-through">${valueTotal.toLocaleString()}</span>
-              </p>
-              <p className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">
-                Your price: {offer.price}
-              </p>
-              <p className="text-sm text-zinc-600 dark:text-zinc-400 mt-1">One-time investment</p>
-            </div>
-          </section>
-
           {/* ===== TESTIMONIAL #3 ===== */}
           {t[2] && <TestimonialInline testimonial={t[2]} />}
 
@@ -327,33 +396,38 @@ const DFYOfferPage: React.FC = () => {
             </div>
           </section>
 
-          {/* ===== ABOUT TIM (CREDIBILITY) ===== */}
-          <section className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm dark:shadow-none p-6 sm:p-8">
-            <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mb-4">Why Tim?</h2>
-            <p className="text-zinc-700 dark:text-zinc-300 leading-relaxed mb-6">
-              {offer.aboutTimBlurb}
-            </p>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-              <div className="text-center">
-                <p className="text-2xl font-bold text-violet-600 dark:text-violet-400">$4.7M</p>
-                <p className="text-xs text-zinc-600 dark:text-zinc-400">Agency Revenue</p>
+          {/* ===== GUARANTEE SECTION ===== */}
+          <section>
+            <div className="bg-white dark:bg-zinc-900 rounded-xl border-2 border-green-200 dark:border-green-500/20 p-6 sm:p-10">
+              <div className="flex items-center gap-3 mb-2">
+                <Shield className="w-7 h-7 text-green-500" />
+                <h2 className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">
+                  {offer.guarantee}
+                </h2>
               </div>
-              <div className="text-center">
-                <p className="text-2xl font-bold text-violet-600 dark:text-violet-400">20K+</p>
-                <p className="text-xs text-zinc-600 dark:text-zinc-400">Opted-in Leads</p>
-              </div>
-              <div className="text-center">
-                <p className="text-2xl font-bold text-violet-600 dark:text-violet-400">$200K+</p>
-                <p className="text-xs text-zinc-600 dark:text-zinc-400">LTV Deals Closed</p>
-              </div>
-              <div className="text-center">
-                <p className="text-2xl font-bold text-violet-600 dark:text-violet-400">300+</p>
-                <p className="text-xs text-zinc-600 dark:text-zinc-400">Founders Taught</p>
+              <p className="text-zinc-600 dark:text-zinc-400 mb-8">{offer.guaranteeDetails}</p>
+
+              <div className="space-y-6">
+                {offer.guaranteeItems.map((item, i) => (
+                  <div key={i} className="flex items-start gap-4">
+                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-green-50 dark:bg-green-500/10 flex items-center justify-center mt-0.5">
+                      <CheckCircle2 className="w-5 h-5 text-green-500" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-zinc-900 dark:text-white mb-1">
+                        {item.label}
+                      </h3>
+                      <p className="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
+                        {item.detail}
+                      </p>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           </section>
 
-          {/* ===== PRICING CARD + GUARANTEE ===== */}
+          {/* ===== PRICING CARD ===== */}
           <section className="text-center">
             <div className="bg-white dark:bg-zinc-900 border-2 border-violet-500 rounded-xl p-8 sm:p-10 max-w-lg mx-auto">
               <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mb-2">
@@ -379,17 +453,6 @@ const DFYOfferPage: React.FC = () => {
               </ul>
 
               <DFYCta variant="primary" />
-
-              {/* Guarantee */}
-              <div className="mt-8 pt-6 border-t border-zinc-200 dark:border-zinc-800">
-                <div className="flex items-center justify-center gap-2 mb-3">
-                  <Shield className="w-5 h-5 text-violet-400" />
-                  <h3 className="font-semibold text-zinc-800 dark:text-zinc-200">
-                    {offer.guarantee}
-                  </h3>
-                </div>
-                <p className="text-sm text-zinc-600 dark:text-zinc-400">{offer.guaranteeDetails}</p>
-              </div>
             </div>
           </section>
 
@@ -409,17 +472,6 @@ const DFYOfferPage: React.FC = () => {
                 />
               ))}
             </div>
-          </section>
-
-          {/* ===== PRE-SENJA CTA ===== */}
-          <section className="text-center py-8">
-            <h2 className="text-3xl font-bold text-zinc-900 dark:text-zinc-100 mb-4">
-              Ready to Get Your System Built?
-            </h2>
-            <p className="text-zinc-600 dark:text-zinc-400 mb-8 max-w-2xl mx-auto">
-              Stop building. Start closing. We&rsquo;ll have your lead gen system live in 10 days.
-            </p>
-            <DFYCta variant="primary" />
           </section>
 
           {/* ===== SENJA TESTIMONIAL EMBED ===== */}
