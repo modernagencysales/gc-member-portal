@@ -98,7 +98,7 @@ describe('OfferPage (DFY)', () => {
     render(<OfferPage />);
 
     await waitFor(() => {
-      const links = screen.getAllByRole('link', { name: /Build My System/i });
+      const links = screen.getAllByRole('link', { name: /Book Your Strategy Call/i });
       expect(links.length).toBeGreaterThan(0);
       expect(links[0]).toHaveAttribute('href', 'https://buy.stripe.com/test123');
     });
