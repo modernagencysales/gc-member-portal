@@ -3,6 +3,7 @@ import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft,
+  ArrowUpCircle,
   RefreshCw,
   ExternalLink,
   AlertCircle,
@@ -227,6 +228,27 @@ const DfyEngagementDetail: React.FC = () => {
     onError: (err: Error) => setError(err.message),
   });
 
+  const upgradeMutation = useMutation({
+    mutationFn: async () => {
+      const res = await fetch(
+        `${import.meta.env.VITE_GTM_SYSTEM_URL || 'https://gtmconductor.com'}/api/dfy/admin/engagements/${engagementId}/upgrade`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-admin-key': import.meta.env.VITE_ADMIN_API_KEY,
+          },
+          body: JSON.stringify({ monthly_rate: 250000 }),
+        }
+      );
+      if (!res.ok) throw new Error('Upgrade failed');
+      return res.json();
+    },
+    onSuccess: () => {
+      refreshAll();
+    },
+  });
+
   // ---- Deliverables grouped by milestone ----
   const milestoneGroups = useMemo(() => {
     const groups = new Map<string | null, DfyAdminDeliverable[]>();
@@ -276,6 +298,11 @@ const DfyEngagementDetail: React.FC = () => {
             {engagement.client_company}
           </p>
         </div>
+        {engagement.engagement_type === 'intro_offer' && (
+          <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wide bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300">
+            Intro Offer
+          </span>
+        )}
         <DfyStatusBadge status={engagement.status} type="engagement" />
         <button
           onClick={refreshAll}
@@ -516,6 +543,9 @@ const DfyEngagementDetail: React.FC = () => {
             onResume={() => engagementMutation.mutate({ status: 'active' })}
             onSyncPlaybooks={() => syncMutation.mutate()}
             isSyncing={syncMutation.isPending}
+            engagementType={engagement.engagement_type}
+            onUpgrade={() => upgradeMutation.mutate()}
+            isUpgrading={upgradeMutation.isPending}
           />
 
           {/* 3.5 Intake Form Responses */}
@@ -745,6 +775,9 @@ function ActionButtons({
   onResume,
   onSyncPlaybooks,
   isSyncing,
+  engagementType,
+  onUpgrade,
+  isUpgrading,
 }: {
   status: string;
   isLoading: boolean;
@@ -753,6 +786,9 @@ function ActionButtons({
   onResume: () => void;
   onSyncPlaybooks: () => void;
   isSyncing: boolean;
+  engagementType?: string;
+  onUpgrade?: () => void;
+  isUpgrading?: boolean;
 }) {
   const showActions = status === 'onboarding' || status === 'active' || status === 'paused';
 
@@ -796,6 +832,22 @@ function ActionButtons({
         <BookOpen className="w-4 h-4" />
         {isSyncing ? 'Syncing...' : 'Sync Playbooks'}
       </button>
+      {engagementType === 'intro_offer' &&
+        (status === 'active' || status === 'completed') &&
+        onUpgrade && (
+          <button
+            onClick={() => {
+              if (window.confirm('Convert this intro offer to a full DFY engagement? This will add additional deliverables and set the monthly rate to $2,500/mo.')) {
+                onUpgrade!();
+              }
+            }}
+            disabled={isUpgrading}
+            className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-violet-600 text-white hover:bg-violet-700 disabled:opacity-50 transition-colors"
+          >
+            <ArrowUpCircle className="w-4 h-4" />
+            {isUpgrading ? 'Upgrading...' : 'Convert to Full DFY'}
+          </button>
+        )}
     </div>
   );
 }
