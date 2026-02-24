@@ -158,4 +158,5 @@ export const queryKeys = {
   dfyAutomationRuns: (engagementId: string) => ['dfy', 'automation-runs', engagementId] as const,
   dfyAutomationOutput: (engagementId: string, automationType: string) =>
     ['dfy', 'automation-output', engagementId, automationType] as const,
+  dfyIntakeFiles: (engagementId: string) => ['dfy', 'intake-files', engagementId] as const,
 };

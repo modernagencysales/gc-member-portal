@@ -9,7 +9,7 @@ import type {
 
 // Column constants — must match DB schema (never select('*'))
 const ADMIN_ENGAGEMENT_COLUMNS =
-  'id, proposal_id, tenant_id, client_name, client_email, client_company, portal_slug, status, monthly_rate, start_date, linear_project_id, slack_channel_id, stripe_subscription_id, onboarding_checklist, linkedin_url, unipile_account_id, linkedin_connected_at, communication_preference, created_at';
+  'id, proposal_id, tenant_id, client_name, client_email, client_company, portal_slug, status, monthly_rate, start_date, linear_project_id, slack_channel_id, stripe_subscription_id, onboarding_checklist, linkedin_url, unipile_account_id, linkedin_connected_at, communication_preference, intake_data, intake_submitted_at, created_at';
 const DELIVERABLE_COLUMNS =
   'id, engagement_id, name, description, category, status, assignee, due_date, sort_order, client_approved_at, client_notes, linear_issue_id, milestone_id, playbook_url, automation_type, automation_status, depends_on, revision_feedback, revision_requested_at, revision_count, created_at';
 const AUTOMATION_RUN_COLUMNS =
@@ -255,4 +255,11 @@ export async function postEngagementUpdate(engagementId: string, message: string
     method: 'POST',
     body: JSON.stringify({ message }),
   });
+}
+
+export async function fetchIntakeFileUrls(
+  engagementId: string
+): Promise<Array<{ name: string; url: string | null; size: number; type: string }>> {
+  const result = await gtmAdminFetch(`/api/dfy/admin/intake-files/${engagementId}`);
+  return result.files || [];
 }
