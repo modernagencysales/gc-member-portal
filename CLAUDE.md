@@ -102,10 +102,36 @@ src/
 | `/admin/gc/tools` | GC member tool access |
 | `/admin/gc/onboarding` | GC onboarding checklist |
 | `/admin/affiliates` | Affiliate program |
+| `/admin/dfy` | DFY engagement list |
+| `/admin/dfy/:id` | DFY engagement detail (deliverables, activity, upgrade) |
+| `/admin/dfy/templates` | DFY template editor |
+| `/client/:slug` | Client portal (intake wizard, dashboard, deliverables) |
+
+### DFY Admin & Client Portal
+
+**Admin DFY pages** (`components/admin/dfy/`):
+- `DfyEngagementList.tsx` — List all DFY engagements with status filters
+- `DfyEngagementDetail.tsx` — Single engagement: deliverables, activity timeline, admin actions. Intro offers show violet "Intro Offer" badge + upgrade button (intro_offer → full_service with `window.confirm()`)
+- `DfyTemplateEditor.tsx` — Edit deliverable templates
+- `DfyStatusBadge.tsx` — Reusable status badge component
+
+**Client portal** (`components/client-portal/`):
+- `ClientPortalPage.tsx` — Main entry point. Three-gate logic for intro offers: (1) show `IntroOfferIntakeWizard` if `intake_status === 'pending'`, (2) show processing spinner if `intake_status === 'submitted'`, (3) show full portal otherwise
+- `IntroOfferIntakeWizard.tsx` — 4-step wizard: Best Clients URLs → Dream Clients URLs → Data Dump (file upload) → Quick Confirms. Validates min 2 LinkedIn URLs per step. Submits to `POST /api/dfy/client/intake` on gtm-system
+- `StepDataDump.tsx` — File upload with drag-drop. Validates extensions against `ALLOWED_EXTENSIONS` set
+- `ClientDashboard.tsx`, `DeliverableCard.tsx`, `ActivityTimeline.tsx` — Full portal UI
+
+**Services:**
+- `services/dfy-service.ts` — Client-facing Supabase queries. `DfyEngagement` interface includes `engagement_type`, `intake_status`, `processed_intake`
+- `services/dfy-admin-supabase.ts` — Admin queries. `ADMIN_ENGAGEMENT_COLUMNS` includes all DFY + intro offer columns
+
+**Auth:** Admin routes use `x-admin-key` header (via `VITE_ADMIN_API_KEY`). Client portal uses `portal_slug` URL param to look up engagement (no auth session needed — client accesses via unique link).
+
+**Cross-origin:** Client portal calls gtm-system API (`gtmconductor.com`) for intake submission + file upload. Requires CORS on gtm-system + CSP `connect-src` in `vercel.json`.
 
 ## Database Models
 
-`Prospect` -- prospects, `ProspectPost` -- posts, `BlueprintSettings` -- config, `BlueprintContentBlock` -- content, `BootcampStudent` -- students, `BootcampChecklistItem` -- checklist, `BootcampStudentProgress` -- progress, `BootcampStudentSurvey` -- surveys, `BootcampInviteCode` -- invites, `LmsCohort` -- cohorts, `LmsWeek` -- weeks, `LmsLesson` -- lessons, `LmsContentItem` -- content, `LmsActionItem` -- actions, `LmsLessonProgress` -- progress, `LmsActionItemProgress` -- progress, `GCMember` -- members, `ToolAccess` -- permissions, `Campaign` -- campaigns, `MemberProgress` -- progress, `MemberICP` -- ICPs, `SubscriptionEvent` -- billing
+`Prospect` -- prospects, `ProspectPost` -- posts, `BlueprintSettings` -- config, `BlueprintContentBlock` -- content, `BootcampStudent` -- students, `BootcampChecklistItem` -- checklist, `BootcampStudentProgress` -- progress, `BootcampStudentSurvey` -- surveys, `BootcampInviteCode` -- invites, `LmsCohort` -- cohorts, `LmsWeek` -- weeks, `LmsLesson` -- lessons, `LmsContentItem` -- content, `LmsActionItem` -- actions, `LmsLessonProgress` -- progress, `LmsActionItemProgress` -- progress, `GCMember` -- members, `ToolAccess` -- permissions, `Campaign` -- campaigns, `MemberProgress` -- progress, `MemberICP` -- ICPs, `SubscriptionEvent` -- billing, `DfyEngagement` -- dfy_engagements (engagement_type, intake_status, processed_intake, pricing_tier), `DfyDeliverable` -- dfy_deliverables (depends_on, automation_type, automation_status), `DfyActivityLog` -- dfy_activity_log, `DfyClientSession` -- dfy_client_sessions
 
 ## Feature Decision Guide
 
