@@ -28,6 +28,7 @@ interface FormData {
   nextCohortDateEngineering: string;
   spotsRemainingFoundations: string;
   spotsRemainingEngineering: string;
+  spotsRemainingDfy: string;
   blueprintVideoUrl: string;
   callBookedVideoUrl: string;
   thankYouVideoUrl: string;
@@ -49,6 +50,7 @@ const BlueprintSettingsModal: React.FC<BlueprintSettingsModalProps> = ({ isOpen,
     nextCohortDateEngineering: '',
     spotsRemainingFoundations: '',
     spotsRemainingEngineering: '',
+    spotsRemainingDfy: '',
     blueprintVideoUrl: '',
     callBookedVideoUrl: '',
     thankYouVideoUrl: '',
@@ -79,6 +81,7 @@ const BlueprintSettingsModal: React.FC<BlueprintSettingsModalProps> = ({ isOpen,
         nextCohortDateEngineering: settings.nextCohortDateEngineering || '',
         spotsRemainingFoundations: settings.spotsRemainingFoundations?.toString() || '',
         spotsRemainingEngineering: settings.spotsRemainingEngineering?.toString() || '',
+        spotsRemainingDfy: settings.spotsRemainingDfy?.toString() || '',
         blueprintVideoUrl: settings.blueprintVideoUrl || '',
         callBookedVideoUrl: settings.callBookedVideoUrl || '',
         thankYouVideoUrl: settings.thankYouVideoUrl || '',
@@ -120,6 +123,9 @@ const BlueprintSettingsModal: React.FC<BlueprintSettingsModalProps> = ({ isOpen,
         : undefined,
       spotsRemainingEngineering: formData.spotsRemainingEngineering
         ? parseInt(formData.spotsRemainingEngineering, 10)
+        : undefined,
+      spotsRemainingDfy: formData.spotsRemainingDfy
+        ? parseInt(formData.spotsRemainingDfy, 10)
         : undefined,
       blueprintVideoUrl: formData.blueprintVideoUrl || undefined,
       callBookedVideoUrl: formData.callBookedVideoUrl || undefined,
@@ -483,6 +489,19 @@ const BlueprintSettingsModal: React.FC<BlueprintSettingsModalProps> = ({ isOpen,
                     value={formData.spotsRemainingEngineering}
                     onChange={(e) => handleChange('spotsRemainingEngineering', e.target.value)}
                     placeholder="15"
+                    className="w-full px-4 py-2.5 rounded-lg border bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500 focus:ring-2 focus:ring-violet-500 focus:border-transparent"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-zinc-200 mb-1.5">
+                    DFY Spots Remaining
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={formData.spotsRemainingDfy}
+                    onChange={(e) => handleChange('spotsRemainingDfy', e.target.value)}
+                    placeholder="10"
                     className="w-full px-4 py-2.5 rounded-lg border bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500 focus:ring-2 focus:ring-violet-500 focus:border-transparent"
                   />
                 </div>

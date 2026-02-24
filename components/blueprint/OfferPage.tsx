@@ -1,44 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { AlertCircle, Calendar, Check, X, Shield, Star, Zap, Clock } from 'lucide-react';
+import {
+  AlertCircle,
+  Check,
+  X,
+  Shield,
+  Zap,
+  Rocket,
+  Gift,
+  ArrowRight,
+  CheckCircle2,
+  Star,
+  Clock,
+} from 'lucide-react';
 import { getProspectBySlug, getBlueprintSettings } from '../../services/blueprint-supabase';
 import { Prospect, BlueprintSettings, getProspectDisplayName } from '../../types/blueprint-types';
-import { OFFERS } from './offer-data';
-import {
-  getNextCohortDate,
-  formatCohortDate,
-  getDaysUntilCohort,
-  getSpotsRemaining,
-} from './offer-utils';
-import {
-  FAQAccordionItem,
-  CurriculumWeek,
-  ValueStackRow,
-  TestimonialInline,
-  CTASection,
-  SenjaEmbed,
-} from './offer-components';
+import { DFY_OFFER } from './dfy-offer-data';
+import { FAQAccordionItem, ValueStackRow, TestimonialInline, SenjaEmbed } from './offer-components';
 import ThemeToggle from './ThemeToggle';
-
-// ============================================
-// Helpers
-// ============================================
-
-/**
- * Convert YouTube watch URLs to embed format with clean player settings
- */
-function toEmbedUrl(url: string): string {
-  if (!url) return url;
-  const ytParams = 'modestbranding=1&rel=0&showinfo=0&iv_load_policy=3';
-  if (url.includes('youtube.com/embed/')) {
-    return url.includes('?') ? url : `${url}?${ytParams}`;
-  }
-  const watchMatch = url.match(/youtube\.com\/watch\?v=([^&]+)/);
-  if (watchMatch) return `https://www.youtube.com/embed/${watchMatch[1]}?${ytParams}`;
-  const shortMatch = url.match(/youtu\.be\/([^?]+)/);
-  if (shortMatch) return `https://www.youtube.com/embed/${shortMatch[1]}?${ytParams}`;
-  return url;
-}
 
 // ============================================
 // Types
@@ -122,6 +101,47 @@ const OfferError: React.FC<OfferErrorProps> = ({
 );
 
 // ============================================
+// Inline CTA Component
+// ============================================
+
+const DfyCta: React.FC<{ paymentUrl: string; variant?: 'primary' | 'secondary' }> = ({
+  paymentUrl,
+  variant = 'primary',
+}) => {
+  const isPrimary = variant === 'primary';
+
+  if (!paymentUrl) {
+    return (
+      <div className="flex justify-center">
+        <button
+          disabled
+          className="px-8 py-4 rounded-lg font-semibold text-center bg-zinc-100 text-zinc-400 dark:bg-zinc-800 dark:text-zinc-500 cursor-not-allowed"
+        >
+          Coming Soon
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex justify-center">
+      <a
+        href={paymentUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={`inline-block px-8 py-4 rounded-lg font-semibold text-center transition-colors ${
+          isPrimary
+            ? 'bg-violet-500 hover:bg-violet-600 text-white text-lg'
+            : 'bg-violet-600 hover:bg-violet-700 text-white'
+        }`}
+      >
+        {DFY_OFFER.ctaPrimary}
+      </a>
+    </div>
+  );
+};
+
+// ============================================
 // Main OfferPage Component
 // ============================================
 
@@ -134,9 +154,8 @@ const OfferPage: React.FC = () => {
   const [notFound, setNotFound] = useState(false);
   const [data, setData] = useState<OfferPageData | null>(null);
 
-  // Accordion states
+  // Accordion state
   const [openFAQ, setOpenFAQ] = useState<number | null>(null);
-  const [openWeek, setOpenWeek] = useState<number | null>(0);
 
   // Fetch data
   const fetchOfferData = async () => {
@@ -183,37 +202,19 @@ const OfferPage: React.FC = () => {
 
   const { prospect, settings } = data;
 
-  // Determine recommended offer
-  const recommendedType: 'foundations' | 'engineering' =
-    prospect.recommendedOffer === 'bootcamp' ? 'foundations' : 'engineering';
-  const offer = OFFERS[recommendedType];
+  // DFY offer data
+  const offer = DFY_OFFER;
+  const t = offer.testimonials;
 
-  // Payment URLs
-  const foundationsPaymentUrl = settings?.foundationsPaymentUrl || undefined;
-  const engineeringPaymentUrl = settings?.engineeringPaymentUrl || undefined;
-  const getPaymentUrl = (type: 'foundations' | 'engineering') =>
-    type === 'foundations' ? foundationsPaymentUrl : engineeringPaymentUrl;
-
-  // Video URLs
-  const offerVideoUrl =
-    recommendedType === 'foundations'
-      ? settings?.foundationsOfferVideoUrl
-      : settings?.engineeringOfferVideoUrl;
-
-  // Cohort info
-  const cohortDate = getNextCohortDate(recommendedType, settings, offer);
-  const cohortDateStr = formatCohortDate(cohortDate);
-  const daysUntil = getDaysUntilCohort(cohortDate);
-  const spotsRemaining = getSpotsRemaining(recommendedType, settings, offer);
+  // Payment URL: settings > env var > empty
+  const paymentUrl = settings?.dfyOfferUrl || import.meta.env.VITE_STRIPE_INTRO_OFFER_URL || '';
+  const spotsRemaining = settings?.spotsRemainingDfy ?? 5;
 
   // Value stack total
   const valueTotal = offer.valueItems.reduce((sum, item) => {
     const num = parseInt(item.soloValue.replace(/[^0-9]/g, ''), 10);
     return sum + (isNaN(num) ? 0 : num);
   }, 0);
-
-  // Split testimonials for scattering
-  const t = offer.testimonials;
 
   return (
     <div className="min-h-screen bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 font-sans">
@@ -243,13 +244,11 @@ const OfferPage: React.FC = () => {
 
         {/* ===== HERO SECTION ===== */}
         <section className="text-center mb-16">
-          {/* Cohort date badge */}
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-violet-50 border border-violet-200 dark:bg-violet-500/10 dark:border-violet-500/20 mb-6">
-            <Calendar className="w-4 h-4 text-violet-400" />
-            <span className="text-sm font-medium text-violet-300">
-              Next cohort: {cohortDateStr}
+            <Rocket className="w-4 h-4 text-violet-400" />
+            <span className="text-sm font-medium text-violet-600 dark:text-violet-300">
+              One-Time Offer
             </span>
-            {daysUntil <= 30 && <span className="text-xs text-violet-400">({daysUntil} days)</span>}
           </div>
 
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-zinc-900 dark:text-zinc-100 leading-tight mb-6 whitespace-pre-line">
@@ -260,26 +259,26 @@ const OfferPage: React.FC = () => {
             {offer.subheadline}
           </p>
 
-          <CTASection paymentUrl={getPaymentUrl(recommendedType)} offer={offer} variant="primary" />
+          <DfyCta paymentUrl={paymentUrl} variant="primary" />
         </section>
 
-        {/* ===== OFFER VIDEO ===== */}
-        {offerVideoUrl && (
-          <section className="mb-16">
-            <div
-              className="relative w-full rounded-xl overflow-hidden border border-zinc-200 dark:border-zinc-800"
-              style={{ paddingBottom: '56.25%' }}
-            >
-              <iframe
-                src={toEmbedUrl(offerVideoUrl)}
-                title="Offer video"
-                className="absolute inset-0 w-full h-full"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              />
+        {/* ===== URGENCY BANNER ===== */}
+        <section className="bg-gradient-to-r from-violet-100 to-violet-50 border border-violet-200 dark:from-violet-600/20 dark:to-violet-500/10 dark:border-violet-500/30 rounded-xl p-6 sm:p-8 text-center mb-16">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8">
+            <div className="flex items-center gap-2">
+              <Star className="w-5 h-5 text-violet-400" />
+              <span className="text-zinc-800 dark:text-zinc-200 font-medium">
+                {spotsRemaining} spots remaining this month
+              </span>
             </div>
-          </section>
-        )}
+            <div className="flex items-center gap-2">
+              <Clock className="w-5 h-5 text-violet-400" />
+              <span className="text-zinc-800 dark:text-zinc-200 font-medium">
+                Your system will be live in 10 days
+              </span>
+            </div>
+          </div>
+        </section>
 
         <div className="space-y-16 sm:space-y-20">
           {/* ===== TESTIMONIAL #1 ===== */}
@@ -318,7 +317,7 @@ const OfferPage: React.FC = () => {
 
             <div className="bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm dark:shadow-none p-6 sm:p-8">
               <h3 className="text-xl font-semibold text-zinc-900 dark:text-zinc-100 mb-6">
-                By the end, you will have:
+                When we're done, you will have:
               </h3>
               <div className="space-y-4">
                 {offer.solutionBullets.map((bullet, i) => (
@@ -336,38 +335,109 @@ const OfferPage: React.FC = () => {
           {/* ===== TESTIMONIAL #2 ===== */}
           {t[1] && <TestimonialInline testimonial={t[1]} />}
 
-          {/* ===== CURRICULUM SECTION ===== */}
+          {/* ===== DELIVERABLES GRID ===== */}
           <section>
             <h2 className="text-3xl font-bold text-zinc-900 dark:text-zinc-100 mb-2">
-              What We Build Together
+              What You Get
             </h2>
             <p className="text-zinc-600 dark:text-zinc-400 mb-8">
-              Week by week, step by step. You build it. Tim gives you feedback. By the end,
-              it&rsquo;s running.
+              Everything built, configured, and launched for you.
             </p>
 
-            <div className="space-y-2">
-              {offer.weeks.map((week, i) => (
-                <CurriculumWeek
-                  key={week.week}
-                  week={week.week}
-                  title={week.title}
-                  bullets={week.bullets}
-                  deliverable={week.deliverable}
-                  isOpen={openWeek === i}
-                  onToggle={() => setOpenWeek(openWeek === i ? null : i)}
-                />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {offer.deliverables.map((item) => (
+                <div
+                  key={item.title}
+                  className="flex items-start gap-4 p-5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl"
+                >
+                  <div className="w-10 h-10 rounded-lg bg-violet-100 dark:bg-violet-500/10 flex items-center justify-center shrink-0">
+                    <item.icon size={20} className="text-violet-600 dark:text-violet-400" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-zinc-900 dark:text-white">{item.title}</h3>
+                    <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-0.5">
+                      {item.description}
+                    </p>
+                  </div>
+                </div>
               ))}
             </div>
           </section>
 
+          {/* ===== BONUSES ===== */}
+          <section>
+            <div className="border border-violet-200 dark:border-violet-500/20 rounded-xl p-6 sm:p-8 bg-violet-50/50 dark:bg-violet-500/5">
+              <div className="flex items-center gap-2 mb-6">
+                <Gift size={20} className="text-violet-500" />
+                <h2 className="text-2xl font-bold text-violet-700 dark:text-violet-300">
+                  Bonus — Included Free
+                </h2>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {offer.bonuses.map((item) => (
+                  <div
+                    key={item.title}
+                    className="flex items-start gap-4 p-4 bg-white/60 dark:bg-zinc-900/40 rounded-lg"
+                  >
+                    <item.icon size={20} className="text-violet-500 mt-0.5 shrink-0" />
+                    <div>
+                      <span className="font-semibold text-zinc-900 dark:text-white">
+                        {item.title}
+                      </span>
+                      <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-0.5">
+                        {item.description}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          {/* ===== HOW IT WORKS ===== */}
+          <section>
+            <h2 className="text-3xl font-bold text-zinc-900 dark:text-zinc-100 mb-2">
+              How It Works
+            </h2>
+            <p className="text-zinc-600 dark:text-zinc-400 mb-8">
+              Three steps. About 1-2 hours of your time. We handle the rest.
+            </p>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {offer.steps.map((step, i) => (
+                <div
+                  key={step.number}
+                  className="relative p-6 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl"
+                >
+                  <div className="w-10 h-10 rounded-full bg-violet-500 text-white flex items-center justify-center font-bold text-lg mb-4">
+                    {step.number}
+                  </div>
+                  <h3 className="font-semibold text-zinc-900 dark:text-white mb-2">{step.title}</h3>
+                  <p className="text-sm text-zinc-500 dark:text-zinc-400 leading-relaxed">
+                    {step.description}
+                  </p>
+                  {i < offer.steps.length - 1 && (
+                    <ArrowRight
+                      size={18}
+                      className="hidden md:block absolute -right-3 top-1/2 -translate-y-1/2 text-zinc-300 dark:text-zinc-600 z-10"
+                    />
+                  )}
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* ===== RESULT BANNER ===== */}
+          <section className="bg-gradient-to-r from-violet-500 to-violet-600 rounded-2xl p-8 sm:p-10 text-center">
+            <Zap size={28} className="text-white/80 mx-auto mb-4" />
+            <p className="text-xl sm:text-2xl font-bold text-white leading-snug max-w-2xl mx-auto">
+              {offer.resultStatement}
+            </p>
+          </section>
+
           {/* ===== MID-PAGE CTA ===== */}
           <section className="text-center">
-            <CTASection
-              paymentUrl={getPaymentUrl(recommendedType)}
-              offer={offer}
-              variant="secondary"
-            />
+            <DfyCta paymentUrl={paymentUrl} variant="secondary" />
           </section>
 
           {/* ===== VALUE STACK ===== */}
@@ -376,7 +446,7 @@ const OfferPage: React.FC = () => {
               Everything You Get
             </h2>
             <p className="text-zinc-600 dark:text-zinc-400 mb-8">
-              Here&rsquo;s what&rsquo;s included when you join:
+              Here&rsquo;s what&rsquo;s included in the DFY package:
             </p>
 
             <div className="space-y-3 mb-6">
@@ -392,31 +462,7 @@ const OfferPage: React.FC = () => {
               <p className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">
                 Your price: {offer.price}
               </p>
-              <p className="text-sm text-zinc-600 dark:text-zinc-400 mt-1">{offer.paymentPlan}</p>
-            </div>
-          </section>
-
-          {/* ===== AI TOOLS INCLUDED ===== */}
-          <section>
-            <div className="flex items-center gap-3 mb-6">
-              <Zap className="w-6 h-6 text-violet-400" />
-              <h2 className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">
-                The AI Tools You Get
-              </h2>
-            </div>
-            <p className="text-zinc-600 dark:text-zinc-400 mb-6">
-              8 weeks of access to proprietary AI tools built to run this exact system.
-            </p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {offer.toolsIncluded.map((tool) => (
-                <div
-                  key={tool.name}
-                  className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-4"
-                >
-                  <p className="font-semibold text-zinc-800 dark:text-zinc-200 mb-1">{tool.name}</p>
-                  <p className="text-sm text-zinc-600 dark:text-zinc-400">{tool.description}</p>
-                </div>
-              ))}
+              <p className="text-sm text-zinc-600 dark:text-zinc-400 mt-1">One-time investment</p>
             </div>
           </section>
 
@@ -493,18 +539,28 @@ const OfferPage: React.FC = () => {
           <section className="text-center">
             <div className="bg-white dark:bg-zinc-900 border-2 border-violet-500 rounded-xl p-8 sm:p-10 max-w-lg mx-auto">
               <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mb-2">
-                {offer.name}
+                DFY Lead Gen System
               </h2>
+              <p className="text-sm font-medium text-violet-600 dark:text-violet-400 mb-2">
+                One-Time Investment
+              </p>
               <div className="text-5xl font-bold text-zinc-900 dark:text-zinc-100 mb-2">
                 {offer.price}
               </div>
-              <p className="text-zinc-600 dark:text-zinc-400 mb-6">{offer.paymentPlan}</p>
+              <p className="text-zinc-600 dark:text-zinc-400 mb-6">
+                Everything built and launched in 10 days
+              </p>
 
-              <CTASection
-                paymentUrl={getPaymentUrl(recommendedType)}
-                offer={offer}
-                variant="primary"
-              />
+              <ul className="space-y-2.5 mb-8 text-left">
+                {offer.priceFeatures.map((feature) => (
+                  <li key={feature} className="flex items-start gap-2.5">
+                    <CheckCircle2 size={16} className="text-violet-500 mt-0.5 shrink-0" />
+                    <span className="text-sm text-zinc-700 dark:text-zinc-300">{feature}</span>
+                  </li>
+                ))}
+              </ul>
+
+              <DfyCta paymentUrl={paymentUrl} variant="primary" />
 
               {/* Guarantee */}
               <div className="mt-8 pt-6 border-t border-zinc-200 dark:border-zinc-800">
@@ -517,35 +573,6 @@ const OfferPage: React.FC = () => {
                 <p className="text-sm text-zinc-600 dark:text-zinc-400">{offer.guaranteeDetails}</p>
               </div>
             </div>
-          </section>
-
-          {/* ===== URGENCY BANNER ===== */}
-          <section className="bg-gradient-to-r from-violet-100 to-violet-50 border border-violet-200 dark:from-violet-600/20 dark:to-violet-500/10 dark:border-violet-500/30 rounded-xl p-6 sm:p-8 text-center">
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-8">
-              <div className="flex items-center gap-2">
-                <Calendar className="w-5 h-5 text-violet-400" />
-                <span className="text-zinc-800 dark:text-zinc-200 font-medium">
-                  Next cohort: {cohortDateStr}
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Star className="w-5 h-5 text-violet-400" />
-                <span className="text-zinc-800 dark:text-zinc-200 font-medium">
-                  {spotsRemaining} spots remaining
-                </span>
-              </div>
-              {daysUntil <= 30 && (
-                <div className="flex items-center gap-2">
-                  <Clock className="w-5 h-5 text-violet-400" />
-                  <span className="text-zinc-800 dark:text-zinc-200 font-medium">
-                    {daysUntil} days left to enroll
-                  </span>
-                </div>
-              )}
-            </div>
-            {offer.urgencyText && (
-              <p className="text-sm text-zinc-600 dark:text-zinc-400 mt-3">{offer.urgencyText}</p>
-            )}
           </section>
 
           {/* ===== FAQ SECTION ===== */}
@@ -566,37 +593,29 @@ const OfferPage: React.FC = () => {
             </div>
           </section>
 
-          {/* ===== FINAL CTA ===== */}
+          {/* ===== PRE-SENJA CTA ===== */}
           <section className="text-center py-8">
             <h2 className="text-3xl font-bold text-zinc-900 dark:text-zinc-100 mb-4">
-              Ready to Build Your System?
+              Ready to Get Your System Built?
             </h2>
             <p className="text-zinc-600 dark:text-zinc-400 mb-8 max-w-2xl mx-auto">
-              Next cohort starts {cohortDateStr}. {spotsRemaining} spots remaining.
+              Stop building. Start closing. We&rsquo;ll have your lead gen system live in 10 days.
             </p>
-            <CTASection
-              paymentUrl={getPaymentUrl(recommendedType)}
-              offer={offer}
-              variant="primary"
-            />
+            <DfyCta paymentUrl={paymentUrl} variant="primary" />
           </section>
 
           {/* ===== SENJA TESTIMONIAL EMBED ===== */}
           <SenjaEmbed />
 
-          {/* ===== FINAL ENROLL CTA ===== */}
+          {/* ===== FINAL CTA ===== */}
           <section className="text-center py-8">
             <h2 className="text-3xl font-bold text-zinc-900 dark:text-zinc-100 mb-4">
-              Ready to Get Started?
+              Ready to Get Your System Built?
             </h2>
             <p className="text-zinc-600 dark:text-zinc-400 mb-8 max-w-2xl mx-auto">
-              Join the next cohort and build your client acquisition system.
+              Stop building. Start closing. We&rsquo;ll have your lead gen system live in 10 days.
             </p>
-            <CTASection
-              paymentUrl={getPaymentUrl(recommendedType)}
-              offer={offer}
-              variant="primary"
-            />
+            <DfyCta paymentUrl={paymentUrl} variant="primary" />
           </section>
         </div>
       </div>

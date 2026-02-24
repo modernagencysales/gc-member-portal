@@ -313,6 +313,7 @@ export interface BlueprintSettings {
   nextCohortDateEngineering?: string;
   spotsRemainingFoundations?: number;
   spotsRemainingEngineering?: number;
+  spotsRemainingDfy?: number;
   // Embed settings
   blueprintVideoUrl?: string;
   callBookedVideoUrl?: string;
@@ -354,6 +355,7 @@ export interface BlueprintSettingsFormData {
   nextCohortDateEngineering?: string;
   spotsRemainingFoundations?: number;
   spotsRemainingEngineering?: number;
+  spotsRemainingDfy?: number;
   blueprintVideoUrl?: string;
   callBookedVideoUrl?: string;
   thankYouVideoUrl?: string;
