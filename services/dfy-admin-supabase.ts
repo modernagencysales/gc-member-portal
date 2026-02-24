@@ -4,6 +4,7 @@ import type {
   DfyAdminDeliverable,
   DfyActivityEntry,
   DfyAutomationRun,
+  DfyAutomationOutput,
 } from '../types/dfy-admin-types';
 
 // Column constants — must match DB schema (never select('*'))
@@ -116,6 +117,24 @@ export async function saveDfyTemplateBySlug(slug: string, template: unknown) {
     method: 'PUT',
     body: JSON.stringify({ key: `dfy_template_${slug}`, template }),
   });
+}
+
+export async function fetchAdminAutomationOutput(
+  engagementId: string,
+  automationType: string
+): Promise<DfyAutomationOutput | null> {
+  const { data, error } = await supabase
+    .from('dfy_automation_runs')
+    .select('output_data, completed_at')
+    .eq('engagement_id', engagementId)
+    .eq('automation_type', automationType)
+    .eq('status', 'completed')
+    .order('completed_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (error || !data) return null;
+  return data as DfyAutomationOutput;
 }
 
 export async function fetchAutomationRuns(engagementId: string): Promise<DfyAutomationRun[]> {

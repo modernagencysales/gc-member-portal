@@ -229,3 +229,19 @@ export const CATEGORY_LABELS: Record<DfyCategory, string> = {
   funnel: 'Funnel',
   outbound: 'Outbound',
 };
+
+// ============================================
+// Automation output types
+// ============================================
+
+export interface ProfileRewriteOutput {
+  headlines: { outcome_based: string; authority_based: string; hybrid: string };
+  about_section: string;
+  featured_suggestions: string[];
+  banner_concept: string;
+}
+
+export interface DfyAutomationOutput {
+  output_data: Record<string, unknown> | null;
+  completed_at: string | null;
+}
