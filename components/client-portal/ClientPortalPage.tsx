@@ -14,6 +14,7 @@ import DeliverableCard from './DeliverableCard';
 import ActivityTimeline from './ActivityTimeline';
 import ClientDashboard from './ClientDashboard';
 import IntakeForm from './IntakeForm';
+import IntroOfferIntakeWizard from './intake-wizard/IntroOfferIntakeWizard';
 
 // ── Category config ────────────────────────────────────
 const CATEGORIES = ['onboarding', 'content', 'funnel', 'outbound'] as const;
@@ -37,6 +38,24 @@ const STATUS_PRIORITY: Record<string, number> = {
 
 function statusSort(a: DfyDeliverable, b: DfyDeliverable): number {
   return (STATUS_PRIORITY[a.status] ?? 99) - (STATUS_PRIORITY[b.status] ?? 99);
+}
+
+// ── Processing state (intro offer) ───────────────────────
+function ProcessingState({ clientName }: { clientName: string }) {
+  return (
+    <div className="min-h-screen bg-white dark:bg-zinc-950 flex items-center justify-center">
+      <div className="max-w-md text-center space-y-6">
+        <div className="w-16 h-16 mx-auto border-4 border-violet-200 dark:border-violet-800 border-t-violet-500 rounded-full animate-spin" />
+        <h2 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100">
+          Building your system, {clientName.split(' ')[0]}
+        </h2>
+        <p className="text-zinc-500 dark:text-zinc-400">
+          We're processing your data and building everything. This usually takes a few minutes.
+          We'll email you when it's ready.
+        </p>
+      </div>
+    </div>
+  );
 }
 
 // ── Component ──────────────────────────────────────────
@@ -167,7 +186,27 @@ const ClientPortalPage: React.FC = () => {
     );
   }
 
-  // ── Intake gate ──────────────────────────────────
+  // ── Intro offer intake wizard gate ──────────────────
+  if (engagement.engagement_type === 'intro_offer' && engagement.intake_status === 'pending') {
+    return (
+      <IntroOfferIntakeWizard
+        portalSlug={slug!}
+        clientName={engagement.client_name}
+        blueprintProspectId={engagement.blueprint_prospect_id}
+        onComplete={reloadEngagement}
+      />
+    );
+  }
+
+  // ── Intro offer processing state ────────────────────
+  if (
+    engagement.engagement_type === 'intro_offer' &&
+    (engagement.intake_status === 'submitted' || engagement.intake_status === 'processing')
+  ) {
+    return <ProcessingState clientName={engagement.client_name} />;
+  }
+
+  // ── Full DFY intake gate ────────────────────────────
   if (!engagement.intake_submitted_at) {
     return (
       <IntakeForm

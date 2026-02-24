@@ -60,6 +60,11 @@ export interface DfyEngagement {
   linkedin_connected_at: string | null;
   intake_data: Record<string, unknown> | null;
   intake_submitted_at: string | null;
+  engagement_type: 'intro_offer' | 'full_dfy';
+  blueprint_prospect_id: string | null;
+  intake_status: 'pending' | 'submitted' | 'processing' | 'ready';
+  processed_intake: Record<string, unknown> | null;
+  magnetlab_user_id: string | null;
   created_at: string;
 }
 
@@ -116,7 +121,7 @@ export async function signProposal(
 // ============================================
 
 const DFY_ENGAGEMENT_COLUMNS =
-  'id, proposal_id, client_name, client_email, client_company, portal_slug, status, monthly_rate, start_date, onboarding_checklist, unipile_account_id, linkedin_connected_at, intake_data, intake_submitted_at, created_at';
+  'id, proposal_id, client_name, client_email, client_company, portal_slug, status, monthly_rate, start_date, onboarding_checklist, unipile_account_id, linkedin_connected_at, intake_data, intake_submitted_at, engagement_type, blueprint_prospect_id, intake_status, processed_intake, magnetlab_user_id, created_at';
 const DFY_DELIVERABLE_COLUMNS =
   'id, engagement_id, name, description, category, status, assignee, due_date, sort_order, client_approved_at, client_notes, created_at';
 const DFY_ACTIVITY_COLUMNS =
