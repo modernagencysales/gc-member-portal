@@ -28,6 +28,8 @@ export interface OnboardingChecklistItem {
 
 export type OnboardingChecklist = Record<string, OnboardingChecklistItem>;
 
+export type DfyEngagementType = 'intro_offer' | 'full_dfy';
+
 export interface DfyAdminEngagement {
   id: string;
   proposal_id: string;
@@ -37,6 +39,11 @@ export interface DfyAdminEngagement {
   client_company: string;
   portal_slug: string;
   status: DfyEngagementStatus;
+  engagement_type: DfyEngagementType;
+  blueprint_prospect_id: string | null;
+  intake_status: 'pending' | 'submitted' | 'processing' | 'ready';
+  processed_intake: Record<string, unknown> | null;
+  magnetlab_user_id: string | null;
   monthly_rate: number;
   start_date: string;
   linear_project_id: string | null;
@@ -211,6 +218,22 @@ export const ENGAGEMENT_STATUS_CONFIGS: Record<
   paused: { label: 'Paused', color: 'orange' },
   completed: { label: 'Completed', color: 'slate' },
   cancelled: { label: 'Cancelled', color: 'red' },
+};
+
+export const ENGAGEMENT_TYPE_CONFIGS: Record<DfyEngagementType, { label: string; color: string }> =
+  {
+    intro_offer: { label: 'Intro Offer', color: 'purple' },
+    full_dfy: { label: 'Full DFY', color: 'blue' },
+  };
+
+export const INTAKE_STATUS_CONFIGS: Record<
+  DfyAdminEngagement['intake_status'],
+  { label: string; color: string }
+> = {
+  pending: { label: 'Pending', color: 'slate' },
+  submitted: { label: 'Submitted', color: 'blue' },
+  processing: { label: 'Processing', color: 'yellow' },
+  ready: { label: 'Ready', color: 'green' },
 };
 
 export const DELIVERABLE_STATUS_CONFIGS: Record<
