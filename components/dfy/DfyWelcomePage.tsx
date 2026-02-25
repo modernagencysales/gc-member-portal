@@ -27,7 +27,7 @@ const DfyWelcomePage: React.FC = () => {
   return (
     <div className="min-h-screen bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 font-sans">
       <ThemeToggle />
-      <div className="max-w-3xl mx-auto px-4 py-12 sm:py-16">
+      <div className="max-w-5xl mx-auto px-4 py-12 sm:py-16">
         {/* Confirmation Header */}
         <div className="text-center mb-12">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 dark:bg-green-500/10 mb-6">
