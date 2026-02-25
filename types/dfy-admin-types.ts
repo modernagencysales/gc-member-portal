@@ -47,6 +47,7 @@ export interface DfyAdminEngagement {
   monthly_rate: number;
   start_date: string;
   linear_project_id: string | null;
+  linear_customer_id: string | null;
   slack_channel_id: string | null;
   stripe_subscription_id: string | null;
   onboarding_checklist: OnboardingChecklist | null;
