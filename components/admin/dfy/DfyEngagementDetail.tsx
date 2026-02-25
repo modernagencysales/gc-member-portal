@@ -1700,15 +1700,83 @@ function ProfileRewriteReviewPanel({
   );
 }
 
+function IntakeFileRow({
+  file,
+  engagementId,
+  isDarkMode,
+}: {
+  file: { name: string; path?: string; size: number; type: string };
+  engagementId: string;
+  isDarkMode: boolean;
+}) {
+  const [url, setUrl] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
+
+  const handleDownload = async () => {
+    if (url) {
+      window.open(url, '_blank');
+      return;
+    }
+    setLoading(true);
+    setError(false);
+    try {
+      const result = await fetchIntakeFileUrls(engagementId);
+      const match = result.find((f) => f.name === file.name);
+      if (match?.url) {
+        setUrl(match.url);
+        window.open(match.url, '_blank');
+      } else {
+        setError(true);
+      }
+    } catch {
+      setError(true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div
+      className={`flex items-center justify-between px-3 py-2 rounded-lg text-sm ${
+        isDarkMode ? 'bg-zinc-800' : 'bg-zinc-50'
+      }`}
+    >
+      <div className="flex items-center gap-2 min-w-0">
+        <FileText
+          className={`w-4 h-4 flex-shrink-0 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}
+        />
+        <span className={`truncate ${isDarkMode ? 'text-zinc-200' : 'text-zinc-900'}`}>
+          {file.name}
+        </span>
+        <span className={`text-xs flex-shrink-0 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
+          {(file.size / 1024).toFixed(0)} KB
+        </span>
+      </div>
+      <button
+        onClick={handleDownload}
+        disabled={loading}
+        className={`flex items-center gap-1 text-xs font-medium flex-shrink-0 px-2 py-1 rounded transition-colors ${
+          error
+            ? 'text-red-400'
+            : isDarkMode
+              ? 'text-violet-400 hover:bg-zinc-700'
+              : 'text-violet-600 hover:bg-zinc-100'
+        } disabled:opacity-50`}
+      >
+        {loading ? (
+          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+        ) : (
+          <Download className="w-3.5 h-3.5" />
+        )}
+        {error ? 'Failed' : loading ? '' : 'Download'}
+      </button>
+    </div>
+  );
+}
+
 function IntakeFormSection({ engagement }: { engagement: DfyAdminEngagement }) {
   const { isDarkMode } = useTheme();
-  const [filesLoading, setFilesLoading] = useState(false);
-  const [files, setFiles] = useState<Array<{
-    name: string;
-    url: string | null;
-    size: number;
-    type: string;
-  }> | null>(null);
 
   const intakeData = engagement.intake_data as {
     ideal_client?: string;
@@ -1721,19 +1789,6 @@ function IntakeFormSection({ engagement }: { engagement: DfyAdminEngagement }) {
   } | null;
 
   const hasFiles = (intakeData?.files?.length ?? 0) > 0;
-
-  const loadFiles = async () => {
-    if (files || filesLoading) return;
-    setFilesLoading(true);
-    try {
-      const result = await fetchIntakeFileUrls(engagement.id);
-      setFiles(result);
-    } catch {
-      setFiles([]);
-    } finally {
-      setFilesLoading(false);
-    }
-  };
 
   if (!engagement.intake_submitted_at) {
     return (
@@ -1804,63 +1859,19 @@ function IntakeFormSection({ engagement }: { engagement: DfyAdminEngagement }) {
       {/* Files */}
       {hasFiles && (
         <div className={`mt-4 pt-4 border-t ${isDarkMode ? 'border-zinc-800' : 'border-zinc-100'}`}>
-          <div className="flex items-center justify-between mb-2">
-            <p
-              className={`text-[11px] font-semibold uppercase tracking-wider ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}
-            >
-              Uploaded Files ({intakeData!.files!.length})
-            </p>
-            {!files && (
-              <button
-                onClick={loadFiles}
-                disabled={filesLoading}
-                className={`text-xs font-medium px-2 py-1 rounded transition-colors ${
-                  isDarkMode
-                    ? 'text-violet-400 hover:bg-zinc-800'
-                    : 'text-violet-600 hover:bg-zinc-50'
-                } disabled:opacity-50`}
-              >
-                {filesLoading ? 'Loading...' : 'Load Download Links'}
-              </button>
-            )}
-          </div>
+          <p
+            className={`text-[11px] font-semibold uppercase tracking-wider mb-2 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}
+          >
+            Uploaded Files ({intakeData!.files!.length})
+          </p>
           <div className="space-y-1.5">
-            {(files || intakeData!.files!).map((file, i) => (
-              <div
+            {intakeData!.files!.map((file, i) => (
+              <IntakeFileRow
                 key={i}
-                className={`flex items-center justify-between px-3 py-2 rounded-lg text-sm ${
-                  isDarkMode ? 'bg-zinc-800' : 'bg-zinc-50'
-                }`}
-              >
-                <div className="flex items-center gap-2 min-w-0">
-                  <FileText
-                    className={`w-4 h-4 flex-shrink-0 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}
-                  />
-                  <span className={`truncate ${isDarkMode ? 'text-zinc-200' : 'text-zinc-900'}`}>
-                    {file.name}
-                  </span>
-                  <span
-                    className={`text-xs flex-shrink-0 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}
-                  >
-                    {(file.size / 1024).toFixed(0)} KB
-                  </span>
-                </div>
-                {'url' in file && file.url ? (
-                  <a
-                    href={file.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={`flex items-center gap-1 text-xs font-medium flex-shrink-0 ${
-                      isDarkMode
-                        ? 'text-violet-400 hover:text-violet-300'
-                        : 'text-violet-600 hover:text-violet-700'
-                    }`}
-                  >
-                    <Download className="w-3.5 h-3.5" />
-                    Download
-                  </a>
-                ) : null}
-              </div>
+                file={file}
+                engagementId={engagement.id}
+                isDarkMode={isDarkMode}
+              />
             ))}
           </div>
         </div>
