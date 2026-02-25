@@ -1542,7 +1542,9 @@ function ProfileRewriteReviewPanel({
     );
   }
 
-  const data = output.output_data as unknown as ProfileRewriteOutput;
+  // Handle both shapes: flat { headlines, ... } or wrapped { rewrite: { headlines, ... } }
+  const raw = output.output_data as Record<string, unknown>;
+  const data = (raw.rewrite ? raw.rewrite : raw) as unknown as ProfileRewriteOutput;
   const alreadyShipped = ['review', 'approved', 'completed'].includes(deliverable.status);
 
   return (
