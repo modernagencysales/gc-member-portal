@@ -86,6 +86,7 @@ const AdminDfyTemplates = lazy(() => import('./components/admin/dfy/DfyTemplateE
 
 // Lazy-loaded: Client Portal (DFY)
 const ClientPortalPage = lazy(() => import('./components/client-portal/ClientPortalPage'));
+const DfyWelcomePage = lazy(() => import('./components/dfy/DfyWelcomePage'));
 
 // Lazy-loaded: Bootcamp
 const BootcampApp = lazy(() => import('./pages/bootcamp/BootcampApp'));
@@ -273,6 +274,9 @@ const App: React.FC = () => {
 
         {/* DFY (Done-For-You) offer page */}
         <Route path="/offer/dfy" element={<DFYOfferPage />} />
+
+        {/* DFY Welcome / Post-Payment Onboarding */}
+        <Route path="/dfy/welcome" element={<DfyWelcomePage />} />
 
         {/* Generic (non-personalized) offer pages for partners/affiliates */}
         <Route path="/offer/:offerType" element={<GenericOfferPage />} />

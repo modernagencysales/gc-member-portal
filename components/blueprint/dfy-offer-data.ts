@@ -300,7 +300,7 @@ export const DFY_OFFER: DFYOfferData = {
     },
   ],
 
-  ctaPrimary: 'Book Your Strategy Call',
+  ctaPrimary: 'Get Started — $2,500',
 
   aboutTimBlurb:
     "Tim built and sold a $4.7M agency using LinkedIn as the primary lead source. He's generated 20,000+ opted-in leads, closed $200K+ LTV deals, and built lead gen systems for 300+ B2B business owners. This isn't theory — it's the exact system his team runs every day. The tools, the processes, the AI — all built in-house because nothing on the market did what he needed. Now his team builds it for you.",

@@ -16,10 +16,11 @@ import { FAQAccordionItem, TestimonialInline, SenjaEmbed } from './offer-compone
 import ThemeToggle from './ThemeToggle';
 
 // ============================================
-// Cal.com Booking URL
+// Stripe Payment Link
 // ============================================
 
-const BOOKING_URL = import.meta.env.VITE_CALCOM_BOOKING_URL || '';
+const CHECKOUT_URL =
+  import.meta.env.VITE_DFY_CHECKOUT_URL || 'https://buy.stripe.com/6oU9AV6bAfm67cF27T0000s';
 
 // ============================================
 // Inline CTA Component
@@ -28,23 +29,10 @@ const BOOKING_URL = import.meta.env.VITE_CALCOM_BOOKING_URL || '';
 const DFYCta: React.FC<{ variant?: 'primary' | 'secondary' }> = ({ variant = 'primary' }) => {
   const isPrimary = variant === 'primary';
 
-  if (!BOOKING_URL) {
-    return (
-      <div className="flex justify-center">
-        <button
-          disabled
-          className="px-8 py-4 rounded-lg font-semibold text-center bg-zinc-100 text-zinc-400 dark:bg-zinc-800 dark:text-zinc-500 cursor-not-allowed"
-        >
-          Coming Soon
-        </button>
-      </div>
-    );
-  }
-
   return (
     <div className="flex justify-center">
       <a
-        href={BOOKING_URL}
+        href={CHECKOUT_URL}
         target="_blank"
         rel="noopener noreferrer"
         className={`inline-block px-8 py-4 rounded-lg font-semibold text-center transition-colors ${
