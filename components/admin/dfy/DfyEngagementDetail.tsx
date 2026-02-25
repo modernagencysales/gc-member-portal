@@ -22,6 +22,7 @@ import {
   Send,
   Download,
   FileText,
+  Trash2,
 } from 'lucide-react';
 import { useTheme } from '../../../context/ThemeContext';
 import { queryKeys } from '../../../lib/queryClient';
@@ -40,6 +41,7 @@ import {
   resendMagicLink,
   postEngagementUpdate,
   fetchIntakeFileUrls,
+  deleteEngagement,
 } from '../../../services/dfy-admin-supabase';
 import type {
   DfyAdminEngagement,
@@ -73,6 +75,7 @@ const DfyEngagementDetail: React.FC = () => {
   const [editingLinkedIn, setEditingLinkedIn] = useState(false);
   const [linkedInDraft, setLinkedInDraft] = useState('');
   const [activeTab, setActiveTab] = useState<'overview' | 'profile_rewrite'>('overview');
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   // ---- Queries ----
   const { data: engagement, isLoading: engLoading } = useQuery({
@@ -249,6 +252,18 @@ const DfyEngagementDetail: React.FC = () => {
     },
   });
 
+  const deleteMutation = useMutation({
+    mutationFn: () => deleteEngagement(engagementId!),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.dfyEngagements() });
+      navigate('/admin/dfy');
+    },
+    onError: (err: Error) => {
+      setError(err.message);
+      setShowDeleteConfirm(false);
+    },
+  });
+
   // ---- Deliverables grouped by milestone ----
   const milestoneGroups = useMemo(() => {
     const groups = new Map<string | null, DfyAdminDeliverable[]>();
@@ -304,6 +319,13 @@ const DfyEngagementDetail: React.FC = () => {
           </span>
         )}
         <DfyStatusBadge status={engagement.status} type="engagement" />
+        <button
+          onClick={() => setShowDeleteConfirm(true)}
+          className="p-2 rounded-lg transition-colors text-red-400 hover:bg-red-500/10 hover:text-red-500"
+          title="Delete engagement"
+        >
+          <Trash2 className="w-4 h-4" />
+        </button>
         <button
           onClick={refreshAll}
           className={`p-2 rounded-lg transition-colors ${
@@ -724,6 +746,59 @@ const DfyEngagementDetail: React.FC = () => {
           }
           isShipping={deliverableMutation.isPending}
         />
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div
+            className={`rounded-xl p-6 max-w-md w-full mx-4 shadow-xl ${
+              isDarkMode ? 'bg-zinc-900 border border-zinc-800' : 'bg-white border border-zinc-200'
+            }`}
+          >
+            <h3
+              className={`text-lg font-semibold mb-2 ${isDarkMode ? 'text-white' : 'text-zinc-900'}`}
+            >
+              Delete Engagement
+            </h3>
+            <p className={`text-sm mb-4 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-600'}`}>
+              Are you sure you want to permanently delete the engagement for{' '}
+              <strong>{engagement.client_name}</strong>? This will remove all deliverables,
+              automation runs, activity logs, and archive the Linear project. This action cannot be
+              undone.
+            </p>
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setShowDeleteConfirm(false)}
+                disabled={deleteMutation.isPending}
+                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  isDarkMode
+                    ? 'bg-zinc-800 text-zinc-300 hover:bg-zinc-700'
+                    : 'bg-zinc-100 text-zinc-700 hover:bg-zinc-200'
+                }`}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => deleteMutation.mutate()}
+                disabled={deleteMutation.isPending}
+                className="px-4 py-2 rounded-lg text-sm font-medium bg-red-600 text-white hover:bg-red-700 transition-colors disabled:opacity-50 flex items-center gap-2"
+              >
+                {deleteMutation.isPending ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Deleting...
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="w-4 h-4" />
+                    Delete Permanently
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

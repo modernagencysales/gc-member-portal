@@ -179,6 +179,12 @@ export async function updateEngagement(
   });
 }
 
+export async function deleteEngagement(id: string) {
+  return gtmAdminFetch(`/api/dfy/admin/engagements/${id}`, {
+    method: 'DELETE',
+  });
+}
+
 export async function updateDeliverable(
   id: string,
   data: {
