@@ -24,6 +24,8 @@ import {
   FileText,
   Trash2,
 } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { useTheme } from '../../../context/ThemeContext';
 import { queryKeys } from '../../../lib/queryClient';
 import {
@@ -1618,6 +1620,45 @@ function ContentCallPrepPanel({
 }) {
   const { isDarkMode } = useTheme();
 
+  const raw = (output?.output_data || {}) as Record<string, unknown>;
+  const callPrep = (raw.call_prep as string) || '';
+  const hasBlueprintData = raw.has_blueprint_data as boolean;
+  const postsIncluded = (raw.posts_included as number) || 0;
+
+  // Parse the call prep into sections: Part A (strategy brief), Part B (questions), Quick Reference
+  // Hooks must be called unconditionally, before early returns
+  const sections = useMemo(() => {
+    const partAMatch = callPrep.match(/# PART A[:\s].*?\n([\s\S]*?)(?=# PART B|$)/i);
+    const partBMatch = callPrep.match(/# PART B[:\s].*?\n([\s\S]*?)(?=# QUICK REFERENCE|$)/i);
+    const quickRefMatch = callPrep.match(/# QUICK REFERENCE.*?\n([\s\S]*?)$/i);
+
+    // Parse individual questions from Part B — look for **Question N:** pattern
+    const questions: Array<{ id: string; question: string; note: string }> = [];
+    if (partBMatch) {
+      const qRegex =
+        /\*\*Question (\d+)[:.]\*\*\s*\n\s*\n\s*\*"([^]*?)"\*\s*\n\s*\n\s*\*\*Extracting:\*\*\s*([^]*?)(?=\n\s*---|\n\s*\*\*Question|\n\s*##|$)/g;
+      let m: RegExpExecArray | null;
+      while ((m = qRegex.exec(partBMatch[1])) !== null) {
+        questions.push({
+          id: `q${m[1]}`,
+          question: m[2].trim(),
+          note: m[3].trim(),
+        });
+      }
+    }
+
+    return {
+      strategyBrief: partAMatch?.[1]?.trim() || callPrep,
+      questionsRaw: partBMatch?.[1]?.trim() || '',
+      questions,
+      quickReference: quickRefMatch?.[1]?.trim() || '',
+    };
+  }, [callPrep]);
+
+  const [activeSection, setActiveSection] = useState<'brief' | 'questions' | 'quickref'>('brief');
+  const [checkedQuestions, setCheckedQuestions] = useState<Set<string>>(new Set());
+
+  // Early returns for loading/empty states — AFTER all hooks
   if (isLoading) {
     return (
       <div className="p-8 text-center">
@@ -1669,10 +1710,25 @@ function ContentCallPrepPanel({
     );
   }
 
-  const raw = output.output_data as Record<string, unknown>;
-  const callPrep = (raw.call_prep as string) || '';
-  const hasBlueprintData = raw.has_blueprint_data as boolean;
-  const postsIncluded = (raw.posts_included as number) || 0;
+  const toggleQuestion = (id: string) => {
+    setCheckedQuestions((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const tabClass = (tab: string) =>
+    `px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
+      activeSection === tab
+        ? isDarkMode
+          ? 'bg-violet-600 text-white'
+          : 'bg-violet-600 text-white'
+        : isDarkMode
+          ? 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800'
+          : 'text-zinc-500 hover:text-zinc-700 hover:bg-zinc-100'
+    }`;
 
   return (
     <div className="space-y-4">
@@ -1691,6 +1747,9 @@ function ContentCallPrepPanel({
             {hasBlueprintData
               ? ` · Blueprint data + ${postsIncluded} posts`
               : ' · Basic info only (no Blueprint)'}
+            {sections.questions.length > 0
+              ? ` · ${checkedQuestions.size}/${sections.questions.length} questions asked`
+              : ''}
           </p>
         </div>
         <button
@@ -1708,21 +1767,129 @@ function ContentCallPrepPanel({
         </button>
       </div>
 
-      {/* Call prep content */}
-      <div
-        className={`rounded-xl border p-6 ${
-          isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-200'
-        }`}
-      >
+      {/* Section tabs */}
+      <div className="flex gap-2">
+        <button className={tabClass('brief')} onClick={() => setActiveSection('brief')}>
+          Strategy Brief
+        </button>
+        <button className={tabClass('questions')} onClick={() => setActiveSection('questions')}>
+          Interview Questions
+          {sections.questions.length > 0 && (
+            <span className="ml-1.5 text-xs opacity-75">({sections.questions.length})</span>
+          )}
+        </button>
+        <button className={tabClass('quickref')} onClick={() => setActiveSection('quickref')}>
+          Quick Reference
+        </button>
+      </div>
+
+      {/* Strategy Brief tab */}
+      {activeSection === 'brief' && (
         <div
-          className={`text-sm whitespace-pre-wrap leading-relaxed ${
-            isDarkMode ? 'text-zinc-300' : 'text-zinc-700'
+          className={`rounded-xl border p-6 ${
+            isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-200'
           }`}
           style={{ maxHeight: '70vh', overflowY: 'auto' }}
         >
-          {callPrep}
+          <div className={`prose prose-sm max-w-none ${isDarkMode ? 'prose-invert' : ''}`}>
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>{sections.strategyBrief}</ReactMarkdown>
+          </div>
         </div>
-      </div>
+      )}
+
+      {/* Interview Questions tab — interactive with checkboxes */}
+      {activeSection === 'questions' && (
+        <div className="space-y-3" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
+          {sections.questions.length > 0 ? (
+            sections.questions.map((q) => (
+              <div
+                key={q.id}
+                className={`rounded-xl border p-4 transition-all ${
+                  checkedQuestions.has(q.id)
+                    ? isDarkMode
+                      ? 'bg-zinc-900/50 border-zinc-700 opacity-60'
+                      : 'bg-zinc-50 border-zinc-200 opacity-60'
+                    : isDarkMode
+                      ? 'bg-zinc-900 border-zinc-800'
+                      : 'bg-white border-zinc-200'
+                }`}
+              >
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => toggleQuestion(q.id)}
+                    className={`mt-0.5 flex-shrink-0 w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
+                      checkedQuestions.has(q.id)
+                        ? 'bg-violet-600 border-violet-600 text-white'
+                        : isDarkMode
+                          ? 'border-zinc-600 hover:border-violet-500'
+                          : 'border-zinc-300 hover:border-violet-500'
+                    }`}
+                  >
+                    {checkedQuestions.has(q.id) && (
+                      <svg
+                        className="w-3 h-3"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={3}
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                    )}
+                  </button>
+                  <div className="flex-1 min-w-0">
+                    <p
+                      className={`text-sm font-medium leading-relaxed ${
+                        checkedQuestions.has(q.id)
+                          ? isDarkMode
+                            ? 'text-zinc-500 line-through'
+                            : 'text-zinc-400 line-through'
+                          : isDarkMode
+                            ? 'text-zinc-200'
+                            : 'text-zinc-800'
+                      }`}
+                    >
+                      {q.question}
+                    </p>
+                    <p className={`text-xs mt-2 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
+                      {q.note}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ))
+          ) : (
+            /* Fallback: render Part B as markdown if regex parsing didn't find structured questions */
+            <div
+              className={`rounded-xl border p-6 ${
+                isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-200'
+              }`}
+            >
+              <div className={`prose prose-sm max-w-none ${isDarkMode ? 'prose-invert' : ''}`}>
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                  {sections.questionsRaw || callPrep}
+                </ReactMarkdown>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Quick Reference tab */}
+      {activeSection === 'quickref' && (
+        <div
+          className={`rounded-xl border p-6 ${
+            isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-200'
+          }`}
+          style={{ maxHeight: '70vh', overflowY: 'auto' }}
+        >
+          <div className={`prose prose-sm max-w-none ${isDarkMode ? 'prose-invert' : ''}`}>
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+              {sections.quickReference || 'No quick reference card available.'}
+            </ReactMarkdown>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
