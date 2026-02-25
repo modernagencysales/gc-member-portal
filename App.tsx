@@ -12,6 +12,7 @@ const GenericOfferPage = lazy(() => import('./components/blueprint/GenericOfferP
 const DFYOfferPage = lazy(() => import('./components/blueprint/DFYOfferPage'));
 const CaseStudiesPage = lazy(() => import('./components/blueprint/CaseStudiesPage'));
 const ProgramsPage = lazy(() => import('./components/blueprint/ProgramsPage'));
+const CommunityPage = lazy(() => import('./components/blueprint/CommunityPage'));
 
 // Lazy-loaded: Proposal pages
 const ProposalPage = lazy(() => import('./components/proposal/ProposalPage'));
@@ -268,6 +269,9 @@ const App: React.FC = () => {
 
         {/* Case Studies */}
         <Route path="/case-studies" element={<CaseStudiesPage />} />
+
+        {/* Community */}
+        <Route path="/community" element={<CommunityPage />} />
 
         {/* Intro Offer progress tracker (public, client-facing) */}
         <Route path="/intro-offer/:offerId" element={<OfferProgressTracker />} />
