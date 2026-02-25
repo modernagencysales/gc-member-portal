@@ -28,7 +28,7 @@ const POST_COLUMNS =
   'id, prospect_id, template_id, name, post_content, first_sentence, post_ready, to_fix, action_items, finalized_content, number, created_at';
 
 const BLUEPRINT_SETTINGS_COLUMNS =
-  'id, sticky_cta_enabled, foundations_payment_url, engineering_payment_url, cal_booking_link, show_bootcamp_offer, show_gc_offer, show_dfy_offer, bootcamp_offer_title, bootcamp_offer_description, bootcamp_offer_cta, gc_offer_title, gc_offer_description, gc_offer_cta, dfy_offer_title, dfy_offer_description, dfy_offer_cta, dfy_offer_url, default_offer_unlocked, next_cohort_date_foundations, next_cohort_date_engineering, spots_remaining_foundations, spots_remaining_engineering, spots_remaining_dfy, blueprint_video_url, call_booked_video_url, thank_you_video_url, foundations_offer_video_url, engineering_offer_video_url, senja_widget_url, max_logos_landing, max_logos_blueprint, created_at, updated_at';
+  'id, sticky_cta_enabled, foundations_payment_url, engineering_payment_url, cal_booking_link, show_bootcamp_offer, show_gc_offer, show_dfy_offer, bootcamp_offer_title, bootcamp_offer_description, bootcamp_offer_cta, gc_offer_title, gc_offer_description, gc_offer_cta, dfy_offer_title, dfy_offer_description, dfy_offer_cta, dfy_offer_url, default_offer_unlocked, spots_remaining_dfy, blueprint_video_url, call_booked_video_url, thank_you_video_url, foundations_offer_video_url, engineering_offer_video_url, senja_widget_url, max_logos_landing, max_logos_blueprint, created_at, updated_at';
 
 const CONTENT_BLOCK_COLUMNS =
   'id, block_type, title, content, image_url, cta_text, cta_url, sort_order, is_visible, target_offer, created_at, updated_at';
@@ -268,10 +268,6 @@ function mapBlueprintSettings(record: Record<string, unknown>): BlueprintSetting
     dfyOfferCta: (record.dfy_offer_cta as string) || '',
     dfyOfferUrl: (record.dfy_offer_url as string) || '',
     defaultOfferUnlocked: (record.default_offer_unlocked as boolean) ?? false,
-    nextCohortDateFoundations: record.next_cohort_date_foundations as string | undefined,
-    nextCohortDateEngineering: record.next_cohort_date_engineering as string | undefined,
-    spotsRemainingFoundations: record.spots_remaining_foundations as number | undefined,
-    spotsRemainingEngineering: record.spots_remaining_engineering as number | undefined,
     blueprintVideoUrl: record.blueprint_video_url as string | undefined,
     callBookedVideoUrl: record.call_booked_video_url as string | undefined,
     thankYouVideoUrl: record.thank_you_video_url as string | undefined,
@@ -666,10 +662,6 @@ export async function updateBlueprintSettings(
     dfyOfferCta: string;
     dfyOfferUrl: string;
     defaultOfferUnlocked: boolean;
-    nextCohortDateFoundations: string;
-    nextCohortDateEngineering: string;
-    spotsRemainingFoundations: number;
-    spotsRemainingEngineering: number;
     spotsRemainingDfy: number;
     blueprintVideoUrl: string;
     callBookedVideoUrl: string;
@@ -736,18 +728,6 @@ export async function updateBlueprintSettings(
   }
   if (settings.defaultOfferUnlocked !== undefined) {
     updateData.default_offer_unlocked = settings.defaultOfferUnlocked;
-  }
-  if (settings.nextCohortDateFoundations !== undefined) {
-    updateData.next_cohort_date_foundations = settings.nextCohortDateFoundations;
-  }
-  if (settings.nextCohortDateEngineering !== undefined) {
-    updateData.next_cohort_date_engineering = settings.nextCohortDateEngineering;
-  }
-  if (settings.spotsRemainingFoundations !== undefined) {
-    updateData.spots_remaining_foundations = settings.spotsRemainingFoundations;
-  }
-  if (settings.spotsRemainingEngineering !== undefined) {
-    updateData.spots_remaining_engineering = settings.spotsRemainingEngineering;
   }
   if (settings.spotsRemainingDfy !== undefined) {
     updateData.spots_remaining_dfy = settings.spotsRemainingDfy;
