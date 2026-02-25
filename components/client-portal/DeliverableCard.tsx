@@ -1,6 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { DfyDeliverable } from '../../services/dfy-service';
-import { approveDeliverable, requestRevision } from '../../services/dfy-service';
+import { approveDeliverable, requestRevision, fetchAutomationOutput } from '../../services/dfy-service';
+import ProfileRewriteModal from './ProfileRewriteModal';
+
+interface ProfileRewriteOutput {
+  headline_options?: string[];
+  about_section?: string;
+  featured_suggestions?: string[];
+  banner_concept?: string;
+}
 
 // ── Status config ──────────────────────────────────────
 const STATUS_CONFIG: Record<string, { label: string; bg: string; text: string }> = {
@@ -55,12 +63,14 @@ interface DeliverableCardProps {
   deliverable: DfyDeliverable;
   portalSlug?: string;
   onApproved?: () => void;
+  expanded?: boolean;
 }
 
 const DeliverableCard: React.FC<DeliverableCardProps> = ({
   deliverable,
   portalSlug,
   onApproved,
+  expanded = false,
 }) => {
   const status = STATUS_CONFIG[deliverable.status] ?? STATUS_CONFIG.pending;
   const categoryLabel = CATEGORY_LABELS[deliverable.category] ?? deliverable.category;
@@ -76,6 +86,28 @@ const DeliverableCard: React.FC<DeliverableCardProps> = ({
   const [revisionSent, setRevisionSent] = useState(false);
 
   const isReview = deliverable.status === 'review' && portalSlug;
+
+  const [rewriteOutput, setRewriteOutput] = useState<ProfileRewriteOutput | null>(null);
+  const [showModal, setShowModal] = useState(false);
+  const [loadingOutput, setLoadingOutput] = useState(false);
+
+  const isProfileRewrite = deliverable.automation_type === 'profile_rewrite';
+  const canShowOutput = isProfileRewrite && ['review', 'approved', 'completed'].includes(deliverable.status);
+
+  useEffect(() => {
+    if (!canShowOutput || !portalSlug) return;
+    setLoadingOutput(true);
+    fetchAutomationOutput(portalSlug, 'profile_rewrite')
+      .then((data) => {
+        if (data?.output) setRewriteOutput(data.output as ProfileRewriteOutput);
+      })
+      .catch(() => {})
+      .finally(() => setLoadingOutput(false));
+  }, [canShowOutput, portalSlug]);
+
+  useEffect(() => {
+    if (expanded && rewriteOutput) setShowModal(true);
+  }, [expanded, rewriteOutput]);
 
   async function handleApprove() {
     if (!portalSlug) return;
@@ -249,6 +281,38 @@ const DeliverableCard: React.FC<DeliverableCardProps> = ({
             Revision request submitted
           </p>
         </div>
+      )}
+
+      {/* ── Profile Rewrite Preview ─────────────── */}
+      {canShowOutput && rewriteOutput && (
+        <div className="mt-3 pt-3 border-t border-gray-100 dark:border-zinc-800 space-y-2">
+          {rewriteOutput.headline_options?.[0] && (
+            <p className="text-sm text-gray-900 dark:text-zinc-100 font-medium">
+              {rewriteOutput.headline_options[0]}
+            </p>
+          )}
+          {rewriteOutput.about_section && (
+            <p className="text-xs text-gray-600 dark:text-zinc-400 line-clamp-2">
+              {rewriteOutput.about_section}
+            </p>
+          )}
+          <button
+            onClick={() => setShowModal(true)}
+            className="text-xs font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
+          >
+            View Full Rewrite →
+          </button>
+        </div>
+      )}
+      {canShowOutput && loadingOutput && (
+        <div className="mt-3 pt-3 border-t border-gray-100 dark:border-zinc-800">
+          <div className="h-3 bg-gray-100 dark:bg-zinc-800 rounded w-2/3 animate-pulse" />
+        </div>
+      )}
+
+      {/* Modal */}
+      {showModal && rewriteOutput && (
+        <ProfileRewriteModal output={rewriteOutput} onClose={() => setShowModal(false)} />
       )}
     </div>
   );
