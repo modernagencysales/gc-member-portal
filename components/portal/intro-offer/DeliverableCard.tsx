@@ -48,12 +48,22 @@ const statusConfig: Record<
   },
 };
 
-function getViewUrl(type: string, metadata: Record<string, unknown>): string | null {
+function getViewUrl(
+  type: string,
+  metadata: Record<string, unknown>
+): { url: string; label: string } | null {
   switch (type) {
     case 'funnel':
-      return (metadata.funnel_url as string) || null;
-    case 'heyreach_account':
-      return 'https://app.heyreach.io';
+      return (metadata.funnel_url as string)
+        ? { url: metadata.funnel_url as string, label: 'View' }
+        : null;
+    case 'heyreach_account': {
+      const invitationUrl = metadata.invitationUrl as string | undefined;
+      if (invitationUrl) {
+        return { url: invitationUrl, label: 'Join Workspace' };
+      }
+      return { url: 'https://app.heyreach.io', label: 'View' };
+    }
     default:
       return null;
   }
@@ -68,7 +78,7 @@ const DeliverableCard: React.FC<DeliverableCardProps> = ({
 }) => {
   const { isDarkMode } = useTheme();
   const config = statusConfig[status] || statusConfig.pending;
-  const viewUrl = status === 'delivered' ? getViewUrl(type, metadata) : null;
+  const viewInfo = status === 'delivered' ? getViewUrl(type, metadata) : null;
   const { Icon } = config;
 
   return (
@@ -97,9 +107,9 @@ const DeliverableCard: React.FC<DeliverableCardProps> = ({
         <span className={`text-sm ${isDarkMode ? config.darkTextClass : config.textClass}`}>
           {config.label}
         </span>
-        {viewUrl && (
+        {viewInfo && (
           <a
-            href={viewUrl}
+            href={viewInfo.url}
             target="_blank"
             rel="noopener noreferrer"
             className={`flex items-center gap-1 text-sm ml-2 ${
@@ -107,7 +117,7 @@ const DeliverableCard: React.FC<DeliverableCardProps> = ({
             }`}
           >
             <Eye className="w-3.5 h-3.5" />
-            View
+            {viewInfo.label}
           </a>
         )}
       </div>
