@@ -509,6 +509,95 @@ const DfyEngagementDetail: React.FC = () => {
                     : undefined
                 }
               />
+              <div>
+                <p
+                  className={`text-[11px] font-semibold uppercase tracking-wider ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}
+                >
+                  Linear Customer
+                </p>
+                <div className="flex items-center gap-2 mt-0.5">
+                  {engagement.linear_customer_id ? (
+                    <>
+                      <a
+                        href={`https://linear.app/modern-agency-sales/customer/${engagement.linear_customer_id}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-indigo-400 hover:text-indigo-300 text-sm underline"
+                      >
+                        View Customer
+                      </a>
+                      <button
+                        onClick={async () => {
+                          if (
+                            !window.confirm(
+                              'Create an additional Linear customer for this engagement?'
+                            )
+                          )
+                            return;
+                          try {
+                            const res = await fetch(
+                              `${import.meta.env.VITE_GTM_SYSTEM_URL || 'https://gtmconductor.com'}/api/dfy/admin/engagements/${engagement.id}/create-customer`,
+                              {
+                                method: 'POST',
+                                headers: {
+                                  'Content-Type': 'application/json',
+                                  'x-admin-key': import.meta.env.VITE_ADMIN_API_KEY || '',
+                                },
+                                body: JSON.stringify({ suffix: `#${Date.now().toString(36)}` }),
+                              }
+                            );
+                            const data = await res.json();
+                            if (data.success) {
+                              window.alert(`Created: ${data.name}`);
+                              queryClient.invalidateQueries({
+                                queryKey: queryKeys.dfyEngagement(engagement.id),
+                              });
+                            } else {
+                              window.alert(`Error: ${data.error}`);
+                            }
+                          } catch {
+                            window.alert('Failed to create customer');
+                          }
+                        }}
+                        className="text-xs text-zinc-500 hover:text-zinc-300 underline"
+                      >
+                        + Additional
+                      </button>
+                    </>
+                  ) : (
+                    <button
+                      onClick={async () => {
+                        try {
+                          const res = await fetch(
+                            `${import.meta.env.VITE_GTM_SYSTEM_URL || 'https://gtmconductor.com'}/api/dfy/admin/engagements/${engagement.id}/create-customer`,
+                            {
+                              method: 'POST',
+                              headers: {
+                                'Content-Type': 'application/json',
+                                'x-admin-key': import.meta.env.VITE_ADMIN_API_KEY || '',
+                              },
+                            }
+                          );
+                          const data = await res.json();
+                          if (data.success) {
+                            window.alert(`Customer created: ${data.name}`);
+                            queryClient.invalidateQueries({
+                              queryKey: queryKeys.dfyEngagement(engagement.id),
+                            });
+                          } else {
+                            window.alert(`Error: ${data.error}`);
+                          }
+                        } catch {
+                          window.alert('Failed to create customer');
+                        }
+                      }}
+                      className="text-indigo-400 hover:text-indigo-300 text-sm underline"
+                    >
+                      Create Customer
+                    </button>
+                  )}
+                </div>
+              </div>
               <InfoPair label="Slack Channel" value={engagement.slack_channel_id || '\u2014'} />
 
               {/* Communication Preference */}
