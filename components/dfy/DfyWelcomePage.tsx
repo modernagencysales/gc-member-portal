@@ -3,7 +3,7 @@ import { CheckCircle2, Mail, ClipboardList, Rocket } from 'lucide-react';
 import CalEmbed from '../blueprint/CalEmbed';
 import ThemeToggle from '../blueprint/ThemeToggle';
 
-const CONTENT_CALL_LINK = 'masonmas/30min';
+const CONTENT_CALL_LINK = 'masonmas/60min';
 
 const steps = [
   {
@@ -44,8 +44,8 @@ const DfyWelcomePage: React.FC = () => {
         <div className="mb-12">
           <h2 className="text-xl font-semibold mb-4 text-center">Book Your Content Call</h2>
           <p className="text-sm text-zinc-500 dark:text-zinc-400 text-center mb-6">
-            This 30-minute call is where we learn about your business, clients, and goals — so we
-            can build a system that actually sounds like you.
+            This call is where we learn about your business, clients, and goals — so we can build a
+            system that actually sounds like you.
           </p>
           <CalEmbed calLink={CONTENT_CALL_LINK} />
         </div>
