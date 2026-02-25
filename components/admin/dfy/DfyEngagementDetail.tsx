@@ -505,7 +505,7 @@ const DfyEngagementDetail: React.FC = () => {
                 value={engagement.linear_project_id ? 'View Project' : '\u2014'}
                 href={
                   engagement.linear_project_id
-                    ? `https://linear.app/project/${engagement.linear_project_id}`
+                    ? `https://linear.app/modern-agency-sales/project/${engagement.linear_project_id}`
                     : undefined
                 }
               />
@@ -912,7 +912,11 @@ function ActionButtons({
         onUpgrade && (
           <button
             onClick={() => {
-              if (window.confirm('Convert this intro offer to a full DFY engagement? This will add additional deliverables and set the monthly rate to $2,500/mo.')) {
+              if (
+                window.confirm(
+                  'Convert this intro offer to a full DFY engagement? This will add additional deliverables and set the monthly rate to $2,500/mo.'
+                )
+              ) {
                 onUpgrade!();
               }
             }}
@@ -1267,7 +1271,7 @@ function DeliverableRow({
           )}
           {deliverable.linear_issue_id && (
             <a
-              href={`https://linear.app/issue/${deliverable.linear_issue_id}`}
+              href={`https://linear.app/modern-agency-sales/issue/${deliverable.linear_issue_id}`}
               target="_blank"
               rel="noopener noreferrer"
               className={`flex items-center gap-0.5 ${
