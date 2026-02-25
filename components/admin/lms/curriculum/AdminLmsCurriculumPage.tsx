@@ -38,8 +38,9 @@ import {
 import WeekEditor from './WeekEditor';
 import LmsContentItemModal from './LmsContentItemModal';
 import InlineAddInput from './InlineAddInput';
-import { ArrowLeft, ChevronDown, AlertCircle, Upload } from 'lucide-react';
+import { ArrowLeft, ChevronDown, AlertCircle, Upload, Download } from 'lucide-react';
 import CsvImportModal from './CsvImportModal';
+import ImportCurriculumModal from './ImportCurriculumModal';
 
 const AdminLmsCurriculumPage: React.FC = () => {
   const { isDarkMode } = useTheme();
@@ -55,6 +56,7 @@ const AdminLmsCurriculumPage: React.FC = () => {
     editingItem?: LmsContentItem;
   } | null>(null);
   const [showCsvImport, setShowCsvImport] = useState(false);
+  const [showImportCurriculum, setShowImportCurriculum] = useState(false);
 
   // Drag and drop sensors
   const sensors = useSensors(
@@ -212,17 +214,30 @@ const AdminLmsCurriculumPage: React.FC = () => {
             {curriculum.weeks.reduce((acc, w) => acc + w.lessons.length, 0)} lessons
           </p>
         </div>
-        <button
-          onClick={() => setShowCsvImport(true)}
-          className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm border ${
-            isDarkMode
-              ? 'border-zinc-700 hover:bg-zinc-800 text-zinc-300'
-              : 'border-zinc-300 hover:bg-zinc-50 text-zinc-700'
-          }`}
-        >
-          <Upload className="w-4 h-4" />
-          Import CSV
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setShowImportCurriculum(true)}
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm border ${
+              isDarkMode
+                ? 'border-violet-700 hover:bg-violet-900/30 text-violet-300'
+                : 'border-violet-300 hover:bg-violet-50 text-violet-700'
+            }`}
+          >
+            <Download className="w-4 h-4" />
+            Import Curriculum
+          </button>
+          <button
+            onClick={() => setShowCsvImport(true)}
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm border ${
+              isDarkMode
+                ? 'border-zinc-700 hover:bg-zinc-800 text-zinc-300'
+                : 'border-zinc-300 hover:bg-zinc-50 text-zinc-700'
+            }`}
+          >
+            <Upload className="w-4 h-4" />
+            Import CSV
+          </button>
+        </div>
       </div>
 
       {/* Weeks */}
@@ -369,6 +384,15 @@ const AdminLmsCurriculumPage: React.FC = () => {
         isOpen={showCsvImport}
         onClose={() => setShowCsvImport(false)}
         cohortId={cohortId}
+        existingWeekCount={curriculum.weeks.length}
+      />
+
+      {/* Import Curriculum Modal */}
+      <ImportCurriculumModal
+        isOpen={showImportCurriculum}
+        onClose={() => setShowImportCurriculum(false)}
+        targetCohortId={cohortId}
+        targetCohortName={selectedCohort?.name || 'this cohort'}
         existingWeekCount={curriculum.weeks.length}
       />
 

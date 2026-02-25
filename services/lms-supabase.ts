@@ -1082,6 +1082,142 @@ async function fetchLmsCurriculumByCohortForStudent(
 }
 
 // ============================================
+// Import Curriculum from Another Cohort
+// ============================================
+
+export interface ImportCurriculumOptions {
+  sourceCohortId: string;
+  targetCohortId: string;
+  excludeRecordings: boolean;
+  onProgress?: (current: number, total: number, label: string) => void;
+}
+
+export interface ImportCurriculumResult {
+  weeksCreated: number;
+  lessonsCreated: number;
+  contentItemsCreated: number;
+  actionItemsCreated: number;
+}
+
+export async function importCurriculumFromCohort(
+  opts: ImportCurriculumOptions
+): Promise<ImportCurriculumResult> {
+  const { sourceCohortId, targetCohortId, excludeRecordings, onProgress } = opts;
+
+  // Fetch source curriculum
+  const source = await fetchLmsCurriculumByCohort(sourceCohortId, false);
+  if (!source) throw new Error('Source cohort not found');
+
+  // Count existing weeks in target to offset sort_order
+  const existingWeeks = await fetchLmsWeeksByCohort(targetCohortId);
+  const weekOffset = existingWeeks.length;
+
+  // Calculate totals for progress
+  let total = 0;
+  for (const week of source.weeks) {
+    total++; // week
+    for (const lesson of week.lessons) {
+      if (excludeRecordings && isRecordingOnlyLesson(lesson)) continue;
+      total++; // lesson
+      for (const ci of lesson.contentItems) {
+        if (excludeRecordings && ci.contentType === 'video') continue;
+        total++; // content item
+      }
+    }
+    total += week.actionItems.length; // action items
+  }
+
+  let current = 0;
+  const result: ImportCurriculumResult = {
+    weeksCreated: 0,
+    lessonsCreated: 0,
+    contentItemsCreated: 0,
+    actionItemsCreated: 0,
+  };
+
+  for (let wi = 0; wi < source.weeks.length; wi++) {
+    const srcWeek = source.weeks[wi];
+    onProgress?.(current, total, `Creating week: ${srcWeek.title}`);
+
+    const newWeek = await createLmsWeek({
+      cohortId: targetCohortId,
+      title: srcWeek.title,
+      description: srcWeek.description,
+      sortOrder: weekOffset + wi,
+      isVisible: srcWeek.isVisible,
+    });
+    current++;
+    result.weeksCreated++;
+
+    // Copy lessons
+    let lessonSort = 0;
+    for (const srcLesson of srcWeek.lessons) {
+      if (excludeRecordings && isRecordingOnlyLesson(srcLesson)) continue;
+
+      onProgress?.(current, total, `Creating lesson: ${srcLesson.title}`);
+      const newLesson = await createLmsLesson({
+        weekId: newWeek.id,
+        title: srcLesson.title,
+        description: srcLesson.description,
+        sortOrder: lessonSort++,
+        isVisible: srcLesson.isVisible,
+      });
+      current++;
+      result.lessonsCreated++;
+
+      // Copy content items
+      let ciSort = 0;
+      for (const srcCI of srcLesson.contentItems) {
+        if (excludeRecordings && srcCI.contentType === 'video') continue;
+
+        onProgress?.(current, total, `Adding: ${srcCI.title}`);
+        await createLmsContentItem({
+          lessonId: newLesson.id,
+          title: srcCI.title,
+          contentType: srcCI.contentType,
+          embedUrl: srcCI.embedUrl,
+          aiToolSlug: srcCI.aiToolSlug,
+          contentText: srcCI.contentText,
+          credentialsData: srcCI.credentialsData,
+          description: srcCI.description,
+          sortOrder: ciSort++,
+          isVisible: srcCI.isVisible,
+        });
+        current++;
+        result.contentItemsCreated++;
+      }
+    }
+
+    // Copy action items
+    for (const srcAction of srcWeek.actionItems) {
+      onProgress?.(current, total, `Adding action: ${srcAction.text.slice(0, 40)}...`);
+      await createLmsActionItem({
+        weekId: newWeek.id,
+        text: srcAction.text,
+        description: srcAction.description,
+        videoUrl: srcAction.videoUrl,
+        sortOrder: srcAction.sortOrder,
+        assignedToEmail: srcAction.assignedToEmail,
+        isVisible: srcAction.isVisible,
+      });
+      current++;
+      result.actionItemsCreated++;
+    }
+  }
+
+  onProgress?.(total, total, 'Done!');
+  return result;
+}
+
+function isRecordingOnlyLesson(lesson: LmsLessonWithContent): boolean {
+  return (
+    lesson.title.toLowerCase().includes('recording') &&
+    lesson.contentItems.length > 0 &&
+    lesson.contentItems.every((ci) => ci.contentType === 'video')
+  );
+}
+
+// ============================================
 // Legacy Adapter for Student Portal
 // Converts new LMS data to existing CourseData format
 // ============================================

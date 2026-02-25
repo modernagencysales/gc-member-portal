@@ -24,6 +24,8 @@ import {
   markLessonIncomplete,
   markActionItemComplete,
   markActionItemIncomplete,
+  importCurriculumFromCohort,
+  ImportCurriculumOptions,
 } from '../services/lms-supabase';
 import { queryKeys } from '../lib/queryClient';
 import {
@@ -340,6 +342,24 @@ export function useReorderLmsActionItemsMutation() {
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: queryKeys.lmsActionItems(variables.weekId) });
       queryClient.invalidateQueries({ queryKey: queryKeys.lmsCurriculum(variables.cohortId) });
+    },
+  });
+}
+
+// ============================================
+// Import Curriculum Mutation
+// ============================================
+
+export function useImportCurriculumMutation() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (opts: ImportCurriculumOptions) => importCurriculumFromCohort(opts),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.lmsCurriculum(variables.targetCohortId),
+      });
+      queryClient.invalidateQueries({ queryKey: queryKeys.lmsWeeks(variables.targetCohortId) });
     },
   });
 }
