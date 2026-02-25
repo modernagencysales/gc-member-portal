@@ -23,6 +23,7 @@ interface ClientMetrics {
 
 interface ClientDashboardProps {
   portalSlug: string;
+  deliverables: Array<{ status: string; automation_type: string | null }>;
 }
 
 const STATUS_COLORS: Record<string, string> = {
@@ -34,7 +35,7 @@ const STATUS_COLORS: Record<string, string> = {
   pending: 'bg-gray-300 dark:bg-zinc-600',
 };
 
-const ClientDashboard: React.FC<ClientDashboardProps> = ({ portalSlug }) => {
+const ClientDashboard: React.FC<ClientDashboardProps> = ({ portalSlug, deliverables }) => {
   const [metrics, setMetrics] = useState<ClientMetrics | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -77,7 +78,11 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ portalSlug }) => {
   return (
     <div className="space-y-6">
       {/* Profile Rewrite */}
-      <ProfileRewriteCard portalSlug={portalSlug} />
+      {(() => {
+        const prDeliverable = deliverables.find(d => d.automation_type === 'profile_rewrite');
+        const isShipped = prDeliverable && ['review', 'approved', 'completed'].includes(prDeliverable.status);
+        return isShipped ? <ProfileRewriteCard portalSlug={portalSlug} /> : null;
+      })()}
 
       {/* Funnel Metrics */}
       {showFunnel && (

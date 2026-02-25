@@ -71,9 +71,11 @@ const ClientPortalPage: React.FC = () => {
 
   const isWelcome = searchParams.get('welcome') === 'true';
   const linkedInJustConnected = searchParams.get('linkedin') === 'connected';
+  const tabParam = searchParams.get('tab');
+  const deliverableParam = searchParams.get('deliverable');
 
   const [activeTab, setActiveTab] = useState<'dashboard' | 'deliverables' | 'activity'>(
-    'dashboard'
+    tabParam === 'deliverables' ? 'deliverables' : tabParam === 'activity' ? 'activity' : 'dashboard'
   );
   const [linkedInLoading, setLinkedInLoading] = useState(false);
   const [recorderTool, setRecorderTool] = useState('');
@@ -503,7 +505,9 @@ const ClientPortalPage: React.FC = () => {
         </div>
 
         {/* ── Dashboard Tab ───────────────────────── */}
-        {activeTab === 'dashboard' && slug && <ClientDashboard portalSlug={slug} />}
+        {activeTab === 'dashboard' && slug && (
+          <ClientDashboard portalSlug={slug} deliverables={deliverables} />
+        )}
 
         {/* ── Deliverables Tab ────────────────────── */}
         {activeTab === 'deliverables' && (
@@ -527,6 +531,7 @@ const ClientPortalPage: React.FC = () => {
                             deliverable={d}
                             portalSlug={slug}
                             onApproved={reload}
+                            expanded={d.id === deliverableParam}
                           />
                         ))}
                       </div>

@@ -80,6 +80,7 @@ export interface DfyDeliverable {
   sort_order: number;
   client_approved_at: string | null;
   client_notes: string | null;
+  automation_type: string | null;
 }
 
 export interface DfyActivityEntry {
@@ -123,7 +124,7 @@ export async function signProposal(
 const DFY_ENGAGEMENT_COLUMNS =
   'id, proposal_id, client_name, client_email, client_company, portal_slug, status, monthly_rate, start_date, onboarding_checklist, unipile_account_id, linkedin_connected_at, intake_data, intake_submitted_at, engagement_type, blueprint_prospect_id, intake_status, processed_intake, magnetlab_user_id, created_at';
 const DFY_DELIVERABLE_COLUMNS =
-  'id, engagement_id, name, description, category, status, assignee, due_date, sort_order, client_approved_at, client_notes, created_at';
+  'id, engagement_id, name, description, category, status, assignee, due_date, sort_order, client_approved_at, client_notes, automation_type, created_at';
 const DFY_ACTIVITY_COLUMNS =
   'id, engagement_id, deliverable_id, action, description, actor, metadata, client_visible, created_at';
 
