@@ -74,7 +74,9 @@ const DfyEngagementDetail: React.FC = () => {
   const [updateMessage, setUpdateMessage] = useState('');
   const [editingLinkedIn, setEditingLinkedIn] = useState(false);
   const [linkedInDraft, setLinkedInDraft] = useState('');
-  const [activeTab, setActiveTab] = useState<'overview' | 'profile_rewrite'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'profile_rewrite' | 'content_call_prep'>(
+    'overview'
+  );
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   // ---- Queries ----
@@ -108,13 +110,25 @@ const DfyEngagementDetail: React.FC = () => {
     enabled: !!engagementId,
   });
 
+  const { data: contentCallPrepOutput, isLoading: callPrepLoading } = useQuery({
+    queryKey: queryKeys.dfyAutomationOutput(engagementId!, 'prepare_content_call'),
+    queryFn: () => fetchAdminAutomationOutput(engagementId!, 'prepare_content_call'),
+    enabled: !!engagementId,
+  });
+
   // ---- Derived: profile rewrite deliverable (for tab visibility) ----
   const profileRewriteDeliverable = useMemo(
     () => deliverables?.find((d) => d.automation_type === 'profile_rewrite') ?? null,
     [deliverables]
   );
 
+  const contentCallPrepDeliverable = useMemo(
+    () => deliverables?.find((d) => d.automation_type === 'prepare_content_call') ?? null,
+    [deliverables]
+  );
+
   const showProfileRewriteTab = !!profileRewriteDeliverable;
+  const showContentCallPrepTab = !!contentCallPrepDeliverable;
 
   // ---- Manual refresh (for header button) ----
   const refreshAll = () => {
@@ -336,8 +350,8 @@ const DfyEngagementDetail: React.FC = () => {
         </button>
       </div>
 
-      {/* Tab bar (only when profile_rewrite deliverable exists) */}
-      {showProfileRewriteTab && (
+      {/* Tab bar (when any review tab exists) */}
+      {(showProfileRewriteTab || showContentCallPrepTab) && (
         <div className={`flex border-b ${isDarkMode ? 'border-zinc-800' : 'border-zinc-200'}`}>
           <button
             onClick={() => setActiveTab('overview')}
@@ -353,21 +367,40 @@ const DfyEngagementDetail: React.FC = () => {
           >
             Overview
           </button>
-          <button
-            onClick={() => setActiveTab('profile_rewrite')}
-            className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors flex items-center gap-1.5 ${
-              activeTab === 'profile_rewrite'
-                ? isDarkMode
-                  ? 'border-violet-500 text-violet-400'
-                  : 'border-violet-600 text-violet-600'
-                : isDarkMode
-                  ? 'border-transparent text-zinc-500 hover:text-zinc-300'
-                  : 'border-transparent text-zinc-400 hover:text-zinc-600'
-            }`}
-          >
-            <Eye className="w-3.5 h-3.5" />
-            Profile Rewrite Review
-          </button>
+          {showContentCallPrepTab && (
+            <button
+              onClick={() => setActiveTab('content_call_prep')}
+              className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors flex items-center gap-1.5 ${
+                activeTab === 'content_call_prep'
+                  ? isDarkMode
+                    ? 'border-violet-500 text-violet-400'
+                    : 'border-violet-600 text-violet-600'
+                  : isDarkMode
+                    ? 'border-transparent text-zinc-500 hover:text-zinc-300'
+                    : 'border-transparent text-zinc-400 hover:text-zinc-600'
+              }`}
+            >
+              <FileText className="w-3.5 h-3.5" />
+              Content Call Prep
+            </button>
+          )}
+          {showProfileRewriteTab && (
+            <button
+              onClick={() => setActiveTab('profile_rewrite')}
+              className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors flex items-center gap-1.5 ${
+                activeTab === 'profile_rewrite'
+                  ? isDarkMode
+                    ? 'border-violet-500 text-violet-400'
+                    : 'border-violet-600 text-violet-600'
+                  : isDarkMode
+                    ? 'border-transparent text-zinc-500 hover:text-zinc-300'
+                    : 'border-transparent text-zinc-400 hover:text-zinc-600'
+              }`}
+            >
+              <Eye className="w-3.5 h-3.5" />
+              Profile Rewrite Review
+            </button>
+          )}
         </div>
       )}
 
@@ -822,6 +855,15 @@ const DfyEngagementDetail: React.FC = () => {
             />
           )}
         </>
+      )}
+
+      {/* Content Call Prep tab */}
+      {activeTab === 'content_call_prep' && contentCallPrepDeliverable && (
+        <ContentCallPrepPanel
+          output={contentCallPrepOutput}
+          isLoading={callPrepLoading}
+          deliverable={contentCallPrepDeliverable}
+        />
       )}
 
       {/* Profile Rewrite Review tab */}
@@ -1561,6 +1603,126 @@ function ActivityRow({ entry }: { entry: DfyActivityEntry }) {
       >
         {new Date(entry.created_at).toLocaleString()}
       </span>
+    </div>
+  );
+}
+
+function ContentCallPrepPanel({
+  output,
+  isLoading,
+  deliverable,
+}: {
+  output: DfyAutomationOutput | null | undefined;
+  isLoading: boolean;
+  deliverable: DfyAdminDeliverable;
+}) {
+  const { isDarkMode } = useTheme();
+
+  if (isLoading) {
+    return (
+      <div className="p-8 text-center">
+        <Loader2 className="w-5 h-5 animate-spin mx-auto text-violet-500" />
+        <p className={`text-sm mt-2 ${isDarkMode ? 'text-zinc-400' : 'text-zinc-500'}`}>
+          Loading call prep...
+        </p>
+      </div>
+    );
+  }
+
+  if (deliverable.automation_status === 'running') {
+    return (
+      <div
+        className={`rounded-xl border p-6 text-center ${
+          isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-200'
+        }`}
+      >
+        <Loader2 className="w-6 h-6 animate-spin mx-auto text-violet-500 mb-3" />
+        <p className={`text-sm font-medium ${isDarkMode ? 'text-zinc-200' : 'text-zinc-700'}`}>
+          Content call prep is being generated...
+        </p>
+        <p className={`text-xs mt-1 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
+          This usually takes 30-60 seconds. Refresh to check.
+        </p>
+      </div>
+    );
+  }
+
+  if (!output?.output_data) {
+    return (
+      <div
+        className={`rounded-xl border p-6 text-center ${
+          isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-200'
+        }`}
+      >
+        <AlertCircle
+          className={`w-6 h-6 mx-auto mb-3 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}
+        />
+        <p className={`text-sm font-medium ${isDarkMode ? 'text-zinc-300' : 'text-zinc-600'}`}>
+          No content call prep yet
+        </p>
+        <p className={`text-xs mt-1 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
+          {deliverable.automation_status === 'failed'
+            ? 'The call prep generation failed. Try re-running from the Overview tab.'
+            : 'The call prep will be generated automatically during onboarding.'}
+        </p>
+      </div>
+    );
+  }
+
+  const raw = output.output_data as Record<string, unknown>;
+  const callPrep = (raw.call_prep as string) || '';
+  const hasBlueprintData = raw.has_blueprint_data as boolean;
+  const postsIncluded = (raw.posts_included as number) || 0;
+
+  return (
+    <div className="space-y-4">
+      {/* Status bar */}
+      <div
+        className={`rounded-xl border p-4 flex items-center justify-between ${
+          isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-200'
+        }`}
+      >
+        <div>
+          <p className={`text-sm font-medium ${isDarkMode ? 'text-zinc-200' : 'text-zinc-800'}`}>
+            Content Call Prep
+          </p>
+          <p className={`text-xs ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
+            Generated {output.completed_at ? new Date(output.completed_at).toLocaleString() : ''}
+            {hasBlueprintData
+              ? ` · Blueprint data + ${postsIncluded} posts`
+              : ' · Basic info only (no Blueprint)'}
+          </p>
+        </div>
+        <button
+          onClick={() => {
+            navigator.clipboard.writeText(callPrep);
+          }}
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+            isDarkMode
+              ? 'bg-zinc-800 text-zinc-300 hover:bg-zinc-700'
+              : 'bg-zinc-100 text-zinc-700 hover:bg-zinc-200'
+          }`}
+        >
+          <Download className="w-3.5 h-3.5" />
+          Copy to Clipboard
+        </button>
+      </div>
+
+      {/* Call prep content */}
+      <div
+        className={`rounded-xl border p-6 ${
+          isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-200'
+        }`}
+      >
+        <div
+          className={`text-sm whitespace-pre-wrap leading-relaxed ${
+            isDarkMode ? 'text-zinc-300' : 'text-zinc-700'
+          }`}
+          style={{ maxHeight: '70vh', overflowY: 'auto' }}
+        >
+          {callPrep}
+        </div>
+      </div>
     </div>
   );
 }
