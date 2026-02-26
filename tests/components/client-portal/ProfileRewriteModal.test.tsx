@@ -74,6 +74,17 @@ describe('ProfileRewriteModal', () => {
     expect(onClose).toHaveBeenCalledOnce();
   });
 
+  it('calls onClose when Escape key is pressed', async () => {
+    const onClose = vi.fn();
+    const user = userEvent.setup();
+
+    render(<ProfileRewriteModal output={mockOutput} onClose={onClose} />);
+
+    await user.keyboard('{Escape}');
+
+    expect(onClose).toHaveBeenCalledOnce();
+  });
+
   it('handles wrapped output_data format (output.rewrite)', () => {
     const wrappedOutput = { rewrite: mockOutput };
     render(<ProfileRewriteModal output={wrappedOutput as any} onClose={vi.fn()} />);

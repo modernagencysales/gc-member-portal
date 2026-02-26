@@ -1,32 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { fetchAutomationOutput } from '../../services/dfy-service';
-
-interface ProfileRewriteHeadlines {
-  outcome_based: string;
-  authority_based: string;
-  hybrid: string;
-}
-
-interface ProfileRewriteOutput {
-  headlines: ProfileRewriteHeadlines;
-  about_section: string;
-  featured_suggestions: string[];
-  banner_concept: string;
-}
+import { normalizeRewriteOutput, type ProfileRewriteData } from './profile-rewrite-utils';
 
 interface ProfileRewriteCardProps {
   portalSlug: string;
 }
 
-function normalizeOutput(raw: unknown): ProfileRewriteOutput | null {
-  if (!raw || typeof raw !== 'object') return null;
-  const data = (raw as any).rewrite ?? raw;
-  if (!data.headlines || !data.about_section) return null;
-  return data as ProfileRewriteOutput;
-}
-
 const ProfileRewriteCard: React.FC<ProfileRewriteCardProps> = ({ portalSlug }) => {
-  const [output, setOutput] = useState<ProfileRewriteOutput | null>(null);
+  const [output, setOutput] = useState<ProfileRewriteData | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -34,7 +15,7 @@ const ProfileRewriteCard: React.FC<ProfileRewriteCardProps> = ({ portalSlug }) =
       try {
         const data = await fetchAutomationOutput(portalSlug, 'profile_rewrite');
         if (data?.output) {
-          setOutput(normalizeOutput(data.output));
+          setOutput(normalizeRewriteOutput(data.output));
         }
       } catch {
         // silently handle

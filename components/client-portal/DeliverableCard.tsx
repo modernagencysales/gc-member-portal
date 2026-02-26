@@ -6,6 +6,7 @@ import {
   fetchAutomationOutput,
 } from '../../services/dfy-service';
 import ProfileRewriteModal from './ProfileRewriteModal';
+import { normalizeRewriteOutput } from './profile-rewrite-utils';
 
 // ── Status config ──────────────────────────────────────
 const STATUS_CONFIG: Record<string, { label: string; bg: string; text: string }> = {
@@ -169,8 +170,8 @@ const DeliverableCard: React.FC<DeliverableCardProps> = ({
       {showRewritePreview &&
         rewriteOutput &&
         (() => {
-          const raw = (rewriteOutput as any).rewrite ?? rewriteOutput;
-          const headline = raw?.headlines?.outcome_based;
+          const normalized = normalizeRewriteOutput(rewriteOutput);
+          const headline = normalized?.headlines?.outcome_based;
           return (
             <div className="mt-3 pt-3 border-t border-gray-100 dark:border-zinc-800">
               <div className="bg-gray-50 dark:bg-zinc-800 rounded-lg px-3 py-2.5">

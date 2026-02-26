@@ -1,35 +1,29 @@
-import React from 'react';
-
-interface ProfileRewriteHeadlines {
-  outcome_based: string;
-  authority_based: string;
-  hybrid: string;
-}
-
-interface ProfileRewriteData {
-  headlines: ProfileRewriteHeadlines;
-  about_section: string;
-  featured_suggestions: string[];
-  banner_concept: string;
-}
+import React, { useEffect } from 'react';
+import { normalizeRewriteOutput } from './profile-rewrite-utils';
 
 interface ProfileRewriteModalProps {
   output: Record<string, unknown>;
   onClose: () => void;
 }
 
-function normalizeOutput(raw: Record<string, unknown>): ProfileRewriteData | null {
-  const data = (raw as any).rewrite ?? raw;
-  if (!data.headlines || !data.about_section) return null;
-  return data as ProfileRewriteData;
-}
-
 const ProfileRewriteModal: React.FC<ProfileRewriteModalProps> = ({ output, onClose }) => {
-  const data = normalizeOutput(output);
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
+
+  const data = normalizeRewriteOutput(output);
   if (!data) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div
+      role="dialog"
+      aria-modal="true"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+    >
       {/* Backdrop */}
       <div
         data-testid="modal-backdrop"
