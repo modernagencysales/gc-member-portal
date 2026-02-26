@@ -1,15 +1,28 @@
 import React, { useEffect, useState } from 'react';
 import { fetchAutomationOutput } from '../../services/dfy-service';
 
+interface ProfileRewriteHeadlines {
+  outcome_based: string;
+  authority_based: string;
+  hybrid: string;
+}
+
 interface ProfileRewriteOutput {
-  headline_options?: string[];
-  about_section?: string;
-  featured_suggestions?: string[];
-  banner_concept?: string;
+  headlines: ProfileRewriteHeadlines;
+  about_section: string;
+  featured_suggestions: string[];
+  banner_concept: string;
 }
 
 interface ProfileRewriteCardProps {
   portalSlug: string;
+}
+
+function normalizeOutput(raw: unknown): ProfileRewriteOutput | null {
+  if (!raw || typeof raw !== 'object') return null;
+  const data = (raw as any).rewrite ?? raw;
+  if (!data.headlines || !data.about_section) return null;
+  return data as ProfileRewriteOutput;
 }
 
 const ProfileRewriteCard: React.FC<ProfileRewriteCardProps> = ({ portalSlug }) => {
@@ -21,7 +34,7 @@ const ProfileRewriteCard: React.FC<ProfileRewriteCardProps> = ({ portalSlug }) =
       try {
         const data = await fetchAutomationOutput(portalSlug, 'profile_rewrite');
         if (data?.output) {
-          setOutput(data.output as ProfileRewriteOutput);
+          setOutput(normalizeOutput(data.output));
         }
       } catch {
         // silently handle
@@ -48,24 +61,33 @@ const ProfileRewriteCard: React.FC<ProfileRewriteCardProps> = ({ portalSlug }) =
         LinkedIn Profile Rewrite
       </h3>
 
-      {output.headline_options && output.headline_options.length > 0 && (
-        <div>
-          <p className="text-xs font-medium text-gray-500 dark:text-zinc-400 mb-1.5">
-            Headline Options
-          </p>
-          <ul className="space-y-1.5">
-            {output.headline_options.map((h, i) => (
-              <li
-                key={i}
-                className="text-sm text-gray-900 dark:text-zinc-100 bg-gray-50 dark:bg-zinc-800 rounded px-3 py-2"
-              >
-                {h}
-              </li>
-            ))}
-          </ul>
+      {/* Headlines */}
+      <div>
+        <p className="text-xs font-medium text-gray-500 dark:text-zinc-400 mb-1.5">
+          Headline Options
+        </p>
+        <div className="space-y-1.5">
+          {(
+            [
+              ['Outcome-Based', output.headlines.outcome_based],
+              ['Authority-Based', output.headlines.authority_based],
+              ['Hybrid', output.headlines.hybrid],
+            ] as const
+          ).map(([label, text]) => (
+            <div
+              key={label}
+              className="text-sm text-gray-900 dark:text-zinc-100 bg-gray-50 dark:bg-zinc-800 rounded px-3 py-2"
+            >
+              <span className="text-[11px] font-medium text-gray-400 dark:text-zinc-500 uppercase tracking-wider">
+                {label}
+              </span>
+              <p className="mt-0.5">{text}</p>
+            </div>
+          ))}
         </div>
-      )}
+      </div>
 
+      {/* About Section */}
       {output.about_section && (
         <div>
           <p className="text-xs font-medium text-gray-500 dark:text-zinc-400 mb-1.5">
@@ -77,6 +99,7 @@ const ProfileRewriteCard: React.FC<ProfileRewriteCardProps> = ({ portalSlug }) =
         </div>
       )}
 
+      {/* Featured Suggestions */}
       {output.featured_suggestions && output.featured_suggestions.length > 0 && (
         <div>
           <p className="text-xs font-medium text-gray-500 dark:text-zinc-400 mb-1.5">
@@ -96,6 +119,7 @@ const ProfileRewriteCard: React.FC<ProfileRewriteCardProps> = ({ portalSlug }) =
         </div>
       )}
 
+      {/* Banner Concept */}
       {output.banner_concept && (
         <div>
           <p className="text-xs font-medium text-gray-500 dark:text-zinc-400 mb-1.5">
