@@ -55,10 +55,25 @@ serve(async (req) => {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const anthropicApiKey = Deno.env.get('ANTHROPIC_API_KEY')!;
+    const heliconeKey = Deno.env.get('HELICONE_API_KEY');
 
     if (!anthropicApiKey) {
       throw new Error('ANTHROPIC_API_KEY is not configured');
     }
+
+    const anthropicUrl = heliconeKey
+      ? 'https://anthropic.helicone.ai/v1/messages'
+      : 'https://api.anthropic.com/v1/messages';
+    const anthropicHeaders: Record<string, string> = {
+      'Content-Type': 'application/json',
+      'x-api-key': anthropicApiKey,
+      'anthropic-version': '2023-06-01',
+      ...(heliconeKey && {
+        'Helicone-Auth': `Bearer ${heliconeKey}`,
+        'Helicone-Property-Source': 'copy-of-gtm-os',
+        'Helicone-Property-Caller': 'chat',
+      }),
+    };
 
     const supabase = createClient(supabaseUrl, supabaseKey);
 
@@ -477,13 +492,9 @@ serve(async (req) => {
     // 7. Call Claude API with streaming
     const messages = [...history, { role: 'user' as const, content: message }];
 
-    const claudeResponse = await fetch('https://api.anthropic.com/v1/messages', {
+    const claudeResponse = await fetch(anthropicUrl, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': anthropicApiKey,
-        'anthropic-version': '2023-06-01',
-      },
+      headers: anthropicHeaders,
       body: JSON.stringify({
         model: tool.model || 'claude-sonnet-4-20250514',
         max_tokens: tool.max_tokens || 1024,

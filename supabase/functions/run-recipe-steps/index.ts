@@ -41,6 +41,25 @@ function interpolate(template: string, fields: Record<string, string>): string {
   });
 }
 
+function getAnthropicConfig() {
+  const apiKey = Deno.env.get('ANTHROPIC_API_KEY');
+  const heliconeKey = Deno.env.get('HELICONE_API_KEY');
+  const url = heliconeKey
+    ? 'https://anthropic.helicone.ai/v1/messages'
+    : 'https://api.anthropic.com/v1/messages';
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    'x-api-key': apiKey!,
+    'anthropic-version': '2023-06-01',
+    ...(heliconeKey && {
+      'Helicone-Auth': `Bearer ${heliconeKey}`,
+      'Helicone-Property-Source': 'copy-of-gtm-os',
+      'Helicone-Property-Caller': 'run-recipe-steps',
+    }),
+  };
+  return { url, headers };
+}
+
 async function runAiPrompt(
   contact: ContactData,
   config: { prompt: string; output_field: string; max_tokens?: number },
@@ -48,14 +67,11 @@ async function runAiPrompt(
 ): Promise<Record<string, string>> {
   const prompt = interpolate(config.prompt, contact.fields);
   const maxTokens = config.max_tokens || 300;
+  const ai = getAnthropicConfig();
 
-  const response = await fetch('https://api.anthropic.com/v1/messages', {
+  const response = await fetch(ai.url, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': anthropicApiKey,
-      'anthropic-version': '2023-06-01',
-    },
+    headers: ai.headers,
     body: JSON.stringify({
       model: 'claude-3-5-haiku-20241022',
       max_tokens: maxTokens,
@@ -97,13 +113,11 @@ ${sourceText}
 Return a JSON object with these keys: ${fieldList}
 Each value should be a string. Return ONLY valid JSON, no markdown.`;
 
-  const response = await fetch('https://api.anthropic.com/v1/messages', {
+  const ai = getAnthropicConfig();
+
+  const response = await fetch(ai.url, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': anthropicApiKey,
-      'anthropic-version': '2023-06-01',
-    },
+    headers: ai.headers,
     body: JSON.stringify({
       model: 'claude-3-5-haiku-20241022',
       max_tokens: 1024,
