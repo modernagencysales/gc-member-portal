@@ -30,6 +30,7 @@ function makeDeliverable(overrides: Partial<DfyDeliverable> = {}): DfyDeliverabl
     sort_order: 1,
     client_approved_at: null,
     client_notes: null,
+    automation_type: null,
     ...overrides,
   };
 }

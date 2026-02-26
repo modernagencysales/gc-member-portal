@@ -196,6 +196,7 @@ describe('dfy-service', () => {
           sort_order: 1,
           client_approved_at: null,
           client_notes: null,
+          automation_type: 'profile_rewrite',
           created_at: '2026-02-01T00:00:00Z',
         },
         {
@@ -210,6 +211,7 @@ describe('dfy-service', () => {
           sort_order: 2,
           client_approved_at: null,
           client_notes: null,
+          automation_type: null,
           created_at: '2026-02-01T00:00:00Z',
         },
       ];
@@ -243,6 +245,33 @@ describe('dfy-service', () => {
       const result = await getDeliverables('eng-001');
 
       expect(result).toEqual([]);
+    });
+
+    it('includes automation_type in returned deliverables', async () => {
+      const deliverables = [
+        {
+          id: 'del-001',
+          engagement_id: 'eng-001',
+          name: 'Profile Rewrite',
+          description: 'AI profile rewrite',
+          category: 'onboarding',
+          status: 'review',
+          assignee: 'Alice',
+          due_date: '2026-03-01',
+          sort_order: 1,
+          client_approved_at: null,
+          client_notes: null,
+          automation_type: 'profile_rewrite',
+          created_at: '2026-02-01T00:00:00Z',
+        },
+      ];
+
+      const chain = mockSupabaseChain(deliverables);
+      vi.mocked(supabase.from).mockReturnValue(chain as any);
+
+      const result = await getDeliverables('eng-001');
+
+      expect(result[0].automation_type).toBe('profile_rewrite');
     });
   });
 
