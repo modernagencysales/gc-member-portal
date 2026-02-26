@@ -5,13 +5,14 @@ import userEvent from '@testing-library/user-event';
 import DeliverableCard from '../../../components/client-portal/DeliverableCard';
 import type { DfyDeliverable } from '../../../services/dfy-service';
 
-// Mock approveDeliverable from dfy-service
 const mockApproveDeliverable = vi.fn();
+const mockFetchAutomationOutput = vi.fn();
 vi.mock('../../../services/dfy-service', async () => {
   const actual = await vi.importActual('../../../services/dfy-service');
   return {
     ...actual,
     approveDeliverable: (...args: any[]) => mockApproveDeliverable(...args),
+    fetchAutomationOutput: (...args: any[]) => mockFetchAutomationOutput(...args),
   };
 });
 
@@ -40,6 +41,7 @@ function makeDeliverable(overrides: Partial<DfyDeliverable> = {}): DfyDeliverabl
 beforeEach(() => {
   vi.clearAllMocks();
   mockApproveDeliverable.mockReset();
+  mockFetchAutomationOutput.mockReset();
 });
 
 describe('DeliverableCard', () => {
@@ -237,5 +239,96 @@ describe('DeliverableCard', () => {
       expect(screen.getByText(label)).toBeInTheDocument();
       unmount();
     }
+  });
+
+  it('shows headline preview and "View Full Rewrite" for profile_rewrite in review status', async () => {
+    mockFetchAutomationOutput.mockResolvedValue({
+      output: {
+        headlines: {
+          outcome_based: 'I help B2B founders generate pipeline',
+          authority_based: 'Former HubSpot exec',
+          hybrid: 'HubSpot alumni helping founders',
+        },
+        about_section: 'About text',
+        featured_suggestions: ['Suggestion 1'],
+        banner_concept: 'Banner text',
+      },
+      completed_at: '2026-02-20T00:00:00Z',
+    });
+
+    render(
+      <DeliverableCard
+        deliverable={makeDeliverable({
+          status: 'review',
+          automation_type: 'profile_rewrite',
+        })}
+        portalSlug="test-portal"
+      />
+    );
+
+    expect(await screen.findByText(/I help B2B founders generate pipeline/)).toBeInTheDocument();
+    expect(screen.getByText('View Full Rewrite')).toBeInTheDocument();
+  });
+
+  it('does NOT show preview for non-profile_rewrite deliverables', () => {
+    render(
+      <DeliverableCard
+        deliverable={makeDeliverable({
+          status: 'review',
+          automation_type: 'content_calendar',
+        })}
+        portalSlug="test-portal"
+      />
+    );
+
+    expect(screen.queryByText('View Full Rewrite')).not.toBeInTheDocument();
+  });
+
+  it('does NOT fetch output when automation_type is not profile_rewrite', () => {
+    render(
+      <DeliverableCard
+        deliverable={makeDeliverable({
+          status: 'review',
+          automation_type: null,
+        })}
+        portalSlug="test-portal"
+      />
+    );
+
+    expect(mockFetchAutomationOutput).not.toHaveBeenCalled();
+  });
+
+  it('opens modal when "View Full Rewrite" is clicked', async () => {
+    const user = userEvent.setup();
+
+    mockFetchAutomationOutput.mockResolvedValue({
+      output: {
+        headlines: {
+          outcome_based: 'Outcome headline',
+          authority_based: 'Authority headline',
+          hybrid: 'Hybrid headline',
+        },
+        about_section: 'Full about section',
+        featured_suggestions: ['Suggestion'],
+        banner_concept: 'Banner concept text',
+      },
+      completed_at: '2026-02-20T00:00:00Z',
+    });
+
+    render(
+      <DeliverableCard
+        deliverable={makeDeliverable({
+          status: 'review',
+          automation_type: 'profile_rewrite',
+        })}
+        portalSlug="test-portal"
+      />
+    );
+
+    await screen.findByText('View Full Rewrite');
+    await user.click(screen.getByText('View Full Rewrite'));
+
+    expect(screen.getByText('LinkedIn Profile Rewrite')).toBeInTheDocument();
+    expect(screen.getByText('Full about section')).toBeInTheDocument();
   });
 });

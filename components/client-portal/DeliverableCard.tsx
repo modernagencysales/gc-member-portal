@@ -1,6 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { DfyDeliverable } from '../../services/dfy-service';
-import { approveDeliverable, requestRevision } from '../../services/dfy-service';
+import {
+  approveDeliverable,
+  requestRevision,
+  fetchAutomationOutput,
+} from '../../services/dfy-service';
+import ProfileRewriteModal from './ProfileRewriteModal';
 
 // ── Status config ──────────────────────────────────────
 const STATUS_CONFIG: Record<string, { label: string; bg: string; text: string }> = {
@@ -74,6 +79,23 @@ const DeliverableCard: React.FC<DeliverableCardProps> = ({
   const [approveError, setApproveError] = useState<string | null>(null);
   const [approved, setApproved] = useState(false);
   const [revisionSent, setRevisionSent] = useState(false);
+  const [rewriteOutput, setRewriteOutput] = useState<Record<string, unknown> | null>(null);
+  const [showRewriteModal, setShowRewriteModal] = useState(false);
+
+  const isProfileRewrite = deliverable.automation_type === 'profile_rewrite';
+  const showRewritePreview =
+    isProfileRewrite &&
+    !!portalSlug &&
+    ['review', 'approved', 'completed'].includes(deliverable.status);
+
+  useEffect(() => {
+    if (!showRewritePreview || !portalSlug) return;
+    fetchAutomationOutput(portalSlug, 'profile_rewrite')
+      .then((data) => {
+        if (data?.output) setRewriteOutput(data.output as Record<string, unknown>);
+      })
+      .catch(() => {});
+  }, [showRewritePreview, portalSlug]);
 
   const isReview = deliverable.status === 'review' && portalSlug;
 
@@ -142,6 +164,36 @@ const DeliverableCard: React.FC<DeliverableCardProps> = ({
           </span>
         )}
       </div>
+
+      {/* ── Profile Rewrite Preview ──────────────── */}
+      {showRewritePreview &&
+        rewriteOutput &&
+        (() => {
+          const raw = (rewriteOutput as any).rewrite ?? rewriteOutput;
+          const headline = raw?.headlines?.outcome_based;
+          return (
+            <div className="mt-3 pt-3 border-t border-gray-100 dark:border-zinc-800">
+              <div className="bg-gray-50 dark:bg-zinc-800 rounded-lg px-3 py-2.5">
+                {headline && (
+                  <p className="text-sm text-gray-800 dark:text-zinc-200 line-clamp-2 mb-2">
+                    {headline}
+                  </p>
+                )}
+                <button
+                  onClick={() => setShowRewriteModal(true)}
+                  className="text-xs font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
+                >
+                  View Full Rewrite
+                </button>
+              </div>
+            </div>
+          );
+        })()}
+
+      {/* ── Profile Rewrite Modal ────────────────── */}
+      {showRewriteModal && rewriteOutput && (
+        <ProfileRewriteModal output={rewriteOutput} onClose={() => setShowRewriteModal(false)} />
+      )}
 
       {/* ── Approval / Revision section (review status only) ────── */}
       {isReview && !approved && !revisionSent && (
