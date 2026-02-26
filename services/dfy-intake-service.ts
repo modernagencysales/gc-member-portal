@@ -2,7 +2,7 @@ import { supabase } from '../lib/supabaseClient';
 import type { IntakeWizardData } from '../types/dfy-intake-types';
 import { getPortalToken } from './dfy-service';
 
-const GTM_SYSTEM_URL = import.meta.env.VITE_GTM_SYSTEM_URL || 'https://gtmconductor.com';
+const GTM_SYSTEM_URL = import.meta.env.VITE_GTM_SYSTEM_URL || 'https://www.modernagencysales.com';
 
 export async function submitIntakeWizard(
   portalSlug: string,

@@ -522,7 +522,8 @@ serve(async (req) => {
           }
 
           // Trigger provisioning via gtm-system API
-          const gtmSystemUrl = Deno.env.get('GTM_SYSTEM_URL') || 'https://gtmconductor.com';
+          const gtmSystemUrl =
+            Deno.env.get('GTM_SYSTEM_URL') || 'https://www.modernagencysales.com';
           try {
             const triggerRes = await fetch(`${gtmSystemUrl}/api/infrastructure/provision`, {
               method: 'POST',

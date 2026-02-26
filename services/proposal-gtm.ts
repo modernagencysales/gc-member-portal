@@ -1,7 +1,7 @@
 import { supabase } from '../lib/supabaseClient';
 import type { ProposalPackageConfig } from '../types/proposal-types';
 
-const GTM_API_BASE = import.meta.env.VITE_GTM_API_URL || 'https://gtmconductor.com';
+const GTM_API_BASE = import.meta.env.VITE_GTM_API_URL || 'https://www.modernagencysales.com';
 const ADMIN_API_KEY = import.meta.env.VITE_ADMIN_API_KEY;
 
 async function gtmFetch(path: string, options: RequestInit = {}) {

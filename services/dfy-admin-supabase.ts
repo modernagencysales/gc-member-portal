@@ -21,7 +21,7 @@ const ACTIVITY_COLUMNS =
 // GTM Admin API helper (x-admin-key auth)
 // ============================================
 
-const GTM_API_BASE = import.meta.env.VITE_GTM_SYSTEM_URL || 'https://gtmconductor.com';
+const GTM_API_BASE = import.meta.env.VITE_GTM_SYSTEM_URL || 'https://www.modernagencysales.com';
 const ADMIN_API_KEY = import.meta.env.VITE_ADMIN_API_KEY;
 
 async function gtmAdminFetch(path: string, options: RequestInit = {}) {

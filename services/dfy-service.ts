@@ -99,7 +99,7 @@ export interface DfyActivityEntry {
 // Sign Proposal
 // ============================================
 
-const GTM_SYSTEM_URL = import.meta.env.VITE_GTM_SYSTEM_URL || 'https://gtmconductor.com';
+const GTM_SYSTEM_URL = import.meta.env.VITE_GTM_SYSTEM_URL || 'https://www.modernagencysales.com';
 
 export async function signProposal(
   proposalId: string,

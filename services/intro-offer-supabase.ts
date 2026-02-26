@@ -61,7 +61,7 @@ export async function fetchLeadName(leadId: string): Promise<string | null> {
 // Admin actions (call gtm-system API)
 // ============================================
 
-const GTM_API_BASE = import.meta.env.VITE_GTM_API_URL || 'https://gtmconductor.com';
+const GTM_API_BASE = import.meta.env.VITE_GTM_API_URL || 'https://www.modernagencysales.com';
 
 async function gtmFetch(path: string, options: RequestInit = {}) {
   // Get current Supabase session token for authenticated API calls
