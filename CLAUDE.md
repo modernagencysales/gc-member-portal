@@ -117,7 +117,7 @@ src/
 
 **Client portal** (`components/client-portal/`):
 - `ClientPortalPage.tsx` — Main entry point. Three-gate logic for intro offers: (1) show `IntroOfferIntakeWizard` if `intake_status === 'pending'`, (2) show processing spinner if `intake_status === 'submitted'`, (3) show full portal otherwise
-- `IntroOfferIntakeWizard.tsx` — 5-step wizard: Best Clients URLs → Dream Clients URLs → Data Dump (file upload) → Call Transcript (paste) → Quick Confirms. Validates min 2 LinkedIn URLs per step. Submits to `POST /api/dfy/client/intake` on gtm-system
+- `IntroOfferIntakeWizard.tsx` — 4-step wizard: Best Clients URLs → Dream Clients URLs → Data Dump (file upload) → Quick Confirms. Validates min 2 LinkedIn URLs per step. Submits to `POST /api/dfy/client/intake` on gtm-system
 - `StepDataDump.tsx` — File upload with drag-drop. Validates extensions against `ALLOWED_EXTENSIONS` set
 - `ClientDashboard.tsx`, `DeliverableCard.tsx`, `ActivityTimeline.tsx` — Full portal UI
 

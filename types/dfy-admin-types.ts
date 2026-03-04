@@ -53,6 +53,7 @@ export interface DfyAdminEngagement {
   onboarding_checklist: OnboardingChecklist | null;
   communication_preference: DfyCommunicationPreference;
   linkedin_url: string | null;
+  call_transcript: string | null;
   intake_data: Record<string, unknown> | null;
   intake_submitted_at: string | null;
   unipile_account_id: string | null;
