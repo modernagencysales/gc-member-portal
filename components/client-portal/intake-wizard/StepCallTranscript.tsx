@@ -5,8 +5,11 @@ interface StepCallTranscriptProps {
   onChange: (transcript: string) => void;
 }
 
+const MAX_CHARS = 100_000;
+
 const StepCallTranscript: React.FC<StepCallTranscriptProps> = ({ callTranscript, onChange }) => {
   const charCount = callTranscript.length;
+  const nearLimit = charCount > MAX_CHARS * 0.9;
 
   return (
     <div>
@@ -21,16 +24,22 @@ const StepCallTranscript: React.FC<StepCallTranscriptProps> = ({ callTranscript,
 
       <div className="mb-4">
         <textarea
+          id="call-transcript"
           value={callTranscript}
           onChange={(e) => onChange(e.target.value)}
+          maxLength={MAX_CHARS}
           rows={14}
           placeholder={`Paste your call transcript here...\n\nExample:\nHost: So tell me about your biggest challenge right now.\nClient: Honestly, we're spending $10k/month on ads but can't tell which leads are actually qualified...`}
           className="w-full text-sm bg-white dark:bg-zinc-900 border border-gray-300 dark:border-zinc-700 rounded-md px-3 py-2 focus:ring-2 focus:ring-violet-500 focus:border-violet-500 outline-none text-gray-900 dark:text-zinc-100 placeholder-gray-400 dark:placeholder-zinc-500 resize-none"
         />
         <div className="flex items-center justify-between mt-1.5">
-          <p className="text-xs text-gray-400 dark:text-zinc-500">
+          <p
+            className={`text-xs ${nearLimit ? 'text-amber-500 dark:text-amber-400' : 'text-gray-400 dark:text-zinc-500'}`}
+          >
             {charCount > 0
-              ? `${charCount.toLocaleString()} characters`
+              ? nearLimit
+                ? `${(MAX_CHARS - charCount).toLocaleString()} characters remaining`
+                : `${charCount.toLocaleString()} characters`
               : 'No transcript pasted yet'}
           </p>
           <p className="text-xs text-gray-400 dark:text-zinc-500">
