@@ -5,6 +5,7 @@ import type {
   DfyActivityEntry,
   DfyAutomationRun,
   DfyAutomationOutput,
+  DfyIntakeFile,
 } from '../types/dfy-admin-types';
 
 // Column constants — must match DB schema (never select('*'))
@@ -269,4 +270,43 @@ export async function fetchIntakeFileUrls(
 ): Promise<Array<{ name: string; url: string | null; size: number; type: string }>> {
   const result = await gtmAdminFetch(`/api/dfy/admin/intake-files/${engagementId}`);
   return result.files || [];
+}
+
+// ============================================
+// Engagement files (dfy_intake_files table)
+// ============================================
+
+export async function fetchEngagementFiles(engagementId: string): Promise<DfyIntakeFile[]> {
+  const result = await gtmAdminFetch(`/api/dfy/admin/engagements/${engagementId}/files`);
+  return result.files || [];
+}
+
+export async function createEngagementFileRecord(
+  engagementId: string,
+  file: { file_name: string; file_type: string; storage_path: string; file_size: number }
+): Promise<DfyIntakeFile> {
+  return gtmAdminFetch(`/api/dfy/admin/engagements/${engagementId}/files`, {
+    method: 'POST',
+    body: JSON.stringify(file),
+  });
+}
+
+export async function deleteEngagementFile(engagementId: string, fileId: string): Promise<void> {
+  await gtmAdminFetch(`/api/dfy/admin/engagements/${engagementId}/files/${fileId}`, {
+    method: 'DELETE',
+  });
+}
+
+export async function uploadAdminFileToStorage(
+  engagementId: string,
+  file: File
+): Promise<{ storage_path: string }> {
+  const sanitizedName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+  const uuid = globalThis.crypto.randomUUID();
+  const storagePath = `${engagementId}/admin/${uuid}-${sanitizedName}`;
+
+  const { error } = await supabase.storage.from('dfy-intake-files').upload(storagePath, file);
+
+  if (error) throw new Error(`Upload failed: ${error.message}`);
+  return { storage_path: storagePath };
 }
