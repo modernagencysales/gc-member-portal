@@ -2362,14 +2362,15 @@ function ResourceFilesSection({ engagementId }: { engagementId: string }) {
     setUploading(true);
 
     try {
+      const errors: string[] = [];
       for (const file of Array.from(fileList)) {
         const ext = '.' + file.name.split('.').pop()?.toLowerCase();
         if (!ALLOWED_FILE_EXTENSIONS.has(ext)) {
-          setUploadError(`Unsupported file type: ${ext}`);
+          errors.push(`Unsupported file type: ${ext}`);
           continue;
         }
         if (file.size > MAX_FILE_SIZE) {
-          setUploadError(`File too large (max 50MB): ${file.name}`);
+          errors.push(`File too large (max 50MB): ${file.name}`);
           continue;
         }
 
@@ -2380,6 +2381,9 @@ function ResourceFilesSection({ engagementId }: { engagementId: string }) {
           storage_path,
           file_size: file.size,
         });
+      }
+      if (errors.length > 0) {
+        setUploadError(errors.join('; '));
       }
       queryClient.invalidateQueries({ queryKey: queryKeys.dfyIntakeFiles(engagementId) });
     } catch (err) {
