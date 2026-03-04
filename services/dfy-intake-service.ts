@@ -38,6 +38,7 @@ export async function submitIntakeWizard(
     best_client_urls: data.bestClientUrls.filter((u) => u.url.trim()),
     dream_client_urls: data.dreamClientUrls.filter((u) => u.url.trim()),
     raw_text_dump: data.rawTextDump,
+    call_transcript: data.callTranscript,
     confirms: {
       niche: data.confirms.niche,
       tone: data.confirms.tone,

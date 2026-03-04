@@ -5,6 +5,7 @@ import { submitIntakeWizard, fetchBlueprintData } from '../../../services/dfy-in
 import StepBestClients from './StepBestClients';
 import StepDreamClients from './StepDreamClients';
 import StepDataDump from './StepDataDump';
+import StepCallTranscript from './StepCallTranscript';
 import StepQuickConfirms from './StepQuickConfirms';
 
 interface IntroOfferIntakeWizardProps {
@@ -30,6 +31,7 @@ function createInitialData(): IntakeWizardData {
     ],
     files: [],
     rawTextDump: '',
+    callTranscript: '',
     confirms: {
       niche: '',
       tone: '',
@@ -160,6 +162,13 @@ const IntroOfferIntakeWizard: React.FC<IntroOfferIntakeWizardProps> = ({
           />
         );
       case 3:
+        return (
+          <StepCallTranscript
+            callTranscript={data.callTranscript}
+            onChange={(callTranscript) => setData((prev) => ({ ...prev, callTranscript }))}
+          />
+        );
+      case 4:
         return (
           <StepQuickConfirms
             confirms={data.confirms}
