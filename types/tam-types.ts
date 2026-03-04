@@ -52,6 +52,10 @@ export interface IcpProfile {
   contactsPerCompany: number;
   specialCriteria?: string;
   seedCompanyDomains?: string[];
+  /** Target number of companies to source (default 1000) */
+  targetListSize?: number;
+  /** Minimum Discolike similarity score threshold (default 50, lower = more results) */
+  discolikeMinScore?: number;
   sourcingLimits?: SourcingLimits;
 }
 
@@ -59,10 +63,12 @@ export interface IcpProfile {
 export interface SourcingLimits {
   /** Prospeo max pages (25 results/page). Default: 40 → ~1,000 companies */
   prospeoMaxPages?: number;
-  /** Discolike max records (domain consensus). Default: 200 */
+  /** Discolike max records per round (snowball discovery). Default: 500 */
   discolikeMaxRecords?: number;
-  /** BlitzAPI max pages (100 results/page). Default: 20 → ~2,000 companies. Set to 200 for ~20k */
+  /** BlitzAPI max pages (100 results/page). Default: 20 → ~2,000 contacts */
   blitzApiMaxPages?: number;
+  /** Max snowball discovery iterations. Default: 10 */
+  discolikeMaxRounds?: number;
 }
 
 export interface SourcingStrategy {

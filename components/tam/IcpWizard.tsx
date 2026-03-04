@@ -24,7 +24,8 @@ const IcpWizard: React.FC<IcpWizardProps> = ({ onComplete, isSubmitting, error }
     industryKeywords: [],
     targetTitles: [],
     seniorityPreference: [],
-    contactsPerCompany: 1,
+    contactsPerCompany: 2,
+    targetListSize: 1000,
     specialCriteria: '',
     seedCompanyDomains: [],
   });
@@ -83,12 +84,15 @@ const IcpWizard: React.FC<IcpWizardProps> = ({ onComplete, isSubmitting, error }
       industryKeywords,
       targetTitles: formData.targetTitles || [],
       seniorityPreference: formData.seniorityPreference || [],
-      contactsPerCompany: formData.contactsPerCompany || 1,
+      contactsPerCompany: formData.contactsPerCompany || 2,
+      targetListSize: formData.targetListSize || 1000,
+      discolikeMinScore: formData.discolikeMinScore,
       specialCriteria: formData.specialCriteria,
       seedCompanyDomains:
         formData.seedCompanyDomains && formData.seedCompanyDomains.length > 0
           ? formData.seedCompanyDomains
           : undefined,
+      sourcingLimits: formData.sourcingLimits,
     };
 
     onComplete(icpProfile);

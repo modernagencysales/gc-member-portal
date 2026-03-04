@@ -11,6 +11,12 @@ const BUSINESS_MODEL_LABELS: Record<BusinessModelType, string> = {
   other: 'Other',
 };
 
+const TARGET_LIST_PRESETS = [
+  { value: 1000, label: '1,000 companies', desc: 'Quick run' },
+  { value: 5000, label: '5,000 companies', desc: 'Recommended for outbound' },
+  { value: 10000, label: '10,000 companies', desc: 'Maximum coverage (30-60 min)' },
+];
+
 interface WizardStep4Props {
   formData: Partial<IcpProfile>;
   setFormData: (data: Partial<IcpProfile>) => void;
@@ -32,6 +38,9 @@ const WizardStep4Review: React.FC<WizardStep4Props> = ({
   isSubmitting,
   error,
 }) => {
+  const [customTarget, setCustomTarget] = useState(false);
+  const targetListSize = formData.targetListSize || 1000;
+
   return (
     <div className="space-y-6">
       <div>
@@ -42,6 +51,62 @@ const WizardStep4Review: React.FC<WizardStep4Props> = ({
       </div>
 
       <div className="space-y-4">
+        {/* Target List Size — prominent, above everything else */}
+        <div className="p-4 rounded-xl bg-violet-50 dark:bg-violet-900/20 border border-violet-200 dark:border-violet-800">
+          <h3 className="font-semibold text-zinc-900 dark:text-white mb-3">Target List Size</h3>
+          <div className="grid grid-cols-3 gap-2 mb-3">
+            {TARGET_LIST_PRESETS.map((preset) => (
+              <button
+                key={preset.value}
+                type="button"
+                onClick={() => {
+                  setCustomTarget(false);
+                  setFormData({ ...formData, targetListSize: preset.value });
+                }}
+                className={`p-3 rounded-lg border text-left transition-colors ${
+                  !customTarget && targetListSize === preset.value
+                    ? 'border-violet-500 bg-violet-100 dark:bg-violet-900/40'
+                    : 'border-zinc-200 dark:border-zinc-700 hover:border-violet-300 dark:hover:border-violet-700'
+                }`}
+              >
+                <div className="text-sm font-semibold text-zinc-900 dark:text-white">
+                  {preset.label}
+                </div>
+                <div className="text-xs text-zinc-500 dark:text-zinc-400">{preset.desc}</div>
+              </button>
+            ))}
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setCustomTarget(true)}
+              className={`text-xs px-2 py-1 rounded ${
+                customTarget
+                  ? 'bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300'
+                  : 'text-zinc-500 hover:text-violet-500'
+              }`}
+            >
+              Custom
+            </button>
+            {customTarget && (
+              <input
+                type="number"
+                min={100}
+                max={50000}
+                value={targetListSize}
+                onChange={(e) => {
+                  const v = parseInt(e.target.value, 10);
+                  if (!isNaN(v) && v > 0) {
+                    setFormData({ ...formData, targetListSize: v });
+                  }
+                }}
+                className="w-32 px-3 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
+                placeholder="e.g. 3000"
+              />
+            )}
+          </div>
+        </div>
+
         {/* Business Model Summary */}
         <div className="p-4 rounded-xl bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700">
           <h3 className="font-semibold text-zinc-900 dark:text-white mb-2">Business Model</h3>
@@ -110,7 +175,7 @@ const WizardStep4Review: React.FC<WizardStep4Props> = ({
             </p>
             <p>
               <span className="font-medium">Contacts per company:</span>{' '}
-              {formData.contactsPerCompany}
+              {formData.contactsPerCompany || 2}
             </p>
           </div>
         </div>
@@ -119,6 +184,9 @@ const WizardStep4Review: React.FC<WizardStep4Props> = ({
         <SourcingLimitsPanel
           limits={formData.sourcingLimits || {}}
           onChange={(limits) => setFormData({ ...formData, sourcingLimits: limits })}
+          targetListSize={targetListSize}
+          discolikeMinScore={formData.discolikeMinScore}
+          onMinScoreChange={(score) => setFormData({ ...formData, discolikeMinScore: score })}
         />
 
         {/* Special Criteria */}
@@ -180,44 +248,42 @@ const LIMIT_FIELDS: {
   label: string;
   defaultValue: number;
   hint: string;
-  perPageSize: number;
 }[] = [
   {
     key: 'prospeoMaxPages',
     label: 'Prospeo pages',
     defaultValue: 40,
     hint: '25 companies/page',
-    perPageSize: 25,
   },
   {
     key: 'discolikeMaxRecords',
-    label: 'Discolike max records',
-    defaultValue: 200,
-    hint: 'companies from domain consensus',
-    perPageSize: 0,
+    label: 'Discolike per round',
+    defaultValue: 500,
+    hint: 'companies per snowball round',
+  },
+  {
+    key: 'discolikeMaxRounds',
+    label: 'Snowball rounds',
+    defaultValue: 10,
+    hint: 'discovery iterations',
   },
   {
     key: 'blitzApiMaxPages',
     label: 'BlitzAPI pages',
     defaultValue: 20,
-    hint: '100 companies/page',
-    perPageSize: 100,
+    hint: 'for contact finding (not company sourcing)',
   },
 ];
-
-function estimateCompanies(limits: Partial<SourcingLimits>): string {
-  const prospeo = (limits.prospeoMaxPages || 40) * 25;
-  const discolike = limits.discolikeMaxRecords || 200;
-  const blitz = (limits.blitzApiMaxPages || 20) * 100;
-  const total = prospeo + discolike + blitz;
-  return `~${total.toLocaleString()} max (before dedup)`;
-}
 
 const SourcingLimitsPanel: React.FC<{
   limits: Partial<SourcingLimits>;
   onChange: (limits: Partial<SourcingLimits>) => void;
-}> = ({ limits, onChange }) => {
+  targetListSize: number;
+  discolikeMinScore?: number;
+  onMinScoreChange: (score: number) => void;
+}> = ({ limits, onChange, targetListSize, discolikeMinScore, onMinScoreChange }) => {
   const [open, setOpen] = useState(false);
+  const minScore = discolikeMinScore ?? 50;
 
   return (
     <div className="rounded-xl border border-zinc-200 dark:border-zinc-700 overflow-hidden">
@@ -228,9 +294,9 @@ const SourcingLimitsPanel: React.FC<{
       >
         <div className="flex items-center gap-2">
           <Settings2 className="w-4 h-4 text-zinc-500" />
-          <h3 className="font-semibold text-zinc-900 dark:text-white text-sm">Sourcing Volume</h3>
+          <h3 className="font-semibold text-zinc-900 dark:text-white text-sm">Sourcing Settings</h3>
           <span className="text-xs text-zinc-500 dark:text-zinc-400">
-            {estimateCompanies(limits)}
+            ~{targetListSize.toLocaleString()} target
           </span>
         </div>
         <span className="text-xs text-violet-500 font-medium">{open ? 'Hide' : 'Customize'}</span>
@@ -239,14 +305,33 @@ const SourcingLimitsPanel: React.FC<{
       {open && (
         <div className="p-4 space-y-3 border-t border-zinc-200 dark:border-zinc-700">
           <p className="text-xs text-zinc-500 dark:text-zinc-400">
-            Adjust how many leads each source pulls. Higher values = more companies but longer run
-            time.
+            Fine-tune sourcing behavior. Snowball discovery uses your seed companies to find similar
+            businesses across multiple rounds.
           </p>
-          {LIMIT_FIELDS.map(({ key, label, defaultValue, hint, perPageSize }) => {
+
+          {/* Min similarity score slider */}
+          <div className="flex items-center gap-3">
+            <label className="text-sm text-zinc-700 dark:text-zinc-300 w-48 shrink-0">
+              Min similarity score
+            </label>
+            <input
+              type="range"
+              min={20}
+              max={80}
+              value={minScore}
+              onChange={(e) => onMinScoreChange(parseInt(e.target.value, 10))}
+              className="flex-1 accent-violet-500"
+            />
+            <span className="text-sm text-zinc-600 dark:text-zinc-400 w-8 text-right">
+              {minScore}
+            </span>
+          </div>
+          <p className="text-xs text-zinc-400 dark:text-zinc-500 ml-48 pl-3 -mt-1">
+            Lower = more results but less similar to seeds
+          </p>
+
+          {LIMIT_FIELDS.map(({ key, label, defaultValue, hint }) => {
             const value = limits[key] ?? defaultValue;
-            const estimated = perPageSize
-              ? ` (~${(value * perPageSize).toLocaleString()} companies)`
-              : '';
             return (
               <div key={key} className="flex items-center gap-3">
                 <label className="text-sm text-zinc-700 dark:text-zinc-300 w-48 shrink-0">
@@ -264,10 +349,7 @@ const SourcingLimitsPanel: React.FC<{
                   }}
                   className="w-24 px-3 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
                 />
-                <span className="text-xs text-zinc-400 dark:text-zinc-500">
-                  {hint}
-                  {estimated}
-                </span>
+                <span className="text-xs text-zinc-400 dark:text-zinc-500">{hint}</span>
               </div>
             );
           })}
