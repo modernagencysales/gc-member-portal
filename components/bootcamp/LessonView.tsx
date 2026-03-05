@@ -697,7 +697,11 @@ const LessonView: React.FC<LessonViewProps> = ({
                   src={
                     lesson.embedUrl.includes('drive.google.com/file')
                       ? lesson.embedUrl.replace(/\/view.*$/, '/preview')
-                      : lesson.embedUrl
+                      : (lesson.embedUrl.includes('grain.com') ||
+                            lesson.embedUrl.includes('grain.co')) &&
+                          lesson.embedUrl.includes('/share/')
+                        ? lesson.embedUrl.replace('/share/', '/_/embed/')
+                        : lesson.embedUrl
                   }
                   className="w-full h-full border-0"
                   allowFullScreen
