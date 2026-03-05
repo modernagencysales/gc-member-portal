@@ -94,6 +94,7 @@ const BootcampApp: React.FC = () => {
   const [currentLesson, setCurrentLesson] = useState<Lesson | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [isDarkMode, setIsDarkMode] = useState(() => {
     return localStorage.getItem('gtm_os_theme') === 'dark';
   });
@@ -239,30 +240,48 @@ const BootcampApp: React.FC = () => {
 
     const cohortName = cohortNameOverride || activeUser.cohort;
 
-    // Try new Supabase LMS first, fall back to Airtable if no content
-    let data = await fetchStudentCurriculumAsLegacy(cohortName, activeUser.email);
+    try {
+      setLoadError(null);
 
-    // If Supabase LMS has no weeks, fall back to Airtable
-    if (!data.weeks.length) {
-      data = await fetchCourseData(cohortName, activeUser.email);
+      // Try new Supabase LMS first, fall back to Airtable if no content
+      let data = await fetchStudentCurriculumAsLegacy(cohortName, activeUser.email);
+
+      // If Supabase LMS has no weeks, fall back to Airtable
+      if (!data.weeks.length) {
+        data = await fetchCourseData(cohortName, activeUser.email);
+      }
+
+      // Prevent stale data from overwriting (race condition between init + enrollment load)
+      if (loadRequestRef.current !== thisLoadId) return;
+
+      setCourseData(data);
+
+      // Lead Magnet users with no content grants should land on My Blueprint, not Week 1
+      if (activeUser.status === 'Lead Magnet') {
+        setCurrentLesson({
+          id: 'my-blueprint',
+          title: 'My Blueprint',
+          embedUrl: 'virtual:my-blueprint',
+        });
+      } else if (data.weeks.length > 0 && data.weeks[0].lessons.length > 0) {
+        setCurrentLesson(data.weeks[0].lessons[0]);
+      } else {
+        // Fallback: no lessons available yet
+        setCurrentLesson({
+          id: 'no-content',
+          title: 'No Content Available',
+          embedUrl: '',
+        });
+      }
+    } catch (error) {
+      console.error('Failed to load curriculum:', error);
+      if (loadRequestRef.current !== thisLoadId) return;
+      setLoadError('Unable to load your content. Please refresh the page to try again.');
+    } finally {
+      if (loadRequestRef.current === thisLoadId) {
+        setLoading(false);
+      }
     }
-
-    // Prevent stale data from overwriting (race condition between init + enrollment load)
-    if (loadRequestRef.current !== thisLoadId) return;
-
-    setCourseData(data);
-
-    // Lead Magnet users with no content grants should land on My Blueprint, not Week 1
-    if (activeUser.status === 'Lead Magnet') {
-      setCurrentLesson({
-        id: 'my-blueprint',
-        title: 'My Blueprint',
-        embedUrl: 'virtual:my-blueprint',
-      });
-    } else if (data.weeks.length > 0 && data.weeks[0].lessons.length > 0) {
-      setCurrentLesson(data.weeks[0].lessons[0]);
-    }
-    setLoading(false);
   };
 
   // Reload curriculum when active enrollment changes
@@ -618,6 +637,19 @@ const BootcampApp: React.FC = () => {
   }
 
   // Curriculum loading
+  if (loadError) {
+    return (
+      <div className="flex flex-col items-center justify-center p-8 gap-4">
+        <p className="text-red-600 dark:text-red-400">{loadError}</p>
+        <button
+          onClick={() => window.location.reload()}
+          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+        >
+          Refresh Page
+        </button>
+      </div>
+    );
+  }
   if (!courseData || !currentLesson) return <div className="p-8">Syncing content...</div>;
 
   const currentWeek = courseData.weeks.find(
@@ -954,6 +986,7 @@ const BootcampApp: React.FC = () => {
       <FeedbackWidget
         userEmail={bootcampStudent?.email ?? user?.email ?? null}
         userId={bootcampStudent?.id ?? null}
+        appName="Bootcamp"
       />
     </div>
   );
