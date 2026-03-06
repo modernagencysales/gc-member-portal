@@ -986,7 +986,6 @@ const BootcampApp: React.FC = () => {
       <FeedbackWidget
         userEmail={bootcampStudent?.email ?? user?.email ?? null}
         userId={bootcampStudent?.id ?? null}
-        appName="Bootcamp"
       />
     </div>
   );

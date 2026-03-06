@@ -5,11 +5,12 @@ import type {
   DfyActivityEntry,
   DfyAutomationRun,
   DfyAutomationOutput,
+  DfyIntakeFile,
 } from '../types/dfy-admin-types';
 
 // Column constants — must match DB schema (never select('*'))
 const ADMIN_ENGAGEMENT_COLUMNS =
-  'id, proposal_id, tenant_id, client_name, client_email, client_company, portal_slug, status, monthly_rate, start_date, linear_project_id, slack_channel_id, stripe_subscription_id, onboarding_checklist, linkedin_url, unipile_account_id, linkedin_connected_at, communication_preference, intake_data, intake_submitted_at, engagement_type, blueprint_prospect_id, intake_status, processed_intake, magnetlab_user_id, linear_customer_id, created_at';
+  'id, proposal_id, tenant_id, client_name, client_email, client_company, portal_slug, status, monthly_rate, start_date, linear_project_id, slack_channel_id, stripe_subscription_id, onboarding_checklist, linkedin_url, call_transcript, unipile_account_id, linkedin_connected_at, communication_preference, intake_data, intake_submitted_at, engagement_type, blueprint_prospect_id, intake_status, processed_intake, magnetlab_user_id, linear_customer_id, created_at';
 const DELIVERABLE_COLUMNS =
   'id, engagement_id, name, description, category, status, assignee, due_date, sort_order, client_approved_at, client_notes, linear_issue_id, milestone_id, playbook_url, automation_type, automation_status, depends_on, revision_feedback, revision_requested_at, revision_count, created_at';
 const AUTOMATION_RUN_COLUMNS =
@@ -171,6 +172,7 @@ export async function updateEngagement(
     onboarding_checklist?: Record<string, unknown>;
     communication_preference?: string;
     linkedin_url?: string | null;
+    call_transcript?: string | null;
   }
 ) {
   return gtmAdminFetch(`/api/dfy/admin/engagements/${id}`, {
@@ -268,4 +270,43 @@ export async function fetchIntakeFileUrls(
 ): Promise<Array<{ name: string; url: string | null; size: number; type: string }>> {
   const result = await gtmAdminFetch(`/api/dfy/admin/intake-files/${engagementId}`);
   return result.files || [];
+}
+
+// ============================================
+// Engagement files (dfy_intake_files table)
+// ============================================
+
+export async function fetchEngagementFiles(engagementId: string): Promise<DfyIntakeFile[]> {
+  const result = await gtmAdminFetch(`/api/dfy/admin/engagements/${engagementId}/files`);
+  return result.files || [];
+}
+
+export async function createEngagementFileRecord(
+  engagementId: string,
+  file: { file_name: string; file_type: string; storage_path: string; file_size: number }
+): Promise<DfyIntakeFile> {
+  return gtmAdminFetch(`/api/dfy/admin/engagements/${engagementId}/files`, {
+    method: 'POST',
+    body: JSON.stringify(file),
+  });
+}
+
+export async function deleteEngagementFile(engagementId: string, fileId: string): Promise<void> {
+  await gtmAdminFetch(`/api/dfy/admin/engagements/${engagementId}/files/${fileId}`, {
+    method: 'DELETE',
+  });
+}
+
+export async function uploadAdminFileToStorage(
+  engagementId: string,
+  file: File
+): Promise<{ storage_path: string }> {
+  const sanitizedName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+  const uuid = globalThis.crypto.randomUUID();
+  const storagePath = `${engagementId}/admin/${uuid}-${sanitizedName}`;
+
+  const { error } = await supabase.storage.from('dfy-intake-files').upload(storagePath, file);
+
+  if (error) throw new Error(`Upload failed: ${error.message}`);
+  return { storage_path: storagePath };
 }

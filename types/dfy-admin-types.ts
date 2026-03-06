@@ -53,6 +53,7 @@ export interface DfyAdminEngagement {
   onboarding_checklist: OnboardingChecklist | null;
   communication_preference: DfyCommunicationPreference;
   linkedin_url: string | null;
+  call_transcript: string | null;
   intake_data: Record<string, unknown> | null;
   intake_submitted_at: string | null;
   unipile_account_id: string | null;
@@ -270,4 +271,18 @@ export interface ProfileRewriteOutput {
 export interface DfyAutomationOutput {
   output_data: Record<string, unknown> | null;
   completed_at: string | null;
+}
+
+export interface DfyIntakeFile {
+  id: string;
+  engagement_id: string;
+  file_name: string;
+  file_type: string;
+  storage_path: string;
+  file_size: number | null;
+  processed: boolean;
+  extracted_text: string | null;
+  uploaded_by: 'client' | 'admin';
+  created_at: string;
+  signed_url: string | null;
 }
