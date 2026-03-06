@@ -1,9 +1,9 @@
-import React, { useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { CheckCircle, BarChart3, AlertTriangle, User, Lightbulb, Calendar } from 'lucide-react';
 import ThemeToggle from './ThemeToggle';
-import CalEmbed from './CalEmbed';
+import IClosedBooking from '../shared/IClosedBooking';
 import { getBlueprintSettings } from '../../services/blueprint-supabase';
 import { queryKeys } from '../../lib/queryClient';
 
@@ -58,26 +58,51 @@ const BLUEPRINT_CONTENTS = [
 // BlueprintThankYou Component
 // ============================================
 
-const CAL_BOOKING_LINK = 'vlad-timinski-pqqica/30min';
-
 const BlueprintThankYou: React.FC = () => {
   const location = useLocation();
   const state = location.state as {
     prospectId?: string;
     reportUrl?: string;
     monthlyIncome?: string;
+    email?: string;
+    fullName?: string;
   } | null;
-  const DISQUALIFYING_REVENUE = ['Not generating revenue yet', 'Under $5k', '$5k-$10k'];
-  const showBooking = !state?.monthlyIncome || !DISQUALIFYING_REVENUE.includes(state.monthlyIncome);
-  const calEmbedRef = useRef<HTMLDivElement>(null);
+
+  // Qualification state from funnel API
+  const [qualState, setQualState] = useState<{
+    qualified: boolean;
+    iclosed_event_url: string;
+  } | null>(null);
+
+  useEffect(() => {
+    if (!state?.email) return;
+    fetch(
+      `${import.meta.env.VITE_GTM_SYSTEM_URL}/api/funnel/qualification/${encodeURIComponent(state.email)}`,
+      { headers: { 'x-admin-key': import.meta.env.VITE_ADMIN_API_KEY } }
+    )
+      .then((r) => r.json())
+      .then((d) =>
+        setQualState({
+          qualified: d.qualification?.qualified ?? false,
+          iclosed_event_url: d.iclosed_event_url || '',
+        })
+      )
+      .catch(() => setQualState({ qualified: false, iclosed_event_url: '' }));
+  }, [state?.email]);
+
+  // Show booking while loading or if qualified with a valid URL
+  const showBooking =
+    qualState === null || qualState.qualified !== false || !!qualState.iclosed_event_url;
+
+  const bookingEmbedRef = useRef<HTMLDivElement>(null);
 
   const { data: settings } = useQuery({
     queryKey: queryKeys.blueprintSettings(),
     queryFn: getBlueprintSettings,
   });
 
-  const scrollToCalEmbed = () => {
-    calEmbedRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  const scrollToBookingEmbed = () => {
+    bookingEmbedRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
   return (
@@ -128,13 +153,25 @@ const BlueprintThankYou: React.FC = () => {
                 Book a free 30-minute strategy call. We&apos;ll walk you through your blueprint,
                 answer your questions, and map out your next steps.
               </p>
-              <button
-                onClick={scrollToCalEmbed}
-                className="inline-flex items-center gap-2 px-8 py-4 rounded-xl text-lg font-semibold bg-violet-500 hover:bg-violet-600 text-white transition-colors shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40"
-              >
-                <Calendar className="w-5 h-5" />
-                Book Your Free Walkthrough
-              </button>
+              {qualState?.iclosed_event_url ? (
+                <IClosedBooking
+                  mode="popup"
+                  eventUrl={qualState.iclosed_event_url}
+                  leadEmail={state?.email}
+                  leadName={state?.fullName}
+                  qualified={qualState.qualified}
+                  disqualifiedRedirectUrl="/blueprint/resources"
+                  ctaText="Book Your Free Walkthrough"
+                />
+              ) : (
+                <button
+                  onClick={scrollToBookingEmbed}
+                  className="inline-flex items-center gap-2 px-8 py-4 rounded-xl text-lg font-semibold bg-violet-500 hover:bg-violet-600 text-white transition-colors shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40"
+                >
+                  <Calendar className="w-5 h-5" />
+                  Book Your Free Walkthrough
+                </button>
+              )}
             </div>
           </section>
         )}
@@ -165,13 +202,22 @@ const BlueprintThankYou: React.FC = () => {
             link via email once it's ready. */}
       </div>
 
-      {/* CalEmbed — wider container so month view doesn't collapse to mobile */}
-      {showBooking && (
+      {/* iClosed inline embed — wider container */}
+      {showBooking && qualState?.iclosed_event_url && (
         <div className="max-w-5xl mx-auto px-4 pb-12 sm:pb-16">
           <h2 className="text-2xl sm:text-3xl font-bold text-zinc-900 dark:text-zinc-100 text-center mb-6">
             Book Your Free Walkthrough Now
           </h2>
-          <CalEmbed ref={calEmbedRef} calLink={CAL_BOOKING_LINK} />
+          <div ref={bookingEmbedRef}>
+            <IClosedBooking
+              mode="inline"
+              eventUrl={qualState.iclosed_event_url}
+              leadEmail={state?.email}
+              leadName={state?.fullName}
+              qualified={qualState.qualified}
+              disqualifiedRedirectUrl="/blueprint/resources"
+            />
+          </div>
         </div>
       )}
 

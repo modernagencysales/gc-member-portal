@@ -29,7 +29,7 @@ import ContentRoadmap from './ContentRoadmap';
 import MarketingBlock from './MarketingBlock';
 import CTAButton from './CTAButton';
 import StickyCTA from './StickyCTA';
-import CalEmbed, { buildCalBookingUrl, CalProspectInfo } from './CalEmbed';
+import IClosedBooking from '../shared/IClosedBooking';
 import SectionBridge from './SectionBridge';
 import ValueStack from './ValueStack';
 import SimpleSteps from './SimpleSteps';
@@ -214,8 +214,14 @@ const BlueprintPage: React.FC = () => {
   const [notFound, setNotFound] = useState(false);
   const [data, setData] = useState<BlueprintData | null>(null);
 
-  // Ref for CalEmbed intersection observer
-  const calEmbedRef = useRef<HTMLDivElement>(null);
+  // Ref for IClosedBooking inline embed intersection observer
+  const bookingEmbedRef = useRef<HTMLDivElement>(null);
+
+  // Qualification state from funnel API
+  const [qualState, setQualState] = useState<{
+    qualified: boolean;
+    iclosed_event_url: string;
+  } | null>(null);
 
   // Fetch data
   const fetchBlueprintData = async () => {
@@ -269,6 +275,24 @@ const BlueprintPage: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [slug]);
 
+  // Fetch qualification from the funnel API once prospect email is available
+  useEffect(() => {
+    if (!data?.prospect?.email) return;
+    const email = data.prospect.email;
+    fetch(
+      `${import.meta.env.VITE_GTM_SYSTEM_URL}/api/funnel/qualification/${encodeURIComponent(email)}`,
+      { headers: { 'x-admin-key': import.meta.env.VITE_ADMIN_API_KEY } }
+    )
+      .then((r) => r.json())
+      .then((d) =>
+        setQualState({
+          qualified: d.qualification?.qualified ?? false,
+          iclosed_event_url: d.iclosed_event_url || '',
+        })
+      )
+      .catch(() => setQualState({ qualified: false, iclosed_event_url: '' }));
+  }, [data?.prospect?.email]);
+
   // Handle loading state
   if (loading) {
     return <BlueprintLoadingState />;
@@ -294,29 +318,14 @@ const BlueprintPage: React.FC = () => {
   // Filter content blocks — only FAQ needed now (bootcamp removed)
   const faqBlock = contentBlocks.find((b) => b.blockType === 'faq');
 
-  // Get calBookingLink from settings with fallback
-  const calBookingLink = settings?.calBookingLink || 'timkeen/30min';
-
-  // Build prospect info for Cal.com pre-filling
-  const prospectInfo: CalProspectInfo = {
-    name: prospect.fullName,
-    email: prospect.email,
-    company: prospect.company,
-    authorityScore: prospect.authorityScore,
-  };
-
-  // Build a standalone (new-tab) Cal.com booking URL with pre-filled prospect data
-  const calNewTabUrl = buildCalBookingUrl(calBookingLink, { prospectInfo });
-
   // Score-based intro paragraph
   const authorityScore = prospect.authorityScore ?? 0;
   const introParagraph = getScoreBasedIntro(authorityScore);
 
-  // Hide booking UI for disqualified survey respondents (low revenue)
-  // Cold email leads (no monthlyIncome) still see booking
-  const DISQUALIFYING_REVENUE = ['Not generating revenue yet', 'Under $5k', '$5k-$10k'];
+  // Qualification-based booking visibility (from funnel API)
+  // Show booking by default while qualification is loading, hide only if explicitly disqualified
   const showBooking =
-    !prospect.monthlyIncome || !DISQUALIFYING_REVENUE.includes(prospect.monthlyIncome);
+    qualState === null || qualState.qualified !== false || !!qualState.iclosed_event_url;
 
   // Dynamic CTA: offer unlock → "View Your Offer", otherwise default
   const offerUrl =
@@ -338,9 +347,9 @@ const BlueprintPage: React.FC = () => {
   const stickyCtaHref = tenantBranding?.offer_cta_url || offerUrl || undefined;
   const tenantColorStyles = getTenantColors(tenantBranding);
 
-  // Scroll to CalEmbed handler
-  const scrollToCalEmbed = () => {
-    const el = calEmbedRef.current;
+  // Scroll to booking embed handler
+  const scrollToBookingEmbed = () => {
+    const el = bookingEmbedRef.current;
     if (!el) return;
     el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     // Re-scroll after a brief delay in case layout shifts from lazy-loaded content
@@ -469,7 +478,7 @@ const BlueprintPage: React.FC = () => {
               <CTAButton
                 text={ctaText}
                 subtext={ctaSubtext}
-                onClick={ctaHref ? undefined : scrollToCalEmbed}
+                onClick={ctaHref ? undefined : scrollToBookingEmbed}
                 href={ctaHref}
                 size="large"
                 icon={offerUrl ? 'arrow' : 'calendar'}
@@ -516,8 +525,8 @@ const BlueprintPage: React.FC = () => {
         )}
       </div>
 
-      {/* Bottom section — headline, Cal embed, credibility note (hidden for disqualified) */}
-      {showBooking && (
+      {/* Bottom section — headline, iClosed embed, credibility note (hidden for disqualified) */}
+      {showBooking && qualState?.iclosed_event_url && (
         <div className="max-w-4xl mx-auto px-4 pb-12 sm:pb-16 space-y-6">
           <ScrollReveal>
             <h2 className="text-3xl sm:text-4xl font-bold text-center text-zinc-900 dark:text-zinc-100">
@@ -526,7 +535,16 @@ const BlueprintPage: React.FC = () => {
           </ScrollReveal>
 
           <ScrollReveal>
-            <CalEmbed ref={calEmbedRef} calLink={calBookingLink} prospectInfo={prospectInfo} />
+            <div ref={bookingEmbedRef}>
+              <IClosedBooking
+                mode="inline"
+                eventUrl={qualState.iclosed_event_url}
+                leadEmail={prospect.email}
+                leadName={prospect.fullName}
+                qualified={qualState.qualified}
+                disqualifiedRedirectUrl="/blueprint/resources"
+              />
+            </div>
           </ScrollReveal>
 
           <ScrollReveal delay={100}>
@@ -541,7 +559,7 @@ const BlueprintPage: React.FC = () => {
       {/* 22. StickyCTA (fixed position) */}
       <StickyCTA
         text={stickyCtaText}
-        calEmbedRef={calEmbedRef}
+        calEmbedRef={bookingEmbedRef}
         isVisible={(settings?.stickyCTAEnabled ?? true) && (!!stickyCtaHref || showBooking)}
         href={stickyCtaHref}
         useBrandColors={hasTenantBranding}
