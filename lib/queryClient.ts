@@ -159,4 +159,11 @@ export const queryKeys = {
   dfyAutomationOutput: (engagementId: string, automationType: string) =>
     ['dfy', 'automation-output', engagementId, automationType] as const,
   dfyIntakeFiles: (engagementId: string) => ['dfy', 'intake-files', engagementId] as const,
+
+  // Funnel
+  funnelStages: () => ['funnel', 'stages'] as const,
+  funnelMetrics: (channel?: string, dateRange?: string) =>
+    ['funnel', 'metrics', channel, dateRange] as const,
+  funnelAttribution: (dateRange?: string) => ['funnel', 'attribution', dateRange] as const,
+  funnelConfig: () => ['funnel', 'config'] as const,
 };

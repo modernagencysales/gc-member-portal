@@ -19,6 +19,7 @@ import {
   ScrollText,
   Briefcase,
   LayoutTemplate,
+  BarChart3,
 } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 
@@ -60,6 +61,10 @@ const sections: NavSection[] = [
   {
     label: 'Sales',
     items: [{ to: '/admin/proposals', icon: ScrollText, label: 'Proposals', end: true }],
+  },
+  {
+    label: 'Funnel',
+    items: [{ to: '/admin/funnel', icon: BarChart3, label: 'Dashboard' }],
   },
   {
     label: 'DFY Clients',

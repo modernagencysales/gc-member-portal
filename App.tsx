@@ -62,6 +62,9 @@ const AdminLmsCurriculumPage = lazy(
   () => import('./components/admin/lms/curriculum/AdminLmsCurriculumPage')
 );
 
+// Lazy-loaded: Funnel Admin
+const AdminFunnelPage = lazy(() => import('./components/admin/funnel/AdminFunnelPage'));
+
 // Lazy-loaded: Blueprint Admin
 const AdminBlueprintsPage = lazy(() => import('./components/admin/blueprints/AdminBlueprintsPage'));
 
@@ -195,6 +198,8 @@ const App: React.FC = () => {
           <Route path="dfy" element={<AdminDfyList />} />
           <Route path="dfy/templates" element={<AdminDfyTemplates />} />
           <Route path="dfy/:engagementId" element={<AdminDfyDetail />} />
+          {/* Funnel */}
+          <Route path="funnel" element={<AdminFunnelPage />} />
           {/* Affiliates */}
           <Route path="affiliates" element={<AdminAffiliatesPage />} />
           {/* Legacy redirects (within layout) */}
