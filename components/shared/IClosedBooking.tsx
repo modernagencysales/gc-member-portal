@@ -90,6 +90,22 @@ export function mapQualificationData(prospect: {
 }
 
 /**
+ * Normalize a phone number to E.164 format for iClosed.
+ * - Already has '+' prefix → pass through
+ * - 10 digits (US/CA) → prepend '+1'
+ * - 11 digits starting with '1' (US/CA with country code) → prepend '+'
+ * - Otherwise → return as-is (best effort)
+ */
+function normalizePhone(phone: string | undefined): string | undefined {
+  if (!phone) return undefined;
+  const digits = phone.replace(/\D/g, '');
+  if (phone.startsWith('+')) return phone;
+  if (digits.length === 10) return `+1${digits}`;
+  if (digits.length === 11 && digits.startsWith('1')) return `+${digits}`;
+  return `+${digits}`;
+}
+
+/**
  * Build the full iClosed booking URL with pre-filled data.
  * Supports: iclosedName, iclosedEmail, iclosedPhone, custom qualificationData, UTM params.
  */
@@ -112,7 +128,8 @@ function buildIClosedUrl(
   // Pre-fill lead info
   if (options?.leadName) params.set('iclosedName', options.leadName);
   if (options?.leadEmail) params.set('iclosedEmail', options.leadEmail);
-  if (options?.leadPhone) params.set('iclosedPhone', options.leadPhone);
+  const normalizedPhone = normalizePhone(options?.leadPhone);
+  if (normalizedPhone) params.set('iclosedPhone', normalizedPhone);
 
   // Add qualification data as custom identifiers
   if (options?.qualificationData) {
@@ -228,7 +245,8 @@ export function useIClosedLiftWidget(
             const url = new URL(iframe.src);
             if (lead.name) url.searchParams.set('iclosedName', lead.name);
             if (lead.email) url.searchParams.set('iclosedEmail', lead.email);
-            if (lead.phone) url.searchParams.set('iclosedPhone', lead.phone);
+            const liftPhone = normalizePhone(lead.phone);
+            if (liftPhone) url.searchParams.set('iclosedPhone', liftPhone);
             if (lead.qualificationData) {
               for (const [key, value] of Object.entries(lead.qualificationData)) {
                 if (value) url.searchParams.set(key, value);
