@@ -218,23 +218,31 @@ const BlueprintPage: React.FC = () => {
   const [notFound, setNotFound] = useState(false);
   const [data, setData] = useState<BlueprintData | null>(null);
 
-  // LIFT floating CTA widget on all blueprint pages — pass lead data so popup pre-fills
-  const liftQualData = data?.prospect ? mapQualificationData(data.prospect) : undefined;
-  useIClosedLiftWidget('WB1jQQR2OgMi', {
-    name: data?.prospect?.fullName,
-    email: data?.prospect?.email,
-    phone: data?.prospect?.phone,
-    qualificationData: liftQualData,
-  });
-
-  // Ref for IClosedBooking inline embed intersection observer
-  const bookingEmbedRef = useRef<HTMLDivElement>(null);
-
   // Qualification state from funnel API
   const [qualState, setQualState] = useState<{
     qualified: boolean;
     iclosed_event_url: string;
+    phone: string;
   } | null>(null);
+
+  // Ref for IClosedBooking inline embed intersection observer
+  const bookingEmbedRef = useRef<HTMLDivElement>(null);
+
+  // LIFT floating CTA widget on all blueprint pages — pass lead data so popup pre-fills
+  // Disabled for disqualified prospects (qualState loaded + qualified === false)
+  const liftQualData = data?.prospect ? mapQualificationData(data.prospect) : undefined;
+  const liftEnabled = qualState === null || qualState.qualified !== false;
+  const bestPhone = data?.prospect?.phone || qualState?.phone || undefined;
+  useIClosedLiftWidget(
+    'WB1jQQR2OgMi',
+    {
+      name: data?.prospect?.fullName,
+      email: data?.prospect?.email,
+      phone: bestPhone,
+      qualificationData: liftQualData,
+    },
+    liftEnabled
+  );
 
   // Fetch data
   const fetchBlueprintData = async () => {
@@ -296,7 +304,7 @@ const BlueprintPage: React.FC = () => {
       .then(setQualState)
       .catch((err) => {
         console.error('Failed to fetch qualification:', err);
-        setQualState({ qualified: false, iclosed_event_url: '' });
+        setQualState({ qualified: false, iclosed_event_url: '', phone: '' });
       });
   }, [data?.prospect?.email]);
 
@@ -331,8 +339,7 @@ const BlueprintPage: React.FC = () => {
 
   // Qualification-based booking visibility (from funnel API)
   // Show booking by default while qualification is loading, hide only if explicitly disqualified
-  const showBooking =
-    qualState === null || qualState.qualified !== false || !!qualState.iclosed_event_url;
+  const showBooking = qualState === null || qualState.qualified !== false;
 
   // Dynamic CTA: offer unlock → "View Your Offer", otherwise default
   const offerUrl =
@@ -534,7 +541,7 @@ const BlueprintPage: React.FC = () => {
 
       {/* Bottom section — headline, iClosed embed, credibility note (hidden for disqualified) */}
       {showBooking && qualState?.iclosed_event_url && (
-        <div className="max-w-6xl mx-auto px-4 pb-12 sm:pb-16 space-y-6">
+        <div ref={bookingEmbedRef} className="max-w-6xl mx-auto px-4 pb-12 sm:pb-16 space-y-6">
           <ScrollReveal>
             <h2 className="text-3xl sm:text-4xl font-bold text-center text-zinc-900 dark:text-zinc-100">
               {tenantBranding?.offer_title || 'Book Your Free Strategy Call Now'}
@@ -542,13 +549,13 @@ const BlueprintPage: React.FC = () => {
           </ScrollReveal>
 
           <ScrollReveal>
-            <div ref={bookingEmbedRef}>
+            <div>
               <IClosedBooking
                 mode="inline"
                 eventUrl={qualState.iclosed_event_url}
                 leadEmail={prospect.email}
                 leadName={prospect.fullName}
-                leadPhone={prospect.phone}
+                leadPhone={bestPhone}
                 qualificationData={mapQualificationData(prospect)}
                 qualified={qualState.qualified}
                 disqualifiedRedirectUrl="/blueprint/resources"

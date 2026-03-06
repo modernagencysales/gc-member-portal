@@ -168,7 +168,8 @@ export function useIClosedLiftWidget(
     email?: string;
     phone?: string;
     qualificationData?: Record<string, string>;
-  }
+  },
+  enabled = true
 ) {
   const leadRef = useRef(leadData);
   leadRef.current = leadData;
@@ -176,6 +177,22 @@ export function useIClosedLiftWidget(
   useEffect(() => {
     const LIFT_ID = 'iclosed-lift-widget';
     const WIDGET_ID = 'iclosed-widget-script';
+
+    const cleanupDom = () => {
+      const el = document.getElementById(LIFT_ID);
+      if (el) el.remove();
+      document
+        .querySelectorAll(
+          '[data-iclosed-lift], .iclosed-lift-widget, .iclosed-cta-widget, [class*="iclosed"]'
+        )
+        .forEach((node) => node.remove());
+    };
+
+    // When disabled, tear down any existing widget and bail out
+    if (!enabled) {
+      cleanupDom();
+      return;
+    }
 
     // Remove plain widget script if it was loaded first (no LIFT support)
     const existingPlain = document.getElementById(WIDGET_ID);
@@ -226,16 +243,9 @@ export function useIClosedLiftWidget(
 
     return () => {
       observer.disconnect();
-      const el = document.getElementById(LIFT_ID);
-      if (el) el.remove();
-      // Remove any LIFT widget DOM elements injected by the script
-      document
-        .querySelectorAll(
-          '[data-iclosed-lift], .iclosed-lift-widget, .iclosed-cta-widget, [class*="iclosed"]'
-        )
-        .forEach((node) => node.remove());
+      cleanupDom();
     };
-  }, [widgetId]);
+  }, [widgetId, enabled]);
 }
 
 // ============================================

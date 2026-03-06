@@ -81,17 +81,11 @@ const BlueprintThankYou: React.FC = () => {
       })
     : undefined;
 
-  useIClosedLiftWidget('WB1jQQR2OgMi', {
-    name: state?.fullName,
-    email: state?.email,
-    phone: state?.phone,
-    qualificationData: qualData,
-  });
-
   // Qualification state from funnel API
   const [qualState, setQualState] = useState<{
     qualified: boolean;
     iclosed_event_url: string;
+    phone: string;
   } | null>(null);
 
   useEffect(() => {
@@ -101,13 +95,24 @@ const BlueprintThankYou: React.FC = () => {
       .then(setQualState)
       .catch((err) => {
         console.error('Failed to fetch qualification:', err);
-        setQualState({ qualified: false, iclosed_event_url: '' });
+        setQualState({ qualified: false, iclosed_event_url: '', phone: '' });
       });
   }, [state?.email]);
 
-  // Show booking while loading or if qualified with a valid URL
-  const showBooking =
-    qualState === null || qualState.qualified !== false || !!qualState.iclosed_event_url;
+  // Show booking while loading or if qualified; hide if explicitly disqualified
+  const showBooking = qualState === null || qualState.qualified !== false;
+
+  const bestPhone = state?.phone || qualState?.phone || undefined;
+  useIClosedLiftWidget(
+    'WB1jQQR2OgMi',
+    {
+      name: state?.fullName,
+      email: state?.email,
+      phone: bestPhone,
+      qualificationData: qualData,
+    },
+    showBooking
+  );
 
   const bookingEmbedRef = useRef<HTMLDivElement>(null);
 
@@ -174,7 +179,7 @@ const BlueprintThankYou: React.FC = () => {
                   eventUrl={qualState.iclosed_event_url}
                   leadEmail={state?.email}
                   leadName={state?.fullName}
-                  leadPhone={state?.phone}
+                  leadPhone={bestPhone}
                   qualificationData={qualData}
                   qualified={qualState.qualified}
                   disqualifiedRedirectUrl="/blueprint/resources"
@@ -221,17 +226,17 @@ const BlueprintThankYou: React.FC = () => {
 
       {/* iClosed inline embed — wider container */}
       {showBooking && qualState?.iclosed_event_url && (
-        <div className="max-w-6xl mx-auto px-4 pb-12 sm:pb-16">
+        <div ref={bookingEmbedRef} className="max-w-6xl mx-auto px-4 pb-12 sm:pb-16">
           <h2 className="text-2xl sm:text-3xl font-bold text-zinc-900 dark:text-zinc-100 text-center mb-6">
             Book Your Free Walkthrough Now
           </h2>
-          <div ref={bookingEmbedRef}>
+          <div>
             <IClosedBooking
               mode="inline"
               eventUrl={qualState.iclosed_event_url}
               leadEmail={state?.email}
               leadName={state?.fullName}
-              leadPhone={state?.phone}
+              leadPhone={bestPhone}
               qualificationData={qualData}
               qualified={qualState.qualified}
               disqualifiedRedirectUrl="/blueprint/resources"
