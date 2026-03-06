@@ -308,6 +308,30 @@ const BlueprintPage: React.FC = () => {
       });
   }, [data?.prospect?.email]);
 
+  // Hide LIFT floating widget when the booking embed is visible on screen
+  useEffect(() => {
+    const el = bookingEmbedRef.current;
+    if (!el) return;
+
+    const toggle = (visible: boolean) => {
+      document
+        .querySelectorAll(
+          '[data-iclosed-lift], .iclosed-lift-widget, .iclosed-cta-widget, [class*="iclosed"]'
+        )
+        .forEach((node) => {
+          if (node.closest('[data-iclosed-link]') || node.tagName === 'IFRAME') return;
+          (node as HTMLElement).style.display = visible ? 'none' : '';
+        });
+    };
+
+    const observer = new IntersectionObserver(
+      (entries) => entries.forEach((entry) => toggle(entry.isIntersecting)),
+      { threshold: 0 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [qualState]);
+
   // Handle loading state
   if (loading) {
     return <BlueprintLoadingState />;
@@ -366,10 +390,6 @@ const BlueprintPage: React.FC = () => {
     const el = bookingEmbedRef.current;
     if (!el) return;
     el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    // Re-scroll after a brief delay in case layout shifts from lazy-loaded content
-    setTimeout(() => {
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 800);
   };
 
   return (
