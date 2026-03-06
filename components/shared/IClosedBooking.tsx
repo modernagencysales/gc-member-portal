@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Calendar, ExternalLink } from 'lucide-react';
 
 // ============================================
@@ -35,6 +35,58 @@ function getPageUtmParams(): Record<string, string> {
     }
   }
   return params;
+}
+
+/**
+ * Map prospect data to iClosed custom field identifiers.
+ * Identifiers: monthlyrevenue, businesstype (configured in iClosed event settings).
+ * Values must match iClosed dropdown options exactly.
+ */
+export function mapQualificationData(prospect: {
+  monthlyIncome?: string;
+  businessType?: string;
+}): Record<string, string> {
+  const data: Record<string, string> = {};
+
+  // Monthly revenue: map our form values to iClosed options
+  // iClosed options: Under $10k, $10k-$20k, $20k-$50k, $50k-$100k, $100k+
+  if (prospect.monthlyIncome) {
+    const revenueMap: Record<string, string> = {
+      'Not generating revenue yet': 'Under $10k',
+      'Under $5k': 'Under $10k',
+      '$5k-$10k': 'Under $10k',
+      '$10k-$30k': '$10k-$20k',
+      '$30k-$50k': '$20k-$50k',
+      '$30k-$100k': '$50k-$100k',
+      '$50k-$100k': '$50k-$100k',
+      '$100k+': '$100k+',
+    };
+    const mapped = revenueMap[prospect.monthlyIncome];
+    if (mapped) data.monthlyrevenue = mapped;
+  }
+
+  // Business type: map our form values to iClosed options
+  // iClosed options: Agency, Consultancy, SaaS, Coaching, Other
+  if (prospect.businessType) {
+    const typeMap: Record<string, string> = {
+      Agency: 'Agency',
+      'Done for you agency': 'Agency',
+      Consulting: 'Consultancy',
+      'Consulting or coaching': 'Consultancy',
+      Coaching: 'Coaching',
+      SaaS: 'SaaS',
+      'SaaS or productised service': 'SaaS',
+      Freelance: 'Other',
+      'Freelancer or solo service': 'Other',
+      'Service Provider': 'Other',
+      Other: 'Other',
+      'Other B2B offer': 'Other',
+    };
+    const mapped = typeMap[prospect.businessType];
+    if (mapped) data.businesstype = mapped;
+  }
+
+  return data;
 }
 
 /**
@@ -79,20 +131,111 @@ function buildIClosedUrl(
   return url.toString();
 }
 
-/** Load the iClosed widget script once */
+/**
+ * Load the iClosed widget script once.
+ * If a LIFT widget is already loaded (with data-cta-widget), skip — it handles both LIFT and inline/popup.
+ */
 function useIClosedWidgetScript() {
   useEffect(() => {
-    const SCRIPT_ID = 'iclosed-widget-script';
-    if (document.getElementById(SCRIPT_ID)) return;
+    // Skip if any iClosed widget script is already loaded (either inline or LIFT)
+    if (
+      document.getElementById('iclosed-widget-script') ||
+      document.getElementById('iclosed-lift-widget')
+    )
+      return;
 
     const script = document.createElement('script');
-    script.id = SCRIPT_ID;
+    script.id = 'iclosed-widget-script';
     script.src = 'https://app.iclosed.io/assets/widget.js';
     script.async = true;
     document.body.appendChild(script);
-
-    // No cleanup — the widget script should persist for the page lifetime
   }, []);
+}
+
+/**
+ * Load the iClosed LIFT floating CTA widget.
+ * Loads widget.js with data-cta-widget attribute — handles both LIFT floating button AND inline/popup embeds.
+ * Cleans up on unmount so the floating button only appears on pages that use this hook.
+ *
+ * When leadData is provided, a MutationObserver injects pre-fill params (iclosedName, iclosedEmail,
+ * iclosedPhone) into any iClosed popup iframes the LIFT widget creates. If all three are present,
+ * iClosed skips its qualifying questions entirely.
+ */
+export function useIClosedLiftWidget(
+  widgetId = 'WB1jQQR2OgMi',
+  leadData?: {
+    name?: string;
+    email?: string;
+    phone?: string;
+    qualificationData?: Record<string, string>;
+  }
+) {
+  const leadRef = useRef(leadData);
+  leadRef.current = leadData;
+
+  useEffect(() => {
+    const LIFT_ID = 'iclosed-lift-widget';
+    const WIDGET_ID = 'iclosed-widget-script';
+
+    // Remove plain widget script if it was loaded first (no LIFT support)
+    const existingPlain = document.getElementById(WIDGET_ID);
+    if (existingPlain) existingPlain.remove();
+
+    if (document.getElementById(LIFT_ID)) return;
+
+    const script = document.createElement('script');
+    script.id = LIFT_ID;
+    script.src = 'https://app.iclosed.io/assets/widget.js';
+    script.setAttribute('data-cta-widget', widgetId);
+    script.async = true;
+    document.body.appendChild(script);
+
+    // MutationObserver: intercept iClosed popup iframes and inject lead pre-fill params
+    const observer = new MutationObserver((mutations) => {
+      const lead = leadRef.current;
+      if (!lead?.name && !lead?.email && !lead?.phone) return;
+
+      for (const mutation of mutations) {
+        for (const node of mutation.addedNodes) {
+          if (!(node instanceof HTMLElement)) continue;
+          // Find iClosed iframes — either the node itself or descendants
+          const iframes =
+            node.tagName === 'IFRAME'
+              ? [node as HTMLIFrameElement]
+              : Array.from(node.querySelectorAll('iframe'));
+          for (const iframe of iframes) {
+            if (!iframe.src?.includes('iclosed.io/e/')) continue;
+            // Already has pre-fill params — skip
+            if (iframe.src.includes('iclosedName=') || iframe.src.includes('iclosedEmail='))
+              continue;
+            const url = new URL(iframe.src);
+            if (lead.name) url.searchParams.set('iclosedName', lead.name);
+            if (lead.email) url.searchParams.set('iclosedEmail', lead.email);
+            if (lead.phone) url.searchParams.set('iclosedPhone', lead.phone);
+            if (lead.qualificationData) {
+              for (const [key, value] of Object.entries(lead.qualificationData)) {
+                if (value) url.searchParams.set(key, value);
+              }
+            }
+            iframe.src = url.toString();
+          }
+        }
+      }
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    return () => {
+      observer.disconnect();
+      const el = document.getElementById(LIFT_ID);
+      if (el) el.remove();
+      // Remove any LIFT widget DOM elements injected by the script
+      document
+        .querySelectorAll(
+          '[data-iclosed-lift], .iclosed-lift-widget, .iclosed-cta-widget, [class*="iclosed"]'
+        )
+        .forEach((node) => node.remove());
+    };
+  }, [widgetId]);
 }
 
 // ============================================
@@ -159,10 +302,7 @@ const IClosedBooking: React.FC<IClosedBookingProps> = ({
 
   // Inline mode: render an iframe embedding the booking page
   return (
-    <div
-      className={`bg-white dark:bg-zinc-900 rounded-xl border border-zinc-200 dark:border-zinc-800 shadow-sm dark:shadow-none overflow-hidden ${className}`}
-      style={{ scrollMarginTop: '16px' }}
-    >
+    <div className={`overflow-hidden ${className}`} style={{ scrollMarginTop: '16px' }}>
       <div className="relative w-full" style={{ minHeight: '700px' }}>
         <iframe
           src={fullUrl}

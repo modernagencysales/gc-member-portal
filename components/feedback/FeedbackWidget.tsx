@@ -1,14 +1,16 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { MessageSquarePlus, Bug, Lightbulb, MessageCircle, X, Check, Loader2 } from 'lucide-react';
-import { supabase } from '../../lib/supabaseClient';
 import type { FeedbackType, BugSeverity, FeedbackPayload, FeedbackResponse } from './types';
 
 interface FeedbackWidgetProps {
   userEmail: string | null;
   userId: string | null;
+  appName?: string;
 }
 
-const APP_NAME = 'Bootcamp';
+const GTM_API_BASE = import.meta.env.VITE_GTM_API_URL || 'https://gtmconductor.com';
+const ADMIN_API_KEY = import.meta.env.VITE_ADMIN_API_KEY;
+const DEFAULT_APP_NAME = 'GTM OS';
 const APP_VERSION = '1.0.0';
 
 const TYPE_OPTIONS: { value: FeedbackType; label: string; icon: typeof Bug }[] = [
@@ -46,7 +48,7 @@ function getOSInfo(): string {
   return 'Unknown';
 }
 
-export function FeedbackWidget({ userEmail, userId }: FeedbackWidgetProps) {
+export function FeedbackWidget({ userEmail, userId, appName }: FeedbackWidgetProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [type, setType] = useState<FeedbackType>('bug');
   const [severity, setSeverity] = useState<BugSeverity>('medium');
@@ -129,24 +131,32 @@ export function FeedbackWidget({ userEmail, userId }: FeedbackWidgetProps) {
         browser: getBrowserInfo(),
         os: getOSInfo(),
         screenResolution: `${window.screen.width}x${window.screen.height}`,
-        appName: APP_NAME,
+        appName: appName || DEFAULT_APP_NAME,
         appVersion: APP_VERSION,
         timestamp: new Date().toISOString(),
       },
     };
 
     try {
-      const { data, error } = await supabase.functions.invoke('submit-feedback', {
-        body: payload,
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (ADMIN_API_KEY) {
+        headers['x-admin-key'] = ADMIN_API_KEY;
+      }
+
+      const res = await fetch(`${GTM_API_BASE}/api/feedback`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(payload),
       });
 
-      if (error) {
+      if (!res.ok) {
+        const data = await res.json().catch(() => null);
         setStatus('error');
-        setErrorMessage('Something went wrong. Please try again.');
+        setErrorMessage(data?.error ?? 'Something went wrong. Please try again.');
         return;
       }
 
-      const response = data as FeedbackResponse;
+      const response: FeedbackResponse = await res.json();
       if (response.success) {
         setStatus('success');
       } else {

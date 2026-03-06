@@ -5,6 +5,7 @@ import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
 import { isAdminEmail } from '../../config/adminConfig';
 import { Menu } from 'lucide-react';
+import { FeedbackWidget } from '../feedback/FeedbackWidget';
 
 const routeTitles: Record<string, string> = {
   '/admin': 'Admin Dashboard',
@@ -100,6 +101,7 @@ const UnifiedAdminLayout: React.FC = () => {
           </div>
         </main>
       </div>
+      <FeedbackWidget userEmail={gcMember.email} userId={gcMember.id} appName="GTM OS Admin" />
     </div>
   );
 };

@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { CheckCircle, Mail, FileText, Target, Monitor, ClipboardList, Zap } from 'lucide-react';
 import ThemeToggle from './ThemeToggle';
+import { useIClosedLiftWidget } from '../shared/IClosedBooking';
 
 // ============================================
 // Types
@@ -80,6 +81,7 @@ const SenjaEmbed: React.FC = () => {
 // ============================================
 
 const CallBookedThankYou: React.FC = () => {
+  useIClosedLiftWidget();
   const location = useLocation();
   const state = location.state as LocationState | null;
   const reportUrl = state?.reportUrl;

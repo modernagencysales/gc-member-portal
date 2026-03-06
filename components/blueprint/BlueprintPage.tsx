@@ -29,7 +29,11 @@ import ContentRoadmap from './ContentRoadmap';
 import MarketingBlock from './MarketingBlock';
 import CTAButton from './CTAButton';
 import StickyCTA from './StickyCTA';
-import IClosedBooking from '../shared/IClosedBooking';
+import IClosedBooking, {
+  useIClosedLiftWidget,
+  mapQualificationData,
+} from '../shared/IClosedBooking';
+import { funnelApi } from '../../lib/api/funnel';
 import SectionBridge from './SectionBridge';
 import ValueStack from './ValueStack';
 import SimpleSteps from './SimpleSteps';
@@ -214,6 +218,15 @@ const BlueprintPage: React.FC = () => {
   const [notFound, setNotFound] = useState(false);
   const [data, setData] = useState<BlueprintData | null>(null);
 
+  // LIFT floating CTA widget on all blueprint pages — pass lead data so popup pre-fills
+  const liftQualData = data?.prospect ? mapQualificationData(data.prospect) : undefined;
+  useIClosedLiftWidget('WB1jQQR2OgMi', {
+    name: data?.prospect?.fullName,
+    email: data?.prospect?.email,
+    phone: data?.prospect?.phone,
+    qualificationData: liftQualData,
+  });
+
   // Ref for IClosedBooking inline embed intersection observer
   const bookingEmbedRef = useRef<HTMLDivElement>(null);
 
@@ -278,19 +291,13 @@ const BlueprintPage: React.FC = () => {
   // Fetch qualification from the funnel API once prospect email is available
   useEffect(() => {
     if (!data?.prospect?.email) return;
-    const email = data.prospect.email;
-    fetch(
-      `${import.meta.env.VITE_GTM_SYSTEM_URL}/api/funnel/qualification/${encodeURIComponent(email)}`,
-      { headers: { 'x-admin-key': import.meta.env.VITE_ADMIN_API_KEY } }
-    )
-      .then((r) => r.json())
-      .then((d) =>
-        setQualState({
-          qualified: d.qualification?.qualified ?? false,
-          iclosed_event_url: d.iclosed_event_url || '',
-        })
-      )
-      .catch(() => setQualState({ qualified: false, iclosed_event_url: '' }));
+    funnelApi
+      .getQualification(data.prospect.email)
+      .then(setQualState)
+      .catch((err) => {
+        console.error('Failed to fetch qualification:', err);
+        setQualState({ qualified: false, iclosed_event_url: '' });
+      });
   }, [data?.prospect?.email]);
 
   // Handle loading state
@@ -527,7 +534,7 @@ const BlueprintPage: React.FC = () => {
 
       {/* Bottom section — headline, iClosed embed, credibility note (hidden for disqualified) */}
       {showBooking && qualState?.iclosed_event_url && (
-        <div className="max-w-4xl mx-auto px-4 pb-12 sm:pb-16 space-y-6">
+        <div className="max-w-6xl mx-auto px-4 pb-12 sm:pb-16 space-y-6">
           <ScrollReveal>
             <h2 className="text-3xl sm:text-4xl font-bold text-center text-zinc-900 dark:text-zinc-100">
               {tenantBranding?.offer_title || 'Book Your Free Strategy Call Now'}
@@ -541,6 +548,8 @@ const BlueprintPage: React.FC = () => {
                 eventUrl={qualState.iclosed_event_url}
                 leadEmail={prospect.email}
                 leadName={prospect.fullName}
+                leadPhone={prospect.phone}
+                qualificationData={mapQualificationData(prospect)}
                 qualified={qualState.qualified}
                 disqualifiedRedirectUrl="/blueprint/resources"
               />

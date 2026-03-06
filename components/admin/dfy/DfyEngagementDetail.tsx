@@ -1809,7 +1809,9 @@ function ContentCallPrepPanel({
           }`}
           style={{ maxHeight: '70vh', overflowY: 'auto' }}
         >
-          <div className={`prose prose-sm max-w-none ${isDarkMode ? 'prose-invert' : ''}`}>
+          <div
+            className={`prose prose-base prose-h3:mt-8 prose-h3:mb-3 prose-p:mb-4 max-w-none leading-relaxed ${isDarkMode ? 'prose-invert' : ''}`}
+          >
             <ReactMarkdown remarkPlugins={[remarkGfm]}>{sections.strategyBrief}</ReactMarkdown>
           </div>
         </div>
@@ -1817,12 +1819,12 @@ function ContentCallPrepPanel({
 
       {/* Interview Questions tab — interactive with checkboxes */}
       {activeSection === 'questions' && (
-        <div className="space-y-3" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
+        <div className="space-y-4" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
           {sections.questions.length > 0 ? (
             sections.questions.map((q) => (
               <div
                 key={q.id}
-                className={`rounded-xl border p-4 transition-all ${
+                className={`rounded-xl border p-5 transition-all ${
                   checkedQuestions.has(q.id)
                     ? isDarkMode
                       ? 'bg-zinc-900/50 border-zinc-700 opacity-60'
@@ -1832,10 +1834,10 @@ function ContentCallPrepPanel({
                       : 'bg-white border-zinc-200'
                 }`}
               >
-                <div className="flex gap-3">
+                <div className="flex gap-4">
                   <button
                     onClick={() => toggleQuestion(q.id)}
-                    className={`mt-0.5 flex-shrink-0 w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
+                    className={`mt-1 flex-shrink-0 w-6 h-6 rounded border-2 flex items-center justify-center transition-colors ${
                       checkedQuestions.has(q.id)
                         ? 'bg-violet-600 border-violet-600 text-white'
                         : isDarkMode
@@ -1845,7 +1847,7 @@ function ContentCallPrepPanel({
                   >
                     {checkedQuestions.has(q.id) && (
                       <svg
-                        className="w-3 h-3"
+                        className="w-3.5 h-3.5"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
@@ -1857,7 +1859,7 @@ function ContentCallPrepPanel({
                   </button>
                   <div className="flex-1 min-w-0">
                     <p
-                      className={`text-sm font-medium leading-relaxed ${
+                      className={`text-base font-medium leading-loose ${
                         checkedQuestions.has(q.id)
                           ? isDarkMode
                             ? 'text-zinc-500 line-through'
@@ -1869,7 +1871,12 @@ function ContentCallPrepPanel({
                     >
                       {q.question}
                     </p>
-                    <p className={`text-xs mt-2 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
+                    <p
+                      className={`text-sm mt-3 leading-relaxed ${
+                        isDarkMode ? 'text-zinc-400' : 'text-zinc-500'
+                      }`}
+                    >
+                      <span className="font-medium">Extracting: </span>
                       {q.note}
                     </p>
                   </div>
@@ -1883,7 +1890,9 @@ function ContentCallPrepPanel({
                 isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-200'
               }`}
             >
-              <div className={`prose prose-sm max-w-none ${isDarkMode ? 'prose-invert' : ''}`}>
+              <div
+                className={`prose prose-base max-w-none leading-relaxed ${isDarkMode ? 'prose-invert' : ''}`}
+              >
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>
                   {sections.questionsRaw || callPrep}
                 </ReactMarkdown>
@@ -1901,9 +1910,14 @@ function ContentCallPrepPanel({
           }`}
           style={{ maxHeight: '70vh', overflowY: 'auto' }}
         >
-          <div className={`prose prose-sm max-w-none ${isDarkMode ? 'prose-invert' : ''}`}>
+          <div
+            className={`prose prose-base prose-h3:mt-8 prose-h3:mb-3 prose-p:mb-3 prose-li:mb-2 max-w-none leading-loose ${isDarkMode ? 'prose-invert' : ''}`}
+          >
             <ReactMarkdown remarkPlugins={[remarkGfm]}>
-              {sections.quickReference || 'No quick reference card available.'}
+              {(sections.quickReference || 'No quick reference card available.').replace(
+                /^(SECTION \d+[^\n]*)/gm,
+                '\n---\n\n### $1'
+              )}
             </ReactMarkdown>
           </div>
         </div>

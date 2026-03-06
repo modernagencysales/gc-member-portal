@@ -3,7 +3,11 @@ import { Link, useLocation } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { CheckCircle, BarChart3, AlertTriangle, User, Lightbulb, Calendar } from 'lucide-react';
 import ThemeToggle from './ThemeToggle';
-import IClosedBooking from '../shared/IClosedBooking';
+import IClosedBooking, {
+  useIClosedLiftWidget,
+  mapQualificationData,
+} from '../shared/IClosedBooking';
+import { funnelApi } from '../../lib/api/funnel';
 import { getBlueprintSettings } from '../../services/blueprint-supabase';
 import { queryKeys } from '../../lib/queryClient';
 
@@ -64,9 +68,25 @@ const BlueprintThankYou: React.FC = () => {
     prospectId?: string;
     reportUrl?: string;
     monthlyIncome?: string;
+    businessType?: string;
     email?: string;
     fullName?: string;
+    phone?: string;
   } | null;
+
+  const qualData = state
+    ? mapQualificationData({
+        monthlyIncome: state.monthlyIncome,
+        businessType: state.businessType,
+      })
+    : undefined;
+
+  useIClosedLiftWidget('WB1jQQR2OgMi', {
+    name: state?.fullName,
+    email: state?.email,
+    phone: state?.phone,
+    qualificationData: qualData,
+  });
 
   // Qualification state from funnel API
   const [qualState, setQualState] = useState<{
@@ -76,18 +96,13 @@ const BlueprintThankYou: React.FC = () => {
 
   useEffect(() => {
     if (!state?.email) return;
-    fetch(
-      `${import.meta.env.VITE_GTM_SYSTEM_URL}/api/funnel/qualification/${encodeURIComponent(state.email)}`,
-      { headers: { 'x-admin-key': import.meta.env.VITE_ADMIN_API_KEY } }
-    )
-      .then((r) => r.json())
-      .then((d) =>
-        setQualState({
-          qualified: d.qualification?.qualified ?? false,
-          iclosed_event_url: d.iclosed_event_url || '',
-        })
-      )
-      .catch(() => setQualState({ qualified: false, iclosed_event_url: '' }));
+    funnelApi
+      .getQualification(state.email)
+      .then(setQualState)
+      .catch((err) => {
+        console.error('Failed to fetch qualification:', err);
+        setQualState({ qualified: false, iclosed_event_url: '' });
+      });
   }, [state?.email]);
 
   // Show booking while loading or if qualified with a valid URL
@@ -159,6 +174,8 @@ const BlueprintThankYou: React.FC = () => {
                   eventUrl={qualState.iclosed_event_url}
                   leadEmail={state?.email}
                   leadName={state?.fullName}
+                  leadPhone={state?.phone}
+                  qualificationData={qualData}
                   qualified={qualState.qualified}
                   disqualifiedRedirectUrl="/blueprint/resources"
                   ctaText="Book Your Free Walkthrough"
@@ -204,7 +221,7 @@ const BlueprintThankYou: React.FC = () => {
 
       {/* iClosed inline embed — wider container */}
       {showBooking && qualState?.iclosed_event_url && (
-        <div className="max-w-5xl mx-auto px-4 pb-12 sm:pb-16">
+        <div className="max-w-6xl mx-auto px-4 pb-12 sm:pb-16">
           <h2 className="text-2xl sm:text-3xl font-bold text-zinc-900 dark:text-zinc-100 text-center mb-6">
             Book Your Free Walkthrough Now
           </h2>
@@ -214,6 +231,8 @@ const BlueprintThankYou: React.FC = () => {
               eventUrl={qualState.iclosed_event_url}
               leadEmail={state?.email}
               leadName={state?.fullName}
+              leadPhone={state?.phone}
+              qualificationData={qualData}
               qualified={qualState.qualified}
               disqualifiedRedirectUrl="/blueprint/resources"
             />

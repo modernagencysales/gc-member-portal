@@ -85,10 +85,16 @@
       <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
     </div>
 
-    <!-- Global error handler -->
+    <!-- Global error handler (only for first-party load failures) -->
     <script>
       window.onerror = function(msg, url, line, col, error) {
-        document.getElementById('root').innerHTML = '<div style="padding: 40px; text-align: center;"><h1 style="color: red; margin-bottom: 16px;">JavaScript Error</h1><pre style="text-align: left; background: #f0f0f0; padding: 16px; border-radius: 8px; overflow: auto;">' + msg + '\n\nFile: ' + url + '\nLine: ' + line + '</pre></div>';
+        // Ignore cross-origin script errors (third-party widgets like iClosed, Senja, ClearFeed)
+        if (msg === 'Script error.' || msg === 'Script error') return true;
+        // Only show error page if React hasn't mounted yet (initial load failure)
+        var root = document.getElementById('root');
+        if (root && root.querySelector('#initial-loader')) {
+          root.innerHTML = '<div style="padding: 40px; text-align: center;"><h1 style="color: red; margin-bottom: 16px;">JavaScript Error</h1><pre style="text-align: left; background: #f0f0f0; padding: 16px; border-radius: 8px; overflow: auto;">' + msg + '\n\nFile: ' + url + '\nLine: ' + line + '</pre></div>';
+        }
         return false;
       };
     </script>
@@ -103,5 +109,8 @@
         client_id: "e04ff535-4984-41d1-9d62-36d9e9de5b06"
       });
     </script>
+
+    <!-- iClosed Lift Widget -->
+    <script type="text/javascript" src="https://app.iclosed.io/assets/widget.js" data-cta-widget="WB1jQQR2OgMi" async></script>
   </body>
 </html>

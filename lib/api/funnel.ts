@@ -25,6 +25,17 @@ export const funnelApi = {
     return funnelFetch(`/attribution?${qs}`);
   },
   getConfig: () => funnelFetch('/config'),
+  getQualification: async (
+    email: string
+  ): Promise<{ qualified: boolean; iclosed_event_url: string }> => {
+    const data = await funnelFetch(`/qualification/${encodeURIComponent(email)}`);
+    // Default to qualified=true when no record exists — don't block prospects
+    // who haven't been through the qualification process yet
+    return {
+      qualified: data.qualification?.qualified ?? true,
+      iclosed_event_url: data.iclosed_event_url || '',
+    };
+  },
   updateConfig: async (key: string, value: string) => {
     const res = await fetch(`${GTM_BASE}/api/funnel/config`, {
       method: 'PUT',

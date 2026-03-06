@@ -19,6 +19,7 @@ import { Prospect, BlueprintSettings, getProspectDisplayName } from '../../types
 import { DFY_OFFER } from './dfy-offer-data';
 import { FAQAccordionItem, TestimonialInline, SenjaEmbed } from './offer-components';
 import ThemeToggle from './ThemeToggle';
+import { useIClosedLiftWidget } from '../shared/IClosedBooking';
 
 // ============================================
 // Types
@@ -147,6 +148,7 @@ const DfyCta: React.FC<{ paymentUrl: string; variant?: 'primary' | 'secondary' }
 // ============================================
 
 const OfferPage: React.FC = () => {
+  useIClosedLiftWidget();
   const { slug } = useParams<{ slug: string }>();
 
   // State

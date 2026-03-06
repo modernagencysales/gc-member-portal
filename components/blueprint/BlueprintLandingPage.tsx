@@ -11,6 +11,7 @@ import {
   ChevronRight,
 } from 'lucide-react';
 import ThemeToggle from './ThemeToggle';
+import { useIClosedLiftWidget } from '../shared/IClosedBooking';
 import LogoBar from './LogoBar';
 import {
   getClientLogos,
@@ -808,6 +809,7 @@ const Footer: React.FC = () => (
 // ============================================
 
 const BlueprintLandingPage: React.FC = () => {
+  useIClosedLiftWidget();
   const navigate = useNavigate();
   const [phase, setPhase] = useState<Phase>('landing');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -981,6 +983,10 @@ const BlueprintLandingPage: React.FC = () => {
             prospectId: data.prospect_id,
             reportUrl: data.report_url,
             monthlyIncome: finalData.monthlyIncome,
+            businessType: finalData.businessType,
+            email: finalData.email,
+            fullName: finalData.fullName,
+            phone: finalData.phone || undefined,
           },
         });
       } else if (response.status === 409) {
@@ -991,6 +997,10 @@ const BlueprintLandingPage: React.FC = () => {
             prospectId: data.existing_prospect_id,
             reportUrl: data.report_url,
             monthlyIncome: finalData.monthlyIncome,
+            businessType: finalData.businessType,
+            email: finalData.email,
+            fullName: finalData.fullName,
+            phone: finalData.phone || undefined,
           },
         });
       } else {
