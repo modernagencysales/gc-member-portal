@@ -27,7 +27,12 @@ export const funnelApi = {
   getConfig: () => funnelFetch('/config'),
   getQualification: async (
     email: string
-  ): Promise<{ qualified: boolean; iclosed_event_url: string; phone: string }> => {
+  ): Promise<{
+    qualified: boolean;
+    iclosed_event_url: string;
+    phone: string;
+    source_channel: string;
+  }> => {
     const data = await funnelFetch(`/qualification/${encodeURIComponent(email)}`);
     // Default to qualified=true when no record exists — don't block prospects
     // who haven't been through the qualification process yet
@@ -35,6 +40,7 @@ export const funnelApi = {
       qualified: data.qualification?.qualified ?? true,
       iclosed_event_url: data.iclosed_event_url || '',
       phone: data.phone || '',
+      source_channel: data.qualification?.source_channel || '',
     };
   },
   updateConfig: async (key: string, value: string) => {

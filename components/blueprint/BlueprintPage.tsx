@@ -223,6 +223,7 @@ const BlueprintPage: React.FC = () => {
     qualified: boolean;
     iclosed_event_url: string;
     phone: string;
+    source_channel: string;
   } | null>(null);
 
   // Ref for IClosedBooking inline embed intersection observer
@@ -234,6 +235,16 @@ const BlueprintPage: React.FC = () => {
   const liftEnabled = qualState === null || qualState.qualified !== false;
   const bestPhone = data?.prospect?.phone || qualState?.phone || undefined;
   const bestLinkedinUrl = data?.prospect?.linkedinUrl || undefined;
+
+  // Map prospect source channel to UTM params for iClosed booking attribution
+  const sourceUtms = (() => {
+    const channel = qualState?.source_channel;
+    if (channel === 'plusvibe') return { utm_source: 'plusvibe', utm_medium: 'email' };
+    if (channel === 'heyreach') return { utm_source: 'heyreach', utm_medium: 'linkedin' };
+    if (channel === 'organic') return { utm_source: 'blueprint', utm_medium: 'organic' };
+    return { utm_source: 'blueprint', utm_medium: 'direct' };
+  })();
+
   useIClosedLiftWidget(
     'WB1jQQR2OgMi',
     {
@@ -241,7 +252,7 @@ const BlueprintPage: React.FC = () => {
       email: data?.prospect?.email,
       phone: bestPhone,
       linkedinUrl: bestLinkedinUrl,
-      qualificationData: liftQualData,
+      qualificationData: { ...liftQualData, ...sourceUtms },
     },
     liftEnabled
   );
@@ -306,7 +317,7 @@ const BlueprintPage: React.FC = () => {
       .then(setQualState)
       .catch((err) => {
         console.error('Failed to fetch qualification:', err);
-        setQualState({ qualified: true, iclosed_event_url: '', phone: '' });
+        setQualState({ qualified: true, iclosed_event_url: '', phone: '', source_channel: '' });
       });
   }, [data?.prospect?.email]);
 
@@ -580,6 +591,7 @@ const BlueprintPage: React.FC = () => {
                 leadPhone={bestPhone}
                 leadLinkedinUrl={bestLinkedinUrl}
                 qualificationData={mapQualificationData(prospect)}
+                utmParams={sourceUtms}
                 qualified={qualState.qualified}
                 disqualifiedRedirectUrl="/blueprint/resources"
               />
