@@ -233,12 +233,14 @@ const BlueprintPage: React.FC = () => {
   const liftQualData = data?.prospect ? mapQualificationData(data.prospect) : undefined;
   const liftEnabled = qualState === null || qualState.qualified !== false;
   const bestPhone = data?.prospect?.phone || qualState?.phone || undefined;
+  const bestLinkedinUrl = data?.prospect?.linkedinUrl || undefined;
   useIClosedLiftWidget(
     'WB1jQQR2OgMi',
     {
       name: data?.prospect?.fullName,
       email: data?.prospect?.email,
       phone: bestPhone,
+      linkedinUrl: bestLinkedinUrl,
       qualificationData: liftQualData,
     },
     liftEnabled
@@ -304,7 +306,7 @@ const BlueprintPage: React.FC = () => {
       .then(setQualState)
       .catch((err) => {
         console.error('Failed to fetch qualification:', err);
-        setQualState({ qualified: false, iclosed_event_url: '', phone: '' });
+        setQualState({ qualified: true, iclosed_event_url: '', phone: '' });
       });
   }, [data?.prospect?.email]);
 
@@ -576,6 +578,7 @@ const BlueprintPage: React.FC = () => {
                 leadEmail={prospect.email}
                 leadName={prospect.fullName}
                 leadPhone={bestPhone}
+                leadLinkedinUrl={bestLinkedinUrl}
                 qualificationData={mapQualificationData(prospect)}
                 qualified={qualState.qualified}
                 disqualifiedRedirectUrl="/blueprint/resources"
