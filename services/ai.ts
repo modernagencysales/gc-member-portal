@@ -6,6 +6,8 @@
 import { supabase } from '../lib/supabaseClient';
 import { logError } from '../lib/logError';
 
+// ─── Types ──────────────────────────────────────────────────────────────────
+
 /**
  * ICP Generation result structure
  */
@@ -21,6 +23,8 @@ export interface ICPSuggestion {
   socialProof?: string;
   commonObjections?: string;
 }
+
+// ─── Edge Functions ──────────────────────────────────────────────────────────
 
 /**
  * Uses Claude (via Supabase edge function) to generate ICP suggestions
@@ -52,6 +56,8 @@ export async function generateICPSuggestions(
     commonObjections: data.commonObjections || '',
   };
 }
+
+// ─── Helpers ─────────────────────────────────────────────────────────────────
 
 /**
  * Returns a hardcoded transcript for the demo video,

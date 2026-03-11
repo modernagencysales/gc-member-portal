@@ -7,16 +7,15 @@
 import { supabase } from '../lib/supabaseClient';
 import { IntroOffer, IntroOfferDeliverable } from '../types/intro-offer-types';
 
-// Column constants — must match DB schema in 20260214120000_intro_offers.sql
+// ─── Column Selects ──────────────────────────────────────────────────────────
+
 const OFFER_COLUMNS =
   'id, tenant_id, lead_id, prospect_id, status, stripe_checkout_session_id, amount_paid, discount_code, interview_data, magnetlab_user_id, heyreach_account_id, delivered_at, handed_off_at, notes, created_at, updated_at';
 
 const DELIVERABLE_COLUMNS =
   'id, offer_id, type, status, title, delivery_order, metadata, started_at, completed_at, delivered_at, notes, error_message, created_at';
 
-// ============================================
-// Fetch functions (read from shared Supabase)
-// ============================================
+// ─── Reads ───────────────────────────────────────────────────────────────────
 
 export async function fetchIntroOffers(): Promise<IntroOffer[]> {
   const { data, error } = await supabase
@@ -63,9 +62,7 @@ export async function fetchLeadName(leadId: string): Promise<string | null> {
   return name || (data.email as string) || null;
 }
 
-// ============================================
-// Admin actions (call gtm-system API)
-// ============================================
+// ─── Writes (GTM System API) ─────────────────────────────────────────────────
 
 const GTM_API_BASE = import.meta.env.VITE_GTM_API_URL || 'https://gtmconductor.com';
 
@@ -129,9 +126,7 @@ export async function retryDeliverable(offerId: string, deliverableId: string) {
   });
 }
 
-// ============================================
-// Mapping functions
-// ============================================
+// ─── Mappers ─────────────────────────────────────────────────────────────────
 
 function mapOffer(record: Record<string, unknown>): IntroOffer {
   return {

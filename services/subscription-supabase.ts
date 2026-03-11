@@ -12,7 +12,11 @@ import {
   StudentCohortRole,
 } from '../types/bootcamp-types';
 
+// ─── Constants ───────────────────────────────────────────────────────────────
+
 const MEMBERS_COHORT_ID = '00000000-0000-0000-0000-000000000002';
+
+// ─── Reads ───────────────────────────────────────────────────────────────────
 
 // Fetch student's cohort memberships
 export async function fetchStudentCohorts(studentId: string): Promise<StudentCohort[]> {
@@ -37,6 +41,8 @@ export async function fetchStudentCohorts(studentId: string): Promise<StudentCoh
     })
   );
 }
+
+// ─── Writes ──────────────────────────────────────────────────────────────────
 
 // Add student to a cohort
 export async function addStudentToCohort(
@@ -136,9 +142,7 @@ export async function getStudentByEmail(
   };
 }
 
-// ============================================
-// Edge Function Wrappers
-// ============================================
+// ─── Edge Functions ──────────────────────────────────────────────────────────
 
 export async function createCheckoutSession(
   studentId: string,

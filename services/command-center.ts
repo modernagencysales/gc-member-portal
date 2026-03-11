@@ -7,6 +7,8 @@ import type { CommandCenterData } from '../types/command-center-types';
 import { GTM_SYSTEM_URL } from '../lib/api-config';
 import { logError } from '../lib/logError';
 
+// ─── Reads ───────────────────────────────────────────────────────────────────
+
 export async function fetchCommandCenterData(
   tenantId: string,
   from?: string,
@@ -37,6 +39,8 @@ export async function fetchCommandCenterData(
     return null;
   }
 }
+
+// ─── Helpers ─────────────────────────────────────────────────────────────────
 
 /** Format cents to dollar string */
 export function formatCents(cents: number): string {

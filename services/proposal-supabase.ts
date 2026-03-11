@@ -17,8 +17,12 @@ import type {
   ProposalNextStep,
 } from '../types/proposal-types';
 
+// ─── Column Selects ──────────────────────────────────────────────────────────
+
 const PROPOSAL_COLUMNS =
   'id, slug, prospect_id, status, client_name, client_title, client_company, client_logo_url, client_brand_color, client_website, headline, executive_summary, about_us, client_snapshot, goals, services, roadmap, pricing, next_steps, transcript_text, transcript_source, additional_notes, created_by, view_count, last_viewed_at, created_at, updated_at, monthly_rate_cents';
+
+// ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function mapProposal(record: Record<string, unknown>): Proposal {
   return {
@@ -63,6 +67,8 @@ function mapProposal(record: Record<string, unknown>): Proposal {
     monthlyRateCents: (record.monthly_rate_cents as number) || null,
   };
 }
+
+// ─── Reads ───────────────────────────────────────────────────────────────────
 
 export async function getProposalBySlug(slug: string): Promise<Proposal | null> {
   const { data, error } = await supabase
@@ -109,6 +115,8 @@ export async function getProposalById(id: string): Promise<Proposal | null> {
   if (error || !data) return null;
   return mapProposal(data as Record<string, unknown>);
 }
+
+// ─── Writes ──────────────────────────────────────────────────────────────────
 
 /** Fields that callers are permitted to update on proposals. */
 const PROPOSAL_ALLOWED_UPDATE_FIELDS = [

@@ -19,9 +19,7 @@ import {
   DomainAvailability,
 } from '../types/infrastructure-types';
 
-// ============================================
-// Mappers
-// ============================================
+// ─── Mappers ─────────────────────────────────────────────────────────────────
 
 function mapTier(data: Record<string, unknown>): InfraTier {
   return {
@@ -91,9 +89,7 @@ function mapOutreachPricing(data: Record<string, unknown>): OutreachPricing {
   };
 }
 
-// ============================================
-// Queries
-// ============================================
+// ─── Reads ───────────────────────────────────────────────────────────────────
 
 export async function fetchActiveTiers(): Promise<InfraTier[]> {
   const { data, error } = await supabase
@@ -182,9 +178,7 @@ export async function fetchProvisioningLog(provisionId: string): Promise<Provisi
   return (data.provisioning_log as ProvisioningStep[]) || [];
 }
 
-// ============================================
-// Mutations
-// ============================================
+// ─── Writes ──────────────────────────────────────────────────────────────────
 
 export async function createProvision(input: {
   studentId: string;
@@ -217,9 +211,7 @@ export async function createProvision(input: {
   return mapProvision(data);
 }
 
-// ============================================
-// Edge Function Wrappers
-// ============================================
+// ─── Edge Functions ──────────────────────────────────────────────────────────
 
 interface InfraCheckoutDomain {
   domainName: string;

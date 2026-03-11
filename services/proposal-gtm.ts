@@ -8,6 +8,8 @@ import { supabase } from '../lib/supabaseClient';
 import { gtmAdminFetch } from '../lib/api/gtm-fetch';
 import type { ProposalPackageConfig } from '../types/proposal-types';
 
+// ─── Types ───────────────────────────────────────────────────────────────────
+
 export interface GenerateProposalInput {
   prospect_id?: string;
   transcript_text: string;
@@ -18,6 +20,8 @@ export interface GenerateProposalInput {
   client_title?: string;
   client_website?: string;
 }
+
+// ─── GTM System Calls ────────────────────────────────────────────────────────
 
 export async function generateProposal(
   input: GenerateProposalInput
@@ -44,6 +48,8 @@ export async function fetchAttioTranscript(
   });
 }
 
+// ─── Supabase Reads ──────────────────────────────────────────────────────────
+
 export async function fetchProposalPackages(): Promise<ProposalPackageConfig[]> {
   const { data, error } = await supabase
     .from('bootcamp_settings')
@@ -54,6 +60,8 @@ export async function fetchProposalPackages(): Promise<ProposalPackageConfig[]> 
   if (error || !data) return [];
   return data.value?.packages || [];
 }
+
+// ─── Supabase Writes ─────────────────────────────────────────────────────────
 
 // Proposal AI Prompts — editable via admin panel
 export interface ProposalPrompts {

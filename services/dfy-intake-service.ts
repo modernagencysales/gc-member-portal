@@ -8,7 +8,11 @@ import { supabase } from '../lib/supabaseClient';
 import type { IntakeWizardData } from '../types/dfy-intake-types';
 import { getPortalToken } from './dfy-service';
 
+// ─── Constants ───────────────────────────────────────────────────────────────
+
 const GTM_SYSTEM_URL = import.meta.env.VITE_GTM_SYSTEM_URL || 'https://gtmconductor.com';
+
+// ─── Writes ──────────────────────────────────────────────────────────────────
 
 export async function submitIntakeWizard(
   portalSlug: string,
@@ -71,6 +75,8 @@ export async function submitIntakeWizard(
     throw new Error(err.error || `Submission failed (${res.status})`);
   }
 }
+
+// ─── Reads ───────────────────────────────────────────────────────────────────
 
 export async function fetchBlueprintData(prospectId: string): Promise<{
   niche: string;

@@ -14,9 +14,7 @@ import type {
   EnrichmentStatus,
 } from '../types/cold-email-recipe-types';
 
-// ============================================
-// Mappers
-// ============================================
+// ─── Mappers ─────────────────────────────────────────────────────────────────
 
 function mapRecipe(data: Record<string, unknown>): BootcampRecipe {
   return {
@@ -62,9 +60,7 @@ function mapContact(data: Record<string, unknown>): BootcampContact {
   };
 }
 
-// ============================================
-// Explicit column lists (select('*') fails silently on Vercel)
-// ============================================
+// ─── Column Selects ──────────────────────────────────────────────────────────
 
 const RECIPE_COLUMNS =
   'id, student_id, name, slug, description, steps, email_template, is_active, created_at, updated_at';
@@ -72,9 +68,7 @@ const CONTACT_LIST_COLUMNS = 'id, student_id, name, contact_count, column_mappin
 const CONTACT_COLUMNS =
   'id, list_id, student_id, first_name, last_name, email, company, title, linkedin_url, custom_fields, step_outputs, enrichment_status, created_at';
 
-// ============================================
-// Recipes
-// ============================================
+// ─── Recipes ─────────────────────────────────────────────────────────────────
 
 export async function fetchRecipes(studentId: string): Promise<BootcampRecipe[]> {
   const { data, error } = await supabase
@@ -158,9 +152,7 @@ export async function deleteRecipe(recipeId: string): Promise<void> {
   if (error) throw new Error(error.message);
 }
 
-// ============================================
-// Contact Lists
-// ============================================
+// ─── Contact Lists ───────────────────────────────────────────────────────────
 
 export async function fetchContactLists(studentId: string): Promise<BootcampContactList[]> {
   const { data, error } = await supabase
@@ -197,9 +189,7 @@ export async function deleteContactList(listId: string): Promise<void> {
   if (error) throw new Error(error.message);
 }
 
-// ============================================
-// Contacts
-// ============================================
+// ─── Contacts ────────────────────────────────────────────────────────────────
 
 export async function fetchContacts(
   listId: string,
@@ -280,9 +270,7 @@ export async function resetContactEnrichment(listId: string): Promise<void> {
   if (error) throw new Error(error.message);
 }
 
-// ============================================
-// Edge Function Wrappers
-// ============================================
+// ─── Edge Functions ──────────────────────────────────────────────────────────
 
 interface RecipeStepContact {
   id: string;
