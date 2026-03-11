@@ -9,7 +9,6 @@ import {
 } from '../../services/bootcamp-supabase';
 import { useBootcampAuth } from '../../hooks/useBootcampAuth';
 import { useBootcampCurriculum } from '../../hooks/useBootcampCurriculum';
-import type { ProgressSnapshot } from '../../hooks/useBootcampCurriculum';
 import { useBootcampProgress } from '../../hooks/useBootcampProgress';
 import Sidebar from '../../components/bootcamp/Sidebar';
 import LessonView from '../../components/bootcamp/LessonView';
@@ -45,7 +44,9 @@ import {
 import RedeemCodeModal from '../../components/bootcamp/RedeemCodeModal';
 import { StudentSettingsModal } from '../../components/bootcamp/settings';
 import { FeedbackWidget } from '../../components/feedback/FeedbackWidget';
+import { logError } from '../../lib/logError';
 import type { User } from '../../types';
+import type { ProgressSnapshot } from '../../hooks/useBootcampCurriculum';
 import { BootcampSurveyFormData, OnboardingStep } from '../../types/bootcamp-types';
 import { queryKeys } from '../../lib/queryClient';
 import { Menu, X, Terminal, Users, AlertCircle } from 'lucide-react';
@@ -290,20 +291,24 @@ const BootcampApp: React.FC = () => {
   };
 
   const handleEnterCurriculum = async () => {
-    // Mark onboarding as complete
-    const updatedStudent = await completeOnboardingMutation.mutateAsync();
+    try {
+      // Mark onboarding as complete
+      const updatedStudent = await completeOnboardingMutation.mutateAsync();
 
-    // Update user state with correct access level for curriculum view
-    if (user && updatedStudent) {
-      const updatedUser: User = {
-        ...user,
-        status: updatedStudent.accessLevel || 'Full Access',
-      };
-      setUser(updatedUser);
-      localStorage.setItem('lms_user_obj', JSON.stringify(updatedUser));
+      // Update user state with correct access level for curriculum view
+      if (user && updatedStudent) {
+        const updatedUser: User = {
+          ...user,
+          status: updatedStudent.accessLevel || 'Full Access',
+        };
+        setUser(updatedUser);
+        localStorage.setItem('lms_user_obj', JSON.stringify(updatedUser));
+      }
+
+      completeStep('complete');
+    } catch (error) {
+      logError('BootcampApp:enterCurriculum', error);
     }
-
-    completeStep('complete');
   };
 
   // Calculate onboarding progress percentage

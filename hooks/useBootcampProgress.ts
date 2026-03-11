@@ -7,6 +7,7 @@
 
 import { useState, useCallback } from 'react';
 
+import { logError } from '../lib/logError';
 import type { ProgressSnapshot } from './useBootcampCurriculum';
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
@@ -57,7 +58,11 @@ export function useBootcampProgress({
   ): void => {
     if (!userEmail) return;
     const payload = { items: Array.from(items), proof, notes, submitted };
-    localStorage.setItem(getStorageKey(userEmail), JSON.stringify(payload));
+    try {
+      localStorage.setItem(getStorageKey(userEmail), JSON.stringify(payload));
+    } catch (error) {
+      logError('useBootcampProgress:save', error);
+    }
   };
 
   // ─── Hydration ───────────────────────────────────────────────────────────────
