@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Loader2, Pause, Play, CheckCircle2 } from 'lucide-react';
-import { supabase } from '../../../lib/supabaseClient';
 import type { RankingRun } from '../../../types/connection-qualifier-types';
 import {
   fetchRankingRun,
@@ -11,6 +10,7 @@ import {
   updateRunPhase2Progress,
   updateRunStatus,
   finalizeRanking,
+  invokeEnrichConnections,
 } from '../../../services/connection-ranker-supabase';
 import { logError } from '../../../lib/logError';
 
@@ -62,24 +62,19 @@ export default function Phase2Progress({ run, onComplete, onPause }: Phase2Progr
           if (pauseRef.current) break;
 
           try {
-            const { data, error: fnError } = await supabase.functions.invoke(
-              'rank-connections-enrich',
-              {
-                body: {
-                  connections: [
-                    {
-                      id: conn.id,
-                      firstName: conn.firstName,
-                      lastName: conn.lastName,
-                      company: conn.company,
-                      position: conn.position,
-                      deterministicScore: conn.deterministicScore,
-                    },
-                  ],
-                  criteria: run.criteria,
+            const { data, error: fnError } = await invokeEnrichConnections({
+              connections: [
+                {
+                  id: conn.id,
+                  firstName: conn.firstName,
+                  lastName: conn.lastName,
+                  company: conn.company,
+                  position: conn.position,
+                  deterministicScore: conn.deterministicScore,
                 },
-              }
-            );
+              ],
+              criteria: run.criteria,
+            });
 
             if (fnError) throw fnError;
 

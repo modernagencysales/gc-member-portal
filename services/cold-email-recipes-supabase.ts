@@ -273,3 +273,18 @@ export async function resetContactEnrichment(listId: string): Promise<void> {
 
   if (error) throw new Error(error.message);
 }
+
+// ============================================
+// Edge Function Wrappers
+// ============================================
+
+interface RecipeStepContact {
+  id: string;
+  fields: Record<string, string>;
+}
+
+export async function invokeRunRecipeSteps(contacts: RecipeStepContact[], steps: RecipeStep[]) {
+  return supabase.functions.invoke('run-recipe-steps', {
+    body: { contacts, steps },
+  });
+}

@@ -129,3 +129,18 @@ export async function getStudentByEmail(
     stripeCustomerId: data.stripe_customer_id,
   };
 }
+
+// ============================================
+// Edge Function Wrappers
+// ============================================
+
+export async function createCheckoutSession(
+  studentId: string,
+  studentEmail: string,
+  successUrl: string,
+  cancelUrl: string
+) {
+  return supabase.functions.invoke('create-checkout', {
+    body: { studentId, studentEmail, successUrl, cancelUrl },
+  });
+}

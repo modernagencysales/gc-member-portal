@@ -500,6 +500,37 @@ export async function fetchResultsForExport(
 }
 
 // ============================================
+// Edge Function Wrappers
+// ============================================
+
+interface QualifyConnectionsPayload {
+  connections: { firstName: string; lastName: string; company: string; position: string }[];
+  criteria: { targetTitles: string[]; targetIndustries: string[]; freeTextDescription: string };
+}
+
+export async function invokeQualifyConnections(payload: QualifyConnectionsPayload) {
+  return supabase.functions.invoke('qualify-connections', { body: payload });
+}
+
+interface EnrichConnectionPayload {
+  id: string;
+  firstName: string;
+  lastName: string;
+  company: string;
+  position: string;
+  deterministicScore: number;
+}
+
+interface EnrichConnectionsPayload {
+  connections: EnrichConnectionPayload[];
+  criteria: QualificationCriteria;
+}
+
+export async function invokeEnrichConnections(payload: EnrichConnectionsPayload) {
+  return supabase.functions.invoke('rank-connections-enrich', { body: payload });
+}
+
+// ============================================
 // Phase 2 count helper
 // ============================================
 

@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { supabase } from '../../../lib/supabaseClient';
 import { fetchMemberICP } from '../../../services/supabase';
+import { invokeQualifyConnections } from '../../../services/connection-ranker-supabase';
 import CsvUploader from './CsvUploader';
 import QualificationCriteria from './QualificationCriteria';
 import ProcessingProgress from './ProcessingProgress';
@@ -132,19 +132,17 @@ export default function ConnectionQualifier({ userId }: ConnectionQualifierProps
       const batch = batches[i];
 
       try {
-        const { data, error: fnError } = await supabase.functions.invoke('qualify-connections', {
-          body: {
-            connections: batch.map((c) => ({
-              firstName: c.firstName,
-              lastName: c.lastName,
-              company: c.company,
-              position: c.position,
-            })),
-            criteria: {
-              targetTitles: criteria.targetTitles,
-              targetIndustries: criteria.targetIndustries,
-              freeTextDescription: criteria.freeTextDescription,
-            },
+        const { data, error: fnError } = await invokeQualifyConnections({
+          connections: batch.map((c) => ({
+            firstName: c.firstName,
+            lastName: c.lastName,
+            company: c.company,
+            position: c.position,
+          })),
+          criteria: {
+            targetTitles: criteria.targetTitles,
+            targetIndustries: criteria.targetIndustries,
+            freeTextDescription: criteria.freeTextDescription,
           },
         });
 

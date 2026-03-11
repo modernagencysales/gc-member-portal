@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { X, Sparkles, MessageSquare, Users, Bot } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
-import { supabase } from '../../lib/supabaseClient';
+import { createCheckoutSession } from '../../services/subscription-supabase';
 import { logError } from '../../lib/logError';
 
 interface SubscriptionModalProps {
@@ -23,14 +23,12 @@ const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
   const handleSubscribe = async () => {
     setIsLoading(true);
     try {
-      const { data, error } = await supabase.functions.invoke('create-checkout', {
-        body: {
-          studentId,
-          studentEmail,
-          successUrl: `${window.location.origin}/bootcamp?subscription=success`,
-          cancelUrl: `${window.location.origin}/bootcamp?subscription=canceled`,
-        },
-      });
+      const { data, error } = await createCheckoutSession(
+        studentId,
+        studentEmail,
+        `${window.location.origin}/bootcamp?subscription=success`,
+        `${window.location.origin}/bootcamp?subscription=canceled`
+      );
 
       if (error) throw error;
 

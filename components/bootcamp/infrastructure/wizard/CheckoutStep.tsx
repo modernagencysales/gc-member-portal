@@ -10,7 +10,7 @@ import {
   Linkedin,
 } from 'lucide-react';
 import { useTheme } from '../../../../context/ThemeContext';
-import { supabase } from '../../../../lib/supabaseClient';
+import { createInfraCheckout } from '../../../../services/infrastructure-supabase';
 import { useOutreachPricing } from '../../../../hooks/useInfrastructure';
 import type {
   InfraTier,
@@ -76,25 +76,20 @@ const CheckoutStep: React.FC<CheckoutStepProps> = ({
 
     try {
       // Edge function creates provision records + Stripe checkout (uses service_role to bypass RLS)
-      const { data: checkoutData, error: checkoutError } = await supabase.functions.invoke(
-        'create-infra-checkout',
-        {
-          body: {
-            studentId: userId,
-            products: selectedProducts,
-            serviceProvider,
-            tierId: tier?.id || undefined,
-            domains: hasEmailInfra
-              ? domains.map((d) => ({
-                  domainName: d.domainName,
-                  serviceProvider: d.serviceProvider || serviceProvider,
-                }))
-              : undefined,
-            mailboxPattern1: hasEmailInfra ? pattern1 : undefined,
-            mailboxPattern2: hasEmailInfra ? pattern2 : undefined,
-          },
-        }
-      );
+      const { data: checkoutData, error: checkoutError } = await createInfraCheckout({
+        studentId: userId,
+        products: selectedProducts,
+        serviceProvider,
+        tierId: tier?.id || undefined,
+        domains: hasEmailInfra
+          ? domains.map((d) => ({
+              domainName: d.domainName,
+              serviceProvider: d.serviceProvider || serviceProvider,
+            }))
+          : undefined,
+        mailboxPattern1: hasEmailInfra ? pattern1 : undefined,
+        mailboxPattern2: hasEmailInfra ? pattern2 : undefined,
+      });
 
       if (checkoutError) {
         throw new Error(`Failed to create checkout session: ${checkoutError.message}`);

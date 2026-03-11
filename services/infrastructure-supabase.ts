@@ -1,4 +1,5 @@
 import { supabase } from '../lib/supabaseClient';
+import { GTM_SYSTEM_URL, buildGtmHeaders } from '../lib/api-config';
 import {
   InfraTier,
   InfraProvision,
@@ -8,6 +9,8 @@ import {
   OutreachPricing,
   StudentProvisions,
   ProductType,
+  ServiceProvider,
+  DomainAvailability,
 } from '../types/infrastructure-types';
 
 // ============================================
@@ -206,4 +209,42 @@ export async function createProvision(input: {
 
   if (error) throw new Error(error.message);
   return mapProvision(data);
+}
+
+// ============================================
+// Edge Function Wrappers
+// ============================================
+
+interface InfraCheckoutDomain {
+  domainName: string;
+  serviceProvider: ServiceProvider;
+}
+
+interface CreateInfraCheckoutInput {
+  studentId: string;
+  products: ProductType[];
+  serviceProvider: ServiceProvider;
+  tierId?: string;
+  domains?: InfraCheckoutDomain[];
+  mailboxPattern1?: string;
+  mailboxPattern2?: string;
+}
+
+export async function createInfraCheckout(input: CreateInfraCheckoutInput) {
+  return supabase.functions.invoke('create-infra-checkout', { body: input });
+}
+
+export async function checkDomainAvailability(domain: string): Promise<{
+  domains: (Omit<DomainAvailability, 'serviceProvider'> & { serviceProvider?: ServiceProvider })[];
+}> {
+  const res = await fetch(`${GTM_SYSTEM_URL}/api/infrastructure/domains/check`, {
+    method: 'POST',
+    headers: buildGtmHeaders(),
+    body: JSON.stringify({ domain }),
+  });
+  if (!res.ok) {
+    const errData = await res.json().catch(() => ({}));
+    throw new Error((errData as { error?: string }).error || `Domain check failed (${res.status})`);
+  }
+  return res.json();
 }

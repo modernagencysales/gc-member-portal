@@ -1,13 +1,15 @@
 import React, { useState, useCallback } from 'react';
 import { Play, RotateCcw } from 'lucide-react';
-import { supabase } from '../../../../lib/supabaseClient';
 import {
   useRecipes,
   useContactLists,
   useContacts,
   useResetContactEnrichment,
 } from '../../../../hooks/useColdEmailRecipes';
-import { updateContactEnrichment } from '../../../../services/cold-email-recipes-supabase';
+import {
+  updateContactEnrichment,
+  invokeRunRecipeSteps,
+} from '../../../../services/cold-email-recipes-supabase';
 import type {
   BootcampContact,
   RecipeStep,
@@ -167,9 +169,7 @@ export default function GeneratePanel({ userId }: Props) {
           }));
 
           try {
-            const { data, error } = await supabase.functions.invoke('run-recipe-steps', {
-              body: { contacts: batchPayload, steps: group.steps },
-            });
+            const { data, error } = await invokeRunRecipeSteps(batchPayload, group.steps);
 
             if (error) throw error;
 
