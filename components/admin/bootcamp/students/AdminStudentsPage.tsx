@@ -15,6 +15,7 @@ import {
   useMarkCalendarAddedMutation,
 } from '../../../../hooks/useBootcampAdminMutations';
 import { BootcampStudent, BootcampStudentSurvey } from '../../../../types/bootcamp-types';
+import type { BootcampStudentInsertInput } from '../../../../services/bootcamp-supabase';
 import StudentTable from './StudentTable';
 import StudentModal from './StudentModal';
 import StudentSurveyModal from './StudentSurveyModal';
@@ -117,7 +118,7 @@ const AdminStudentsPage: React.FC = () => {
           await updateMutation.mutateAsync({ studentId: editingStudent.id, updates: data });
           studentId = editingStudent.id;
         } else {
-          const created = await createMutation.mutateAsync(data);
+          const created = await createMutation.mutateAsync(data as BootcampStudentInsertInput);
           studentId = (created as { id: string }).id;
         }
       } catch (err) {

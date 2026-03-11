@@ -7,6 +7,8 @@ import { supabase } from '../lib/supabaseClient';
 import { logError, logWarn } from '../lib/logError';
 import {
   BootcampStudent,
+  BootcampStudentStatus,
+  BootcampAccessLevel,
   BootcampChecklistItem,
   BootcampStudentProgress,
   BootcampStudentSurvey,
@@ -86,8 +88,21 @@ export async function fetchBootcampStudentById(studentId: string): Promise<Bootc
   return mapBootcampStudent(data);
 }
 
+export interface BootcampStudentInsertInput {
+  email: string;
+  name?: string;
+  company?: string;
+  cohort?: string;
+  status?: BootcampStudentStatus;
+  accessLevel?: BootcampAccessLevel;
+  purchaseDate?: Date;
+  paymentSource?: string;
+  paymentId?: string;
+  notes?: string;
+}
+
 export async function createBootcampStudent(
-  student: Partial<BootcampStudent>
+  student: BootcampStudentInsertInput
 ): Promise<BootcampStudent> {
   const insertData = {
     email: student.email,

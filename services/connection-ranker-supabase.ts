@@ -168,10 +168,24 @@ export async function createRankingRun(
   return mapRankingRun(data);
 }
 
+interface RunStatusExtra {
+  phase1_completed_at?: string;
+  phase2_total?: number;
+  phase2_completed_at?: string;
+  completed_at?: string;
+  total_connections?: number;
+  tier_definite_keep?: number;
+  tier_strong_keep?: number;
+  tier_borderline?: number;
+  tier_likely_remove?: number;
+  tier_definite_remove?: number;
+  tier_protected?: number;
+}
+
 export async function updateRunStatus(
   runId: string,
   status: RunStatus,
-  extraFields?: Record<string, unknown>
+  extraFields?: RunStatusExtra
 ): Promise<void> {
   const update: Record<string, unknown> = { status, ...extraFields };
   const { error } = await supabase.from('connection_ranking_runs').update(update).eq('id', runId);

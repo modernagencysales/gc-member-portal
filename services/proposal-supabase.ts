@@ -104,13 +104,52 @@ export async function getProposalById(id: string): Promise<Proposal | null> {
   return mapProposal(data as Record<string, unknown>);
 }
 
+/** Fields that callers are permitted to update on proposals. */
+const PROPOSAL_ALLOWED_UPDATE_FIELDS = [
+  'status',
+  'client_name',
+  'client_title',
+  'client_company',
+  'client_logo_url',
+  'client_brand_color',
+  'client_website',
+  'headline',
+  'executive_summary',
+  'about_us',
+  'client_snapshot',
+  'goals',
+  'services',
+  'roadmap',
+  'pricing',
+  'next_steps',
+  'transcript_text',
+  'transcript_source',
+  'additional_notes',
+  'monthly_rate_cents',
+] as const;
+
+type ProposalUpdateField = (typeof PROPOSAL_ALLOWED_UPDATE_FIELDS)[number];
+export type ProposalUpdateInput = Partial<Record<ProposalUpdateField, unknown>>;
+
+function filterAllowedFields(input: Record<string, unknown>): Record<string, unknown> {
+  const allowed = new Set<string>(PROPOSAL_ALLOWED_UPDATE_FIELDS);
+  const filtered: Record<string, unknown> = {};
+  for (const key of Object.keys(input)) {
+    if (allowed.has(key)) filtered[key] = input[key];
+  }
+  return filtered;
+}
+
 export async function updateProposal(
   id: string,
-  updates: Partial<Record<string, unknown>>
+  updates: ProposalUpdateInput
 ): Promise<Proposal | null> {
+  const filtered = filterAllowedFields(updates as Record<string, unknown>);
+  filtered.updated_at = new Date().toISOString();
+
   const { data, error } = await supabase
     .from('proposals')
-    .update({ ...updates, updated_at: new Date().toISOString() })
+    .update(filtered)
     .eq('id', id)
     .select(PROPOSAL_COLUMNS)
     .single();

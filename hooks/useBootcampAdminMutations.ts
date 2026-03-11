@@ -17,6 +17,7 @@ import {
   createInviteCode,
   updateInviteCode,
   deleteInviteCode,
+  type BootcampStudentInsertInput,
 } from '../services/bootcamp-supabase';
 import { queryKeys } from '../lib/queryClient';
 import {
@@ -38,7 +39,7 @@ export function useCreateBootcampStudentMutation() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (student: Partial<BootcampStudent>) => createBootcampStudent(student),
+    mutationFn: (student: BootcampStudentInsertInput) => createBootcampStudent(student),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: queryKeys.bootcampAdminStudents() });
     },

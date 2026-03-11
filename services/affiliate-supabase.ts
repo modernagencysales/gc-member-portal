@@ -515,8 +515,18 @@ export async function fetchAllAffiliateAssets(): Promise<AffiliateAsset[]> {
   return (data || []).map(mapAsset);
 }
 
+export interface AffiliateAssetInsertInput {
+  title: string;
+  description?: string | null;
+  assetType?: AssetType;
+  contentText?: string | null;
+  fileUrl?: string | null;
+  sortOrder?: number;
+  isVisible?: boolean;
+}
+
 export async function createAffiliateAsset(
-  asset: Partial<AffiliateAsset>
+  asset: AffiliateAssetInsertInput
 ): Promise<AffiliateAsset> {
   const insertData = {
     title: asset.title,
