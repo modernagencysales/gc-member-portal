@@ -1,39 +1,22 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import mammoth from 'mammoth';
-import ReactMarkdown from 'react-markdown';
-import remarkBreaks from 'remark-breaks';
-import remarkGfm from 'remark-gfm';
+/**
+ * LmsContentItemModal — Modal shell for creating and editing LMS content items.
+ * Delegates form state to useContentItemForm; renders TextContentEditor and
+ * CredentialsFields for their respective content types.
+ */
+
+import React from 'react';
+import { X, Video, FileText, Link, Key, Bot, Table, Presentation, BookOpen } from 'lucide-react';
 import { useTheme } from '../../../../context/ThemeContext';
-import {
+import type {
   LmsContentItem,
   LmsContentItemFormData,
   LmsContentType,
-  detectContentType,
-  normalizeEmbedUrl,
 } from '../../../../types/lms-types';
-import {
-  X,
-  AlertCircle,
-  Video,
-  FileText,
-  Link,
-  Key,
-  Bot,
-  Table,
-  Presentation,
-  BookOpen,
-  Bold,
-  Italic,
-  Heading2,
-  List,
-  ListOrdered,
-  Link2,
-  Eye,
-  Code,
-  Minus,
-  Upload,
-} from 'lucide-react';
-import { logError, logWarn } from '../../../../lib/logError';
+import { useContentItemForm } from '../../../../hooks/useContentItemForm';
+import TextContentEditor from './TextContentEditor';
+import CredentialsFields from './CredentialsFields';
+
+// ─── Types ───────────────────────────────────────────────────────────────────
 
 interface LmsContentItemModalProps {
   isOpen: boolean;
@@ -43,6 +26,8 @@ interface LmsContentItemModalProps {
   initialContentType?: LmsContentType;
   isLoading: boolean;
 }
+
+// ─── Constants ────────────────────────────────────────────────────────────────
 
 const CONTENT_TYPE_OPTIONS: { value: LmsContentType; label: string; icon: React.ReactNode }[] = [
   { value: 'video', label: 'Video', icon: <Video className="w-4 h-4" /> },
@@ -56,250 +41,34 @@ const CONTENT_TYPE_OPTIONS: { value: LmsContentType; label: string; icon: React.
   { value: 'sop_link', label: 'Reference SOP', icon: <BookOpen className="w-4 h-4" /> },
 ];
 
-// Markdown toolbar editor for text content
-const TextContentEditor: React.FC<{
-  value: string;
-  onChange: (val: string) => void;
-  isDarkMode: boolean;
-  required?: boolean;
-}> = ({ value, onChange, isDarkMode, required }) => {
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const [showPreview, setShowPreview] = useState(false);
-  const [importing, setImporting] = useState(false);
+const URL_FIELD_CONTENT_TYPES: LmsContentType[] = [
+  'video',
+  'slide_deck',
+  'guide',
+  'clay_table',
+  'external_link',
+  'sop_link',
+];
 
-  const handleDocxImport = useCallback(
-    async (e: React.ChangeEvent<HTMLInputElement>) => {
-      const file = e.target.files?.[0];
-      if (!file) return;
-      setImporting(true);
-      try {
-        const arrayBuffer = await file.arrayBuffer();
-        const result = await mammoth.convertToHtml({ arrayBuffer });
-        if (result.value) {
-          // Prefix with marker so the student view knows to render as HTML
-          onChange('<!--docx-->' + result.value);
-          setShowPreview(true);
-        }
-        if (result.messages.length > 0) {
-          logWarn('LmsContentItemModal:docxImport', 'DOCX import warnings', {
-            messages: result.messages,
-          });
-        }
-      } catch (err) {
-        logError('LmsContentItemModal:docxImport', err);
-        window.alert('Failed to import DOCX file. Please try again.');
-      } finally {
-        setImporting(false);
-        // Reset file input so same file can be re-imported
-        if (fileInputRef.current) fileInputRef.current.value = '';
-      }
-    },
-    [onChange]
-  );
-
-  const insertMarkdown = useCallback(
-    (before: string, after: string = '') => {
-      const ta = textareaRef.current;
-      if (!ta) return;
-      const start = ta.selectionStart;
-      const end = ta.selectionEnd;
-      const selected = value.substring(start, end);
-      const newText = value.substring(0, start) + before + selected + after + value.substring(end);
-      onChange(newText);
-      // Restore cursor position after the inserted text
-      requestAnimationFrame(() => {
-        ta.focus();
-        const cursorPos = start + before.length + selected.length + after.length;
-        ta.setSelectionRange(
-          selected ? cursorPos : start + before.length,
-          selected ? cursorPos : start + before.length
-        );
-      });
-    },
-    [value, onChange]
-  );
-
-  const toolbarButtons = [
-    {
-      icon: <Bold className="w-3.5 h-3.5" />,
-      action: () => insertMarkdown('**', '**'),
-      title: 'Bold',
-    },
-    {
-      icon: <Italic className="w-3.5 h-3.5" />,
-      action: () => insertMarkdown('*', '*'),
-      title: 'Italic',
-    },
-    {
-      icon: <Heading2 className="w-3.5 h-3.5" />,
-      action: () => {
-        const ta = textareaRef.current;
-        if (!ta) return;
-        const start = ta.selectionStart;
-        const end = ta.selectionEnd;
-        const selected = value.substring(start, end);
-        // Find start of current line
-        const lineStart = value.lastIndexOf('\n', start - 1) + 1;
-        const linePrefix = value.substring(lineStart, start);
-        if (selected) {
-          // Wrap selection as heading
-          const prefix = lineStart === start && !linePrefix ? '' : '\n';
-          const newText =
-            value.substring(0, start) + prefix + '## ' + selected + '\n' + value.substring(end);
-          onChange(newText);
-        } else {
-          // Add heading at start of current line (or new line)
-          if (linePrefix.trim() === '') {
-            const newText = value.substring(0, lineStart) + '## ' + value.substring(start);
-            onChange(newText);
-            requestAnimationFrame(() => {
-              ta.focus();
-              ta.setSelectionRange(lineStart + 3, lineStart + 3);
-            });
-          } else {
-            const newText = value.substring(0, start) + '\n## ';
-            onChange(newText + value.substring(start));
-            requestAnimationFrame(() => {
-              ta.focus();
-              ta.setSelectionRange(start + 4, start + 4);
-            });
-          }
-        }
-      },
-      title: 'Heading',
-    },
-    {
-      icon: <List className="w-3.5 h-3.5" />,
-      action: () => insertMarkdown('\n- '),
-      title: 'Bullet list',
-    },
-    {
-      icon: <ListOrdered className="w-3.5 h-3.5" />,
-      action: () => insertMarkdown('\n1. '),
-      title: 'Numbered list',
-    },
-    {
-      icon: <Link2 className="w-3.5 h-3.5" />,
-      action: () => insertMarkdown('[', '](url)'),
-      title: 'Link',
-    },
-    {
-      icon: <Code className="w-3.5 h-3.5" />,
-      action: () => insertMarkdown('`', '`'),
-      title: 'Code',
-    },
-    {
-      icon: <Minus className="w-3.5 h-3.5" />,
-      action: () => insertMarkdown('\n---\n'),
-      title: 'Divider',
-    },
-  ];
-
-  return (
-    <div>
-      <div className="flex items-center justify-between mb-1.5">
-        <label
-          className={`block text-sm font-medium ${isDarkMode ? 'text-zinc-300' : 'text-zinc-700'}`}
-        >
-          Text Content *
-        </label>
-        <button
-          type="button"
-          onClick={() => setShowPreview(!showPreview)}
-          className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-colors ${
-            showPreview
-              ? 'bg-violet-600 text-white'
-              : isDarkMode
-                ? 'text-zinc-400 hover:bg-zinc-800'
-                : 'text-zinc-500 hover:bg-zinc-100'
-          }`}
-        >
-          <Eye className="w-3.5 h-3.5" />
-          {showPreview ? 'Editing' : 'Preview'}
-        </button>
-      </div>
-
-      {showPreview ? (
-        <div
-          className={`w-full min-h-[300px] max-h-[60vh] overflow-y-auto px-6 py-4 rounded-lg border text-sm document-content ${
-            isDarkMode
-              ? 'bg-zinc-800 border-zinc-700 text-zinc-200'
-              : 'bg-white border-zinc-300 text-zinc-800'
-          }`}
-        >
-          <ReactMarkdown remarkPlugins={[remarkBreaks, remarkGfm]}>
-            {value || '*Nothing to preview*'}
-          </ReactMarkdown>
-        </div>
-      ) : (
-        <>
-          {/* Toolbar */}
-          <div
-            className={`flex items-center gap-0.5 px-2 py-1.5 rounded-t-lg border border-b-0 ${
-              isDarkMode ? 'bg-zinc-800 border-zinc-700' : 'bg-zinc-50 border-zinc-300'
-            }`}
-          >
-            {toolbarButtons.map((btn, i) => (
-              <button
-                key={i}
-                type="button"
-                onClick={btn.action}
-                title={btn.title}
-                className={`p-1.5 rounded ${
-                  isDarkMode
-                    ? 'text-zinc-400 hover:bg-zinc-700 hover:text-zinc-200'
-                    : 'text-zinc-500 hover:bg-zinc-200 hover:text-zinc-700'
-                }`}
-              >
-                {btn.icon}
-              </button>
-            ))}
-          </div>
-
-          <textarea
-            ref={textareaRef}
-            value={value}
-            onChange={(e) => onChange(e.target.value)}
-            placeholder="Write your content using Markdown formatting..."
-            rows={16}
-            required={required}
-            className={`w-full px-4 py-3 rounded-b-lg border ${
-              isDarkMode
-                ? 'bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500'
-                : 'bg-white border-zinc-300 text-zinc-900 placeholder:text-zinc-400'
-            } focus:ring-2 focus:ring-violet-500 focus:border-transparent resize-y font-mono text-sm min-h-[200px]`}
-          />
-        </>
-      )}
-      <div className="flex items-center gap-2 mt-1.5">
-        <p className={`text-xs flex-1 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
-          Supports Markdown: **bold**, *italic*, ## headings, - lists, [links](url), --- dividers
-        </p>
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept=".docx"
-          onChange={handleDocxImport}
-          className="hidden"
-        />
-        <button
-          type="button"
-          onClick={() => fileInputRef.current?.click()}
-          disabled={importing}
-          className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-medium transition-colors ${
-            isDarkMode
-              ? 'text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200'
-              : 'text-zinc-500 hover:bg-zinc-100 hover:text-zinc-700'
-          } ${importing ? 'opacity-50 cursor-wait' : ''}`}
-        >
-          <Upload className="w-3.5 h-3.5" />
-          {importing ? 'Importing...' : 'Import DOCX'}
-        </button>
-      </div>
-    </div>
-  );
+const URL_LABELS: Partial<Record<LmsContentType, string>> = {
+  video: 'Video URL',
+  slide_deck: 'Gamma URL',
+  guide: 'Guidde URL',
+  clay_table: 'Clay Table URL',
+  sop_link: 'Playbook SOP URL',
+  external_link: 'External URL',
 };
+
+const URL_PLACEHOLDERS: Partial<Record<LmsContentType, string>> = {
+  video: 'https://youtube.com/watch?v=... or https://loom.com/share/...',
+  slide_deck: 'https://gamma.app/...',
+  guide: 'https://app.guidde.com/share/...',
+  clay_table: 'https://app.clay.com/...',
+  sop_link: 'https://dwy-playbook.vercel.app/...',
+  external_link: 'https://...',
+};
+
+// ─── Component ───────────────────────────────────────────────────────────────
 
 const LmsContentItemModal: React.FC<LmsContentItemModalProps> = ({
   isOpen,
@@ -310,82 +79,30 @@ const LmsContentItemModal: React.FC<LmsContentItemModalProps> = ({
   isLoading,
 }) => {
   const { isDarkMode } = useTheme();
-  const [formData, setFormData] = useState<Partial<LmsContentItemFormData>>({
-    title: '',
-    contentType: 'video',
-    embedUrl: '',
-    aiToolSlug: '',
-    contentText: '',
-    credentialsData: { loginUrl: '', username: '', password: '', notes: '' },
-    description: '',
-    isVisible: true,
+  const { formData, setFormData, handleUrlChange, handleSubmit } = useContentItemForm({
+    initialData,
+    initialContentType,
+    isOpen,
+    onSubmit,
   });
-
-  useEffect(() => {
-    if (initialData) {
-      // For text content, extract text from embedUrl if contentText is empty
-      let contentText = initialData.contentText || '';
-      if (!contentText && initialData.embedUrl?.startsWith('text:')) {
-        contentText = initialData.embedUrl.replace(/^text:\s*/, '');
-      }
-      setFormData({
-        title: initialData.title,
-        contentType: initialData.contentType,
-        embedUrl: initialData.embedUrl?.startsWith('text:') ? '' : initialData.embedUrl || '',
-        aiToolSlug: initialData.aiToolSlug || '',
-        contentText,
-        credentialsData: initialData.credentialsData || {
-          loginUrl: '',
-          username: '',
-          password: '',
-          notes: '',
-        },
-        description: initialData.description || '',
-        isVisible: initialData.isVisible,
-      });
-    } else {
-      setFormData({
-        title: '',
-        contentType: initialContentType || 'video',
-        embedUrl: '',
-        aiToolSlug: '',
-        contentText: '',
-        credentialsData: { loginUrl: '', username: '', password: '', notes: '' },
-        description: '',
-        isVisible: true,
-      });
-    }
-  }, [initialData, initialContentType, isOpen]);
-
-  const handleUrlChange = (url: string) => {
-    const detectedType = detectContentType(url);
-    const normalizedUrl = normalizeEmbedUrl(url);
-
-    setFormData((prev) => ({
-      ...prev,
-      embedUrl: normalizedUrl || url,
-      contentType: detectedType,
-    }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    await onSubmit(formData as LmsContentItemFormData);
-  };
 
   if (!isOpen) return null;
 
-  const showUrlField = [
-    'video',
-    'slide_deck',
-    'guide',
-    'clay_table',
-    'external_link',
-    'sop_link',
-  ].includes(formData.contentType || '');
-  const showAiToolField = formData.contentType === 'ai_tool';
-  const showTextField = formData.contentType === 'text';
-  const showCredentialsFields = formData.contentType === 'credentials';
+  const contentType = formData.contentType || 'video';
+  const showUrlField = URL_FIELD_CONTENT_TYPES.includes(contentType);
+  const showAiToolField = contentType === 'ai_tool';
+  const showTextField = contentType === 'text';
+  const showCredentialsFields = contentType === 'credentials';
+
+  const inputBase = `w-full px-4 py-2.5 rounded-lg border ${
+    isDarkMode
+      ? 'bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500'
+      : 'bg-white border-zinc-300 text-zinc-900 placeholder:text-zinc-400'
+  } focus:ring-2 focus:ring-violet-500 focus:border-transparent`;
+
+  const labelBase = `block text-sm font-medium mb-1.5 ${
+    isDarkMode ? 'text-zinc-300' : 'text-zinc-700'
+  }`;
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -394,6 +111,7 @@ const LmsContentItemModal: React.FC<LmsContentItemModalProps> = ({
           isDarkMode ? 'bg-zinc-900' : 'bg-white'
         } shadow-xl`}
       >
+        {/* Header */}
         <div
           className={`sticky top-0 flex items-center justify-between px-6 py-4 border-b ${
             isDarkMode ? 'border-zinc-800 bg-zinc-900' : 'border-zinc-200 bg-white'
@@ -411,15 +129,9 @@ const LmsContentItemModal: React.FC<LmsContentItemModalProps> = ({
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          {/* Content Type */}
+          {/* Content Type Selector */}
           <div>
-            <label
-              className={`block text-sm font-medium mb-1.5 ${
-                isDarkMode ? 'text-zinc-300' : 'text-zinc-700'
-              }`}
-            >
-              Content Type *
-            </label>
+            <label className={labelBase}>Content Type *</label>
             <div className="grid grid-cols-4 gap-2">
               {CONTENT_TYPE_OPTIONS.map((option) => (
                 <button
@@ -427,7 +139,7 @@ const LmsContentItemModal: React.FC<LmsContentItemModalProps> = ({
                   type="button"
                   onClick={() => setFormData({ ...formData, contentType: option.value })}
                   className={`flex flex-col items-center gap-1.5 p-3 rounded-lg border transition-colors ${
-                    formData.contentType === option.value
+                    contentType === option.value
                       ? isDarkMode
                         ? 'border-violet-500 bg-violet-900/30 text-violet-400'
                         : 'border-violet-500 bg-violet-50 text-violet-700'
@@ -445,71 +157,28 @@ const LmsContentItemModal: React.FC<LmsContentItemModalProps> = ({
 
           {/* Title */}
           <div>
-            <label
-              className={`block text-sm font-medium mb-1.5 ${
-                isDarkMode ? 'text-zinc-300' : 'text-zinc-700'
-              }`}
-            >
-              Title *
-            </label>
+            <label className={labelBase}>Title *</label>
             <input
               type="text"
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
               placeholder="e.g., Introduction Video, Getting Started Guide"
               required
-              className={`w-full px-4 py-2.5 rounded-lg border ${
-                isDarkMode
-                  ? 'bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500'
-                  : 'bg-white border-zinc-300 text-zinc-900 placeholder:text-zinc-400'
-              } focus:ring-2 focus:ring-violet-500 focus:border-transparent`}
+              className={inputBase}
             />
           </div>
 
           {/* URL Field */}
           {showUrlField && (
             <div>
-              <label
-                className={`block text-sm font-medium mb-1.5 ${
-                  isDarkMode ? 'text-zinc-300' : 'text-zinc-700'
-                }`}
-              >
-                {formData.contentType === 'video'
-                  ? 'Video URL'
-                  : formData.contentType === 'slide_deck'
-                    ? 'Gamma URL'
-                    : formData.contentType === 'guide'
-                      ? 'Guidde URL'
-                      : formData.contentType === 'clay_table'
-                        ? 'Clay Table URL'
-                        : formData.contentType === 'sop_link'
-                          ? 'Playbook SOP URL'
-                          : 'External URL'}{' '}
-                *
-              </label>
+              <label className={labelBase}>{URL_LABELS[contentType] ?? 'External URL'} *</label>
               <input
                 type="url"
                 value={formData.embedUrl}
                 onChange={(e) => handleUrlChange(e.target.value)}
-                placeholder={
-                  formData.contentType === 'video'
-                    ? 'https://youtube.com/watch?v=... or https://loom.com/share/...'
-                    : formData.contentType === 'slide_deck'
-                      ? 'https://gamma.app/...'
-                      : formData.contentType === 'guide'
-                        ? 'https://app.guidde.com/share/...'
-                        : formData.contentType === 'clay_table'
-                          ? 'https://app.clay.com/...'
-                          : formData.contentType === 'sop_link'
-                            ? 'https://dwy-playbook.vercel.app/...'
-                            : 'https://...'
-                }
+                placeholder={URL_PLACEHOLDERS[contentType] ?? 'https://...'}
                 required={showUrlField}
-                className={`w-full px-4 py-2.5 rounded-lg border ${
-                  isDarkMode
-                    ? 'bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500'
-                    : 'bg-white border-zinc-300 text-zinc-900 placeholder:text-zinc-400'
-                } focus:ring-2 focus:ring-violet-500 focus:border-transparent`}
+                className={inputBase}
               />
               <p className={`text-xs mt-1 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
                 URLs are automatically normalized for embedding
@@ -517,27 +186,17 @@ const LmsContentItemModal: React.FC<LmsContentItemModalProps> = ({
             </div>
           )}
 
-          {/* AI Tool Field */}
+          {/* AI Tool Slug */}
           {showAiToolField && (
             <div>
-              <label
-                className={`block text-sm font-medium mb-1.5 ${
-                  isDarkMode ? 'text-zinc-300' : 'text-zinc-700'
-                }`}
-              >
-                AI Tool Slug *
-              </label>
+              <label className={labelBase}>AI Tool Slug *</label>
               <input
                 type="text"
                 value={formData.aiToolSlug}
                 onChange={(e) => setFormData({ ...formData, aiToolSlug: e.target.value })}
                 placeholder="e.g., lead-generator, email-writer"
                 required={showAiToolField}
-                className={`w-full px-4 py-2.5 rounded-lg border ${
-                  isDarkMode
-                    ? 'bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500'
-                    : 'bg-white border-zinc-300 text-zinc-900 placeholder:text-zinc-400'
-                } focus:ring-2 focus:ring-violet-500 focus:border-transparent`}
+                className={inputBase}
               />
               <p className={`text-xs mt-1 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
                 Enter the slug of the AI tool from your AI Tools configuration
@@ -545,7 +204,7 @@ const LmsContentItemModal: React.FC<LmsContentItemModalProps> = ({
             </div>
           )}
 
-          {/* Text Content Field with Markdown Editor */}
+          {/* Text / Markdown Editor */}
           {showTextField && (
             <TextContentEditor
               value={formData.contentText || ''}
@@ -555,155 +214,35 @@ const LmsContentItemModal: React.FC<LmsContentItemModalProps> = ({
             />
           )}
 
-          {/* Credentials Fields */}
+          {/* Credentials */}
           {showCredentialsFields && (
-            <div
-              className={`p-4 rounded-lg space-y-3 ${isDarkMode ? 'bg-zinc-800/50' : 'bg-zinc-50'}`}
-            >
-              <div className="flex items-center gap-2 mb-2">
-                <Key className="w-4 h-4 text-amber-500" />
-                <span
-                  className={`text-sm font-medium ${isDarkMode ? 'text-zinc-300' : 'text-zinc-700'}`}
-                >
-                  Credential Details
-                </span>
-              </div>
-
-              <div>
-                <label
-                  className={`block text-xs font-medium mb-1 ${
-                    isDarkMode ? 'text-zinc-400' : 'text-zinc-600'
-                  }`}
-                >
-                  Login URL
-                </label>
-                <input
-                  type="url"
-                  value={formData.credentialsData?.loginUrl || ''}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      credentialsData: { ...formData.credentialsData, loginUrl: e.target.value },
-                    })
-                  }
-                  placeholder="https://app.example.com/login"
-                  className={`w-full px-3 py-2 rounded-lg border text-sm ${
-                    isDarkMode
-                      ? 'bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500'
-                      : 'bg-white border-zinc-300 text-zinc-900 placeholder:text-zinc-400'
-                  } focus:ring-2 focus:ring-violet-500 focus:border-transparent`}
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label
-                    className={`block text-xs font-medium mb-1 ${
-                      isDarkMode ? 'text-zinc-400' : 'text-zinc-600'
-                    }`}
-                  >
-                    Username / Email
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.credentialsData?.username || ''}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        credentialsData: { ...formData.credentialsData, username: e.target.value },
-                      })
-                    }
-                    placeholder="user@example.com"
-                    className={`w-full px-3 py-2 rounded-lg border text-sm ${
-                      isDarkMode
-                        ? 'bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500'
-                        : 'bg-white border-zinc-300 text-zinc-900 placeholder:text-zinc-400'
-                    } focus:ring-2 focus:ring-violet-500 focus:border-transparent`}
-                  />
-                </div>
-                <div>
-                  <label
-                    className={`block text-xs font-medium mb-1 ${
-                      isDarkMode ? 'text-zinc-400' : 'text-zinc-600'
-                    }`}
-                  >
-                    Password
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.credentialsData?.password || ''}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        credentialsData: { ...formData.credentialsData, password: e.target.value },
-                      })
-                    }
-                    placeholder="••••••••"
-                    className={`w-full px-3 py-2 rounded-lg border text-sm font-mono ${
-                      isDarkMode
-                        ? 'bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500'
-                        : 'bg-white border-zinc-300 text-zinc-900 placeholder:text-zinc-400'
-                    } focus:ring-2 focus:ring-violet-500 focus:border-transparent`}
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label
-                  className={`block text-xs font-medium mb-1 ${
-                    isDarkMode ? 'text-zinc-400' : 'text-zinc-600'
-                  }`}
-                >
-                  Notes
-                </label>
-                <textarea
-                  value={formData.credentialsData?.notes || ''}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      credentialsData: { ...formData.credentialsData, notes: e.target.value },
-                    })
-                  }
-                  placeholder="Any additional instructions..."
-                  rows={2}
-                  className={`w-full px-3 py-2 rounded-lg border text-sm ${
-                    isDarkMode
-                      ? 'bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500'
-                      : 'bg-white border-zinc-300 text-zinc-900 placeholder:text-zinc-400'
-                  } focus:ring-2 focus:ring-violet-500 focus:border-transparent resize-none`}
-                />
-              </div>
-
-              <div
-                className={`flex items-start gap-2 p-2 rounded text-xs ${
-                  isDarkMode ? 'bg-amber-900/20 text-amber-400' : 'bg-amber-50 text-amber-700'
-                }`}
-              >
-                <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
-                <span>Credentials will be displayed with copy buttons for easy access.</span>
-              </div>
-            </div>
+            <CredentialsFields
+              value={formData.credentialsData || {}}
+              onChange={(updated) =>
+                setFormData({
+                  ...formData,
+                  credentialsData: {
+                    loginUrl: '',
+                    username: '',
+                    password: '',
+                    notes: '',
+                    ...updated,
+                  },
+                })
+              }
+              isDarkMode={isDarkMode}
+            />
           )}
 
           {/* Description */}
           <div>
-            <label
-              className={`block text-sm font-medium mb-1.5 ${
-                isDarkMode ? 'text-zinc-300' : 'text-zinc-700'
-              }`}
-            >
-              Description
-            </label>
+            <label className={labelBase}>Description</label>
             <textarea
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               placeholder="Optional description shown to students..."
               rows={2}
-              className={`w-full px-4 py-2.5 rounded-lg border ${
-                isDarkMode
-                  ? 'bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500'
-                  : 'bg-white border-zinc-300 text-zinc-900 placeholder:text-zinc-400'
-              } focus:ring-2 focus:ring-violet-500 focus:border-transparent resize-none`}
+              className={`${inputBase} resize-none`}
             />
           </div>
 
