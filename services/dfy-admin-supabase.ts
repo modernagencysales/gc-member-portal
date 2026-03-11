@@ -1,3 +1,9 @@
+/**
+ * DFY Admin Supabase Service. Admin-facing data access for DFY engagements, deliverables,
+ * activity logs, and automation runs. Uses explicit column selects and admin auth headers.
+ * Constraint: Never imports React components or UI elements.
+ */
+
 import { supabase } from '../lib/supabaseClient';
 import { gtmAdminFetch } from '../lib/api/gtm-fetch';
 import type {

@@ -26,7 +26,7 @@ import Register from '../../components/bootcamp/Register';
 import { FunnelAccessExpiredScreen } from '../../components/bootcamp/funnel-access';
 import { Terminal } from 'lucide-react';
 import type { ProgressSnapshot } from '../../hooks/useBootcampCurriculum';
-import type { User } from '../../types';
+import type { User } from '../../types/bootcamp-types';
 
 // ─── Component ──────────────────────────────────────────────────────────────
 

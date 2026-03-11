@@ -9,7 +9,7 @@ import { AlertCircle } from 'lucide-react';
 import MyPosts from './MyPosts';
 import ErrorBoundary from '../shared/ErrorBoundary';
 import LessonView from './LessonView';
-import type { Lesson, Week } from '../../types';
+import type { Lesson, Week } from '../../types/bootcamp-types';
 import type { BootcampStudent } from '../../types/bootcamp-types';
 
 // ─── Lazy-loaded virtual pages ─────────────────────────────────────────────

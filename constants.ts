@@ -1,4 +1,4 @@
-import { CourseData } from './types';
+import { CourseData } from './types/bootcamp-types';
 
 export const COURSE_DATA: CourseData = {
   title: 'LinkedIn Bootcamp: Automation Mastery',

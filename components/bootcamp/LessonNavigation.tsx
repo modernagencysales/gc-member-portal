@@ -1,6 +1,6 @@
 import React from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { Lesson } from '../../types';
+import { Lesson } from '../../types/bootcamp-types';
 
 interface LessonNavigationProps {
   prevLesson: Lesson | null;

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Mail, ArrowRight, UserPlus, Loader2, Ticket, Users } from 'lucide-react';
 import { validateInviteCode, registerBootcampStudent } from '../../services/bootcamp-supabase';
-import { User } from '../../types';
+import { User } from '../../types/bootcamp-types';
 import { BootcampInviteCode } from '../../types/bootcamp-types';
 
 interface RegisterProps {

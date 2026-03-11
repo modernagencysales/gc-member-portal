@@ -1222,7 +1222,7 @@ function isRecordingOnlyLesson(lesson: LmsLessonWithContent): boolean {
 // Converts new LMS data to existing CourseData format
 // ============================================
 
-import { CourseData, Week, Lesson, ActionItem } from '../types';
+import { CourseData, Week, Lesson, ActionItem } from '../types/bootcamp-types';
 
 /**
  * Convert content item to legacy embedUrl format

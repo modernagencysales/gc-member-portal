@@ -1,3 +1,9 @@
+/**
+ * DFY Client Portal Service. Manages portal session tokens, fetches engagement and
+ * deliverable data for the client-facing portal. Auth is token-based (no Supabase session).
+ * Constraint: Never imports React components or UI elements.
+ */
+
 import { supabase } from '../lib/supabaseClient';
 
 // ============================================

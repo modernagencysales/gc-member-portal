@@ -7,7 +7,7 @@
 
 import React, { useState } from 'react';
 import { ClipboardList, Sparkles } from 'lucide-react';
-import type { Lesson, Week } from '../../types';
+import type { Lesson, Week } from '../../types/bootcamp-types';
 import type { BootcampStudent } from '../../types/bootcamp-types';
 import MyBlueprint from './MyBlueprint';
 import LessonNavigation from './LessonNavigation';

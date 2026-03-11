@@ -1,6 +1,6 @@
 import React from 'react';
 import { ChevronDown, BookOpen, CheckCircle2 } from 'lucide-react';
-import { CourseData, Lesson } from '../../../types';
+import { CourseData, Lesson } from '../../../types/bootcamp-types';
 import { StudentEnrollment } from '../../../types/bootcamp-types';
 import SidebarWeekItem from './SidebarWeekItem';
 

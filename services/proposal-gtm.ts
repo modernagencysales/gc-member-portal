@@ -1,3 +1,9 @@
+/**
+ * Proposal GTM Service. Calls the gtm-system API for AI proposal generation, Attio note
+ * fetching, and proposal package configuration. Admin-authenticated via gtmAdminFetch.
+ * Constraint: Never imports React components or UI elements.
+ */
+
 import { supabase } from '../lib/supabaseClient';
 import { gtmAdminFetch } from '../lib/api/gtm-fetch';
 import type { ProposalPackageConfig } from '../types/proposal-types';

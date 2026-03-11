@@ -1,3 +1,8 @@
+/**
+ * Command Center Service. Fetches GTM analytics dashboard data from the gtm-system API.
+ * Constraint: Never imports React components or UI elements.
+ */
+
 import type { CommandCenterData } from '../types/command-center-types';
 import { GTM_SYSTEM_URL } from '../lib/api-config';
 import { logError } from '../lib/logError';

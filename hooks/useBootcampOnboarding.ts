@@ -13,7 +13,7 @@ import {
 import { logError } from '../lib/logError';
 import { queryKeys } from '../lib/queryClient';
 import type { Dispatch, SetStateAction } from 'react';
-import type { User } from '../types';
+import type { User } from '../types/bootcamp-types';
 import type {
   BootcampStudent,
   BootcampSurveyFormData,

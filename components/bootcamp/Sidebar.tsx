@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { CourseData, Lesson, User } from '../../types';
+import { CourseData, Lesson, User } from '../../types/bootcamp-types';
 import { AITool } from '../../types/chat-types';
 import { StudentEnrollment } from '../../types/bootcamp-types';
 import { LayoutDashboard } from 'lucide-react';

@@ -1,6 +1,6 @@
 import React from 'react';
 import { ChevronDown, ClipboardList } from 'lucide-react';
-import { Lesson, Week } from '../../../types';
+import { Lesson, Week } from '../../../types/bootcamp-types';
 import ProgressRing from './ProgressRing';
 
 interface SidebarWeekItemProps {

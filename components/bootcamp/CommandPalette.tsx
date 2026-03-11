@@ -11,7 +11,7 @@ import {
   Database,
   FileText,
 } from 'lucide-react';
-import { Lesson, CourseData } from '../../types';
+import { Lesson, CourseData } from '../../types/bootcamp-types';
 import { AITool } from '../../types/chat-types';
 
 interface CommandItem {

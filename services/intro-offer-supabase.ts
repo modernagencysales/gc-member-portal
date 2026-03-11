@@ -1,3 +1,9 @@
+/**
+ * Intro Offer Supabase Service. Reads and updates intro offer records and deliverables
+ * from the shared Supabase database (table owned by gtm-system).
+ * Constraint: Never imports React components or UI elements.
+ */
+
 import { supabase } from '../lib/supabaseClient';
 import { IntroOffer, IntroOfferDeliverable } from '../types/intro-offer-types';
 

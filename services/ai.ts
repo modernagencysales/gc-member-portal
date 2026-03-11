@@ -1,3 +1,8 @@
+/**
+ * AI Service. Proxies Claude AI calls (via Supabase edge functions) for ICP generation.
+ * Constraint: Never imports React components or UI elements.
+ */
+
 import { supabase } from '../lib/supabaseClient';
 import { logError } from '../lib/logError';
 

@@ -1,3 +1,9 @@
+/**
+ * Infrastructure Supabase Service. Reads and writes infrastructure provisioning data
+ * (tiers, provisions, domains) and proxies domain availability checks to the gtm-system API.
+ * Constraint: Never imports React components or UI elements.
+ */
+
 import { supabase } from '../lib/supabaseClient';
 import { GTM_SYSTEM_URL, buildGtmHeaders } from '../lib/api-config';
 import {

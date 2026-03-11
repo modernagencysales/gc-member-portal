@@ -1,3 +1,9 @@
+/**
+ * Cold Email Recipes Supabase Service. Manages bootcamp cold-email recipes, contact lists,
+ * and enrichment status for student outreach campaigns.
+ * Constraint: Never imports React components or UI elements.
+ */
+
 import { supabase } from '../lib/supabaseClient';
 import type {
   BootcampRecipe,

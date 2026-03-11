@@ -6,7 +6,7 @@ import { useSearchParams } from 'react-router-dom';
 import { verifyBootcampStudent, redeemCode } from '../services/bootcamp-supabase';
 import { useAuth } from '../context/AuthContext';
 import { logError } from '../lib/logError';
-import type { User } from '../types';
+import type { User } from '../types/bootcamp-types';
 import type { BootcampStudent } from '../types/bootcamp-types';
 
 // ─── Return Interface ─────────────────────────────────────────────────────────

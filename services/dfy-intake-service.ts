@@ -1,3 +1,9 @@
+/**
+ * DFY Intake Service. Handles client portal intake wizard submission — uploads files to
+ * Supabase Storage and forwards intake data to the gtm-system API.
+ * Constraint: Never imports React components or UI elements.
+ */
+
 import { supabase } from '../lib/supabaseClient';
 import type { IntakeWizardData } from '../types/dfy-intake-types';
 import { getPortalToken } from './dfy-service';

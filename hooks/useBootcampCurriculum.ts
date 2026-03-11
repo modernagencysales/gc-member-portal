@@ -7,7 +7,7 @@
 import { useState, useRef } from 'react';
 import { fetchStudentCurriculumAsLegacy } from '../services/lms-supabase';
 import { logError } from '../lib/logError';
-import type { CourseData, Lesson, User } from '../types';
+import type { CourseData, Lesson, User } from '../types/bootcamp-types';
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 

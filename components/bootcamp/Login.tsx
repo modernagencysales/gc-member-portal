@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Mail, ArrowRight, ShieldCheck, Loader2 } from 'lucide-react';
 import { verifyBootcampStudent } from '../../services/bootcamp-supabase';
-import { User } from '../../types';
+import { User } from '../../types/bootcamp-types';
 
 interface LoginProps {
   onLogin: (user: User) => void;

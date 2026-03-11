@@ -1,3 +1,9 @@
+/**
+ * Subscription Supabase Service. Manages bootcamp student cohort memberships, Stripe
+ * subscription events, and Stripe checkout session creation for bootcamp billing.
+ * Constraint: Never imports React components or UI elements.
+ */
+
 import { supabase } from '../lib/supabaseClient';
 import {
   SubscriptionStatus,

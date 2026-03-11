@@ -18,7 +18,7 @@ import {
   ClipboardList,
   Lock,
 } from 'lucide-react';
-import { Lesson } from '../../../types';
+import { Lesson } from '../../../types/bootcamp-types';
 import { AITool } from '../../../types/chat-types';
 import type { FunnelAccessState } from '../../../hooks/useFunnelAccess';
 import { FunnelNudgeSubtle } from '../funnel-access';

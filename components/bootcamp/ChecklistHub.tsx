@@ -8,7 +8,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { CheckCircle, Target, Check, ChevronDown, ChevronUp } from 'lucide-react';
-import type { Week } from '../../types';
+import type { Week } from '../../types/bootcamp-types';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 

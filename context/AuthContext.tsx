@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { GCMember, AppMode, AuthState } from '../types/gc-types';
-import { User } from '../types';
+import { User } from '../types/bootcamp-types';
 import { verifyGCMember } from '../services/supabase';
 import { verifyBootcampStudent } from '../services/bootcamp-supabase';
 import { logError } from '../lib/logError';

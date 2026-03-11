@@ -1,5 +1,5 @@
 import React from 'react';
-import { ActionItem } from '../../types';
+import { ActionItem } from '../../types/bootcamp-types';
 import { Check, Link, AlertCircle } from 'lucide-react';
 
 interface ChecklistProps {

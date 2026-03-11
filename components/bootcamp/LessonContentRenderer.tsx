@@ -11,7 +11,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkBreaks from 'remark-breaks';
 import remarkGfm from 'remark-gfm';
 import { ExternalLink, ShieldAlert, Bot, Copy, CheckCheck, Key } from 'lucide-react';
-import type { Lesson } from '../../types';
+import type { Lesson } from '../../types/bootcamp-types';
 import { ChatInterface } from '../chat';
 import LessonDescription from './LessonDescription';
 import SopLinksCard from './SopLinksCard';

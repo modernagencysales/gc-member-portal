@@ -1,3 +1,9 @@
+/**
+ * Proposal Supabase Service. CRUD operations for sales proposals stored in the shared
+ * Supabase database. Includes view tracking and package configuration management.
+ * Constraint: Never imports React components or UI elements.
+ */
+
 import { supabase } from '../lib/supabaseClient';
 import { logError } from '../lib/logError';
 import type {

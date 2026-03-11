@@ -28,7 +28,7 @@ import SubscriptionModal from './SubscriptionModal';
 import RedeemCodeModal from './RedeemCodeModal';
 import { StudentSettingsModal } from './settings';
 import { FeedbackWidget } from '../feedback/FeedbackWidget';
-import type { User, CourseData, Lesson } from '../../types';
+import type { User, CourseData, Lesson } from '../../types/bootcamp-types';
 import type { BootcampStudent, StudentEnrollment } from '../../types/bootcamp-types';
 import type { AITool } from '../../types/chat-types';
 import type { FunnelAccessState } from '../../hooks/useFunnelAccess';
