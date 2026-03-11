@@ -4,6 +4,7 @@
  */
 
 import { supabase } from '../lib/supabaseClient';
+import { logError, logWarn } from '../lib/logError';
 import {
   GCMember,
   ToolAccess,
@@ -55,13 +56,13 @@ export async function verifyGCMember(email: string): Promise<GCMember | null> {
       .single();
 
     if (error || !data) {
-      console.log('Member not found:', email);
+      logWarn('gc:verifyGCMember', 'Member not found', { email });
       return null;
     }
 
     return mapGCMember(data);
   } catch (error) {
-    console.error('GC Member verification failed:', error);
+    logError('gc:verifyGCMember', error, { email });
     return null;
   }
 }
@@ -95,13 +96,13 @@ export async function fetchMemberTools(memberId: string): Promise<ToolAccess[]> 
       .eq('member_id', memberId);
 
     if (error) {
-      console.error('Failed to fetch tools:', error);
+      logError('gc:fetchMemberTools', error, { memberId });
       return [];
     }
 
     return (data || []).map(mapToolAccess);
   } catch (error) {
-    console.error('Failed to fetch tools:', error);
+    logError('gc:fetchMemberTools', error, { memberId });
     return [];
   }
 }
@@ -134,13 +135,13 @@ export async function fetchOnboardingChecklist(): Promise<OnboardingChecklistIte
       .order('sort_order', { ascending: true });
 
     if (error) {
-      console.error('Failed to fetch checklist:', error);
+      logError('gc:fetchOnboardingChecklist', error);
       return [];
     }
 
     return (data || []).map(mapOnboardingChecklistItem);
   } catch (error) {
-    console.error('Failed to fetch checklist:', error);
+    logError('gc:fetchOnboardingChecklist', error);
     return [];
   }
 }
@@ -170,13 +171,13 @@ export async function fetchMemberProgress(memberId: string): Promise<MemberProgr
       .eq('member_id', memberId);
 
     if (error) {
-      console.error('Failed to fetch progress:', error);
+      logError('gc:fetchMemberProgress', error, { memberId });
       return [];
     }
 
     return (data || []).map(mapMemberProgress);
   } catch (error) {
-    console.error('Failed to fetch progress:', error);
+    logError('gc:fetchMemberProgress', error, { memberId });
     return [];
   }
 }
@@ -307,7 +308,7 @@ export async function updateMemberProgress(
       .single();
 
     if (error) {
-      console.error('Failed to update progress:', error);
+      logError('gc:updateMemberProgress', error, { progressId, memberId });
       throw new Error(error.message);
     }
 
@@ -330,7 +331,7 @@ export async function updateMemberProgress(
       .single();
 
     if (error) {
-      console.error('Failed to create progress:', error);
+      logError('gc:updateMemberProgress', error, { memberId, checklistItemId });
       throw new Error(error.message);
     }
 
@@ -351,7 +352,7 @@ export async function fetchMemberICP(memberId: string): Promise<MemberICP | null
       .maybeSingle();
 
     if (error) {
-      console.error('Failed to fetch ICP:', error);
+      logError('gc:fetchMemberICP', error, { memberId });
       return null;
     }
 
@@ -359,7 +360,7 @@ export async function fetchMemberICP(memberId: string): Promise<MemberICP | null
 
     return mapMemberICP(data);
   } catch (error) {
-    console.error('Failed to fetch ICP:', error);
+    logError('gc:fetchMemberICP', error, { memberId });
     return null;
   }
 }
@@ -415,7 +416,7 @@ export async function updateMemberICP(
       .single();
 
     if (error) {
-      console.error('Failed to update ICP:', error);
+      logError('gc:updateMemberICP', error, { icpId, memberId });
       throw new Error(error.message);
     }
 
@@ -436,7 +437,7 @@ export async function updateMemberICP(
       .single();
 
     if (error) {
-      console.error('Failed to create ICP:', error);
+      logError('gc:updateMemberICP', error, { memberId });
       throw new Error(error.message);
     }
 
@@ -457,13 +458,13 @@ export async function fetchMemberCampaigns(memberId: string): Promise<Campaign[]
       .order('start_date', { ascending: false });
 
     if (error) {
-      console.error('Failed to fetch campaigns:', error);
+      logError('gc:fetchMemberCampaigns', error, { memberId });
       return [];
     }
 
     return (data || []).map(mapCampaign);
   } catch (error) {
-    console.error('Failed to fetch campaigns:', error);
+    logError('gc:fetchMemberCampaigns', error, { memberId });
     return [];
   }
 }
@@ -517,7 +518,7 @@ export async function updateCampaignMetrics(
     .single();
 
   if (error) {
-    console.error('Failed to update campaign metrics:', error);
+    logError('gc:updateCampaignMetrics', error, { campaignId });
     throw new Error(error.message);
   }
 
@@ -536,7 +537,7 @@ export async function fetchResources(memberPlan: MemberPlan): Promise<Resource[]
       .order('sort_order', { ascending: true });
 
     if (error) {
-      console.error('Failed to fetch resources:', error);
+      logError('gc:fetchResources', error, { memberPlan });
       return [];
     }
 
@@ -548,7 +549,7 @@ export async function fetchResources(memberPlan: MemberPlan): Promise<Resource[]
       return false;
     });
   } catch (error) {
-    console.error('Failed to fetch resources:', error);
+    logError('gc:fetchResources', error, { memberPlan });
     return [];
   }
 }
@@ -597,7 +598,7 @@ export async function fetchFeaturedResources(memberPlan: MemberPlan): Promise<Re
       .order('sort_order', { ascending: true });
 
     if (error) {
-      console.error('Failed to fetch featured resources:', error);
+      logError('gc:fetchFeaturedResources', error, { memberPlan });
       return [];
     }
 
@@ -609,7 +610,7 @@ export async function fetchFeaturedResources(memberPlan: MemberPlan): Promise<Re
       return false;
     });
   } catch (error) {
-    console.error('Failed to fetch featured resources:', error);
+    logError('gc:fetchFeaturedResources', error, { memberPlan });
     return [];
   }
 }

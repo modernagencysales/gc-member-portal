@@ -4,6 +4,7 @@
  */
 
 import { supabase } from '../lib/supabaseClient';
+import { logError, logWarn } from '../lib/logError';
 import {
   BootcampStudent,
   BootcampChecklistItem,
@@ -52,13 +53,13 @@ export async function verifyBootcampStudent(email: string): Promise<BootcampStud
       .single();
 
     if (error || !data) {
-      console.log('Bootcamp student not found:', email);
+      logWarn('bootcamp:verifyBootcampStudent', 'Bootcamp student not found', { email });
       return null;
     }
 
     return mapBootcampStudent(data);
   } catch (error) {
-    console.error('Bootcamp student verification failed:', error);
+    logError('bootcamp:verifyBootcampStudent', error, { email });
     return null;
   }
 }
@@ -218,13 +219,13 @@ export async function fetchBootcampOnboardingChecklist(): Promise<BootcampCheckl
       .order('sort_order', { ascending: true });
 
     if (error) {
-      console.error('Failed to fetch bootcamp checklist:', error);
+      logError('bootcamp:fetchBootcampOnboardingChecklist', error);
       return [];
     }
 
     return (data || []).map(mapBootcampChecklistItem);
   } catch (error) {
-    console.error('Failed to fetch bootcamp checklist:', error);
+    logError('bootcamp:fetchBootcampOnboardingChecklist', error);
     return [];
   }
 }
@@ -328,13 +329,13 @@ export async function fetchBootcampStudentProgress(
       .eq('student_id', studentId);
 
     if (error) {
-      console.error('Failed to fetch student progress:', error);
+      logError('bootcamp:fetchBootcampStudentProgress', error, { studentId });
       return [];
     }
 
     return (data || []).map(mapBootcampStudentProgress);
   } catch (error) {
-    console.error('Failed to fetch student progress:', error);
+    logError('bootcamp:fetchBootcampStudentProgress', error, { studentId });
     return [];
   }
 }
@@ -477,14 +478,14 @@ export async function fetchBootcampStudentSurvey(
       .maybeSingle();
 
     if (error) {
-      console.error('Failed to fetch student survey:', error);
+      logError('bootcamp:fetchBootcampStudentSurvey', error, { studentId });
       return null;
     }
 
     if (!data) return null;
     return mapBootcampStudentSurvey(data);
   } catch (error) {
-    console.error('Failed to fetch student survey:', error);
+    logError('bootcamp:fetchBootcampStudentSurvey', error, { studentId });
     return null;
   }
 }
@@ -590,13 +591,13 @@ export async function fetchBootcampSetting<K extends keyof BootcampSettings>(
       .single();
 
     if (error || !data) {
-      console.error(`Failed to fetch setting ${key}:`, error);
+      logError('bootcamp:fetchBootcampSetting', error, { key });
       return null;
     }
 
     return data.value as BootcampSettings[K];
   } catch (error) {
-    console.error(`Failed to fetch setting ${key}:`, error);
+    logError('bootcamp:fetchBootcampSetting', error, { key });
     return null;
   }
 }
@@ -606,7 +607,7 @@ export async function fetchAllBootcampSettings(): Promise<Partial<BootcampSettin
     const { data, error } = await supabase.from('bootcamp_settings').select('key, value');
 
     if (error) {
-      console.error('Failed to fetch settings:', error);
+      logError('bootcamp:fetchAllBootcampSettings', error);
       return {};
     }
 
@@ -621,7 +622,7 @@ export async function fetchAllBootcampSettings(): Promise<Partial<BootcampSettin
 
     return settings;
   } catch (error) {
-    console.error('Failed to fetch settings:', error);
+    logError('bootcamp:fetchAllBootcampSettings', error);
     return {};
   }
 }
@@ -660,7 +661,7 @@ export async function fetchStudentsWithProgress(): Promise<
         .select(BOOTCAMP_PROGRESS_COLUMNS)
         .in('student_id', studentIds);
       if (error) {
-        console.error('Failed to batch fetch student progress:', error);
+        logError('bootcamp:fetchStudentsWithProgress', error, { context: 'batch progress' });
         return [];
       }
       return data || [];
@@ -671,7 +672,7 @@ export async function fetchStudentsWithProgress(): Promise<
         .select(BOOTCAMP_SURVEY_COLUMNS)
         .in('student_id', studentIds);
       if (error) {
-        console.error('Failed to batch fetch student surveys:', error);
+        logError('bootcamp:fetchStudentsWithProgress', error, { context: 'batch surveys' });
         return [];
       }
       return data || [];
@@ -985,7 +986,7 @@ export async function validateInviteCode(code: string): Promise<BootcampInviteCo
       .maybeSingle();
 
     if (error) {
-      console.error('Invite code validation error:', error);
+      logError('bootcamp:validateInviteCode', error, { code });
       return null;
     }
 
@@ -1005,7 +1006,7 @@ export async function validateInviteCode(code: string): Promise<BootcampInviteCo
 
     return inviteCode;
   } catch (err) {
-    console.error('Invite code validation failed:', err);
+    logError('bootcamp:validateInviteCode', err, { code });
     return null;
   }
 }
@@ -1069,19 +1070,17 @@ export async function findProspectByEmail(email: string): Promise<string | null>
       .maybeSingle();
 
     if (error) {
-      console.error('Error finding prospect by email:', error);
+      logError('bootcamp:findProspectByEmail', error, { email });
       return null;
     }
 
     if (!data) {
-      console.log('No prospect found for email:', email);
       return null;
     }
 
-    console.log('Found prospect for email:', email, '-> prospect_id:', data.id);
     return data.id as string;
   } catch (error) {
-    console.error('Failed to find prospect by email:', error);
+    logError('bootcamp:findProspectByEmail', error, { email });
     return null;
   }
 }
@@ -1104,11 +1103,10 @@ export async function linkStudentToProspect(
     .single();
 
   if (error) {
-    console.error('Failed to link student to prospect:', error);
+    logError('bootcamp:linkStudentToProspect', error, { studentId, prospectId });
     throw new Error(error.message);
   }
 
-  console.log('Successfully linked student', studentId, 'to prospect', prospectId);
   return mapBootcampStudent(data);
 }
 
@@ -1181,7 +1179,7 @@ export async function registerBootcampStudent(
       { onConflict: 'student_id,cohort_id' }
     );
   } catch (e) {
-    console.error('Failed to enroll student in cohorts (non-fatal):', e);
+    logError('bootcamp:registerBootcampStudent', e, { context: 'cohort enrollment non-fatal' });
   }
 
   // 5. Grant tool credits if code specifies them
@@ -1202,20 +1200,13 @@ export async function registerBootcampStudent(
     const prospectId = await findProspectByEmail(email);
     if (prospectId) {
       await linkStudentToProspect(student.id, prospectId);
-      console.log('Bootcamp student linked to prospect:', {
-        studentId: student.id,
-        prospectId,
-        email,
-      });
-    } else {
-      console.log('No prospect found to link for bootcamp student:', {
-        studentId: student.id,
-        email,
-      });
     }
   } catch (error) {
     // Log but don't fail registration if prospect linking fails
-    console.error('Failed to link bootcamp student to prospect (non-fatal):', error);
+    logError('bootcamp:registerBootcampStudent', error, {
+      context: 'prospect linking non-fatal',
+      email,
+    });
   }
 
   // 9. Increment invite code usage
@@ -1242,7 +1233,7 @@ async function grantToolCredits(
       .maybeSingle();
 
     if (!tool) {
-      console.warn(`Tool not found for slug: ${grant.toolSlug}`);
+      logWarn('bootcamp:grantToolCredits', 'Tool not found for slug', { toolSlug: grant.toolSlug });
       continue;
     }
 
@@ -1258,7 +1249,7 @@ async function grantToolCredits(
     );
 
     if (error) {
-      console.error(`Failed to grant tool credits for ${grant.toolSlug}:`, error);
+      logError('bootcamp:grantToolCredits', error, { toolSlug: grant.toolSlug, studentId });
     }
   }
 }
@@ -1279,7 +1270,7 @@ async function grantContentAccess(
     );
 
     if (error) {
-      console.error(`Failed to grant content access for ${weekId}:`, error);
+      logError('bootcamp:grantContentAccess', error, { weekId, studentId });
     }
   }
 }
@@ -1294,7 +1285,7 @@ async function recordRedeemedCode(studentId: string, code: string): Promise<void
   );
 
   if (error) {
-    console.error('Failed to record redeemed code:', error);
+    logError('bootcamp:recordRedeemedCode', error, { studentId, code });
   }
 }
 
@@ -1452,13 +1443,13 @@ export async function fetchFunnelToolPresets(): Promise<FunnelToolPresets> {
       .single();
 
     if (error || !data) {
-      console.error('Failed to fetch funnel tool presets:', error);
+      logError('bootcamp:fetchFunnelToolPresets', error);
       return {};
     }
 
     return data.value as FunnelToolPresets;
   } catch (error) {
-    console.error('Failed to fetch funnel tool presets:', error);
+    logError('bootcamp:fetchFunnelToolPresets', error);
     return {};
   }
 }
@@ -1475,7 +1466,10 @@ async function upsertBootcampSetting(
     p_description: description,
   });
   if (!rpcError) return;
-  console.warn('[settings] RPC failed:', rpcError.message);
+  logWarn('bootcamp:upsertBootcampSetting', 'RPC failed, falling back to manual upsert', {
+    key,
+    message: rpcError.message,
+  });
 
   // Strategy 2: Check if row exists, then UPDATE or INSERT separately
   const { data: existing } = await supabase
@@ -1491,7 +1485,7 @@ async function upsertBootcampSetting(
       .update({ value, description })
       .eq('id', existing.id);
     if (updateError) {
-      console.error('[settings] UPDATE by id failed:', updateError.message);
+      logError('bootcamp:upsertBootcampSetting', updateError, { key, context: 'UPDATE' });
       throw new Error(updateError.message);
     }
   } else {
@@ -1500,7 +1494,7 @@ async function upsertBootcampSetting(
       .from('bootcamp_settings')
       .insert({ key, value, description });
     if (insertError) {
-      console.error('[settings] INSERT failed:', insertError.message);
+      logError('bootcamp:upsertBootcampSetting', insertError, { key, context: 'INSERT' });
       throw new Error(insertError.message);
     }
   }

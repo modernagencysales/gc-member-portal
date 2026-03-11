@@ -1,4 +1,5 @@
 import { supabase } from '../lib/supabaseClient';
+import { logError } from '../lib/logError';
 
 /**
  * ICP Generation result structure
@@ -29,7 +30,7 @@ export async function generateICPSuggestions(
   });
 
   if (error) {
-    console.error('ICP Generation Failed:', error);
+    logError('ai:generateICPSuggestions', error, { companyName });
     throw new Error('Unable to generate ICP suggestions. Please try again.');
   }
 

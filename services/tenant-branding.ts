@@ -35,6 +35,7 @@ interface CacheEntry {
 // ============================================
 
 import { BLUEPRINT_BACKEND_URL } from '../lib/api-config';
+import { logError } from '../lib/logError';
 
 const BACKEND_URL = BLUEPRINT_BACKEND_URL;
 
@@ -88,9 +89,10 @@ export async function fetchTenantBranding(tenantId: string): Promise<TenantBrand
     }
 
     if (!response.ok) {
-      console.error(
-        `[tenant-branding] Failed to fetch branding for tenant ${tenantId}: ${response.status}`
-      );
+      logError('tenantBranding:fetchTenantBranding', new Error(`HTTP ${response.status}`), {
+        tenantId,
+        status: response.status,
+      });
       return null;
     }
 
@@ -104,7 +106,7 @@ export async function fetchTenantBranding(tenantId: string): Promise<TenantBrand
     setCachedBranding(tenantId, branding);
     return branding;
   } catch (err) {
-    console.error('[tenant-branding] Network error fetching branding:', err);
+    logError('tenantBranding:fetchTenantBranding', err, { tenantId });
     return null;
   }
 }

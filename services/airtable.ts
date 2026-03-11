@@ -1,5 +1,6 @@
 import { CourseData, Week, Lesson, User } from '../types';
 import { COURSE_DATA as MOCK_DATA } from '../constants';
+import { logError, logWarn } from '../lib/logError';
 
 // Airtable record types for Bootcamp data
 interface LessonFields {
@@ -92,7 +93,7 @@ export async function verifyUser(email: string): Promise<User | null> {
     }
     return null;
   } catch (e) {
-    console.error('Verification failed', e);
+    logError('airtable:verifyUser', e, { email });
     return null;
   }
 }
@@ -109,7 +110,11 @@ async function fetchCohortCurriculum(
     );
 
     if (!res.ok) {
-      console.warn('Failed to fetch cohort curriculum, using default ordering');
+      logWarn(
+        'airtable:fetchCohortCurriculum',
+        'Failed to fetch cohort curriculum, using default ordering',
+        { cohort }
+      );
       return new Map();
     }
 
@@ -136,7 +141,7 @@ async function fetchCohortCurriculum(
     // Return cohort-specific if exists, otherwise Global
     return cohortConfig.size > 0 ? cohortConfig : globalConfig;
   } catch (error) {
-    console.error('Failed to fetch cohort curriculum', error);
+    logError('airtable:fetchCohortCurriculum', error, { cohort });
     return new Map();
   }
 }
@@ -248,7 +253,7 @@ export async function fetchCourseData(
       cohort: targetCohort,
     };
   } catch (error) {
-    console.error('Fetch failed', error);
+    logError('airtable:fetchCourseData', error, { targetCohort, userEmail });
     return MOCK_DATA;
   }
 }

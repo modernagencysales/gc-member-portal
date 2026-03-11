@@ -4,6 +4,7 @@
  */
 
 import { supabase } from '../lib/supabaseClient';
+import { logError, logWarn } from '../lib/logError';
 import {
   Prospect,
   ProspectPost,
@@ -318,17 +319,17 @@ export async function getProspectBySlug(slug: string): Promise<Prospect | null> 
     if (error) {
       if (error.code === 'PGRST116') {
         // Row not found - this is expected for 404 scenarios
-        console.log('Prospect not found for slug:', slug);
+        logWarn('blueprint:getProspectBySlug', 'Prospect not found for slug', { slug });
         return null;
       }
-      console.error('Error fetching prospect by slug:', error);
+      logError('blueprint:getProspectBySlug', error, { slug });
       return null;
     }
 
     if (!data) return null;
     return mapProspect(data);
   } catch (error) {
-    console.error('Failed to fetch prospect by slug:', error);
+    logError('blueprint:getProspectBySlug', error, { slug });
     return null;
   }
 }
@@ -345,13 +346,13 @@ export async function getProspectById(id: string): Promise<Prospect | null> {
       .single();
 
     if (error || !data) {
-      console.error('Error fetching prospect by id:', error);
+      logError('blueprint:getProspectById', error, { id });
       return null;
     }
 
     return mapProspect(data);
   } catch (error) {
-    console.error('Failed to fetch prospect by id:', error);
+    logError('blueprint:getProspectById', error, { id });
     return null;
   }
 }
@@ -406,13 +407,13 @@ export async function listProspects(filters?: ProspectFilters): Promise<Prospect
     const { data, error } = await query;
 
     if (error) {
-      console.error('Error listing prospects:', error);
+      logError('blueprint:listProspects', error);
       throw new Error(error.message);
     }
 
     return (data || []).map(mapProspect);
   } catch (error) {
-    console.error('Failed to list prospects:', error);
+    logError('blueprint:listProspects', error);
     throw error;
   }
 }
@@ -448,7 +449,7 @@ export async function updateProspectOffer(
     .single();
 
   if (error) {
-    console.error('Error updating prospect offer:', error);
+    logError('blueprint:updateProspectOffer', error, { id });
     throw new Error(error.message);
   }
 
@@ -467,7 +468,7 @@ export async function updateProspectSlug(id: string, slug: string): Promise<Pros
     .single();
 
   if (error) {
-    console.error('Error updating prospect slug:', error);
+    logError('blueprint:updateProspectSlug', error, { id, slug });
     throw new Error(error.message);
   }
 
@@ -517,7 +518,7 @@ export async function createProspectFromLanding(data: {
   const { error } = await supabase.from('prospects').insert(insertData);
 
   if (error) {
-    console.error('Error creating prospect from landing:', error);
+    logError('blueprint:createProspectFromLanding', error);
     throw new Error(error.message);
   }
 
@@ -540,13 +541,13 @@ export async function getProspectPosts(prospectId: string): Promise<ProspectPost
       .order('number', { ascending: true });
 
     if (error) {
-      console.error('Error fetching prospect posts:', error);
+      logError('blueprint:getProspectPosts', error, { prospectId });
       return [];
     }
 
     return (data || []).map(mapProspectPost);
   } catch (error) {
-    console.error('Failed to fetch prospect posts:', error);
+    logError('blueprint:getProspectPosts', error, { prospectId });
     return [];
   }
 }
@@ -569,13 +570,13 @@ export async function updatePostFinalizedContent(
       .eq('id', postId);
 
     if (error) {
-      console.error('Error updating finalized content:', error);
+      logError('blueprint:updatePostFinalizedContent', error, { postId });
       return false;
     }
 
     return true;
   } catch (error) {
-    console.error('Failed to update finalized content:', error);
+    logError('blueprint:updatePostFinalizedContent', error, { postId });
     return false;
   }
 }
@@ -594,13 +595,13 @@ export async function getProspectCount(): Promise<number> {
       .select('*', { count: 'exact', head: true });
 
     if (error) {
-      console.error('Error fetching prospect count:', error);
+      logError('blueprint:getProspectCount', error);
       return 0;
     }
 
     return count ?? 0;
   } catch (error) {
-    console.error('Failed to fetch prospect count:', error);
+    logError('blueprint:getProspectCount', error);
     return 0;
   }
 }
@@ -624,17 +625,17 @@ export async function getBlueprintSettings(): Promise<BlueprintSettings | null> 
     if (error) {
       if (error.code === 'PGRST116') {
         // No settings found - return null
-        console.log('No blueprint settings found');
+        logWarn('blueprint:getBlueprintSettings', 'No blueprint settings found');
         return null;
       }
-      console.error('Error fetching blueprint settings:', error);
+      logError('blueprint:getBlueprintSettings', error);
       return null;
     }
 
     if (!data) return null;
     return mapBlueprintSettings(data);
   } catch (error) {
-    console.error('Failed to fetch blueprint settings:', error);
+    logError('blueprint:getBlueprintSettings', error);
     return null;
   }
 }
@@ -785,7 +786,7 @@ export async function updateBlueprintSettings(
   }
 
   if (error) {
-    console.error('Error updating blueprint settings:', error);
+    logError('blueprint:updateBlueprintSettings', error);
     throw new Error(error.message);
   }
 
@@ -816,14 +817,14 @@ export async function getContentBlock(
       if (error.code === 'PGRST116') {
         return null;
       }
-      console.error('Error fetching content block:', error);
+      logError('blueprint:getContentBlock', error, { key });
       return null;
     }
 
     if (!data) return null;
     return mapBlueprintContentBlock(data);
   } catch (error) {
-    console.error('Failed to fetch content block:', error);
+    logError('blueprint:getContentBlock', error, { key });
     return null;
   }
 }
@@ -840,13 +841,13 @@ export async function getAllContentBlocks(): Promise<BlueprintContentBlock[]> {
       .order('sort_order', { ascending: true });
 
     if (error) {
-      console.error('Error fetching content blocks:', error);
+      logError('blueprint:getAllContentBlocks', error);
       return [];
     }
 
     return (data || []).map(mapBlueprintContentBlock);
   } catch (error) {
-    console.error('Failed to fetch content blocks:', error);
+    logError('blueprint:getAllContentBlocks', error);
     return [];
   }
 }
@@ -862,13 +863,13 @@ export async function getAllContentBlocksAdmin(): Promise<BlueprintContentBlock[
       .order('sort_order', { ascending: true });
 
     if (error) {
-      console.error('Error fetching content blocks:', error);
+      logError('blueprint:getAllContentBlocksAdmin', error);
       throw new Error(error.message);
     }
 
     return (data || []).map(mapBlueprintContentBlock);
   } catch (error) {
-    console.error('Failed to fetch content blocks:', error);
+    logError('blueprint:getAllContentBlocksAdmin', error);
     throw error;
   }
 }
@@ -928,7 +929,7 @@ export async function updateContentBlock(
     .single();
 
   if (error) {
-    console.error('Error updating content block:', error);
+    logError('blueprint:updateContentBlock', error, { id });
     throw new Error(error.message);
   }
 
@@ -968,7 +969,7 @@ export async function createContentBlock(block: {
     .single();
 
   if (error) {
-    console.error('Error creating content block:', error);
+    logError('blueprint:createContentBlock', error);
     throw new Error(error.message);
   }
 
@@ -982,7 +983,7 @@ export async function deleteContentBlock(id: string): Promise<void> {
   const { error } = await supabase.from('blueprint_content_blocks').delete().eq('id', id);
 
   if (error) {
-    console.error('Error deleting content block:', error);
+    logError('blueprint:deleteContentBlock', error, { id });
     throw new Error(error.message);
   }
 }
@@ -1023,13 +1024,13 @@ export async function getClientLogos(): Promise<ClientLogo[]> {
       .order('sort_order', { ascending: true });
 
     if (error) {
-      console.error('Error fetching client logos:', error);
+      logError('blueprint:getClientLogos', error);
       return [];
     }
 
     return (data || []).map(mapClientLogo);
   } catch (error) {
-    console.error('Failed to fetch client logos:', error);
+    logError('blueprint:getClientLogos', error);
     return [];
   }
 }
@@ -1045,13 +1046,13 @@ export async function getAllClientLogos(): Promise<ClientLogo[]> {
       .order('sort_order', { ascending: true });
 
     if (error) {
-      console.error('Error fetching all client logos:', error);
+      logError('blueprint:getAllClientLogos', error);
       return [];
     }
 
     return (data || []).map(mapClientLogo);
   } catch (error) {
-    console.error('Failed to fetch all client logos:', error);
+    logError('blueprint:getAllClientLogos', error);
     return [];
   }
 }
@@ -1069,7 +1070,7 @@ export async function uploadClientLogoFile(file: globalThis.File): Promise<strin
     .upload(filePath, file, { contentType: file.type, upsert: false });
 
   if (uploadError) {
-    console.error('Error uploading logo file:', uploadError);
+    logError('blueprint:uploadClientLogoFile', uploadError);
     throw new Error(uploadError.message);
   }
 
@@ -1097,7 +1098,7 @@ export async function createClientLogo(logo: {
     .single();
 
   if (error) {
-    console.error('Error creating client logo:', error);
+    logError('blueprint:createClientLogo', error);
     throw new Error(error.message);
   }
 
@@ -1125,7 +1126,7 @@ export async function updateClientLogo(
     .single();
 
   if (error) {
-    console.error('Error updating client logo:', error);
+    logError('blueprint:updateClientLogo', error, { id });
     throw new Error(error.message);
   }
 
@@ -1139,7 +1140,7 @@ export async function deleteClientLogo(id: string): Promise<void> {
   const { error } = await supabase.from('client_logos').delete().eq('id', id);
 
   if (error) {
-    console.error('Error deleting client logo:', error);
+    logError('blueprint:deleteClientLogo', error, { id });
     throw new Error(error.message);
   }
 }
@@ -1191,18 +1192,18 @@ export async function getProspectByEmail(email: string): Promise<Prospect | null
       .maybeSingle();
 
     if (error) {
-      console.error('Error fetching prospect by email:', error);
+      logError('blueprint:getProspectByEmail', error, { email });
       return null;
     }
 
     if (!data) {
-      console.log('Prospect not found for email:', email);
+      logWarn('blueprint:getProspectByEmail', 'Prospect not found for email', { email });
       return null;
     }
 
     return mapProspect(data);
   } catch (error) {
-    console.error('Failed to fetch prospect by email:', error);
+    logError('blueprint:getProspectByEmail', error, { email });
     return null;
   }
 }

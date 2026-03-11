@@ -4,6 +4,7 @@
  */
 
 import { supabase } from '../lib/supabaseClient';
+import { logError, logWarn } from '../lib/logError';
 import {
   Affiliate,
   Referral,
@@ -117,13 +118,13 @@ export async function fetchAffiliateBySlug(slug: string): Promise<Affiliate | nu
       .single();
 
     if (error || !data) {
-      console.log('Affiliate not found by slug:', slug);
+      logWarn('affiliate:fetchAffiliateBySlug', 'Affiliate not found by slug', { slug });
       return null;
     }
 
     return mapAffiliate(data);
   } catch (error) {
-    console.error('Failed to fetch affiliate by slug:', error);
+    logError('affiliate:fetchAffiliateBySlug', error, { slug });
     return null;
   }
 }
@@ -138,13 +139,13 @@ export async function fetchAffiliateByCode(code: string): Promise<Affiliate | nu
       .single();
 
     if (error || !data) {
-      console.log('Affiliate not found by code:', code);
+      logWarn('affiliate:fetchAffiliateByCode', 'Affiliate not found by code', { code });
       return null;
     }
 
     return mapAffiliate(data);
   } catch (error) {
-    console.error('Failed to fetch affiliate by code:', error);
+    logError('affiliate:fetchAffiliateByCode', error, { code });
     return null;
   }
 }
@@ -158,13 +159,13 @@ export async function fetchAffiliateByEmail(email: string): Promise<Affiliate | 
       .single();
 
     if (error || !data) {
-      console.log('Affiliate not found by email:', email);
+      logWarn('affiliate:fetchAffiliateByEmail', 'Affiliate not found by email', { email });
       return null;
     }
 
     return mapAffiliate(data);
   } catch (error) {
-    console.error('Failed to fetch affiliate by email:', error);
+    logError('affiliate:fetchAffiliateByEmail', error, { email });
     return null;
   }
 }
@@ -218,7 +219,7 @@ export async function fetchAffiliateStats(affiliateId: string): Promise<Affiliat
       .eq('affiliate_id', affiliateId);
 
     if (refError) {
-      console.error('Failed to fetch referral stats:', refError);
+      logError('affiliate:fetchAffiliateStats', refError, { affiliateId, context: 'referrals' });
       return { totalReferrals: 0, activeReferrals: 0, totalEarned: 0, pendingPayouts: 0 };
     }
 
@@ -229,7 +230,7 @@ export async function fetchAffiliateStats(affiliateId: string): Promise<Affiliat
       .eq('affiliate_id', affiliateId);
 
     if (payError) {
-      console.error('Failed to fetch payout stats:', payError);
+      logError('affiliate:fetchAffiliateStats', payError, { affiliateId, context: 'payouts' });
     }
 
     const allReferrals = referrals || [];
@@ -248,7 +249,7 @@ export async function fetchAffiliateStats(affiliateId: string): Promise<Affiliat
 
     return { totalReferrals, activeReferrals, totalEarned, pendingPayouts };
   } catch (error) {
-    console.error('Failed to compute affiliate stats:', error);
+    logError('affiliate:fetchAffiliateStats', error, { affiliateId });
     return { totalReferrals: 0, activeReferrals: 0, totalEarned: 0, pendingPayouts: 0 };
   }
 }
@@ -344,7 +345,7 @@ export async function fetchAdminAffiliateStats(): Promise<AffiliateAdminStats> {
       .select('status');
 
     if (affError) {
-      console.error('Failed to fetch affiliate stats:', affError);
+      logError('affiliate:fetchAdminAffiliateStats', affError, { context: 'affiliates' });
       return {
         totalAffiliates: 0,
         activeAffiliates: 0,
@@ -366,7 +367,7 @@ export async function fetchAdminAffiliateStats(): Promise<AffiliateAdminStats> {
       .select('id');
 
     if (refError) {
-      console.error('Failed to fetch referral count:', refError);
+      logError('affiliate:fetchAdminAffiliateStats', refError, { context: 'referrals' });
     }
 
     const totalReferrals = (referrals || []).length;
@@ -377,7 +378,7 @@ export async function fetchAdminAffiliateStats(): Promise<AffiliateAdminStats> {
       .select('amount, status');
 
     if (payError) {
-      console.error('Failed to fetch payout stats:', payError);
+      logError('affiliate:fetchAdminAffiliateStats', payError, { context: 'payouts' });
     }
 
     const allPayouts = payouts || [];
@@ -397,7 +398,7 @@ export async function fetchAdminAffiliateStats(): Promise<AffiliateAdminStats> {
       pendingPayouts,
     };
   } catch (error) {
-    console.error('Failed to compute admin affiliate stats:', error);
+    logError('affiliate:fetchAdminAffiliateStats', error);
     return {
       totalAffiliates: 0,
       activeAffiliates: 0,
@@ -465,7 +466,6 @@ export async function attributeReferralToStudent(
       .maybeSingle();
 
     if (findError || !existing) {
-      console.log('No pending referral found for email:', email);
       return null;
     }
 
@@ -485,7 +485,7 @@ export async function attributeReferralToStudent(
     if (error) throw new Error(error.message);
     return mapReferral(data);
   } catch (error) {
-    console.error('Failed to attribute referral to student:', error);
+    logError('affiliate:attributeReferralToStudent', error, { email, studentId });
     return null;
   }
 }

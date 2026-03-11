@@ -1,4 +1,5 @@
 import { supabase } from '../lib/supabaseClient';
+import { logError } from '../lib/logError';
 import type {
   Proposal,
   ProposalAboutUs,
@@ -75,7 +76,8 @@ export async function getProposalBySlug(slug: string): Promise<Proposal | null> 
       last_viewed_at: new Date().toISOString(),
     })
     .eq('id', data.id)
-    .then(() => {});
+    .then(() => {})
+    .catch((err) => logError('proposal:updateViewCount', err, { proposalId: data.id }));
 
   return mapProposal(data as Record<string, unknown>);
 }

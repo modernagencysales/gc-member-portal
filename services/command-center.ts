@@ -1,5 +1,6 @@
 import type { CommandCenterData } from '../types/command-center-types';
 import { GTM_SYSTEM_URL } from '../lib/api-config';
+import { logError } from '../lib/logError';
 
 export async function fetchCommandCenterData(
   tenantId: string,
@@ -18,13 +19,16 @@ export async function fetchCommandCenterData(
     });
 
     if (!response.ok) {
-      console.error('Command center fetch failed:', response.status);
+      logError('commandCenter:fetchCommandCenterData', new Error(`HTTP ${response.status}`), {
+        tenantId,
+        status: response.status,
+      });
       return null;
     }
 
     return await response.json();
   } catch (error) {
-    console.error('Failed to fetch command center data:', error);
+    logError('commandCenter:fetchCommandCenterData', error, { tenantId });
     return null;
   }
 }
