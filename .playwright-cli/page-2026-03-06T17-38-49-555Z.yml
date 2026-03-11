@@ -1,0 +1,7 @@
+- generic [active] [ref=e1]:
+  - paragraph [ref=e5]: Loading your blueprint...
+  - button [ref=e9] [cursor=pointer]:
+    - generic:
+      - generic:
+        - img
+    - img [ref=e11]

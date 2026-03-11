@@ -1,0 +1,298 @@
+- generic [ref=e2]:
+  - region "Notifications (F8)":
+    - list
+  - generic [ref=e3]:
+    - navigation [ref=e4]:
+      - link "iClosed iClosed University" [ref=e5] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e6]:
+          - img "iClosed" [ref=e7]
+          - generic [ref=e8]: iClosed University
+      - generic [ref=e9]:
+        - link "Home" [ref=e10] [cursor=pointer]:
+          - /url: /
+        - link "Courses" [ref=e12] [cursor=pointer]:
+          - /url: /courses
+          - text: Courses
+          - img [ref=e14]
+        - link "Live Sessions" [ref=e17] [cursor=pointer]:
+          - /url: /live-sessions
+          - text: Live Sessions
+          - img [ref=e19]
+        - link "Product" [ref=e22] [cursor=pointer]:
+          - /url: /product
+          - text: Product
+          - img [ref=e24]
+      - generic [ref=e26]:
+        - button "🇺🇸 EN" [ref=e28]:
+          - generic [ref=e29]: 🇺🇸
+          - generic [ref=e30]: EN
+          - img [ref=e33]
+        - link "Go to App" [ref=e35] [cursor=pointer]:
+          - /url: https://app.iclosed.io/campaign?hash=cb98204f-e8dc-4647-b1ef-1fad996ce864_1770114415956
+          - generic [ref=e36]:
+            - generic [ref=e37]: Go to App
+            - img [ref=e40]
+    - generic [ref=e43]:
+      - generic [ref=e44]:
+        - heading "Product Documentation" [level=1] [ref=e45]
+        - paragraph [ref=e46]: Everything you need to know about iClosed. From getting started to advanced features.
+      - generic [ref=e47]:
+        - link "iClosed Overview 8 articles Learn the fundamentals of iClosed and what makes it different" [ref=e48] [cursor=pointer]:
+          - /url: https://docs.iclosed.io/en/collections/10363781-iclosed-overview
+          - img [ref=e51]
+          - generic [ref=e53]:
+            - generic [ref=e54]:
+              - heading "iClosed Overview" [level=3] [ref=e55]
+              - generic [ref=e56]: 8 articles
+            - paragraph [ref=e57]: Learn the fundamentals of iClosed and what makes it different
+          - img [ref=e60]
+        - link "Getting Started 15 articles Step-by-step guides to set up and configure your first workflow" [ref=e62] [cursor=pointer]:
+          - /url: https://docs.iclosed.io/en/collections/10363880-getting-started
+          - img [ref=e65]
+          - generic [ref=e67]:
+            - generic [ref=e68]:
+              - heading "Getting Started" [level=3] [ref=e69]
+              - generic [ref=e70]: 15 articles
+            - paragraph [ref=e71]: Step-by-step guides to set up and configure your first workflow
+          - img [ref=e74]
+        - link "AI Scheduler 81 articles Master intelligent scheduling, routing, and availability management" [ref=e76] [cursor=pointer]:
+          - /url: https://docs.iclosed.io/en/collections/9233549-ai-scheduler
+          - img [ref=e79]
+          - generic [ref=e85]:
+            - generic [ref=e86]:
+              - heading "AI Scheduler" [level=3] [ref=e87]
+              - generic [ref=e88]: 81 articles
+            - paragraph [ref=e89]: Master intelligent scheduling, routing, and availability management
+          - img [ref=e92]
+        - link "Global Data 36 articles Leverage data intelligence for lead qualification and validation" [ref=e94] [cursor=pointer]:
+          - /url: https://docs.iclosed.io/en/collections/9233547-global-data
+          - img [ref=e97]
+          - generic [ref=e101]:
+            - generic [ref=e102]:
+              - heading "Global Data" [level=3] [ref=e103]
+              - generic [ref=e104]: 36 articles
+            - paragraph [ref=e105]: Leverage data intelligence for lead qualification and validation
+          - img [ref=e108]
+        - link "Analytics 13 articles Track performance, measure ROI, and optimize your funnel" [ref=e110] [cursor=pointer]:
+          - /url: https://docs.iclosed.io/en/collections/10557850-analytics
+          - img [ref=e113]
+          - generic [ref=e116]:
+            - generic [ref=e117]:
+              - heading "Analytics" [level=3] [ref=e118]
+              - generic [ref=e119]: 13 articles
+            - paragraph [ref=e120]: Track performance, measure ROI, and optimize your funnel
+          - img [ref=e123]
+        - link "Tracking 5 articles Pixel tracking, attribution, and conversion optimization" [ref=e125] [cursor=pointer]:
+          - /url: https://docs.iclosed.io/en/collections/9233548-tracking
+          - img [ref=e128]
+          - generic [ref=e133]:
+            - generic [ref=e134]:
+              - heading "Tracking" [level=3] [ref=e135]
+              - generic [ref=e136]: 5 articles
+            - paragraph [ref=e137]: Pixel tracking, attribution, and conversion optimization
+          - img [ref=e140]
+        - link "Members 2 articles Manage team members, roles, and permissions" [ref=e142] [cursor=pointer]:
+          - /url: https://docs.iclosed.io/en/collections/10398566-members
+          - img [ref=e145]
+          - generic [ref=e151]:
+            - generic [ref=e152]:
+              - heading "Members" [level=3] [ref=e153]
+              - generic [ref=e154]: 2 articles
+            - paragraph [ref=e155]: Manage team members, roles, and permissions
+          - img [ref=e158]
+        - link "Integrations 14 articles Connect iClosed with your favorite tools and CRMs" [ref=e160] [cursor=pointer]:
+          - /url: https://docs.iclosed.io/en/collections/10357410-integrations
+          - img [ref=e163]
+          - generic [ref=e168]:
+            - generic [ref=e169]:
+              - heading "Integrations" [level=3] [ref=e170]
+              - generic [ref=e171]: 14 articles
+            - paragraph [ref=e172]: Connect iClosed with your favorite tools and CRMs
+          - img [ref=e175]
+        - link "Users & Settings 12 articles Configure account settings, notifications, and preferences" [ref=e177] [cursor=pointer]:
+          - /url: https://docs.iclosed.io/en/collections/9233546-users-settings
+          - img [ref=e180]
+          - generic [ref=e184]:
+            - generic [ref=e185]:
+              - heading "Users & Settings" [level=3] [ref=e186]
+              - generic [ref=e187]: 12 articles
+            - paragraph [ref=e188]: Configure account settings, notifications, and preferences
+          - img [ref=e191]
+        - link "Billing 11 articles Manage subscriptions, invoices, and payment methods" [ref=e193] [cursor=pointer]:
+          - /url: https://docs.iclosed.io/en/collections/10363869-billing
+          - img [ref=e196]
+          - generic [ref=e200]:
+            - generic [ref=e201]:
+              - heading "Billing" [level=3] [ref=e202]
+              - generic [ref=e203]: 11 articles
+            - paragraph [ref=e204]: Manage subscriptions, invoices, and payment methods
+          - img [ref=e207]
+        - link "Product Releases 16 articles Stay up to date with the latest features and improvements" [ref=e209] [cursor=pointer]:
+          - /url: https://docs.iclosed.io/en/collections/10557890-product-releases
+          - img [ref=e212]
+          - generic [ref=e217]:
+            - generic [ref=e218]:
+              - heading "Product Releases" [level=3] [ref=e219]
+              - generic [ref=e220]: 16 articles
+            - paragraph [ref=e221]: Stay up to date with the latest features and improvements
+          - img [ref=e224]
+      - link "View all documentation" [ref=e227] [cursor=pointer]:
+        - /url: https://docs.iclosed.io/en/
+        - generic [ref=e228]: View all documentation
+        - img [ref=e231]
+    - contentinfo [ref=e233]:
+      - generic [ref=e234]:
+        - generic [ref=e235]:
+          - generic [ref=e236]:
+            - generic [ref=e237]: Register Now
+            - heading "Ready to master revenue operations?" [level=2] [ref=e241]:
+              - text: Ready to master
+              - text: revenue operations?
+            - paragraph [ref=e242]: Join 4,000+ top performers. Learn, automate your workflow, and close more deals with iClosed.
+            - generic [ref=e243]:
+              - link "Get Started" [ref=e244] [cursor=pointer]:
+                - /url: https://app.iclosed.io/campaign?hash=cb98204f-e8dc-4647-b1ef-1fad996ce864_1770114415956
+                - generic [ref=e245]: Get Started
+                - img [ref=e248]
+              - link "Go to iClosed" [ref=e250] [cursor=pointer]:
+                - /url: https://www.iclosed.io/
+                - generic [ref=e251]: Go to iClosed
+                - img [ref=e254]
+          - generic [ref=e256]:
+            - link "Advanced AI Agents & Automation Master AI-powered workflows to scale your outreach and close more deals. 8 lessons AI workflows A Alex 1h 45m" [ref=e257] [cursor=pointer]:
+              - /url: /courses
+              - generic [ref=e258]:
+                - generic [ref=e259]:
+                  - img [ref=e261]
+                  - text: Advanced
+                - img [ref=e267]
+              - heading "AI Agents & Automation" [level=3] [ref=e269]
+              - paragraph [ref=e270]: Master AI-powered workflows to scale your outreach and close more deals.
+              - generic [ref=e271]:
+                - generic [ref=e272]: 8 lessons
+                - generic [ref=e273]: AI workflows
+              - generic [ref=e275]:
+                - generic [ref=e276]: A
+                - generic [ref=e277]: Alex
+                - generic [ref=e278]:
+                  - img [ref=e280]
+                  - text: 1h 45m
+            - link "Intermediate Core Sales Workflows Build high-converting pipelines that close deals faster. 10 lessons Pipeline mastery M Marcus 2h 15m" [ref=e284] [cursor=pointer]:
+              - /url: /courses
+              - generic [ref=e285]:
+                - generic [ref=e286]:
+                  - img [ref=e288]
+                  - text: Intermediate
+                - img [ref=e292]
+              - heading "Core Sales Workflows" [level=3] [ref=e294]
+              - paragraph [ref=e295]: Build high-converting pipelines that close deals faster.
+              - generic [ref=e296]:
+                - generic [ref=e297]: 10 lessons
+                - generic [ref=e298]: Pipeline mastery
+              - generic [ref=e300]:
+                - generic [ref=e301]: M
+                - generic [ref=e302]: Marcus
+                - generic [ref=e303]:
+                  - img [ref=e305]
+                  - text: 2h 15m
+            - link "Beginner Getting Started Guide Your first steps to mastering iClosed essentials. 5 lessons Quick start Isma Isma 45m" [ref=e309] [cursor=pointer]:
+              - /url: /courses
+              - generic [ref=e310]:
+                - generic [ref=e311]:
+                  - img [ref=e313]
+                  - text: Beginner
+                - img [ref=e318]
+              - heading "Getting Started Guide" [level=3] [ref=e320]
+              - paragraph [ref=e321]: Your first steps to mastering iClosed essentials.
+              - generic [ref=e322]:
+                - generic [ref=e323]: 5 lessons
+                - generic [ref=e324]: Quick start
+              - generic [ref=e326]:
+                - img "Isma" [ref=e327]
+                - generic [ref=e328]: Isma
+                - generic [ref=e329]:
+                  - img [ref=e331]
+                  - text: 45m
+            - generic [ref=e335]:
+              - generic [ref=e336]:
+                - generic [ref=e337]:
+                  - img [ref=e339]
+                  - text: Popular
+                - img [ref=e343]
+              - heading "7-Day iClosed Challenge" [level=3] [ref=e345]
+              - paragraph [ref=e346]: A practical, step-by-step course designed to help you find and fix the biggest revenue leaks in your funnel — fast. Each day focuses on one critical bottleneck with clear takeaways.
+              - generic [ref=e347]:
+                - generic [ref=e348]: 7 focused lessons
+                - generic [ref=e349]: Real funnel problems
+              - generic [ref=e350]:
+                - generic [ref=e351]:
+                  - generic [ref=e352]:
+                    - img "Isma" [ref=e353]
+                    - generic [ref=e354]: Isma
+                  - generic [ref=e355]:
+                    - img [ref=e357]
+                    - text: 7 days
+                - generic [ref=e361]:
+                  - img [ref=e363]
+                  - text: 8 lessons
+              - generic [ref=e367]: Hover to explore courses
+        - generic [ref=e369]:
+          - generic [ref=e370]:
+            - generic [ref=e371]:
+              - img "iClosed" [ref=e372]
+              - generic [ref=e373]: iClosed University
+            - paragraph [ref=e374]: "The #1 resource for revenue teams using iClosed. Learn, connect, and grow with the community."
+            - generic [ref=e375]:
+              - link [ref=e376] [cursor=pointer]:
+                - /url: https://twitter.com/iclosed
+                - img [ref=e378]
+              - link [ref=e380] [cursor=pointer]:
+                - /url: https://linkedin.com/company/iclosed
+                - img [ref=e382]
+              - link [ref=e384] [cursor=pointer]:
+                - /url: https://youtube.com/@iclosed
+                - img [ref=e386]
+          - generic [ref=e388]:
+            - heading "Product" [level=4] [ref=e389]
+            - list [ref=e390]:
+              - listitem [ref=e391]:
+                - link "iClosed Home" [ref=e392] [cursor=pointer]:
+                  - /url: https://www.iclosed.io/
+              - listitem [ref=e393]:
+                - link "Results" [ref=e394] [cursor=pointer]:
+                  - /url: https://www.iclosed.io/results
+              - listitem [ref=e395]:
+                - link "Pricing" [ref=e396] [cursor=pointer]:
+                  - /url: https://www.iclosed.io/pricing
+              - listitem [ref=e397]:
+                - link "Changelog" [ref=e398] [cursor=pointer]:
+                  - /url: https://docs.iclosed.io/en/collections/10557890-product-releases
+          - generic [ref=e399]:
+            - heading "University" [level=4] [ref=e400]
+            - list [ref=e401]:
+              - listitem [ref=e402]:
+                - link "Home" [ref=e403] [cursor=pointer]:
+                  - /url: /
+              - listitem [ref=e404]:
+                - link "All Courses" [ref=e405] [cursor=pointer]:
+                  - /url: /courses
+              - listitem [ref=e406]:
+                - link "Live Sessions" [ref=e407] [cursor=pointer]:
+                  - /url: /live-sessions
+              - listitem [ref=e408]:
+                - link "Product Docs" [ref=e409] [cursor=pointer]:
+                  - /url: /product
+              - listitem [ref=e410]:
+                - link "Calculators" [ref=e411] [cursor=pointer]:
+                  - /url: /calculators
+              - listitem [ref=e412]:
+                - link "Help Center" [ref=e413] [cursor=pointer]:
+                  - /url: https://docs.iclosed.io/en/
+        - generic [ref=e414]:
+          - generic [ref=e415]: © 2026 iClosed. All rights reserved.
+          - generic [ref=e416]:
+            - link "Privacy" [ref=e417] [cursor=pointer]:
+              - /url: https://www.iclosed.io/privacy-policy
+            - link "Terms" [ref=e418] [cursor=pointer]:
+              - /url: https://www.iclosed.io/terms

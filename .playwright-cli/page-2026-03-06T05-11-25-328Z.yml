@@ -1,0 +1,425 @@
+- generic [ref=e1]:
+  - generic [ref=e3]:
+    - link "Skip to main content" [ref=e4] [cursor=pointer]:
+      - /url: "#main-content"
+    - main [ref=e5]:
+      - generic [ref=e9]:
+        - generic [ref=e12]:
+          - link "iClosed Help" [ref=e15] [cursor=pointer]:
+            - /url: /en/
+            - img "iClosed Help" [ref=e16]
+          - navigation [ref=e19]:
+            - generic [ref=e20] [cursor=pointer]:
+              - combobox "Change language" [ref=e21]:
+                - option "English" [selected]
+              - generic [ref=e22]:
+                - img [ref=e23]
+                - text: English
+                - img [ref=e26]
+        - generic [ref=e33]:
+          - generic [ref=e34]: Search for articles...
+          - textbox "Search for articles..." [ref=e35]
+          - generic:
+            - img
+      - generic [ref=e37]:
+        - navigation "Breadcrumb" [ref=e39]:
+          - list [ref=e40]:
+            - listitem [ref=e41]:
+              - link "All Collections" [ref=e42] [cursor=pointer]:
+                - /url: /en/
+              - img [ref=e44]
+            - listitem [ref=e46]: AI Scheduler
+        - generic [ref=e47]:
+          - generic [ref=e48]:
+            - generic [ref=e52]:
+              - heading "AI Scheduler" [level=1] [ref=e53]
+              - paragraph [ref=e55]: All you need to know about iClosed scheduler as a whole
+            - generic [ref=e58]: 87 articles
+          - generic [ref=e59]:
+            - link "AI Scheduler overview" [ref=e61] [cursor=pointer]:
+              - /url: https://docs.iclosed.io/en/articles/9909589-ai-scheduler-overview
+              - generic [ref=e63]: AI Scheduler overview
+              - img [ref=e65]
+            - generic [ref=e68]:
+              - link "Events" [ref=e70] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/collections/10398208-events
+                - heading "Events" [level=2] [ref=e71]
+              - separator [ref=e72]
+              - link "Detailed overview of Event creation" [ref=e73] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/9818754-detailed-overview-of-event-creation
+                - generic [ref=e75]: Detailed overview of Event creation
+                - img [ref=e77]
+              - link "Difference between Strategy and Discovery event" [ref=e79] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/9835780-difference-between-strategy-and-discovery-event
+                - generic [ref=e81]: Difference between Strategy and Discovery event
+                - img [ref=e83]
+              - link "Managing your Events" [ref=e85] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/9858847-managing-your-events
+                - generic [ref=e87]: Managing your Events
+                - img [ref=e89]
+              - link "Setting up Event details" [ref=e91] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/9858622-setting-up-event-details
+                - generic [ref=e93]: Setting up Event details
+                - img [ref=e95]
+              - link "Managing Hosts within events" [ref=e97] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/9858877-managing-hosts-within-events
+                - generic [ref=e99]: Managing Hosts within events
+                - img [ref=e101]
+              - link "Hosts priority explained" [ref=e103] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/9833592-hosts-priority-explained
+                - generic [ref=e105]: Hosts priority explained
+                - img [ref=e107]
+              - link "Event Time and Limits" [ref=e109] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/9857034-event-time-and-limits
+                - generic [ref=e111]: Event Time and Limits
+                - img [ref=e113]
+              - link "Invitee Questions" [ref=e115] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/9858951-invitee-questions
+                - generic [ref=e117]: Invitee Questions
+                - img [ref=e119]
+              - link "Invitee disqualification and redirection" [ref=e121] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/9859008-invitee-disqualification-and-redirection
+                - generic [ref=e123]: Invitee disqualification and redirection
+                - img [ref=e125]
+              - link "Conditional Routing" [ref=e127] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/9859017-conditional-routing
+                - generic [ref=e129]: Conditional Routing
+                - img [ref=e131]
+              - link "Notifications explained" [ref=e133] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/9947040-notifications-explained
+                - generic [ref=e135]: Notifications explained
+                - img [ref=e137]
+              - link "Confirmation Email Best Practices" [ref=e139] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/12742583-confirmation-email-best-practices
+                - generic [ref=e141]: Confirmation Email Best Practices
+                - img [ref=e143]
+              - link "SMS (text messages) experts guide" [ref=e145] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/9851701-sms-text-messages-experts-guide
+                - generic [ref=e147]: SMS (text messages) experts guide
+                - img [ref=e149]
+              - link "Confirmation Page" [ref=e151] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/11184819-confirmation-page
+                - generic [ref=e153]: Confirmation Page
+                - img [ref=e155]
+              - link "Scheduler Customizations" [ref=e157] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/9859067-scheduler-customizations
+                - generic [ref=e159]: Scheduler Customizations
+                - img [ref=e161]
+              - link "Embedding the scheduler on your website" [ref=e163] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/9915264-embedding-the-scheduler-on-your-website
+                - generic [ref=e165]: Embedding the scheduler on your website
+                - img [ref=e167]
+              - link "How to duplicate an Event?" [ref=e169] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/9850768-how-to-duplicate-an-event
+                - generic [ref=e171]: How to duplicate an Event?
+                - img [ref=e173]
+              - link "How to enable or disable an Event?" [ref=e175] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/9850741-how-to-enable-or-disable-an-event
+                - generic [ref=e177]: How to enable or disable an Event?
+                - img [ref=e179]
+              - link "iClosed defense mechanism against spam or fake bookings" [ref=e181] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/9851464-iclosed-defense-mechanism-against-spam-or-fake-bookings
+                - generic [ref=e183]: iClosed defense mechanism against spam or fake bookings
+                - img [ref=e185]
+              - link "Pre-qualified form skipping" [ref=e187] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/10398661-pre-qualified-form-skipping
+                - generic [ref=e189]: Pre-qualified form skipping
+                - img [ref=e191]
+              - link "iClosed Time Zones Explained" [ref=e193] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/13833221-iclosed-time-zones-explained
+                - generic [ref=e195]: iClosed Time Zones Explained
+                - img [ref=e197]
+            - generic [ref=e200]:
+              - link "Scheduled Calls" [ref=e202] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/collections/10398209-scheduled-calls
+                - heading "Scheduled Calls" [level=2] [ref=e203]
+              - separator [ref=e204]
+              - link "Call outcomes getting started guide" [ref=e205] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/7266163-call-outcomes-getting-started-guide
+                - generic [ref=e207]: Call outcomes getting started guide
+                - img [ref=e209]
+              - link "Upcoming Calls" [ref=e211] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/9849805-upcoming-calls
+                - generic [ref=e213]: Upcoming Calls
+                - img [ref=e215]
+              - link "Past calls" [ref=e217] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/9849832-past-calls
+                - generic [ref=e219]: Past calls
+                - img [ref=e221]
+              - link "Scheduled calls filters" [ref=e223] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/9849872-scheduled-calls-filters
+                - generic [ref=e225]: Scheduled calls filters
+                - img [ref=e227]
+              - link "Strategy Call Outcome as Sale & Adding Deals" [ref=e229] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/9930529-strategy-call-outcome-as-sale-adding-deals
+                - generic [ref=e231]: Strategy Call Outcome as Sale & Adding Deals
+                - img [ref=e233]
+              - link "Strategy Call Outcome as No Sale" [ref=e235] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/9936732-strategy-call-outcome-as-no-sale
+                - generic [ref=e237]: Strategy Call Outcome as No Sale
+                - img [ref=e239]
+              - link "Discovery call outcome as Approved or Rejected" [ref=e241] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/9936937-discovery-call-outcome-as-approved-or-rejected
+                - generic [ref=e243]: Discovery call outcome as Approved or Rejected
+                - img [ref=e245]
+              - link "What is 'Action Required' badge on scheduled calls pages" [ref=e247] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/9874418-what-is-action-required-badge-on-scheduled-calls-pages
+                - generic [ref=e249]: What is 'Action Required' badge on scheduled calls pages
+                - img [ref=e251]
+              - link "How to cancel or reschedule a call?" [ref=e253] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/9844229-how-to-cancel-or-reschedule-a-call
+                - generic [ref=e255]: How to cancel or reschedule a call?
+                - img [ref=e257]
+              - link "How to locate cancelled meetings in AI Scheduler - Scheduled calls page?" [ref=e259] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/9831423-how-to-locate-cancelled-meetings-in-ai-scheduler-scheduled-calls-page
+                - generic [ref=e261]: How to locate cancelled meetings in AI Scheduler - Scheduled calls page?
+                - img [ref=e263]
+              - link "How to see the calls of your team or a particular member?" [ref=e265] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/9850206-how-to-see-the-calls-of-your-team-or-a-particular-member
+                - generic [ref=e267]: How to see the calls of your team or a particular member?
+                - img [ref=e269]
+              - link "How can I see scheduled calls for a specific invitee?" [ref=e271] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/9850341-how-can-i-see-scheduled-calls-for-a-specific-invitee
+                - generic [ref=e273]: How can I see scheduled calls for a specific invitee?
+                - img [ref=e275]
+              - link "Scheduled Calls Outcome Badges (Tags) explained" [ref=e277] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/9875706-scheduled-calls-outcome-badges-tags-explained
+                - generic [ref=e279]: Scheduled Calls Outcome Badges (Tags) explained
+                - img [ref=e281]
+              - link "Scheduled calls overview" [ref=e283] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/9835795-scheduled-calls-overview
+                - generic [ref=e285]: Scheduled calls overview
+                - img [ref=e287]
+              - link "How to filter scheduled calls with a specific date range?" [ref=e289] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/10057484-how-to-filter-scheduled-calls-with-a-specific-date-range
+                - generic [ref=e291]: How to filter scheduled calls with a specific date range?
+                - img [ref=e293]
+              - link "Call type and Call owner switcher" [ref=e295] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/10300105-call-type-and-call-owner-switcher
+                - generic [ref=e297]: Call type and Call owner switcher
+                - img [ref=e299]
+              - link "Mark Slot As Free" [ref=e301] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/12628762-mark-slot-as-free
+                - generic [ref=e303]: Mark Slot As Free
+                - img [ref=e305]
+            - generic [ref=e308]:
+              - link "Data Intelligence" [ref=e310] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/collections/18189893-data-intelligence
+                - heading "Data Intelligence" [level=2] [ref=e311]
+              - separator [ref=e312]
+              - link "Data Intelligence" [ref=e313] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/13142102-data-intelligence
+                - generic [ref=e315]: Data Intelligence
+                - img [ref=e317]
+              - link "Credit Score" [ref=e319] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/13142134-credit-score
+                - generic [ref=e321]: Credit Score
+                - img [ref=e323]
+              - link "Email Validation" [ref=e325] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/13142141-email-validation
+                - generic [ref=e327]: Email Validation
+                - img [ref=e329]
+              - link "Phone Number Validation" [ref=e331] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/13142145-phone-number-validation
+                - generic [ref=e333]: Phone Number Validation
+                - img [ref=e335]
+            - generic [ref=e338]:
+              - link "Automations" [ref=e340] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/collections/10292682-automations
+                - heading "Automations" [level=2] [ref=e341]
+              - separator [ref=e342]
+              - link "Workflows" [ref=e343] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/9835792-workflows
+                - generic [ref=e345]: Workflows
+                - img [ref=e347]
+              - link "Rules" [ref=e349] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/9835793-rules
+                - generic [ref=e351]: Rules
+                - img [ref=e353]
+              - link "Multi-Booking" [ref=e355] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/10734285-multi-booking
+                - generic [ref=e357]: Multi-Booking
+                - img [ref=e359]
+              - link "LIFT Call-To-Action (CTA) Widget" [ref=e361] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/11275123-lift-call-to-action-cta-widget
+                - generic [ref=e363]: LIFT Call-To-Action (CTA) Widget
+                - img [ref=e365]
+            - generic [ref=e368]:
+              - link "Troubleshooting" [ref=e370] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/collections/9233553-troubleshooting
+                - heading "Troubleshooting" [level=2] [ref=e371]
+              - separator [ref=e372]
+              - link "Troubleshooting - Super Admin guide" [ref=e373] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/9835791-troubleshooting-super-admin-guide
+                - generic [ref=e375]: Troubleshooting - Super Admin guide
+                - img [ref=e377]
+              - link "Troubleshooting Event Availability" [ref=e379] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/9843978-troubleshooting-event-availability
+                - generic [ref=e381]: Troubleshooting Event Availability
+                - img [ref=e383]
+              - link "Troubleshooting - User guide" [ref=e385] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/9835790-troubleshooting-user-guide
+                - generic [ref=e387]: Troubleshooting - User guide
+                - img [ref=e389]
+              - link "Ultimate Guide for Improving Show-Up Rates" [ref=e391] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/12801999-ultimate-guide-for-improving-show-up-rates
+                - generic [ref=e393]: Ultimate Guide for Improving Show-Up Rates
+                - img [ref=e395]
+            - generic [ref=e398]:
+              - link "FAQs" [ref=e400] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/collections/10440455-faqs
+                - heading "FAQs" [level=2] [ref=e401]
+              - separator [ref=e402]
+              - link "How to prefill iClosed form contact information and answers" [ref=e403] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/9830929-how-to-prefill-iclosed-form-contact-information-and-answers
+                - generic [ref=e405]: How to prefill iClosed form contact information and answers
+                - img [ref=e407]
+              - link "How to change language of my scheduler?" [ref=e409] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/9831780-how-to-change-language-of-my-scheduler
+                - generic [ref=e411]: How to change language of my scheduler?
+                - img [ref=e413]
+              - link "Why Conditional routing is not showing in the Events builder?" [ref=e415] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/9896271-why-conditional-routing-is-not-showing-in-the-events-builder
+                - generic [ref=e417]: Why Conditional routing is not showing in the Events builder?
+                - img [ref=e419]
+              - link "How to limit number of event appointments?" [ref=e421] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/9895605-how-to-limit-number-of-event-appointments
+                - generic [ref=e423]: How to limit number of event appointments?
+                - img [ref=e425]
+              - link "How to prevent iClosed from blocking personal events in my Google Calendar?" [ref=e427] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/9835769-how-to-prevent-iclosed-from-blocking-personal-events-in-my-google-calendar
+                - generic [ref=e429]: How to prevent iClosed from blocking personal events in my Google Calendar?
+                - img [ref=e431]
+              - link "Why my user (Closer / Setter) is not receiving calls?" [ref=e433] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/9835777-why-my-user-closer-setter-is-not-receiving-calls
+                - generic [ref=e435]: Why my user (Closer / Setter) is not receiving calls?
+                - img [ref=e437]
+              - link "How to open a Contact Card from a Scheduled calls page?" [ref=e439] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/9850224-how-to-open-a-contact-card-from-a-scheduled-calls-page
+                - generic [ref=e441]: How to open a Contact Card from a Scheduled calls page?
+                - img [ref=e443]
+              - link "How can I bulk select and delete events?" [ref=e445] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/9850755-how-can-i-bulk-select-and-delete-events
+                - generic [ref=e447]: How can I bulk select and delete events?
+                - img [ref=e449]
+              - link "How can I hide events that are turned off?" [ref=e451] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/9850778-how-can-i-hide-events-that-are-turned-off
+                - generic [ref=e453]: How can I hide events that are turned off?
+                - img [ref=e455]
+              - link "How can I restrict User (Closer) from rescheduling events?" [ref=e457] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/9850556-how-can-i-restrict-user-closer-from-rescheduling-events
+                - generic [ref=e459]: How can I restrict User (Closer) from rescheduling events?
+                - img [ref=e461]
+              - link "How can I adjust the priorities for Hosts (Closers) in my event?" [ref=e463] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/9850458-how-can-i-adjust-the-priorities-for-hosts-closers-in-my-event
+                - generic [ref=e465]: How can I adjust the priorities for Hosts (Closers) in my event?
+                - img [ref=e467]
+              - link "Can I update event URL after I embedded it in my website?" [ref=e469] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/9877528-can-i-update-event-url-after-i-embedded-it-in-my-website
+                - generic [ref=e471]: Can I update event URL after I embedded it in my website?
+                - img [ref=e473]
+              - link "How to edit contact details from a Scheduled calls page?" [ref=e475] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/9850237-how-to-edit-contact-details-from-a-scheduled-calls-page
+                - generic [ref=e477]: How to edit contact details from a Scheduled calls page?
+                - img [ref=e479]
+              - link "How to open a meeting link from Scheduled calls page?" [ref=e481] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/9850279-how-to-open-a-meeting-link-from-scheduled-calls-page
+                - generic [ref=e483]: How to open a meeting link from Scheduled calls page?
+                - img [ref=e485]
+              - link "How to book a follow-up meeting" [ref=e487] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/9831594-how-to-book-a-follow-up-meeting
+                - generic [ref=e489]: How to book a follow-up meeting
+                - img [ref=e491]
+              - link "How to see all scheduled calls for a specific event?" [ref=e493] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/9880982-how-to-see-all-scheduled-calls-for-a-specific-event
+                - generic [ref=e495]: How to see all scheduled calls for a specific event?
+                - img [ref=e497]
+              - link "How to add existing deal product while adding a Sale call outcome?" [ref=e499] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/9850321-how-to-add-existing-deal-product-while-adding-a-sale-call-outcome
+                - generic [ref=e501]: How to add existing deal product while adding a Sale call outcome?
+                - img [ref=e503]
+              - link "How to add a new deal product while adding a Sale call outcome?" [ref=e505] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/9850300-how-to-add-a-new-deal-product-while-adding-a-sale-call-outcome
+                - generic [ref=e507]: How to add a new deal product while adding a Sale call outcome?
+                - img [ref=e509]
+              - link "Why my SMS text messages were not sent?" [ref=e511] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/9895570-why-my-sms-text-messages-were-not-sent
+                - generic [ref=e513]: Why my SMS text messages were not sent?
+                - img [ref=e515]
+              - link "How to set up my scheduler if my customers are in different time zone than time zone that I'm in?" [ref=e517] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/9895603-how-to-set-up-my-scheduler-if-my-customers-are-in-different-time-zone-than-time-zone-that-i-m-in
+                - generic [ref=e519]: How to set up my scheduler if my customers are in different time zone than time zone that I'm in?
+                - img [ref=e521]
+              - link "Can I have different time zones for separate events in one iClosed account?" [ref=e523] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/9895585-can-i-have-different-time-zones-for-separate-events-in-one-iclosed-account
+                - generic [ref=e525]: Can I have different time zones for separate events in one iClosed account?
+                - img [ref=e527]
+              - link "How to set up scheduler for leads or customers to select the person they want to have a call with?" [ref=e529] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/9895583-how-to-set-up-scheduler-for-leads-or-customers-to-select-the-person-they-want-to-have-a-call-with
+                - generic [ref=e531]: How to set up scheduler for leads or customers to select the person they want to have a call with?
+                - img [ref=e533]
+              - link "How to set my availability when I'm unavailable for several days or when I'm on vacation?" [ref=e535] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/9850857-how-to-set-my-availability-when-i-m-unavailable-for-several-days-or-when-i-m-on-vacation
+                - generic [ref=e537]: How to set my availability when I'm unavailable for several days or when I'm on vacation?
+                - img [ref=e539]
+              - link "How can I enable or disable invitee to be able to cancel and/or reschedule a call from the confirmation email?" [ref=e541] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/9850617-how-can-i-enable-or-disable-invitee-to-be-able-to-cancel-and-or-reschedule-a-call-from-the-confirmation-email
+                - generic [ref=e543]: How can I enable or disable invitee to be able to cancel and/or reschedule a call from the confirmation email?
+                - img [ref=e545]
+              - link "How to add and customize email or SMS reminders?" [ref=e547] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/9850595-how-to-add-and-customize-email-or-sms-reminders
+                - generic [ref=e549]: How to add and customize email or SMS reminders?
+                - img [ref=e551]
+              - link "Why Approved status is not showing after I selected Discovery call outcome?" [ref=e553] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/9937217-why-approved-status-is-not-showing-after-i-selected-discovery-call-outcome
+                - generic [ref=e555]: Why Approved status is not showing after I selected Discovery call outcome?
+                - img [ref=e557]
+              - link "How to track conversions with UTMs?" [ref=e559] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/9830952-how-to-track-conversions-with-utms
+                - generic [ref=e561]: How to track conversions with UTMs?
+                - img [ref=e563]
+              - link "Why do I still have slots available in iClosed, when I've blocked them in my Google Calendar?" [ref=e565] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/9835767-why-do-i-still-have-slots-available-in-iclosed-when-i-ve-blocked-them-in-my-google-calendar
+                - generic [ref=e567]: Why do I still have slots available in iClosed, when I've blocked them in my Google Calendar?
+                - img [ref=e569]
+              - link "Why my slots are not visible for booking calls even though I'm available?" [ref=e571] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/9835770-why-my-slots-are-not-visible-for-booking-calls-even-though-i-m-available
+                - generic [ref=e573]: Why my slots are not visible for booking calls even though I'm available?
+                - img [ref=e575]
+              - link "How can I add a meeting link after the call has been scheduled already?" [ref=e577] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/9850262-how-can-i-add-a-meeting-link-after-the-call-has-been-scheduled-already
+                - generic [ref=e579]: How can I add a meeting link after the call has been scheduled already?
+                - img [ref=e581]
+              - link "Can I add call outcomes to Past Calls accordingly?" [ref=e583] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/9874415-can-i-add-call-outcomes-to-past-calls-accordingly
+                - generic [ref=e585]: Can I add call outcomes to Past Calls accordingly?
+                - img [ref=e587]
+              - link "How to redirect Disqualified leads to an external URL after booking confirmation?" [ref=e589] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/9850731-how-to-redirect-disqualified-leads-to-an-external-url-after-booking-confirmation
+                - generic [ref=e591]: How to redirect Disqualified leads to an external URL after booking confirmation?
+                - img [ref=e593]
+              - link "How to make phone calls from iClosed" [ref=e595] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/10006177-how-to-make-phone-calls-from-iclosed
+                - generic [ref=e597]: How to make phone calls from iClosed
+                - img [ref=e599]
+              - link "Google calendar troubleshooting and how to fix connection problems" [ref=e601] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/10774522-google-calendar-troubleshooting-and-how-to-fix-connection-problems
+                - generic [ref=e603]: Google calendar troubleshooting and how to fix connection problems
+                - img [ref=e605]
+              - link "How can I set weekly shifts for my Closers and Setters?" [ref=e607] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/10775159-how-can-i-set-weekly-shifts-for-my-closers-and-setters
+                - generic [ref=e609]: How can I set weekly shifts for my Closers and Setters?
+                - img [ref=e611]
+              - link "Invitee is receiving \"Could not find requested event\" when clicks on add to calendar on call confirmation widget or confirmation email" [ref=e613] [cursor=pointer]:
+                - /url: https://docs.iclosed.io/en/articles/13759740-invitee-is-receiving-could-not-find-requested-event-when-clicks-on-add-to-calendar-on-call-confirmation-widget-or-confirmation-email
+                - generic [ref=e615]: Invitee is receiving "Could not find requested event" when clicks on add to calendar on call confirmation widget or confirmation email
+                - img [ref=e617]
+      - generic [ref=e623]:
+        - link "iClosed Help" [ref=e625] [cursor=pointer]:
+          - /url: /en/
+          - img "iClosed Help" [ref=e626]
+        - generic [ref=e628]:
+          - img "Intercom" [ref=e629]
+          - link "We run on Intercom" [ref=e632] [cursor=pointer]:
+            - /url: https://www.intercom.com/intercom-link?company=iClosed&solution=customer-support&utm_campaign=intercom-link&utm_content=We+run+on+Intercom&utm_medium=help-center&utm_referrer=https%3A%2F%2Fdocs.iclosed.io%2Fen%2Fcollections%2F9233549-ai-scheduler&utm_source=desktop-web
+  - alert [ref=e633]

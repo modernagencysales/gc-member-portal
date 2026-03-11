@@ -1,0 +1,702 @@
+- generic [ref=e1]:
+  - generic [ref=e3]:
+    - link "Skip to main content" [ref=e4] [cursor=pointer]:
+      - /url: "#main-content"
+    - main [ref=e5]:
+      - generic [ref=e9]:
+        - generic [ref=e12]:
+          - link "iClosed Help" [ref=e15] [cursor=pointer]:
+            - /url: /en/
+            - img "iClosed Help" [ref=e16]
+          - navigation [ref=e19]:
+            - generic [ref=e20] [cursor=pointer]:
+              - combobox "Change language" [ref=e21]:
+                - option "English" [selected]
+              - generic [ref=e22]:
+                - img [ref=e23]
+                - text: English
+                - img [ref=e26]
+        - generic [ref=e33]:
+          - generic [ref=e34]: Search for articles...
+          - textbox "Search for articles..." [ref=e35]
+          - generic:
+            - img
+      - generic [ref=e39]:
+        - generic [ref=e42]:
+          - link "How to prefill iClosed scheduling form" [ref=e44] [cursor=pointer]:
+            - /url: "#h_64dd99a8cb"
+          - link "Contact information - The default parameters" [ref=e46] [cursor=pointer]:
+            - /url: "#h_0ae69414cc"
+          - link "Custom answers - Identifiers as custom parameters" [ref=e48] [cursor=pointer]:
+            - /url: "#h_6f942e2a9d"
+          - link "Pre-qualified form skipping" [ref=e50] [cursor=pointer]:
+            - /url: "#h_17a43bb289"
+          - link "Use cases" [ref=e52] [cursor=pointer]:
+            - /url: "#h_18832a87c4"
+          - link "From Perspective → Contact details & Custom question answers" [ref=e54] [cursor=pointer]:
+            - /url: "#h_2b7a507c57"
+          - link "From Typeform → Contact details" [ref=e56] [cursor=pointer]:
+            - /url: "#h_4082feb2f4"
+          - link "From Typeform → Custom question answers" [ref=e58] [cursor=pointer]:
+            - /url: "#h_0305083ab1"
+          - link "From Jotform → Contact details" [ref=e60] [cursor=pointer]:
+            - /url: "#h_f4b47e74de"
+          - link "From Jotform → Custom question answers" [ref=e62] [cursor=pointer]:
+            - /url: "#h_3b6b1081e0"
+          - link "From Tally → Contact details" [ref=e64] [cursor=pointer]:
+            - /url: "#h_112e87261e"
+          - link "From Tally → Custom question answers" [ref=e66] [cursor=pointer]:
+            - /url: "#h_840a0c30ee"
+          - link "Transferring lead information from form to scheduler with additional webpages in between" [ref=e68] [cursor=pointer]:
+            - /url: "#h_60b6c4320c"
+          - link "Pre-filling iClosed form fields from email campaigns" [ref=e70] [cursor=pointer]:
+            - /url: "#h_6ed4a6c50e"
+        - generic [ref=e71]:
+          - navigation "Breadcrumb" [ref=e74]:
+            - list [ref=e75]:
+              - listitem [ref=e76]:
+                - link "All Collections" [ref=e77] [cursor=pointer]:
+                  - /url: /en/
+                - img [ref=e79]
+              - listitem [ref=e81]:
+                - link "AI Scheduler" [ref=e82] [cursor=pointer]:
+                  - /url: https://docs.iclosed.io/en/collections/9233549-ai-scheduler
+                - img [ref=e84]
+              - listitem [ref=e86]:
+                - link "FAQs" [ref=e87] [cursor=pointer]:
+                  - /url: https://docs.iclosed.io/en/collections/10440455-faqs
+                - img [ref=e89]
+              - listitem [ref=e91]: How to prefill iClosed form contact information and answers
+          - generic [ref=e93]:
+            - generic [ref=e95]:
+              - generic [ref=e96]:
+                - heading "How to prefill iClosed form contact information and answers" [level=1] [ref=e97]
+                - paragraph [ref=e99]: Learn how to easily pass contact details and custom question answers from any form into the iClosed scheduler
+              - generic [ref=e102]: Updated over 2 weeks ago
+            - article [ref=e105]:
+              - paragraph [ref=e107]: Scheduled call conversion rates go up when prospects don’t have to repeat themselves by re-entering the same information twice.
+              - paragraph [ref=e109]
+              - paragraph [ref=e111]: By creating a faster and smoother booking process, your lead will have an amazing scheduling experience, and iClosed captures lead information immediately.
+              - paragraph [ref=e113]
+              - iframe [ref=e115]:
+                - generic [ref=f4e7]:
+                  - generic "Identifiers - custom parameters for prepopulating answers on iClosed form" [ref=f4e9]
+                  - generic [ref=f4e11]:
+                    - generic [ref=f4e12]:
+                      - generic:
+                        - 'button "Play Video: Identifiers - custom parameters for prepopulating answers on iClosed form"'
+                      - generic:
+                        - generic:
+                          - img [ref=f4e14]
+                          - img "Video Thumbnail" [ref=f4e16]
+                    - 'button "Play Video: Identifiers - custom parameters for prepopulating answers on iClosed form" [ref=f4e18] [cursor=pointer]':
+                      - img [ref=f4e21]
+                    - generic:
+                      - generic:
+                        - button "Play Video" [ref=f4e26] [cursor=pointer]:
+                          - img [ref=f4e29]
+                        - generic [ref=f4e33]:
+                          - generic: 6:02
+                          - slider "Playbar" [ref=f4e35] [cursor=pointer]
+                        - generic [ref=f4e39]:
+                          - button "Show captions menu" [ref=f4e42] [cursor=pointer]:
+                            - img [ref=f4e44]
+                          - button "Mute" [ref=f4e50] [cursor=pointer]:
+                            - img [ref=f4e52]
+                          - button "Show settings menu" [ref=f4e63] [cursor=pointer]:
+                            - img [ref=f4e65]
+                          - button "Fullscreen" [ref=f4e69] [cursor=pointer]:
+                            - img [ref=f4e71]
+              - separator [ref=e117]
+              - heading "How to prefill iClosed scheduling form" [level=1] [ref=e119]
+              - paragraph [ref=e121]: Here’s how to capture contact details and form answers on your opt-in page (or any custom form) and pass them into the iClosed scheduler to pre-fill fields and custom questions.
+              - paragraph [ref=e123]
+              - heading "Contact information - The default parameters" [level=2] [ref=e125]
+              - paragraph [ref=e127]: Set up logic on your webpage or form app (e.g. Typeform, Tally, Jotform,...) and forward the following parameters to your destination URL.
+              - table [ref=e129]:
+                - rowgroup [ref=e130]:
+                  - row "Phone number parameters [Your link]?iclosedPhone=" [ref=e131]:
+                    - cell "Phone number parameters" [ref=e132]:
+                      - paragraph [ref=e134]: Phone number parameters
+                    - cell "[Your link]?iclosedPhone=" [ref=e135]:
+                      - paragraph [ref=e137]: "[Your link]?iclosedPhone="
+                  - row "Email parameters [Your link]?iclosedEmail=" [ref=e138]:
+                    - cell "Email parameters" [ref=e139]:
+                      - paragraph [ref=e141]: Email parameters
+                    - cell "[Your link]?iclosedEmail=" [ref=e142]:
+                      - paragraph [ref=e144]: "[Your link]?iclosedEmail="
+                  - row "Name parameters [Your link]?iclosedName=" [ref=e145]:
+                    - cell "Name parameters" [ref=e146]:
+                      - paragraph [ref=e148]: Name parameters
+                    - cell "[Your link]?iclosedName=" [ref=e149]:
+                      - paragraph [ref=e151]: "[Your link]?iclosedName="
+              - paragraph [ref=e153]: "If you'd like to combine parameters, use \"&\" in between them. The URL would look like as presented below:"
+              - paragraph [ref=e155]
+              - paragraph [ref=e157]:
+                - text: "[Your webpage link]?iclosedPhone=12345678590&iclosedEmail="
+                - link "user@example.com" [ref=e158] [cursor=pointer]:
+                  - /url: mailto:user@example.com
+                - text: "&iclosedName=John%20Doe"
+              - iframe [ref=e160]:
+                - generic [ref=f5e17]:
+                  - generic [ref=f5e23]:
+                    - button [disabled] [ref=f5e25] [cursor=pointer]:
+                      - img [ref=f5e28]:
+                        - img [ref=f5e29]
+                    - button [ref=f5e32] [cursor=pointer]:
+                      - img [ref=f5e35]:
+                        - img [ref=f5e36]
+                    - button [ref=f5e39] [cursor=pointer]:
+                      - img [ref=f5e42]:
+                        - img [ref=f5e43]
+                  - generic [ref=f5e46]:
+                    - img "favicon" [ref=f5e47]
+                    - generic [ref=f5e48]: Prepopulate iClosed form with invitee contact information
+                  - generic [ref=f5e49]:
+                    - button [ref=f5e51] [cursor=pointer]:
+                      - img [ref=f5e54]:
+                        - img [ref=f5e55]
+                    - button [ref=f5e58] [cursor=pointer]:
+                      - img [ref=f5e61]:
+                        - img [ref=f5e62]
+              - separator [ref=e162]
+              - heading "Custom answers - Identifiers as custom parameters" [level=2] [ref=e164]
+              - paragraph [ref=e166]: Identifier in iClosed is a custom parameter that you will define for the custom question, in order to prefill answers from any custom form.
+              - paragraph [ref=e168]
+              - paragraph [ref=e170]: "You can set this up in:"
+              - list [ref=e172]:
+                - listitem [ref=e173]:
+                  - paragraph [ref=e175]:
+                    - generic [ref=e176]:
+                      - link "AI Scheduler → Events" [ref=e177] [cursor=pointer]:
+                        - /url: https://app.iclosed.io/app/ai-scheduler/events
+                      - text: →
+                    - text: Click on the event to open settings, and select Invitee questions or
+                - listitem [ref=e178]:
+                  - paragraph [ref=e180]:
+                    - link "Tracking menu → Event custom fields" [ref=e182] [cursor=pointer]:
+                      - /url: https://app.iclosed.io/app/tracking
+              - paragraph [ref=e184]: Once you're there, edit question or create new one to see Identifier field for the specific question.
+              - paragraph [ref=e186]
+              - link [ref=e188] [cursor=pointer]:
+                - /url: https://downloads.intercomcdn.com/i/o/qykhci6m/1468985159/a3c388fd346cb9f114e503189727/image.png?expires=1772775900&signature=827912209f769955a915bc4861418034c43c2a9b4e333d5946e528646ac9e3ed&req=dSQhHsB2mIBaUPMW1HO4zRFXS%2Ff84Lud%2BciMcffj03NXeqdKek6sdLWuUZFu%0Aw0t8fIlC1TYxcxnVrfI%3D%0A
+                - img [ref=e189]
+              - paragraph [ref=e191]: "Here's a quick video guide on how it works:"
+              - paragraph [ref=e193]
+              - iframe [ref=e195]:
+                - generic [ref=f6e17]:
+                  - generic [ref=f6e23]:
+                    - button [disabled] [ref=f6e25] [cursor=pointer]:
+                      - img [ref=f6e28]:
+                        - img [ref=f6e29]
+                    - button [ref=f6e32] [cursor=pointer]:
+                      - img [ref=f6e35]:
+                        - img [ref=f6e36]
+                    - button [ref=f6e39] [cursor=pointer]:
+                      - img [ref=f6e42]:
+                        - img [ref=f6e43]
+                  - generic [ref=f6e46]:
+                    - img "favicon" [ref=f6e47]
+                    - generic [ref=f6e48]: creating custom identifier for prefilling the scheduling form
+                  - generic [ref=f6e49]:
+                    - button [ref=f6e51] [cursor=pointer]:
+                      - img [ref=f6e54]:
+                        - img [ref=f6e55]
+                    - button [ref=f6e58] [cursor=pointer]:
+                      - img [ref=f6e61]:
+                        - img [ref=f6e62]
+              - generic [ref=e196]:
+                - heading "Important note" [level=3] [ref=e198]
+                - paragraph [ref=e200]: The answers on the form from where you're passing forward data to iClosed scheduling form must match answers exactly as it's created on the iClosed form.
+                - paragraph [ref=e202]
+                - paragraph [ref=e204]: "Additionally, bear in mind that the data needs to be URL encoded, meaning if your form answers contains more words in the answer, make sure to use \"%20\" code which is space in URL encoding. Here's an example:"
+                - link [ref=e206] [cursor=pointer]:
+                  - /url: https://downloads.intercomcdn.com/i/o/qykhci6m/1867126904/12b4d6b26e6cf8b738ed3658d415/image.png?expires=1772775900&signature=6b7e299337d72459d13734ca23f27be130986c3c045cd9d88aaa6147bd38fcc0&req=dSghEch8m4hfXfMW1HO4zcIkx2rxh4p3RUS1g7s59MWuAyp5Ih7J0SxgSEp7%0A%2FzL5jqmpgMYLBVr5%2F14%3D%0A
+                  - img [ref=e207]
+                - list [ref=e209]:
+                  - listitem [ref=e210]:
+                    - paragraph [ref=e212]: Identifier in iClosed for this question = issues-materials
+                  - listitem [ref=e213]:
+                    - paragraph [ref=e215]: URL encoding = [webpage URL]?issues-materials=Backyard%20materials
+                  - listitem [ref=e216]:
+                    - paragraph [ref=e218]: Answer on the form that will be = Backyard materials
+              - separator [ref=e220]
+              - heading "Pre-qualified form skipping" [level=2] [ref=e222]
+              - paragraph [ref=e224]: Pre-populating invitee information is a precondition for turning on the "Pre-qualified form skipping" feature inside the Invitee Questions section in Events setup.
+              - paragraph [ref=e226]
+              - paragraph [ref=e228]: When you prefill all contact information (with or without custom answers), this feature enables leads to land directly to the slots without clicking "Continue" button on the form.
+              - link [ref=e230] [cursor=pointer]:
+                - /url: https://downloads.intercomcdn.com/i/o/qykhci6m/1867148848/5d6541ea5ecbf8e51ea4d98f0356/image.png?expires=1772775900&signature=7d04115951f26f23d0ce47f0bdea8523d46b6778fc3838339e7548e980f557bb&req=dSghEch6lYlbUfMW1HO4zb97kYSULcvN73UTmuvPKy8ruvV5W3f%2BaqfaRvep%0A13o8dPfIwBY1FyErydg%3D%0A
+                - img [ref=e231]
+              - paragraph [ref=e234]:
+                - text: Learn more about
+                - link "Pre-qualified form skipping here" [ref=e236] [cursor=pointer]:
+                  - /url: https://docs.iclosed.io/en/articles/10398661-pre-qualified-form-skipping
+                - text: .
+              - separator [ref=e238]
+              - heading "Use cases" [level=1] [ref=e240]
+              - paragraph [ref=e242]: Here're several examples on how you can send contact information and answers to custom questions from Typeform, Jotform, Tally or any other custom form to iClosed scheduling form, via URL parameters.
+              - paragraph [ref=e244]
+              - heading "From Perspective → Contact details & Custom question answers" [level=2] [ref=e246]
+              - paragraph [ref=e248]: "Here's a quick video walkthrough on how you can send contact information and answers to custom questions from Perspective to the webpage where iClosed scheduler is embedded:"
+              - iframe [ref=e250]:
+                - generic [active] [ref=f7e1]:
+                  - main:
+                    - generic [ref=f7e5]:
+                      - generic [ref=f7e6]:
+                        - generic [ref=f7e9]:
+                          - generic:
+                            - generic [ref=f7e14]:
+                              - generic [ref=f7e16]:
+                                - link "How To Embed iClosed" [ref=f7e19] [cursor=pointer]:
+                                  - /url: https://www.loom.com/share/bfb59c7bc4864a92941681e5a296a6a5
+                                  - generic [ref=f7e20]: How To Embed iClosed
+                                - generic [ref=f7e24]: 47 views
+                              - generic [ref=f7e27]:
+                                - button "Copy link" [ref=f7e29] [cursor=pointer]
+                                - status [ref=f7e32]: Copy link
+                                - link "Open video in Loom" [ref=f7e35] [cursor=pointer]:
+                                  - /url: https://www.loom.com/share/bfb59c7bc4864a92941681e5a296a6a5
+                                - button "View comments, keyboard shortcut C" [ref=f7e40] [cursor=pointer]:
+                                  - generic [ref=f7e44]: "2"
+                            - generic [ref=f7e45]:
+                              - button "Play the video, keyboard shortcut K" [ref=f7e46] [cursor=pointer]:
+                                - img [ref=f7e47]
+                              - generic [ref=f7e52]:
+                                - generic [ref=f7e54]:
+                                  - generic [ref=f7e58] [cursor=pointer]: 0.8×
+                                  - generic [ref=f7e62] [cursor=pointer]: 1×
+                                  - generic [ref=f7e67] [cursor=pointer]: 1.2×
+                                  - generic [ref=f7e71] [cursor=pointer]: 1.5×
+                                  - generic [ref=f7e75] [cursor=pointer]: 1.7×
+                                  - generic [ref=f7e79] [cursor=pointer]: 2×
+                                  - generic [ref=f7e83] [cursor=pointer]: 2.5×
+                                - generic [ref=f7e85]:
+                                  - generic [ref=f7e86]: 5 min
+                                  - generic [ref=f7e87]: ⚡️
+                                  - generic [ref=f7e88]:
+                                    - generic [ref=f7e89]: 6 min 42 sec
+                                    - generic [ref=f7e90]: 5 min 21 sec
+                                    - generic [ref=f7e91]: 4 min 28 sec
+                                    - generic [ref=f7e92]: 3 min 34 sec
+                                    - generic [ref=f7e93]: 3 min 9 sec
+                                    - generic [ref=f7e94]: 2 min 40 sec
+                                    - generic [ref=f7e95]: 2 min 8 sec
+                        - generic:
+                          - generic:
+                            - generic:
+                              - button "Collapse reaction bar":
+                                - generic:
+                                  - generic:
+                                    - img
+                          - generic:
+                            - generic:
+                              - list:
+                                - listitem:
+                                  - generic:
+                                    - list:
+                                      - listitem:
+                                        - generic:
+                                          - generic:
+                                            - generic:
+                                              - generic:
+                                                - generic:
+                                                  - button "heart":
+                                                    - generic: ❤️
+                                      - listitem:
+                                        - generic:
+                                          - generic:
+                                            - generic:
+                                              - generic:
+                                                - generic:
+                                                  - button "yes":
+                                                    - generic: 👍
+                                      - listitem:
+                                        - generic:
+                                          - generic:
+                                            - generic:
+                                              - generic:
+                                                - generic:
+                                                  - button "fire":
+                                                    - generic: 🔥
+                                      - listitem:
+                                        - generic:
+                                          - generic:
+                                            - generic:
+                                              - generic:
+                                                - generic:
+                                                  - button "clap":
+                                                    - generic: 👏
+                                      - listitem:
+                                        - generic:
+                                          - generic:
+                                            - generic:
+                                              - generic:
+                                                - generic:
+                                                  - button "yay":
+                                                    - generic: 🙌
+                                      - listitem:
+                                        - generic:
+                                          - generic:
+                                            - generic:
+                                              - generic:
+                                                - generic:
+                                                  - button "eyes":
+                                                    - generic: 👀
+                                - generic:
+                                  - listitem:
+                                    - generic:
+                                      - generic:
+                                        - generic:
+                                          - generic:
+                                            - generic:
+                                              - button "More reactions, keyboard shortcut 7"
+                          - generic:
+                            - generic:
+                              - generic:
+                                - generic:
+                                  - generic:
+                                    - button "Comment":
+                                      - generic: Comment
+                      - generic [ref=f7e100]:
+                        - generic [ref=f7e101]:
+                          - generic [ref=f7e102]:
+                            - generic [ref=f7e103]: 2 Comments
+                            - button "Close comments panel" [ref=f7e105] [cursor=pointer]
+                          - generic [ref=f7e111]:
+                            - textbox "Respond to Niels..." [ref=f7e113]
+                            - generic [ref=f7e115]:
+                              - button "Add emoji" [ref=f7e118] [cursor=pointer]
+                              - button [ref=f7e124] [cursor=pointer]
+                        - list [ref=f7e127]:
+                          - generic [ref=f7e128]:
+                            - listitem [ref=f7e131]:
+                              - generic [ref=f7e134]:
+                                - img "Jovan Nanic" [ref=f7e138]
+                                - generic [ref=f7e139]:
+                                  - generic [ref=f7e141]:
+                                    - generic [ref=f7e142]: Jovan Nanic
+                                    - button "Commented at 5:22" [ref=f7e143] [cursor=pointer]: 5:22
+                                    - generic [ref=f7e145]: Feb 17
+                                  - generic [ref=f7e148]: Thank you, Niels! 🙏
+                                  - button "Reply" [ref=f7e153] [cursor=pointer]:
+                                    - generic [ref=f7e154]: Reply
+                            - listitem [ref=f7e157]:
+                              - generic [ref=f7e160]:
+                                - img "Diana D" [ref=f7e164]
+                                - generic [ref=f7e165]:
+                                  - generic [ref=f7e167]:
+                                    - generic [ref=f7e168]: Diana D
+                                    - button "Commented at 5:22" [ref=f7e169] [cursor=pointer]: 5:22
+                                    - generic [ref=f7e171]: Feb 17
+                                  - generic [ref=f7e174]: Thank you, Niels! 🙏
+                                  - button "Reply" [ref=f7e179] [cursor=pointer]:
+                                    - generic [ref=f7e180]: Reply
+              - group [ref=e252]:
+                - generic "Step-by-step guide" [ref=e253]:
+                  - heading "Step-by-step guide" [level=3] [ref=e255] [cursor=pointer]
+              - separator [ref=e257]
+              - heading "From Typeform → Contact details" [level=2] [ref=e259]
+              - paragraph [ref=e261]: "Here's a quick video walkthrough on how you can send contact information from Typeform to the webpage where iClosed scheduler is embedded:"
+              - iframe [ref=e263]:
+                - generic [ref=f8e7]:
+                  - generic "Pre-Populating Form Fields from Typeform to iClosed (basic)" [ref=f8e9]
+                  - generic [ref=f8e11]:
+                    - generic [ref=f8e12]:
+                      - generic:
+                        - 'button "Play Video: Pre-Populating Form Fields from Typeform to iClosed (basic)"'
+                      - generic:
+                        - generic:
+                          - img [ref=f8e14]
+                          - img "Video Thumbnail" [ref=f8e16]
+                    - 'button "Play Video: Pre-Populating Form Fields from Typeform to iClosed (basic)" [ref=f8e18] [cursor=pointer]':
+                      - img [ref=f8e21]
+                    - generic:
+                      - generic:
+                        - button "Play Video" [ref=f8e26] [cursor=pointer]:
+                          - img [ref=f8e29]
+                        - generic [ref=f8e33]:
+                          - generic: 3:26
+                          - slider "Playbar" [ref=f8e35] [cursor=pointer]
+                        - generic [ref=f8e39]:
+                          - button "Show captions menu" [ref=f8e42] [cursor=pointer]:
+                            - img [ref=f8e44]
+                          - button "Mute" [ref=f8e50] [cursor=pointer]:
+                            - img [ref=f8e52]
+                          - button "Show settings menu" [ref=f8e63] [cursor=pointer]:
+                            - img [ref=f8e65]
+                          - button "Fullscreen" [ref=f8e69] [cursor=pointer]:
+                            - img [ref=f8e71]
+              - generic [ref=e264]:
+                - heading "Pro tips" [level=3] [ref=e266]
+                - paragraph [ref=e268]: To make sure Typeform details are reliably passed and pre-filled in iClosed, we recommend sending parameters to your webpage URL where the iClosed scheduler is embedded, rather than sending them directly to the event URL.
+                - paragraph [ref=e270]
+                - paragraph [ref=e272]: If you send parameters directly to the event URL, the scheduler can sometimes load before it reads the URL values, which may prevent fields from being pre-filled.
+              - paragraph [ref=e274]
+              - heading "From Typeform → Custom question answers" [level=2] [ref=e276]
+              - paragraph [ref=e278]: "Here's a detailed video tutorial on how you can send all answers from your Typeform to the webpage where iClosed scheduler is embedded:"
+              - iframe [ref=e280]:
+                - generic [ref=f9e7]:
+                  - generic "Pre-Populating Form Fields from Typeform to iClosed (custom)" [ref=f9e9]
+                  - generic [ref=f9e11]:
+                    - generic [ref=f9e12]:
+                      - generic:
+                        - 'button "Play Video: Pre-Populating Form Fields from Typeform to iClosed (custom)"'
+                      - generic:
+                        - generic:
+                          - img [ref=f9e14]
+                          - img "Video Thumbnail" [ref=f9e16]
+                    - 'button "Play Video: Pre-Populating Form Fields from Typeform to iClosed (custom)" [ref=f9e18] [cursor=pointer]':
+                      - img [ref=f9e21]
+                    - generic:
+                      - generic:
+                        - button "Play Video" [ref=f9e26] [cursor=pointer]:
+                          - img [ref=f9e29]
+                        - generic [ref=f9e33]:
+                          - generic: 5:32
+                          - slider "Playbar" [ref=f9e35] [cursor=pointer]
+                        - generic [ref=f9e39]:
+                          - button "Show captions menu" [ref=f9e42] [cursor=pointer]:
+                            - img [ref=f9e44]
+                          - button "Mute" [ref=f9e50] [cursor=pointer]:
+                            - img [ref=f9e52]
+                          - button "Show settings menu" [ref=f9e63] [cursor=pointer]:
+                            - img [ref=f9e65]
+                          - button "Fullscreen" [ref=f9e69] [cursor=pointer]:
+                            - img [ref=f9e71]
+              - group [ref=e282]:
+                - generic "Step-by-step guide" [ref=e283]:
+                  - heading "Step-by-step guide" [level=3] [ref=e285] [cursor=pointer]
+              - separator [ref=e287]
+              - heading "From Jotform → Contact details" [level=2] [ref=e289]
+              - paragraph [ref=e291]: "Here's a quick video walkthrough on how you can send contact information from Jotform to the webpage where iClosed scheduler is embedded or to iClosed event:"
+              - iframe [ref=e293]:
+                - generic [ref=f10e7]:
+                  - generic "Pre-Populating Form Fields from Jotform to iClosed (custom)" [ref=f10e9]
+                  - generic [ref=f10e11]:
+                    - generic [ref=f10e12]:
+                      - generic:
+                        - 'button "Play Video: Pre-Populating Form Fields from Jotform to iClosed (custom)"'
+                      - generic:
+                        - generic:
+                          - img [ref=f10e14]
+                          - img "Video Thumbnail" [ref=f10e16]
+                    - 'button "Play Video: Pre-Populating Form Fields from Jotform to iClosed (custom)" [ref=f10e18] [cursor=pointer]':
+                      - img [ref=f10e21]
+                    - generic:
+                      - generic:
+                        - button "Play Video" [ref=f10e26] [cursor=pointer]:
+                          - img [ref=f10e29]
+                        - generic [ref=f10e33]:
+                          - generic: 5:20
+                          - slider "Playbar" [ref=f10e35] [cursor=pointer]
+                        - generic [ref=f10e39]:
+                          - button "Show captions menu" [ref=f10e42] [cursor=pointer]:
+                            - img [ref=f10e44]
+                          - button "Mute" [ref=f10e50] [cursor=pointer]:
+                            - img [ref=f10e52]
+                          - button "Show settings menu" [ref=f10e63] [cursor=pointer]:
+                            - img [ref=f10e65]
+                          - button "Fullscreen" [ref=f10e69] [cursor=pointer]:
+                            - img [ref=f10e71]
+              - separator [ref=e295]
+              - heading "From Jotform → Custom question answers" [level=2] [ref=e297]
+              - paragraph [ref=e299]: "Here's a detailed video tutorial on how you can send all answers from your Jotform to the webpage where iClosed scheduler is embedded or directly to your iClosed event:"
+              - iframe [ref=e301]:
+                - generic [ref=f11e7]:
+                  - generic "Pre-Populating Form Fields from Jotform to iClosed (custom)" [ref=f11e9]
+                  - generic [ref=f11e11]:
+                    - generic [ref=f11e12]:
+                      - generic:
+                        - 'button "Play Video: Pre-Populating Form Fields from Jotform to iClosed (custom)"'
+                      - generic:
+                        - generic:
+                          - img [ref=f11e14]
+                          - img "Video Thumbnail" [ref=f11e16]
+                    - 'button "Play Video: Pre-Populating Form Fields from Jotform to iClosed (custom)" [ref=f11e18] [cursor=pointer]':
+                      - img [ref=f11e21]
+                    - generic:
+                      - generic:
+                        - button "Play Video" [ref=f11e26] [cursor=pointer]:
+                          - img [ref=f11e29]
+                        - generic [ref=f11e33]:
+                          - generic: 5:20
+                          - slider "Playbar" [ref=f11e35] [cursor=pointer]
+                        - generic [ref=f11e39]:
+                          - button "Show captions menu" [ref=f11e42] [cursor=pointer]:
+                            - img [ref=f11e44]
+                          - button "Mute" [ref=f11e50] [cursor=pointer]:
+                            - img [ref=f11e52]
+                          - button "Show settings menu" [ref=f11e63] [cursor=pointer]:
+                            - img [ref=f11e65]
+                          - button "Fullscreen" [ref=f11e69] [cursor=pointer]:
+                            - img [ref=f11e71]
+              - group [ref=e303]:
+                - generic "Step-by-step guide" [ref=e304]:
+                  - heading "Step-by-step guide" [level=3] [ref=e306] [cursor=pointer]
+              - separator [ref=e308]
+              - heading "From Tally → Contact details" [level=2] [ref=e310]
+              - paragraph [ref=e312]: "Here's a quick video walkthrough on how you can send contact information from Tally to the webpage where iClosed scheduler is embedded or to iClosed event:"
+              - iframe [ref=e314]:
+                - generic [ref=f12e7]:
+                  - generic "Pre-Populating Form Fields from Tally to iClosed (basic)" [ref=f12e9]
+                  - generic [ref=f12e11]:
+                    - generic [ref=f12e12]:
+                      - generic:
+                        - 'button "Play Video: Pre-Populating Form Fields from Tally to iClosed (basic)"'
+                      - generic:
+                        - generic:
+                          - img [ref=f12e14]
+                          - img "Video Thumbnail" [ref=f12e16]
+                    - 'button "Play Video: Pre-Populating Form Fields from Tally to iClosed (basic)" [ref=f12e18] [cursor=pointer]':
+                      - img [ref=f12e21]
+                    - generic:
+                      - generic:
+                        - button "Play Video" [ref=f12e26] [cursor=pointer]:
+                          - img [ref=f12e29]
+                        - generic [ref=f12e33]:
+                          - generic: 2:28
+                          - slider "Playbar" [ref=f12e35] [cursor=pointer]
+                        - generic [ref=f12e39]:
+                          - button "Show captions menu" [ref=f12e42] [cursor=pointer]:
+                            - img [ref=f12e44]
+                          - button "Mute" [ref=f12e50] [cursor=pointer]:
+                            - img [ref=f12e52]
+                          - button "Show settings menu" [ref=f12e63] [cursor=pointer]:
+                            - img [ref=f12e65]
+                          - button "Fullscreen" [ref=f12e69] [cursor=pointer]:
+                            - img [ref=f12e71]
+              - separator [ref=e316]
+              - heading "From Tally → Custom question answers" [level=2] [ref=e318]
+              - paragraph [ref=e320]: "Here's a detailed video tutorial on how you can send all answers from your Tally to the webpage where iClosed scheduler is embedded or directly to your iClosed event:"
+              - iframe [ref=e322]:
+                - generic [ref=f13e7]:
+                  - generic "Pre-Populating Form Fields from Tally to iClosed (custom)" [ref=f13e9]
+                  - generic [ref=f13e11]:
+                    - generic [ref=f13e12]:
+                      - generic:
+                        - 'button "Play Video: Pre-Populating Form Fields from Tally to iClosed (custom)"'
+                      - generic:
+                        - generic:
+                          - img [ref=f13e14]
+                          - img "Video Thumbnail" [ref=f13e16]
+                    - 'button "Play Video: Pre-Populating Form Fields from Tally to iClosed (custom)" [ref=f13e18] [cursor=pointer]':
+                      - img [ref=f13e21]
+                    - generic:
+                      - generic:
+                        - button "Play Video" [ref=f13e26] [cursor=pointer]:
+                          - img [ref=f13e29]
+                        - generic [ref=f13e33]:
+                          - generic: 3:12
+                          - slider "Playbar" [ref=f13e35] [cursor=pointer]
+                        - generic [ref=f13e39]:
+                          - button "Show captions menu" [ref=f13e42] [cursor=pointer]:
+                            - img [ref=f13e44]
+                          - button "Mute" [ref=f13e50] [cursor=pointer]:
+                            - img [ref=f13e52]
+                          - button "Show settings menu" [ref=f13e63] [cursor=pointer]:
+                            - img [ref=f13e65]
+                          - button "Fullscreen" [ref=f13e69] [cursor=pointer]:
+                            - img [ref=f13e71]
+              - generic [ref=e323]:
+                - heading "Pro tips" [level=3] [ref=e325]
+                - paragraph [ref=e327]:
+                  - text: Tally does not show “custom field identifiers” the way Typeform or Jotform do.
+                  - text: Instead, it uses the question label as the parameter name.
+                - paragraph [ref=e329]
+                - paragraph [ref=e331]: If the field type you have in Tally doesn't exist in iClosed, the data won't be passed correctly.
+              - group [ref=e333]:
+                - generic "Step-by-step guide" [ref=e334]:
+                  - heading "Step-by-step guide" [level=3] [ref=e336] [cursor=pointer]
+              - separator [ref=e338]
+              - heading "Transferring lead information from form to scheduler with additional webpages in between" [level=2] [ref=e340]
+              - paragraph [ref=e342]: "This is a scenario where funnel is a bit more complex, where there is minimum one webpage in between the form and iClosed scheduler. For example:"
+              - list [ref=e344]:
+                - listitem [ref=e345]:
+                  - paragraph [ref=e347]: page A where website form is
+                - listitem [ref=e348]:
+                  - paragraph [ref=e350]: page B where VSL is
+                - listitem [ref=e351]:
+                  - paragraph [ref=e353]: page C where iClosed scheduler is
+              - paragraph [ref=e355]
+              - group [ref=e357]:
+                - generic "Step-by-step guide" [ref=e358]:
+                  - heading "Step-by-step guide" [level=3] [ref=e360] [cursor=pointer]
+              - separator [ref=e362]
+              - heading "Pre-filling iClosed form fields from email campaigns" [level=2] [ref=e364]
+              - paragraph [ref=e366]: If you're running retargeting marketing campaigns, prefilling form fields from an email link will help with reducing friction and personalizing the booking experience.
+              - paragraph [ref=e368]
+              - paragraph [ref=e370]: By having custom scheduling link with contact information built in it will ensure higher conversion and better data accuracy as it avoids typos.
+              - paragraph [ref=e372]
+              - group [ref=e374]:
+                - generic "Step-by-step guide" [ref=e375]:
+                  - heading "Step-by-step guide" [level=3] [ref=e377] [cursor=pointer]
+              - separator [ref=e379]
+              - generic [ref=e380]:
+                - heading "Learn more" [level=3] [ref=e382]
+                - list [ref=e384]:
+                  - listitem [ref=e385]:
+                    - paragraph [ref=e387]:
+                      - link "Pre-qualified form skipping" [ref=e389] [cursor=pointer]:
+                        - /url: https://docs.iclosed.io/en/articles/10398661-pre-qualified-form-skipping
+                  - listitem [ref=e390]:
+                    - paragraph [ref=e392]:
+                      - link "Invitee questions explained" [ref=e394] [cursor=pointer]:
+                        - /url: https://docs.iclosed.io/en/articles/9914906-invitee-questions-event-custom-fields
+                  - listitem [ref=e395]:
+                    - paragraph [ref=e397]:
+                      - link "iClosed UTM collection and how to track conversions" [ref=e399] [cursor=pointer]:
+                        - /url: https://intercom.help/iclosed/en/articles/9830952-how-to-track-conversions-with-utms
+                  - listitem [ref=e400]:
+                    - paragraph [ref=e402]:
+                      - link "Meta Pixel integration" [ref=e404] [cursor=pointer]:
+                        - /url: https://intercom.help/iclosed/en/articles/10248143-meta-pixel
+                  - listitem [ref=e405]:
+                    - paragraph [ref=e407]:
+                      - link "How to track Google pixel with iClosed" [ref=e409] [cursor=pointer]:
+                        - /url: https://intercom.help/iclosed/en/articles/9825496-how-track-google-pixel-with-iclosed
+              - generic [ref=e410]:
+                - separator [ref=e411]
+                - generic [ref=e412]: Related Articles
+                - generic [ref=e413]:
+                  - link "How to track conversions with UTMs?" [ref=e414] [cursor=pointer]:
+                    - /url: https://docs.iclosed.io/en/articles/9830952-how-to-track-conversions-with-utms
+                    - generic [ref=e416]: How to track conversions with UTMs?
+                    - img [ref=e418]
+                  - link "Contact Cards" [ref=e420] [cursor=pointer]:
+                    - /url: https://docs.iclosed.io/en/articles/9901500-contact-cards
+                    - generic [ref=e422]: Contact Cards
+                    - img [ref=e424]
+                  - link "Embedding the scheduler on your website" [ref=e426] [cursor=pointer]:
+                    - /url: https://docs.iclosed.io/en/articles/9915264-embedding-the-scheduler-on-your-website
+                    - generic [ref=e428]: Embedding the scheduler on your website
+                    - img [ref=e430]
+                  - link "Meta Pixel" [ref=e432] [cursor=pointer]:
+                    - /url: https://docs.iclosed.io/en/articles/10248143-meta-pixel
+                    - generic [ref=e434]: Meta Pixel
+                    - img [ref=e436]
+                  - link "Pre-qualified form skipping" [ref=e438] [cursor=pointer]:
+                    - /url: https://docs.iclosed.io/en/articles/10398661-pre-qualified-form-skipping
+                    - generic [ref=e440]: Pre-qualified form skipping
+                    - img [ref=e442]
+          - group "Did this answer your question?" [ref=e444]:
+            - generic [ref=e445]: Did this answer your question?
+            - generic [ref=e446]:
+              - button "Disappointed Reaction" [ref=e447] [cursor=pointer]: 😞
+              - button "Neutral Reaction" [ref=e448] [cursor=pointer]: 😐
+              - button "Smiley Reaction" [ref=e449] [cursor=pointer]: 😃
+      - generic [ref=e454]:
+        - link "iClosed Help" [ref=e456] [cursor=pointer]:
+          - /url: /en/
+          - img "iClosed Help" [ref=e457]
+        - generic [ref=e459]:
+          - img "Intercom" [ref=e460]
+          - link "We run on Intercom" [ref=e463] [cursor=pointer]:
+            - /url: https://www.intercom.com/intercom-link?company=iClosed&solution=customer-support&utm_campaign=intercom-link&utm_content=We+run+on+Intercom&utm_medium=help-center&utm_referrer=https%3A%2F%2Fdocs.iclosed.io%2Fen%2Farticles%2F9830929-how-to-prefill-iclosed-form-contact-information-and-answers&utm_source=desktop-web
+  - alert [ref=e464]
+  - iframe [ref=e465]:
+    
+  - button "Open Intercom Messenger" [ref=e466] [cursor=pointer]:
+    - img [ref=e468]
+    - generic:
+      - img

@@ -1,0 +1,330 @@
+- generic [ref=e1]:
+  - generic [ref=e3]:
+    - link "Skip to main content" [ref=e4] [cursor=pointer]:
+      - /url: "#main-content"
+    - main [ref=e5]:
+      - generic [ref=e9]:
+        - generic [ref=e12]:
+          - link "iClosed Help" [ref=e15] [cursor=pointer]:
+            - /url: /en/
+            - img "iClosed Help" [ref=e16]
+          - navigation [ref=e19]:
+            - generic [ref=e20] [cursor=pointer]:
+              - combobox "Change language" [ref=e21]:
+                - option "English" [selected]
+              - generic [ref=e22]:
+                - img [ref=e23]
+                - text: English
+                - img [ref=e26]
+        - generic [ref=e33]:
+          - generic [ref=e34]: Search for articles...
+          - textbox "Search for articles..." [ref=e35]
+          - generic:
+            - img
+      - generic [ref=e39]:
+        - generic [ref=e42]:
+          - link "Copy Embed Code" [ref=e44] [cursor=pointer]:
+            - /url: "#h_a744f044d0"
+          - link "Embed Code Types" [ref=e46] [cursor=pointer]:
+            - /url: "#h_deef60a743"
+          - link "Inline embed code" [ref=e48] [cursor=pointer]:
+            - /url: "#h_7ac71aae52"
+          - link "Pop-up via element click" [ref=e50] [cursor=pointer]:
+            - /url: "#h_f5ac8c3991"
+          - link "Embedding on WordPress website" [ref=e52] [cursor=pointer]:
+            - /url: "#h_6c959e64d0"
+          - link "Embedding on Webflow website" [ref=e54] [cursor=pointer]:
+            - /url: "#h_e0279dcf98"
+          - link "Embedding on Framer website" [ref=e56] [cursor=pointer]:
+            - /url: "#h_9dd3b08b64"
+          - link "Embedding on custom HTML site" [ref=e58] [cursor=pointer]:
+            - /url: "#h_be05518714"
+          - link "Best practices and FAQ's" [ref=e60] [cursor=pointer]:
+            - /url: "#h_68a48489a4"
+        - generic [ref=e61]:
+          - navigation "Breadcrumb" [ref=e64]:
+            - list [ref=e65]:
+              - listitem [ref=e66]:
+                - link "All Collections" [ref=e67] [cursor=pointer]:
+                  - /url: /en/
+                - img [ref=e69]
+              - listitem [ref=e71]:
+                - link "AI Scheduler" [ref=e72] [cursor=pointer]:
+                  - /url: https://docs.iclosed.io/en/collections/9233549-ai-scheduler
+                - img [ref=e74]
+              - listitem [ref=e76]:
+                - link "Events" [ref=e77] [cursor=pointer]:
+                  - /url: https://docs.iclosed.io/en/collections/10398208-events
+                - img [ref=e79]
+              - listitem [ref=e81]: Embedding the scheduler on your website
+          - generic [ref=e83]:
+            - generic [ref=e85]:
+              - generic [ref=e86]:
+                - heading "Embedding the scheduler on your website" [level=1] [ref=e87]
+                - paragraph [ref=e89]: How to embed the scheduler to the most commonly used CMS's (Content Management Systems)
+              - generic [ref=e92]: Updated over 2 weeks ago
+            - article [ref=e95]:
+              - paragraph [ref=e97]: In this article we will cover how to embed iClosed scheduler to any of your web pages, including marketing platforms that have webpage builder such as Systeme.io, HighLevel, ClickFunnels, with examples for most commonly used CMS systems.
+              - link [ref=e99] [cursor=pointer]:
+                - /url: https://downloads.intercomcdn.com/i/o/qykhci6m/2077485093/76e6f2481f538be8866ecf49dfd8/image.png?expires=1772775900&signature=46ace7808871dce0fe0355fab45c63dfc4356e43be746b3798940f8d8a08358e&req=diAgEc12mIFWWvMW1HO4zUDMmPq29u%2Fp47lUIz7z2yHYAIUdm6ggu7JPWgNo%0A0jo1ASudc0lqbt3TDQQ%3D%0A
+                - img [ref=e100]
+              - separator [ref=e102]
+              - heading "Copy Embed Code" [level=1] [ref=e104]
+              - paragraph [ref=e106]:
+                - text: The first thing that you need to do is to copy the event embed code.
+                - text: Navigate to
+                - link "AI Scheduler - Events" [ref=e108] [cursor=pointer]:
+                  - /url: https://app.iclosed.io/app/ai-scheduler/events
+                - text: ", locate the event and click on the \"Embed\" button inside the event card."
+              - paragraph [ref=e110]
+              - link [ref=e112] [cursor=pointer]:
+                - /url: https://downloads.intercomcdn.com/i/o/qykhci6m/1322534179/a17b1552652c9ccd163d57fc9c0b/image.png?expires=1772775900&signature=4679ae52f380786c6e6ba23be45f8d31307ce765ea643519e5a7bb969374a1a2&req=dSMlFMx9mYBYUPMW1HO4zRy5%2BRguq0PTGYZgsTjFZlJx5mEtb%2Fm%2BJi5tL6%2FA%0AD0BZxa2kR6%2Bw4W3pPAI%3D%0A
+                - img [ref=e113]
+              - paragraph [ref=e115]
+              - paragraph [ref=e117]: Alternatively, you can click on the specific event to open event builder, and copy the the code by clicking on the "Embed" button from the top bar.
+              - paragraph [ref=e119]
+              - link [ref=e121] [cursor=pointer]:
+                - /url: https://downloads.intercomcdn.com/i/o/qykhci6m/1322536557/ce363be4bec6030e67bf3b99a0d9/image.png?expires=1772775900&signature=0a96063afe8b729ed68c203db1bac3c771e4c364df28d04160470d3088372f8f&req=dSMlFMx9m4RaXvMW1HO4zTv8ZtvtWmp5alGWilfOP1vg5VN96WezhHWUOVGT%0AunraHjyZC6pKmkpZSrE%3D%0A
+                - img [ref=e122]
+              - paragraph [ref=e124]
+              - paragraph [ref=e126]: In both cases, a pop-up window will appear for you to choose the embed code type.
+              - separator [ref=e128]
+              - heading "Embed Code Types" [level=1] [ref=e130]
+              - paragraph [ref=e132]: "We offer two types of embed code that you can use:"
+              - paragraph [ref=e134]
+              - link [ref=e136] [cursor=pointer]:
+                - /url: https://downloads.intercomcdn.com/i/o/qykhci6m/1446809658/cfd398e369954895b2a1e17f0a34/image.png?expires=1772775900&signature=b93b78efc717c789047eefd79c80f239b5a289bbdf079589486a957326ff67f3&req=dSQjEMF%2BlIdaUfMW1HO4zXu5gVurego1JdxHXiu97ALXe2a9vfKTAvqZ5J5k%0AuJCkDFh8bRIvPq%2Bh7Uo%3D%0A
+                - img [ref=e137]
+              - separator [ref=e139]
+              - heading "Inline embed code" [level=2] [ref=e141]
+              - paragraph [ref=e143]: Will load scheduler directly on your webpage inline, with other website content
+              - paragraph [ref=e145]
+              - link [ref=e147] [cursor=pointer]:
+                - /url: https://downloads.intercomcdn.com/i/o/qykhci6m/1446810392/a1a4a62c1ad43baeaa36f4a85b34/image.png?expires=1772775900&signature=d35dd9bd0607a241167ca7030d95cde670dd637b243a8e0e7cc2c14d5ef3ff3f&req=dSQjEMF%2FnYJWW%2FMW1HO4zSsXss7HM34rl9cRU7Izs7ZxUXl1LW%2BldFbsPK4z%0ASJzJkEqJVsu1oLJij3c%3D%0A
+                - img [ref=e148]
+              - separator [ref=e150]
+              - heading "Pop-up via element click" [level=2] [ref=e152]
+              - paragraph [ref=e154]: Perfect solution for loading scheduler as a dialog after the lead clicks on a button on your webpage.
+              - paragraph [ref=e156]
+              - link [ref=e158] [cursor=pointer]:
+                - /url: https://downloads.intercomcdn.com/i/o/qykhci6m/1446812950/82448345fe82de8be7d3311546af/image.png?expires=1772775900&signature=6e30145cf1a66f11d5becfa33486190063fd092047a3d4baa5cf7934f3cab8ce&req=dSQjEMF%2Fn4haWfMW1HO4zR40RGTdyy4KkeGs6W4LIzCr1H0quqovhMNZ%2FEoK%0ASK7z0PyMEkTRLstQtp4%3D%0A
+                - img [ref=e159]
+              - generic [ref=e160]:
+                - heading "Pro tips" [level=3] [ref=e162]
+                - paragraph [ref=e164]:
+                  - text: Sometimes original elements in webpage builders won't load codes from external apps.
+                  - text: "Here's a step by step guide on how to add pop-up on a click element on Framer:"
+                - generic [ref=e166]:
+                  - text: "import { Override } from \"framer\""
+                  - text: "export function AddICLosedAttrs(): Override {"
+                  - text: "return {"
+                  - text: "\"data-iclosed-link\": \"PASTE YOUR SCHEDULER LINK HERE\","
+                  - text: "\"data-embed-type\": \"popup\","
+                  - text: "}"
+                  - text: "}"
+                - paragraph [ref=e168]: and make sure to this generic code to your webpage header
+                - generic [ref=e170]: <!-- iClosed popup widget begin --> <script type="text/javascript" src="https://app.iclosed.io/assets/widget.js" async></script> <!-- iClosed popup widget end -->
+              - separator [ref=e172]
+              - paragraph [ref=e174]: No matter which option you choose, all you need to do is to simply copy the code and paste it in the iFrame or a button on your website where you'd want scheduler to appear.
+              - generic [ref=e175]:
+                - heading "Attention" [level=3] [ref=e177]
+                - paragraph [ref=e179]: Kindly note that the code is optimized and that you don't need to make any changes to it. By making changes to the code your scheduler may not work properly.
+                - paragraph [ref=e181]
+                - paragraph [ref=e183]: "iClosed scheduling widget is:"
+                - list [ref=e185]:
+                  - listitem [ref=e186]:
+                    - paragraph [ref=e188]: Fully optimized for all devices
+                  - listitem [ref=e189]:
+                    - paragraph [ref=e191]: Dynamic in terms of height adjustments, ensuring proper resizing based on content in the scheduler and ensures the iframe title dynamically updates with the event name.
+                  - listitem [ref=e192]:
+                    - paragraph [ref=e194]: Compatible with all most frequently used browsers, across all devices
+                - separator [ref=e196]
+                - paragraph [ref=e198]: In case you didn't make any manual changes to the embed code, but you've made updates to your Event URL or Company URL after the code has been placed to the webpage, the embed code will change and previous version that has been embedded will stop working.
+                - paragraph [ref=e200]
+                - paragraph [ref=e202]: If you've made a changes to Event URL or Company URL, iClosed will show warning message that the link has been updated, and to prompt you to place the latest version of the embed code to all of your webpages.
+                - paragraph [ref=e204]
+                - link [ref=e206] [cursor=pointer]:
+                  - /url: https://downloads.intercomcdn.com/i/o/qykhci6m/1322550770/cf4c822616b011542c99afad316d/image.png?expires=1772775900&signature=10a2963c63dc14a9498d2e4d6b5f7702f846a25bf28d38a48d3feab8cb741edb&req=dSMlFMx7nYZYWfMW1HO4zbym95m6AfiauZazTr5%2FvOt4qFPb7RLIUJbf%2BQ1l%0Abqwxl5Y%2BdBgiB8LHOa4%3D%0A
+                  - img [ref=e207]
+              - separator [ref=e209]
+              - generic [ref=e210]:
+                - heading "Pro tips" [level=3] [ref=e212]
+                - paragraph [ref=e214]:
+                  - text: We're providing embedding of the call confirmation page to the external page you've set in your event setup.
+                  - text: Navigate to
+                  - link "AI Scheduler - Events" [ref=e216] [cursor=pointer]:
+                    - /url: https://app.iclosed.io/app/ai-scheduler/events
+                  - text: and click on the event to open settings.
+                - paragraph [ref=e218]
+                - paragraph [ref=e220]: Select Confirmation page section and choose option "Redirect to an external URL". As soon as you select it, Embed booking confirmation code will appear.
+                - paragraph [ref=e222]
+                - link [ref=e224] [cursor=pointer]:
+                  - /url: https://downloads.intercomcdn.com/i/o/qykhci6m/1446849681/30f24b5d868203463f329e800786/image.png?expires=1772775900&signature=2fadbf851ecc79e90942ffe25a6d0c87af20eb298096045d7744d022cd286bef&req=dSQjEMF6lIdXWPMW1HO4zR8GKZXdTUdr2mKxeG%2FUpmZF13WDuIj941ZOobrn%0A9R5zuHCtRKmKHMH6o68%3D%0A
+                  - img [ref=e225]
+                - paragraph [ref=e227]
+                - paragraph [ref=e229]: Copy the code and place it on your webpage so your leads will see all additional information on your page and the call confirmation details.
+                - paragraph [ref=e231]
+                - paragraph [ref=e233]: One note though, call confirmation widget will be visible only when a call is actually booked and invitee is redirected to the call confirmation page (wont appear in preview mode as scheduling widget for example).
+              - separator [ref=e235]
+              - heading "Embedding on WordPress website" [level=1] [ref=e237]
+              - group [ref=e239]:
+                - generic "Using custom HTML block" [ref=e240]:
+                  - heading "Using custom HTML block" [level=2] [ref=e242] [cursor=pointer]
+              - separator [ref=e244]
+              - group [ref=e246]:
+                - generic "Using Elementor" [ref=e247]:
+                  - heading "Using Elementor" [level=2] [ref=e249] [cursor=pointer]
+              - separator [ref=e251]
+              - heading "Embedding on Webflow website" [level=1] [ref=e253]
+              - group [ref=e255]:
+                - generic "Step-by-step guide" [ref=e256]:
+                  - heading "Step-by-step guide" [level=2] [ref=e258] [cursor=pointer]
+              - separator [ref=e260]
+              - heading "Embedding on Framer website" [level=1] [ref=e262]
+              - iframe [ref=e264]:
+                - generic [ref=f2e2]:
+                  - img [ref=f2e4]
+                  - generic [ref=f2e9]:
+                    - generic "Framer - iClosed inline embed code" [ref=f2e11]
+                    - generic [ref=f2e13]:
+                      - generic [ref=f2e14]:
+                        - generic:
+                          - 'button "Play Video: Framer - iClosed inline embed code"'
+                        - generic:
+                          - generic:
+                            - img [ref=f2e16]
+                            - img "Video Thumbnail" [ref=f2e18]
+                      - 'button "Play Video: Framer - iClosed inline embed code" [ref=f2e20] [cursor=pointer]':
+                        - img [ref=f2e23]
+                      - generic:
+                        - generic:
+                          - button "Play Video" [ref=f2e28] [cursor=pointer]:
+                            - img [ref=f2e31]
+                          - generic [ref=f2e35]:
+                            - generic: 3:43
+                            - slider "Playbar" [ref=f2e37] [cursor=pointer]
+                          - generic [ref=f2e41]:
+                            - button "Show captions menu" [ref=f2e44] [cursor=pointer]:
+                              - img [ref=f2e46]
+                            - button "Mute" [ref=f2e52] [cursor=pointer]:
+                              - img [ref=f2e54]
+                            - button "Show settings menu" [ref=f2e65] [cursor=pointer]:
+                              - img [ref=f2e67]
+                            - button "Fullscreen" [ref=f2e71] [cursor=pointer]:
+                              - img [ref=f2e73]
+              - group [ref=e266]:
+                - generic "Step-by-step guide" [ref=e267]:
+                  - heading "Step-by-step guide" [level=2] [ref=e269] [cursor=pointer]
+              - separator [ref=e271]
+              - generic [ref=e272]:
+                - heading "Pro tips" [level=3] [ref=e274]
+                - paragraph [ref=e276]: Embedding the scheduler on Wix works as on any other website builder - select custom code element, add the code from iClosed and save changes.
+                - paragraph [ref=e278]
+                - paragraph [ref=e280]: But bear in mind that Wix won't allow redirections outside of the parent page after the call is booked unless you're on Premium Wix Plan.
+                - paragraph [ref=e282]: "In case your Wix plan doesn't support this option, you can use following workaround:"
+                - list [ref=e284]:
+                  - listitem [ref=e285]:
+                    - paragraph [ref=e287]: Set up standard redirecting on a click of a button - e.g. Book a call here button on your main page
+                  - listitem [ref=e288]:
+                    - paragraph [ref=e290]: Add direct iClosed scheduling link instead of the embed code
+                  - listitem [ref=e291]:
+                    - paragraph [ref=e293]: This will open iClosed scheduler external URL that will lead later to thank you page as per Confirmation page settings in iClosed.
+                  - listitem [ref=e294]:
+                    - paragraph [ref=e296]: after the call is booked, it will redirect automatically to confirmation page URL that you've set in iClosed event settings
+              - separator [ref=e298]
+              - heading "Embedding on custom HTML site" [level=1] [ref=e300]
+              - paragraph [ref=e302]: To embed iClosed scheduler to your custom HTML site, all you need to do is to copy embed code and paste it in your HTML site.
+              - paragraph [ref=e304]
+              - paragraph [ref=e306]:
+                - generic [ref=e307]:
+                  - link "You can learn more about HTML iFrame embed here" [ref=e308] [cursor=pointer]:
+                    - /url: https://www.w3schools.com/tags/tag_iframe.ASP
+                  - text: .
+              - separator [ref=e310]
+              - heading "Best practices and FAQ's" [level=1] [ref=e312]
+              - heading "Can I place iClosed iframe inside the iFrame (parent)?" [level=3] [ref=e314]
+              - paragraph [ref=e316]: Yes, but it's not advisable since the iframe parent may block iClosed widget to show or to block redirecting to the secondary "Thank you" page after the call is booked.
+              - paragraph [ref=e318]
+              - paragraph [ref=e320]: This may also prevent iClosed iframe to interact with the HTML elements inside of the frame, in case you have set restrictions to Same-Origin policy on your website.
+              - separator [ref=e322]
+              - heading "Is it possible to interact with HTML elements in the iClosed iframe?" [level=3] [ref=e324]
+              - paragraph [ref=e326]: No iframe allows you to edit HTML elements inside or out that of iframe, It's standard cross-origin-site restriction set by browsers.
+              - separator [ref=e328]
+              - heading "What could be the reasons for scheduler not to display on my website?" [level=3] [ref=e330]
+              - paragraph [ref=e332]: Before proceeding with the troubleshooting steps, please make sure that the embed code provided by iClosed was not changed manually, and that is properly placed in the website builder.
+              - heading "Troubleshooting checklist:" [level=4] [ref=e334]
+              - list [ref=e336]:
+                - listitem [ref=e337]:
+                  - paragraph [ref=e339]: Check the browser console for errors (CSP violations, X-Frame-Options, CORS, JavaScript errors).
+                - listitem [ref=e340]:
+                  - paragraph [ref=e342]: Test on a different browser/device/network to rule out extensions or local issues.
+                - listitem [ref=e343]:
+                  - paragraph [ref=e345]: Verify the iframe source URL works directly in a browser.
+                - listitem [ref=e346]:
+                  - paragraph [ref=e348]: Inspect the parent page's CSS and JavaScript for conflicts.
+                - listitem [ref=e349]:
+                  - paragraph [ref=e351]: Contact the scheduler provider if the issue persists.
+              - group [ref=e353]:
+                - generic "Additional reasons for the scheduler to be blocked from displaying are:" [ref=e354]:
+                  - heading "Additional reasons for the scheduler to be blocked from displaying are:" [level=4] [ref=e356] [cursor=pointer]
+              - separator [ref=e358]
+              - generic [ref=e359]:
+                - heading "Learn more" [level=3] [ref=e361]
+                - list [ref=e363]:
+                  - listitem [ref=e364]:
+                    - paragraph [ref=e366]:
+                      - link "How to pre-populate lead information on the scheduling form" [ref=e368] [cursor=pointer]:
+                        - /url: https://intercom.help/iclosed/en/articles/9830929-pre-populate-form-questions-with-invitee-information
+                  - listitem [ref=e369]:
+                    - paragraph [ref=e371]:
+                      - link "Setting up UTM's for tracking conversions" [ref=e373] [cursor=pointer]:
+                        - /url: https://intercom.help/iclosed/en/articles/9830952-how-to-track-conversions-with-utms
+                  - listitem [ref=e374]:
+                    - paragraph [ref=e376]:
+                      - link "How to track Google pixel with iClosed" [ref=e378] [cursor=pointer]:
+                        - /url: https://intercom.help/iclosed/en/articles/9825496-how-track-google-pixel-with-iclosed
+                  - listitem [ref=e379]:
+                    - paragraph [ref=e381]:
+                      - link "Meta pixel integration" [ref=e383] [cursor=pointer]:
+                        - /url: https://intercom.help/iclosed/en/articles/10248143-meta-pixel
+                  - listitem [ref=e384]:
+                    - paragraph [ref=e386]:
+                      - link "iClosed defense mechanism against spam or fake bookings" [ref=e388] [cursor=pointer]:
+                        - /url: https://intercom.help/iclosed/en/articles/9851464-how-to-prevent-spam-or-fake-bookings-on-my-scheduler
+              - generic [ref=e389]:
+                - separator [ref=e390]
+                - generic [ref=e391]: Related Articles
+                - generic [ref=e392]:
+                  - link "How to prefill iClosed form contact information and answers" [ref=e393] [cursor=pointer]:
+                    - /url: https://docs.iclosed.io/en/articles/9830929-how-to-prefill-iclosed-form-contact-information-and-answers
+                    - generic [ref=e395]: How to prefill iClosed form contact information and answers
+                    - img [ref=e397]
+                  - link "Scheduled calls filters" [ref=e399] [cursor=pointer]:
+                    - /url: https://docs.iclosed.io/en/articles/9849872-scheduled-calls-filters
+                    - generic [ref=e401]: Scheduled calls filters
+                    - img [ref=e403]
+                  - link "Confirmation Page" [ref=e405] [cursor=pointer]:
+                    - /url: https://docs.iclosed.io/en/articles/11184819-confirmation-page
+                    - generic [ref=e407]: Confirmation Page
+                    - img [ref=e409]
+          - group "Did this answer your question?" [ref=e411]:
+            - generic [ref=e412]: Did this answer your question?
+            - generic [ref=e413]:
+              - button "Disappointed Reaction" [ref=e414] [cursor=pointer]: 😞
+              - button "Neutral Reaction" [ref=e415] [cursor=pointer]: 😐
+              - button "Smiley Reaction" [ref=e416] [cursor=pointer]: 😃
+      - generic [ref=e421]:
+        - link "iClosed Help" [ref=e423] [cursor=pointer]:
+          - /url: /en/
+          - img "iClosed Help" [ref=e424]
+        - generic [ref=e426]:
+          - img "Intercom" [ref=e427]
+          - link "We run on Intercom" [ref=e430] [cursor=pointer]:
+            - /url: https://www.intercom.com/intercom-link?company=iClosed&solution=customer-support&utm_campaign=intercom-link&utm_content=We+run+on+Intercom&utm_medium=help-center&utm_referrer=https%3A%2F%2Fdocs.iclosed.io%2Fen%2Farticles%2F9915264-embedding-the-scheduler-on-your-website&utm_source=desktop-web
+  - alert [ref=e431]
+  - iframe [ref=e432]:
+    
+  - button "Open Intercom Messenger" [ref=e433] [cursor=pointer]:
+    - img [ref=e435]
+    - generic:
+      - img

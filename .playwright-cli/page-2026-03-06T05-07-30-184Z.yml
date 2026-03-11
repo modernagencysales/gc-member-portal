@@ -1,0 +1,119 @@
+- generic [ref=e6]:
+  - generic [ref=e7]:
+    - heading "Fill out the form" [level=1] [ref=e10] [cursor=pointer]
+    - heading "Book your event" [level=1] [ref=e13]
+  - generic [ref=e14]:
+    - generic [ref=e15]:
+      - heading "LinkedIn Growth Strategy Call" [level=1] [ref=e16]
+      - paragraph [ref=e18]:
+        - paragraph [ref=e19]: On this call we will break down your LinkedIn Strategy and tell you how best to apply it to your business.
+        - paragraph [ref=e20]
+        - paragraph [ref=e21]: We will also share the program we think would be best for you to help you grow your business.
+      - generic [ref=e22]:
+        - generic [ref=e23]:
+          - generic [ref=e27]:
+            - textbox "Phone number here" [ref=e28]: +1 (416) 558-2831
+            - 'button "Canada: + 1" [ref=e30] [cursor=pointer]'
+          - textbox "First name *" [ref=e34]: Test
+          - textbox "Last name *" [ref=e36]: User
+        - generic [ref=e144]:
+          - generic [ref=e145]:
+            - generic [ref=e146]: Email Address *
+            - textbox "Email *" [ref=e148]
+          - text: This field is required
+        - generic [ref=e149]:
+          - generic [ref=e150]: What is your business' monthly revenue? *
+          - button "Select" [ref=e152] [cursor=pointer]:
+            - generic [ref=e153]:
+              - paragraph [ref=e155]: Select
+              - img [ref=e156]
+          - text: This field is required
+        - generic [ref=e158]:
+          - generic [ref=e159]: What type of business do you run? *
+          - generic [ref=e160]:
+            - button "Select" [expanded] [ref=e161] [cursor=pointer]:
+              - generic [ref=e162]:
+                - paragraph [ref=e164]: Select
+                - img [ref=e165]
+            - listbox "Select" [active] [ref=e203]:
+              - generic [ref=e204]:
+                - option "Agency" [ref=e205] [cursor=pointer]:
+                  - paragraph [ref=e207]: Agency
+                - option "Consultancy" [ref=e208] [cursor=pointer]:
+                  - paragraph [ref=e210]: Consultancy
+                - option "SaaS" [ref=e211] [cursor=pointer]:
+                  - paragraph [ref=e213]: SaaS
+                - option "Coaching" [ref=e214] [cursor=pointer]:
+                  - paragraph [ref=e216]: Coaching
+                - option "Other" [ref=e217] [cursor=pointer]:
+                  - paragraph [ref=e219]: Other
+          - text: This field is required
+        - generic [ref=e167]:
+          - generic [ref=e168]: How big is your team? *
+          - button "Select" [ref=e170] [cursor=pointer]:
+            - generic [ref=e171]:
+              - paragraph [ref=e173]: Select
+              - img [ref=e174]
+          - text: This field is required
+        - paragraph [ref=e38]:
+          - text: By entering your information, you consent to your data being saved in accordance with our
+          - link "Terms" [ref=e39] [cursor=pointer]:
+            - /url: https://www.iclosed.io/invitee-terms
+          - text: "&"
+          - link "Privacy Policy" [ref=e40] [cursor=pointer]:
+            - /url: https://iclosed.io/privacy-policy
+          - text: .
+        - button "Continue" [ref=e41] [cursor=pointer]:
+          - text: Continue
+          - img [ref=e42]
+    - generic [ref=e45]:
+      - generic [ref=e48]:
+        - generic [ref=e49]:
+          - paragraph [ref=e50]: March 2026
+          - generic [ref=e51]:
+            - button "calendar backward" [disabled] [ref=e52]:
+              - img [ref=e53]
+            - button "calendar forward" [disabled] [ref=e55]:
+              - img [ref=e56]
+        - generic [ref=e58]:
+          - generic [ref=e59]:
+            - button "Sun 1" [disabled] [ref=e60]:
+              - paragraph [ref=e61]: Sun
+              - paragraph [ref=e62]: "1"
+            - button "Mon 2" [disabled] [ref=e63]:
+              - paragraph [ref=e64]: Mon
+              - paragraph [ref=e65]: "2"
+            - button "Tue 3" [disabled] [ref=e66]:
+              - paragraph [ref=e67]: Tue
+              - paragraph [ref=e68]: "3"
+            - button "Wed 4" [disabled] [ref=e69]:
+              - paragraph [ref=e70]: Wed
+              - paragraph [ref=e71]: "4"
+            - button "Thu 5" [disabled] [ref=e72]:
+              - paragraph [ref=e73]: Thu
+              - paragraph [ref=e74]: "5"
+          - generic [ref=e75]:
+            - button "Eastern Time - Canada (Toronto) (12:06 AM)" [ref=e78] [cursor=pointer]:
+              - img [ref=e79]
+              - generic [ref=e81]: Eastern Time - Canada (Toronto) (12:06 AM)
+              - img [ref=e82]
+            - generic [ref=e198]:
+              - button "12h" [disabled] [ref=e200]
+              - button "24h" [ref=e202] [cursor=pointer]
+          - region "scrollable content" [ref=e93]:
+            - generic [ref=e95]:
+              - button "09:00 AM" [ref=e97] [cursor=pointer]
+              - button "10:00 AM" [ref=e99] [cursor=pointer]
+              - button "11:00 AM" [ref=e101] [cursor=pointer]
+              - button "12:00 PM" [ref=e103] [cursor=pointer]
+              - button "01:00 PM" [ref=e105] [cursor=pointer]
+              - button "02:00 PM" [ref=e107] [cursor=pointer]
+              - button "03:00 PM" [ref=e109] [cursor=pointer]
+              - button "04:00 PM" [ref=e111] [cursor=pointer]
+              - button "05:00 PM" [ref=e113] [cursor=pointer]
+      - paragraph [ref=e116]: Please fill out the form before choosing your time slot.
+  - paragraph [ref=e117]:
+    - link "Powered by" [ref=e118] [cursor=pointer]:
+      - /url: https://www.iclosed.io?utm_campaign=sign_up&utm_medium=widget&utm_source=https://app.iclosed.io&utm_event=timkeen/li-growth
+      - text: Powered by
+      - img [ref=e119]
