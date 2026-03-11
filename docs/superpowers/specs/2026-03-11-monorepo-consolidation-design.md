@@ -85,7 +85,7 @@ mas-platform/
 │   │   ├── status-code.ts              getStatusCode() helper for route error handling
 │   │   └── index.ts
 │   │
-│   └── integrations/                   @mas/integrations (tsup build, ESM+CJS)
+│   └── integrations/                   @mas/integrations (tsc build, private workspace pkg)
 │       ├── base-client.ts              BaseApiClient (timeout, error handling, typed responses)
 │       ├── plusvibe.ts                  PlusVibe cold email client
 │       ├── heyreach.ts                 HeyReach LinkedIn automation client
