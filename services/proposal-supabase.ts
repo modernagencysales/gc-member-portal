@@ -68,7 +68,7 @@ export async function getProposalBySlug(slug: string): Promise<Proposal | null> 
 
   if (error || !data) return null;
 
-  // Increment view count in background
+  // Increment view count in background — must never affect the return value
   supabase
     .from('proposals')
     .update({
@@ -76,8 +76,9 @@ export async function getProposalBySlug(slug: string): Promise<Proposal | null> 
       last_viewed_at: new Date().toISOString(),
     })
     .eq('id', data.id)
-    .then(() => {})
-    .catch((err) => logError('proposal:updateViewCount', err, { proposalId: data.id }));
+    .then(({ error: updateErr }) => {
+      if (updateErr) logError('proposal:updateViewCount', updateErr, { proposalId: data.id });
+    });
 
   return mapProposal(data as Record<string, unknown>);
 }

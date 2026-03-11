@@ -5,6 +5,7 @@ export function initSentry() {
   const dsn = import.meta.env.VITE_SENTRY_DSN;
 
   if (!dsn) {
+    // eslint-disable-next-line no-console
     console.warn('Sentry DSN not configured. Error tracking disabled.');
     return;
   }
@@ -38,6 +39,7 @@ export function initSentry() {
     beforeSend(event) {
       // Don't send events in development
       if (import.meta.env.DEV) {
+        // eslint-disable-next-line no-console
         console.error('Sentry event (not sent in dev):', event);
         return null;
       }

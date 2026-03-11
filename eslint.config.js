@@ -104,7 +104,7 @@ export default [
       'react-hooks/exhaustive-deps': 'warn',
 
       // General
-      'no-console': ['warn', { allow: ['warn', 'error', 'log'] }],
+      'no-console': 'warn',
       'no-unused-vars': 'off', // Use TypeScript's version
       'no-useless-escape': 'warn',
     },

@@ -26,6 +26,7 @@ function reportMetric(metric: Metric) {
   if (import.meta.env.DEV) {
     const color = rating === 'good' ? 'green' : rating === 'needs-improvement' ? 'orange' : 'red';
 
+    // eslint-disable-next-line no-console
     console.log(
       `%c[Web Vitals] ${metric.name}: ${metric.value.toFixed(2)} (${rating})`,
       `color: ${color}; font-weight: bold`

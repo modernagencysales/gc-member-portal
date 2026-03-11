@@ -11,6 +11,7 @@ export function logError(
   error: unknown,
   metadata?: Record<string, unknown>
 ): void {
+  // eslint-disable-next-line no-console
   console.error(`[${context}]`, error, metadata ?? '');
 
   if (import.meta.env.PROD) {
@@ -31,6 +32,7 @@ export function logWarn(
   message: string,
   metadata?: Record<string, unknown>
 ): void {
+  // eslint-disable-next-line no-console
   console.warn(`[${context}]`, message, metadata ?? '');
 
   if (import.meta.env.PROD) {
