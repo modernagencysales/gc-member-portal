@@ -1,20 +1,24 @@
+/** ProfileRewriteCard. Displays profile rewrite output in the client portal. Never calls supabase directly. */
+
 import React, { useEffect, useState } from 'react';
 import { fetchAutomationOutput } from '../../services/dfy-service';
 import { logError } from '../../lib/logError';
+import {
+  normalizeRewriteOutput,
+  getHeadlineEntries,
+  type ProfileRewriteData,
+} from './profile-rewrite-utils';
 
-interface ProfileRewriteOutput {
-  headline_options?: string[];
-  about_section?: string;
-  featured_suggestions?: string[];
-  banner_concept?: string;
-}
+// ─── Props ──────────────────────────────────────────
 
 interface ProfileRewriteCardProps {
   portalSlug: string;
 }
 
+// ─── Component ──────────────────────────────────────
+
 const ProfileRewriteCard: React.FC<ProfileRewriteCardProps> = ({ portalSlug }) => {
-  const [output, setOutput] = useState<ProfileRewriteOutput | null>(null);
+  const [output, setOutput] = useState<ProfileRewriteData | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -22,7 +26,7 @@ const ProfileRewriteCard: React.FC<ProfileRewriteCardProps> = ({ portalSlug }) =
       try {
         const data = await fetchAutomationOutput(portalSlug, 'profile_rewrite');
         if (data?.output) {
-          setOutput(data.output as ProfileRewriteOutput);
+          setOutput(normalizeRewriteOutput(data.output));
         }
       } catch (err) {
         logError('ProfileRewriteCard:fetchAutomationOutput', err);
@@ -43,24 +47,29 @@ const ProfileRewriteCard: React.FC<ProfileRewriteCardProps> = ({ portalSlug }) =
 
   if (!output) return null;
 
+  const headlineEntries = getHeadlineEntries(output.headlines);
+
   return (
     <div className="rounded-lg border border-gray-200 dark:border-zinc-700 p-5 space-y-4">
       <h3 className="text-sm font-semibold text-gray-700 dark:text-zinc-300">
         LinkedIn Profile Rewrite
       </h3>
 
-      {output.headline_options && output.headline_options.length > 0 && (
+      {headlineEntries.length > 0 && (
         <div>
           <p className="text-xs font-medium text-gray-500 dark:text-zinc-400 mb-1.5">
             Headline Options
           </p>
           <ul className="space-y-1.5">
-            {output.headline_options.map((h, i) => (
+            {headlineEntries.map(({ key, label, value }) => (
               <li
-                key={i}
+                key={key}
                 className="text-sm text-gray-900 dark:text-zinc-100 bg-gray-50 dark:bg-zinc-800 rounded px-3 py-2"
               >
-                {h}
+                <span className="text-xs font-medium text-gray-400 dark:text-zinc-500 mr-1.5">
+                  {label}:
+                </span>
+                {value}
               </li>
             ))}
           </ul>

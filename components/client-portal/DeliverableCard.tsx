@@ -7,13 +7,7 @@ import {
 } from '../../services/dfy-service';
 import { logError } from '../../lib/logError';
 import ProfileRewriteModal from './ProfileRewriteModal';
-
-interface ProfileRewriteOutput {
-  headline_options?: string[];
-  about_section?: string;
-  featured_suggestions?: string[];
-  banner_concept?: string;
-}
+import { normalizeRewriteOutput, type ProfileRewriteData } from './profile-rewrite-utils';
 
 // ── Status config ──────────────────────────────────────
 const STATUS_CONFIG: Record<string, { label: string; bg: string; text: string }> = {
@@ -92,7 +86,7 @@ const DeliverableCard: React.FC<DeliverableCardProps> = ({
 
   const isReview = deliverable.status === 'review' && portalSlug;
 
-  const [rewriteOutput, setRewriteOutput] = useState<ProfileRewriteOutput | null>(null);
+  const [rewriteOutput, setRewriteOutput] = useState<ProfileRewriteData | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [loadingOutput, setLoadingOutput] = useState(false);
 
@@ -105,7 +99,7 @@ const DeliverableCard: React.FC<DeliverableCardProps> = ({
     setLoadingOutput(true);
     fetchAutomationOutput(portalSlug, 'profile_rewrite')
       .then((data) => {
-        if (data?.output) setRewriteOutput(data.output as ProfileRewriteOutput);
+        if (data?.output) setRewriteOutput(normalizeRewriteOutput(data.output));
       })
       .catch((err) => logError('DeliverableCard:fetchAutomationOutput', err))
       .finally(() => setLoadingOutput(false));
@@ -292,9 +286,9 @@ const DeliverableCard: React.FC<DeliverableCardProps> = ({
       {/* ── Profile Rewrite Preview ─────────────── */}
       {canShowOutput && rewriteOutput && (
         <div className="mt-3 pt-3 border-t border-gray-100 dark:border-zinc-800 space-y-2">
-          {rewriteOutput.headline_options?.[0] && (
+          {rewriteOutput.headlines?.outcome_based && (
             <p className="text-sm text-gray-900 dark:text-zinc-100 font-medium">
-              {rewriteOutput.headline_options[0]}
+              {rewriteOutput.headlines.outcome_based}
             </p>
           )}
           {rewriteOutput.about_section && (

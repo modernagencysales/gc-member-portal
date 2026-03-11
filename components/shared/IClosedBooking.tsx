@@ -132,7 +132,7 @@ function buildIClosedUrl(
   if (options?.leadEmail) params.set('iclosedEmail', options.leadEmail);
   const normalizedPhone = normalizePhone(options?.leadPhone);
   if (normalizedPhone) params.set('iclosedPhone', normalizedPhone);
-  if (options?.leadLinkedinUrl) params.set('linkedinUrl', options.leadLinkedinUrl);
+  if (options?.leadLinkedinUrl) params.set('linkedinurl', options.leadLinkedinUrl);
 
   // Add qualification data as custom identifiers
   if (options?.qualificationData) {
@@ -251,7 +251,7 @@ export function useIClosedLiftWidget(
             if (lead.email) url.searchParams.set('iclosedEmail', lead.email);
             const liftPhone = normalizePhone(lead.phone);
             if (liftPhone) url.searchParams.set('iclosedPhone', liftPhone);
-            if (lead.linkedinUrl) url.searchParams.set('linkedinUrl', lead.linkedinUrl);
+            if (lead.linkedinUrl) url.searchParams.set('linkedinurl', lead.linkedinUrl);
             if (lead.qualificationData) {
               for (const [key, value] of Object.entries(lead.qualificationData)) {
                 if (value) url.searchParams.set(key, value);

@@ -1,22 +1,39 @@
-import React from 'react';
+/** ProfileRewriteModal. Full-screen modal displaying complete profile rewrite output. */
 
-interface ProfileRewriteOutput {
-  headline_options?: string[];
-  about_section?: string;
-  featured_suggestions?: string[];
-  banner_concept?: string;
-}
+import React, { useEffect, useCallback } from 'react';
+import { getHeadlineEntries, type ProfileRewriteData } from './profile-rewrite-utils';
+
+// ─── Props ──────────────────────────────────────────
 
 interface ProfileRewriteModalProps {
-  output: ProfileRewriteOutput;
+  output: ProfileRewriteData;
   onClose: () => void;
 }
 
+// ─── Component ──────────────────────────────────────
+
 const ProfileRewriteModal: React.FC<ProfileRewriteModalProps> = ({ output, onClose }) => {
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    },
+    [onClose]
+  );
+
+  useEffect(() => {
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [handleKeyDown]);
+
+  const headlineEntries = getHeadlineEntries(output.headlines);
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
       onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-label="LinkedIn Profile Rewrite"
     >
       <div
         className="relative w-full max-w-2xl max-h-[85vh] overflow-y-auto bg-white dark:bg-zinc-900 rounded-xl shadow-xl mx-4"
@@ -30,6 +47,7 @@ const ProfileRewriteModal: React.FC<ProfileRewriteModalProps> = ({ output, onClo
           <button
             onClick={onClose}
             className="text-gray-400 dark:text-zinc-500 hover:text-gray-600 dark:hover:text-zinc-300 transition-colors"
+            aria-label="Close"
           >
             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path
@@ -45,18 +63,21 @@ const ProfileRewriteModal: React.FC<ProfileRewriteModalProps> = ({ output, onClo
         {/* Content */}
         <div className="px-6 py-5 space-y-5">
           {/* Headline Options */}
-          {output.headline_options && output.headline_options.length > 0 && (
+          {headlineEntries.length > 0 && (
             <div>
               <p className="text-xs font-medium text-gray-500 dark:text-zinc-400 mb-1.5">
                 Headline Options
               </p>
               <ul className="space-y-1.5">
-                {output.headline_options.map((h, i) => (
+                {headlineEntries.map(({ key, label, value }) => (
                   <li
-                    key={i}
+                    key={key}
                     className="text-sm text-gray-900 dark:text-zinc-100 bg-gray-50 dark:bg-zinc-800 rounded px-3 py-2"
                   >
-                    {h}
+                    <span className="text-xs font-medium text-gray-400 dark:text-zinc-500 mr-1.5">
+                      {label}:
+                    </span>
+                    {value}
                   </li>
                 ))}
               </ul>

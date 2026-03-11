@@ -1,7 +1,15 @@
 /** DfyEngagementDetail. Root page for a single DFY engagement — orchestrates tabs, header, and child panels. */
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, RefreshCw, AlertCircle, Trash2, FileText, Eye } from 'lucide-react';
+import {
+  ArrowLeft,
+  RefreshCw,
+  AlertCircle,
+  Trash2,
+  FileText,
+  Eye,
+  MessageSquare,
+} from 'lucide-react';
 import { useTheme } from '../../../context/ThemeContext';
 import { DEFAULT_ONBOARDING_CHECKLIST } from '../../../types/dfy-admin-types';
 import DfyStatusBadge from './DfyStatusBadge';
@@ -18,6 +26,7 @@ import ProfileRewriteReviewPanel from './panels/ProfileRewriteReviewPanel';
 import CallTranscriptSection from './panels/CallTranscriptSection';
 import ResourceFilesSection from './panels/ResourceFilesSection';
 import IntakeFormSection from './panels/IntakeFormSection';
+import ContentTab from './ContentTab';
 
 // ─── Component ─────────────────────────────────────────
 const DfyEngagementDetail = () => {
@@ -25,9 +34,9 @@ const DfyEngagementDetail = () => {
   const { isDarkMode } = useTheme();
   const navigate = useNavigate();
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'overview' | 'profile_rewrite' | 'content_call_prep'>(
-    'overview'
-  );
+  const [activeTab, setActiveTab] = useState<
+    'overview' | 'content' | 'profile_rewrite' | 'content_call_prep'
+  >('overview');
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
   const {
@@ -124,12 +133,41 @@ const DfyEngagementDetail = () => {
       </div>
 
       {/* Tab bar */}
-      {(showProfileRewriteTab || showContentCallPrepTab) && (
-        <div className={`flex border-b ${isDarkMode ? 'border-zinc-800' : 'border-zinc-200'}`}>
+      <div className={`flex border-b ${isDarkMode ? 'border-zinc-800' : 'border-zinc-200'}`}>
+        <button
+          onClick={() => setActiveTab('overview')}
+          className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
+            activeTab === 'overview'
+              ? isDarkMode
+                ? 'border-violet-500 text-violet-400'
+                : 'border-violet-600 text-violet-600'
+              : isDarkMode
+                ? 'border-transparent text-zinc-500 hover:text-zinc-300'
+                : 'border-transparent text-zinc-400 hover:text-zinc-600'
+          }`}
+        >
+          Overview
+        </button>
+        <button
+          onClick={() => setActiveTab('content')}
+          className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors flex items-center gap-1.5 ${
+            activeTab === 'content'
+              ? isDarkMode
+                ? 'border-violet-500 text-violet-400'
+                : 'border-violet-600 text-violet-600'
+              : isDarkMode
+                ? 'border-transparent text-zinc-500 hover:text-zinc-300'
+                : 'border-transparent text-zinc-400 hover:text-zinc-600'
+          }`}
+        >
+          <MessageSquare className="w-3.5 h-3.5" />
+          Content
+        </button>
+        {showContentCallPrepTab && (
           <button
-            onClick={() => setActiveTab('overview')}
-            className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
-              activeTab === 'overview'
+            onClick={() => setActiveTab('content_call_prep')}
+            className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors flex items-center gap-1.5 ${
+              activeTab === 'content_call_prep'
                 ? isDarkMode
                   ? 'border-violet-500 text-violet-400'
                   : 'border-violet-600 text-violet-600'
@@ -138,44 +176,28 @@ const DfyEngagementDetail = () => {
                   : 'border-transparent text-zinc-400 hover:text-zinc-600'
             }`}
           >
-            Overview
+            <FileText className="w-3.5 h-3.5" />
+            Content Call Prep
           </button>
-          {showContentCallPrepTab && (
-            <button
-              onClick={() => setActiveTab('content_call_prep')}
-              className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors flex items-center gap-1.5 ${
-                activeTab === 'content_call_prep'
-                  ? isDarkMode
-                    ? 'border-violet-500 text-violet-400'
-                    : 'border-violet-600 text-violet-600'
-                  : isDarkMode
-                    ? 'border-transparent text-zinc-500 hover:text-zinc-300'
-                    : 'border-transparent text-zinc-400 hover:text-zinc-600'
-              }`}
-            >
-              <FileText className="w-3.5 h-3.5" />
-              Content Call Prep
-            </button>
-          )}
-          {showProfileRewriteTab && (
-            <button
-              onClick={() => setActiveTab('profile_rewrite')}
-              className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors flex items-center gap-1.5 ${
-                activeTab === 'profile_rewrite'
-                  ? isDarkMode
-                    ? 'border-violet-500 text-violet-400'
-                    : 'border-violet-600 text-violet-600'
-                  : isDarkMode
-                    ? 'border-transparent text-zinc-500 hover:text-zinc-300'
-                    : 'border-transparent text-zinc-400 hover:text-zinc-600'
-              }`}
-            >
-              <Eye className="w-3.5 h-3.5" />
-              Profile Rewrite Review
-            </button>
-          )}
-        </div>
-      )}
+        )}
+        {showProfileRewriteTab && (
+          <button
+            onClick={() => setActiveTab('profile_rewrite')}
+            className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors flex items-center gap-1.5 ${
+              activeTab === 'profile_rewrite'
+                ? isDarkMode
+                  ? 'border-violet-500 text-violet-400'
+                  : 'border-violet-600 text-violet-600'
+                : isDarkMode
+                  ? 'border-transparent text-zinc-500 hover:text-zinc-300'
+                  : 'border-transparent text-zinc-400 hover:text-zinc-600'
+            }`}
+          >
+            <Eye className="w-3.5 h-3.5" />
+            Profile Rewrite Review
+          </button>
+        )}
+      </div>
 
       {/* Error banner */}
       {error && (
@@ -256,6 +278,9 @@ const DfyEngagementDetail = () => {
           )}
         </>
       )}
+
+      {/* Content tab */}
+      {activeTab === 'content' && engagementId && <ContentTab engagementId={engagementId} />}
 
       {/* Content Call Prep tab */}
       {activeTab === 'content_call_prep' && contentCallPrepDeliverable && (
