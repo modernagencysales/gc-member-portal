@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useLocation } from 'react-router-dom';
 import {
   AlertCircle,
   Check,
@@ -17,38 +16,23 @@ import { FAQAccordionItem, TestimonialInline, SenjaEmbed } from './offer-compone
 import ThemeToggle from './ThemeToggle';
 
 // ============================================
-// Stripe Payment Links — per closer
+// Stripe Payment Link
 // ============================================
 
-const DEFAULT_CHECKOUT_URL =
+const CHECKOUT_URL =
   import.meta.env.VITE_DFY_CHECKOUT_URL || 'https://buy.stripe.com/6oU9AV6bAfm67cF27T0000s';
-
-const CLOSER_CHECKOUT_URLS: Record<string, string> = {
-  VT: 'https://buy.stripe.com/9B6cN71Vkfm6eF75k50000v',
-  CT: 'https://buy.stripe.com/dRm5kF6bAei2bsV3bX0000w',
-};
-
-function getCheckoutUrl(closer?: string): string {
-  if (closer && CLOSER_CHECKOUT_URLS[closer.toUpperCase()]) {
-    return CLOSER_CHECKOUT_URLS[closer.toUpperCase()];
-  }
-  return DEFAULT_CHECKOUT_URL;
-}
 
 // ============================================
 // Inline CTA Component
 // ============================================
 
-const DFYCta: React.FC<{ variant?: 'primary' | 'secondary'; checkoutUrl: string }> = ({
-  variant = 'primary',
-  checkoutUrl,
-}) => {
+const DFYCta: React.FC<{ variant?: 'primary' | 'secondary' }> = ({ variant = 'primary' }) => {
   const isPrimary = variant === 'primary';
 
   return (
     <div className="flex justify-center">
       <a
-        href={checkoutUrl}
+        href={CHECKOUT_URL}
         target="_blank"
         rel="noopener noreferrer"
         className={`inline-block px-8 py-4 rounded-lg font-semibold text-center transition-colors ${
@@ -68,9 +52,6 @@ const DFYCta: React.FC<{ variant?: 'primary' | 'secondary'; checkoutUrl: string 
 // ============================================
 
 const DFYOfferPage: React.FC = () => {
-  const location = useLocation();
-  const closerMatch = location.pathname.match(/\/offer\/dfy-(\w+)/);
-  const checkoutUrl = getCheckoutUrl(closerMatch?.[1]);
   const [openFAQ, setOpenFAQ] = useState<number | null>(null);
 
   const offer = DFY_OFFER;
@@ -97,7 +78,7 @@ const DFYOfferPage: React.FC = () => {
             {offer.subheadline}
           </p>
 
-          <DFYCta variant="primary" checkoutUrl={checkoutUrl} />
+          <DFYCta variant="primary" />
         </section>
 
         <div className="space-y-16 sm:space-y-20">
@@ -413,7 +394,7 @@ const DFYOfferPage: React.FC = () => {
 
           {/* ===== MID-PAGE CTA ===== */}
           <section className="text-center">
-            <DFYCta variant="secondary" checkoutUrl={checkoutUrl} />
+            <DFYCta variant="secondary" />
           </section>
 
           {/* ===== TESTIMONIAL #3 ===== */}
@@ -605,7 +586,7 @@ const DFYOfferPage: React.FC = () => {
                 ))}
               </ul>
 
-              <DFYCta variant="primary" checkoutUrl={checkoutUrl} />
+              <DFYCta variant="primary" />
             </div>
           </section>
 
@@ -638,7 +619,7 @@ const DFYOfferPage: React.FC = () => {
             <p className="text-zinc-600 dark:text-zinc-400 mb-8 max-w-2xl mx-auto">
               Stop building. Start closing. We&rsquo;ll have your lead gen system live in 10 days.
             </p>
-            <DFYCta variant="primary" checkoutUrl={checkoutUrl} />
+            <DFYCta variant="primary" />
           </section>
         </div>
       </div>

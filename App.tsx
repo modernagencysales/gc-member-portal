@@ -281,10 +281,8 @@ const App: React.FC = () => {
         {/* Intro Offer progress tracker (public, client-facing) */}
         <Route path="/intro-offer/:offerId" element={<OfferProgressTracker />} />
 
-        {/* DFY (Done-For-You) offer page — optional closer suffix (e.g. /offer/dfy-VT) */}
+        {/* DFY (Done-For-You) offer page */}
         <Route path="/offer/dfy" element={<DFYOfferPage />} />
-        <Route path="/offer/dfy-VT" element={<DFYOfferPage />} />
-        <Route path="/offer/dfy-CT" element={<DFYOfferPage />} />
 
         {/* DFY Welcome / Post-Payment Onboarding */}
         <Route path="/dfy/welcome" element={<DfyWelcomePage />} />
