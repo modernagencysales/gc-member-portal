@@ -6,6 +6,7 @@ import {
   ServiceProvider,
 } from '../../../../types/infrastructure-types';
 import { buildGtmHeaders } from '../../../../lib/api-config';
+import { logError } from '../../../../lib/logError';
 
 interface Props {
   tier: InfraTier;
@@ -59,7 +60,7 @@ export default function DomainPicker({
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Domain check failed';
       setFetchError(message);
-      console.error('Domain check failed:', err);
+      logError('DomainPicker:handleDomainCheck', err);
     } finally {
       setChecking(false);
     }

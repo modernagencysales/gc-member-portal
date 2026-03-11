@@ -20,6 +20,7 @@ import {
   OnboardingProgressItem,
   ProgressStatus,
 } from '../../../types/gc-types';
+import { logError, logWarn } from '../../../lib/logError';
 
 const OnboardingPage: React.FC = () => {
   const { gcMember } = useAuth();
@@ -50,7 +51,7 @@ const OnboardingPage: React.FC = () => {
         setExpandedCategories(new Set([firstIncomplete.name]));
       }
     } catch (error) {
-      console.error('Failed to load onboarding data:', error);
+      logError('OnboardingPage:loadOnboardingData', error);
     } finally {
       setLoading(false);
     }
@@ -70,11 +71,11 @@ const OnboardingPage: React.FC = () => {
 
   const handleStatusChange = async (item: OnboardingProgressItem, newStatus: ProgressStatus) => {
     if (!gcMember) {
-      console.error('No gcMember found');
+      logWarn('OnboardingPage:handleStatusChange', 'No gcMember found');
       return;
     }
 
-    console.log('Updating progress:', {
+    logWarn('OnboardingPage:handleStatusChange', 'Updating progress', {
       progressId: item.progressId,
       memberId: gcMember.id,
       itemId: item.id,
@@ -108,12 +109,12 @@ const OnboardingPage: React.FC = () => {
 
     try {
       const result = await updateMemberProgress(item.progressId, gcMember.id, item.id, newStatus);
-      console.log('Progress updated successfully:', result);
+      logWarn('OnboardingPage:handleStatusChange', 'Progress updated successfully', { result });
 
       // Reload data to get server state
       await loadOnboardingData();
     } catch (error) {
-      console.error('Failed to update progress:', error);
+      logError('OnboardingPage:handleStatusChange', error);
       // Revert optimistic update on error
       await loadOnboardingData();
     } finally {

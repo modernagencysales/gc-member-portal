@@ -17,6 +17,7 @@ import { LoadingState } from '../../shared/LoadingSpinner';
 import { fetchMemberICP, updateMemberICP } from '../../../services/supabase';
 import { MemberICP } from '../../../types/gc-types';
 import { generateICPSuggestions, ICPSuggestion } from '../../../services/ai';
+import { logError } from '../../../lib/logError';
 
 const ICPPage: React.FC = () => {
   const { gcMember } = useAuth();
@@ -46,7 +47,7 @@ const ICPPage: React.FC = () => {
         setFormData(data);
       }
     } catch (error) {
-      console.error('Failed to load ICP:', error);
+      logError('ICPPage:loadICP', error);
     } finally {
       setLoading(false);
     }
@@ -66,7 +67,7 @@ const ICPPage: React.FC = () => {
       await loadICP();
       setHasChanges(false);
     } catch (error) {
-      console.error('Failed to save ICP:', error);
+      logError('ICPPage:handleSave', error);
     } finally {
       setSaving(false);
     }

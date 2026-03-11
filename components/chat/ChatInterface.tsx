@@ -23,6 +23,7 @@ import { ChatMessage as ChatMessageType, ChatConversation } from '../../types/ch
 import ChatHeader from './ChatHeader';
 import ChatMessage from './ChatMessage';
 import ChatInput from './ChatInput';
+import { logError } from '../../lib/logError';
 
 interface ChatInterfaceProps {
   toolSlug: string;
@@ -129,7 +130,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({
         refetchConversations();
         setEditingConvId(null);
       } catch (err) {
-        console.error('Failed to rename conversation:', err);
+        logError('ChatInterface:handleRenameConversation', err);
       }
     },
     [refetchConversations]

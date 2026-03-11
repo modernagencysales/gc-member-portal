@@ -10,6 +10,7 @@ import IClosedBooking, {
 import { funnelApi } from '../../lib/api/funnel';
 import { getBlueprintSettings } from '../../services/blueprint-supabase';
 import { queryKeys } from '../../lib/queryClient';
+import { logError } from '../../lib/logError';
 
 // ============================================
 // Helpers
@@ -94,7 +95,7 @@ const BlueprintThankYou: React.FC = () => {
       .getQualification(state.email)
       .then(setQualState)
       .catch((err) => {
-        console.error('Failed to fetch qualification:', err);
+        logError('BlueprintThankYou:fetchQualification', err);
         setQualState({ qualified: false, iclosed_event_url: '', phone: '' });
       });
   }, [state?.email]);

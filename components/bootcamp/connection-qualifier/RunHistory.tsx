@@ -6,6 +6,7 @@ import {
   fetchRankingRunsByUser,
   deleteRankingRun,
 } from '../../../services/connection-ranker-supabase';
+import { logError } from '../../../lib/logError';
 
 interface RunHistoryProps {
   userId: string;
@@ -63,7 +64,7 @@ export default function RunHistory({ userId, onSelectRun, onBack }: RunHistoryPr
         const data = await fetchRankingRunsByUser(userId);
         setRuns(data);
       } catch (err) {
-        console.error('Failed to load runs:', err);
+        logError('RunHistory:loadRuns', err);
       } finally {
         setLoading(false);
       }
@@ -77,7 +78,7 @@ export default function RunHistory({ userId, onSelectRun, onBack }: RunHistoryPr
       await deleteRankingRun(runId);
       setRuns((prev) => prev.filter((r) => r.id !== runId));
     } catch (err) {
-      console.error('Failed to delete run:', err);
+      logError('RunHistory:handleDeleteRun', err);
     }
   };
 

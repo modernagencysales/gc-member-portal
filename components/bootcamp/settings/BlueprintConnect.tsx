@@ -10,6 +10,7 @@ import { BootcampStudent } from '../../../types/bootcamp-types';
 import { Prospect, getProspectDisplayName } from '../../../types/blueprint-types';
 import { getProspectBySlug, getProspectById } from '../../../services/blueprint-supabase';
 import { linkStudentToProspect } from '../../../services/bootcamp-supabase';
+import { logError } from '../../../lib/logError';
 
 interface BlueprintConnectProps {
   student: BootcampStudent;
@@ -96,7 +97,7 @@ const BlueprintConnect: React.FC<BlueprintConnectProps> = ({ student, onUpdate }
       // Notify parent to refresh
       onUpdate();
     } catch (err) {
-      console.error('Failed to connect Blueprint:', err);
+      logError('BlueprintConnect:handleConnect', err);
       setError('Failed to connect Blueprint. Please try again.');
     } finally {
       setIsLoading(false);

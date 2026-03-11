@@ -3,6 +3,7 @@ import { useOutletContext } from 'react-router-dom';
 import { ExternalLink, Loader2 } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import { Affiliate, AffiliateStats } from '../../types/affiliate-types';
+import { logError } from '../../lib/logError';
 
 const AffiliateSettingsPage: React.FC = () => {
   const { affiliate } = useOutletContext<{ affiliate: Affiliate; stats: AffiliateStats }>();
@@ -23,7 +24,7 @@ const AffiliateSettingsPage: React.FC = () => {
       const data = await res.json();
       if (data.url) window.open(data.url, '_blank');
     } catch (err) {
-      console.error('Failed to open Stripe dashboard:', err);
+      logError('AffiliateSettingsPage:openStripeDashboard', err);
     } finally {
       setLoadingStripe(false);
     }

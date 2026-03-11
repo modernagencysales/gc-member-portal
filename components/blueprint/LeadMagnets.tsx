@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { Copy, Check, X } from 'lucide-react';
 import { Prospect, LeadMagnetCard } from '../../types/blueprint-types';
+import { logError } from '../../lib/logError';
 
 // ============================================
 // Types
@@ -35,7 +36,7 @@ const CopyButton: React.FC<CopyButtonProps> = ({ text }) => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
-      console.error('Failed to copy text:', err);
+      logError('LeadMagnets:handleCopy', err);
     }
   };
 

@@ -13,6 +13,7 @@ import {
   ClientLogo,
 } from '../../../services/blueprint-supabase';
 import { queryKeys } from '../../../lib/queryClient';
+import { logError } from '../../../lib/logError';
 
 interface BlueprintSettingsModalProps {
   isOpen: boolean;
@@ -105,7 +106,7 @@ const BlueprintSettingsModal: React.FC<BlueprintSettingsModalProps> = ({ isOpen,
       }, 2000);
     },
     onError: (error) => {
-      console.error('Failed to save settings:', error);
+      logError('BlueprintSettingsModal:save', error);
     },
   });
 
@@ -180,7 +181,7 @@ const BlueprintSettingsModal: React.FC<BlueprintSettingsModalProps> = ({ isOpen,
       setNewLogoUrl('');
       queryClient.invalidateQueries({ queryKey: ['clientLogos'] });
     } catch (err) {
-      console.error('Failed to add logo:', err);
+      logError('BlueprintSettingsModal:handleAddLogo', err);
     } finally {
       setLogoSaving(false);
     }
@@ -192,7 +193,7 @@ const BlueprintSettingsModal: React.FC<BlueprintSettingsModalProps> = ({ isOpen,
       setLogos((prev) => prev.filter((l) => l.id !== id));
       queryClient.invalidateQueries({ queryKey: ['clientLogos'] });
     } catch (err) {
-      console.error('Failed to delete logo:', err);
+      logError('BlueprintSettingsModal:handleDeleteLogo', err);
     }
   };
 
@@ -204,7 +205,7 @@ const BlueprintSettingsModal: React.FC<BlueprintSettingsModalProps> = ({ isOpen,
       );
       queryClient.invalidateQueries({ queryKey: ['clientLogos'] });
     } catch (err) {
-      console.error('Failed to toggle logo:', err);
+      logError('BlueprintSettingsModal:handleToggleLogoVisibility', err);
     }
   };
 
@@ -236,7 +237,7 @@ const BlueprintSettingsModal: React.FC<BlueprintSettingsModalProps> = ({ isOpen,
       }
       queryClient.invalidateQueries({ queryKey: ['clientLogos'] });
     } catch (err) {
-      console.error('Bulk upload failed:', err);
+      logError('BlueprintSettingsModal:handleBulkUpload', err);
       const message = err instanceof Error ? err.message : 'Upload failed';
       setBulkUploadError(`Failed after ${uploaded} of ${files.length}: ${message}`);
     } finally {

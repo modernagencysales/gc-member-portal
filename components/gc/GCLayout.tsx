@@ -5,6 +5,7 @@ import GCHeader from './GCHeader';
 import { useTheme } from '../../context/ThemeContext';
 import { useAuth } from '../../context/AuthContext';
 import { fetchOnboardingWithProgress } from '../../services/supabase';
+import { logError } from '../../lib/logError';
 
 const routeTitles: Record<string, string> = {
   '/portal': 'Dashboard',
@@ -32,7 +33,7 @@ const GCLayout: React.FC = () => {
           const { totalProgress } = await fetchOnboardingWithProgress(gcMember.id, gcMember.plan);
           setOnboardingProgress(totalProgress);
         } catch (error) {
-          console.error('Failed to load onboarding progress:', error);
+          logError('GCLayout:loadOnboardingProgress', error);
         }
       }
     };

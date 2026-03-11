@@ -12,6 +12,7 @@ import {
 } from '../../../types/bootcamp-types';
 import { getProspectByEmail } from '../../../services/blueprint-supabase';
 import type { Prospect } from '../../../types/blueprint-types';
+import { logWarn } from '../../../lib/logError';
 
 interface OnboardingSurveyProps {
   initialData?: BootcampSurveyFormData;
@@ -264,7 +265,7 @@ const OnboardingSurvey: React.FC<OnboardingSurveyProps> = ({
         setShowBlueprintBanner(true);
       } catch (err) {
         // Non-blocking: if lookup fails, just show empty form
-        console.log('Blueprint lookup skipped:', err);
+        logWarn('OnboardingSurvey:lookupBlueprint', 'Blueprint lookup skipped (non-blocking)');
       }
     };
 

@@ -28,6 +28,7 @@ import {
 import { AITool, AIToolInput, formatCategoryLabel } from '../../../../types/chat-types';
 import AIToolModal from './AIToolModal';
 import BulkEditModal from './BulkEditModal';
+import { logError } from '../../../../lib/logError';
 import {
   Plus,
   Search,
@@ -276,7 +277,7 @@ const AdminAIToolsPage: React.FC = () => {
       setIsModalOpen(false);
       setEditingTool(null);
     } catch (err) {
-      console.error('Failed to save AI tool:', err);
+      logError('AdminAIToolsPage:handleSaveTool', err);
       window.alert(`Failed to save tool: ${err instanceof Error ? err.message : 'Unknown error'}`);
     }
   };
@@ -287,7 +288,7 @@ const AdminAIToolsPage: React.FC = () => {
         await deleteMutation.mutateAsync(deletingTool.id);
         setDeletingTool(null);
       } catch (err) {
-        console.error('Failed to delete AI tool:', err);
+        logError('AdminAIToolsPage:handleDeleteTool', err);
         window.alert(
           `Failed to delete tool: ${err instanceof Error ? err.message : 'Unknown error'}`
         );
@@ -302,7 +303,7 @@ const AdminAIToolsPage: React.FC = () => {
         updates: { isActive: !tool.isActive },
       });
     } catch (err) {
-      console.error('Failed to toggle tool:', err);
+      logError('AdminAIToolsPage:handleToggleActive', err);
       window.alert(
         `Failed to update tool: ${err instanceof Error ? err.message : 'Unknown error'}`
       );
@@ -345,7 +346,7 @@ const AdminAIToolsPage: React.FC = () => {
       setSelectedToolIds(new Set());
       setIsBulkEditModalOpen(false);
     } catch (err) {
-      console.error('Failed to bulk update tools:', err);
+      logError('AdminAIToolsPage:handleBulkUpdate', err);
       window.alert(
         `Failed to update tools: ${err instanceof Error ? err.message : 'Unknown error'}`
       );

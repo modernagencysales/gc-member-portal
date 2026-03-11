@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Copy, Check, Info } from 'lucide-react';
 import { Prospect } from '../../types/blueprint-types';
+import { logError } from '../../lib/logError';
 
 // ============================================
 // Types
@@ -60,7 +61,7 @@ const CopyButton: React.FC<CopyButtonProps> = ({ text, label = 'Copy' }) => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
-      console.error('Failed to copy text:', err);
+      logError('ProfileRewrite:handleCopy', err);
     }
   };
 

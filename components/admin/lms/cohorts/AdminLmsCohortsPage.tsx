@@ -27,6 +27,7 @@ import {
   FileEdit,
   Upload,
 } from 'lucide-react';
+import { logError } from '../../../../lib/logError';
 import CsvImportModal from '../curriculum/CsvImportModal';
 
 const AdminLmsCohortsPage: React.FC = () => {
@@ -106,7 +107,7 @@ const AdminLmsCohortsPage: React.FC = () => {
       setIsModalOpen(false);
       setEditingCohort(null);
     } catch (err) {
-      console.error('Failed to save cohort:', err);
+      logError('AdminLmsCohortsPage:handleSaveCohort', err);
       window.alert(
         `Failed to save cohort: ${err instanceof Error ? err.message : 'Unknown error'}`
       );
@@ -119,7 +120,7 @@ const AdminLmsCohortsPage: React.FC = () => {
         await deleteMutation.mutateAsync(deletingCohort.id);
         setDeletingCohort(null);
       } catch (err) {
-        console.error('Failed to delete cohort:', err);
+        logError('AdminLmsCohortsPage:handleDeleteCohort', err);
         window.alert(
           `Failed to delete cohort: ${err instanceof Error ? err.message : 'Unknown error'}`
         );
@@ -135,7 +136,7 @@ const AdminLmsCohortsPage: React.FC = () => {
         updates: { status: nextStatus },
       });
     } catch (err) {
-      console.error('Failed to toggle status:', err);
+      logError('AdminLmsCohortsPage:handleToggleStatus', err);
       window.alert(
         `Failed to update status: ${err instanceof Error ? err.message : 'Unknown error'}`
       );
@@ -152,7 +153,7 @@ const AdminLmsCohortsPage: React.FC = () => {
         });
         setDuplicatingCohort(null);
       } catch (err) {
-        console.error('Failed to duplicate cohort:', err);
+        logError('AdminLmsCohortsPage:handleDuplicate', err);
         window.alert(
           `Failed to duplicate cohort: ${err instanceof Error ? err.message : 'Unknown error'}`
         );

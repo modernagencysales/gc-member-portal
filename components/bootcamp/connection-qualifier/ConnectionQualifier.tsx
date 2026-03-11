@@ -37,6 +37,7 @@ import type {
 } from '../../../types/connection-qualifier-types';
 import type { MemberICP } from '../../../types/gc-types';
 import { Filter } from 'lucide-react';
+import { logError } from '../../../lib/logError';
 
 const BATCH_SIZE = 50;
 
@@ -168,7 +169,7 @@ export default function ConnectionQualifier({ userId }: ConnectionQualifierProps
         setProcessedSoFar((prev) => prev + batch.length);
         setQualifiedSoFar((prev) => prev + newQualified);
       } catch (err) {
-        console.error(`Batch ${i + 1} failed:`, err);
+        logError('ConnectionQualifier:processBatch', err, { batchIndex: i + 1 });
         batch.forEach((conn) => {
           allResults.push({
             ...conn,
@@ -258,7 +259,7 @@ export default function ConnectionQualifier({ userId }: ConnectionQualifierProps
 
         setAggressiveStep('phase1_review');
       } catch (err) {
-        console.error('Phase 1 failed:', err);
+        logError('ConnectionQualifier:phase1', err);
         if (run) {
           await updateRunStatus(run.id, 'failed').catch(() => {});
         }

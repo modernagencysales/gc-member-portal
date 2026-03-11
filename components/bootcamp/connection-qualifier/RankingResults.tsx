@@ -21,6 +21,7 @@ import {
   fetchResultsForExport,
   updateUserOverride,
 } from '../../../services/connection-ranker-supabase';
+import { logError } from '../../../lib/logError';
 
 interface RankingResultsProps {
   run: RankingRun;
@@ -174,7 +175,7 @@ export default function RankingResults({ run, onStartOver }: RankingResultsProps
       setResults(r);
       setTotal(t);
     } catch (err) {
-      console.error('Failed to load results:', err);
+      logError('RankingResults:loadResults', err);
     }
   }, [run.id, activeTier, searchQuery, sortAsc, page]);
 
@@ -203,7 +204,7 @@ export default function RankingResults({ run, onStartOver }: RankingResultsProps
         filter === 'removal' ? 'removal-list' : filter === 'keep' ? 'keep-list' : 'all-scores';
       downloadCsv(csv, `connection-ranking-${label}.csv`);
     } catch (err) {
-      console.error('Export failed:', err);
+      logError('RankingResults:handleExport', err);
     } finally {
       setIsExporting(false);
     }

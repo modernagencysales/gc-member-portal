@@ -20,6 +20,7 @@ import { LoadingState } from '../../shared/LoadingSpinner';
 import { fetchMemberCampaigns, updateCampaignMetrics } from '../../../services/supabase';
 import { Campaign, CampaignMetrics } from '../../../types/gc-types';
 import CampaignAnalytics from './CampaignAnalytics';
+import { logError } from '../../../lib/logError';
 
 type ViewMode = 'analytics' | 'list';
 
@@ -45,7 +46,7 @@ const CampaignsPage: React.FC = () => {
       const data = await fetchMemberCampaigns(gcMember.id);
       setCampaigns(data);
     } catch (error) {
-      console.error('Failed to load campaigns:', error);
+      logError('CampaignsPage:loadCampaigns', error);
     } finally {
       setLoading(false);
     }
@@ -57,7 +58,7 @@ const CampaignsPage: React.FC = () => {
       await loadCampaigns();
       setEditingCampaign(null);
     } catch (error) {
-      console.error('Failed to update metrics:', error);
+      logError('CampaignsPage:handleUpdateMetrics', error);
     }
   };
 

@@ -6,6 +6,7 @@ import { useTheme } from '../../../../context/ThemeContext';
 import { useUpdateBootcampSettingMutation } from '../../../../hooks/useBootcampAdminMutations';
 import { BootcampSettings } from '../../../../types/bootcamp-types';
 import { Settings, Video, Sparkles, Info, Save, Bot } from 'lucide-react';
+import { logError, logWarn } from '../../../../lib/logError';
 import FunnelToolPresetsEditor from './FunnelToolPresetsEditor';
 import CallGrantConfigEditor from './CallGrantConfigEditor';
 import SprintProductConfigEditor from './SprintProductConfigEditor';
@@ -38,7 +39,7 @@ const AdminBootcampSettingsPage: React.FC = () => {
     try {
       for (const [key, value] of Object.entries(localSettings)) {
         if (settings?.[key as keyof BootcampSettings] !== value) {
-          console.log(`Saving setting: ${key} = ${value}`);
+          logWarn('AdminBootcampSettingsPage:handleSave', `Saving setting: ${key}`, { key, value });
           await updateMutation.mutateAsync({
             key: key as keyof BootcampSettings,
             value: value as BootcampSettings[keyof BootcampSettings],
@@ -47,7 +48,7 @@ const AdminBootcampSettingsPage: React.FC = () => {
       }
       setHasChanges(false);
     } catch (error) {
-      console.error('Failed to save settings:', error);
+      logError('AdminBootcampSettingsPage:handleSave', error);
       window.alert('Failed to save settings. Check console for details.');
     }
   };

@@ -28,6 +28,7 @@ import {
   Users,
   Filter,
 } from 'lucide-react';
+import { logError } from '../../../../lib/logError';
 
 const AdminBootcampInviteCodesPage: React.FC = () => {
   const { isDarkMode } = useTheme();
@@ -109,7 +110,7 @@ const AdminBootcampInviteCodesPage: React.FC = () => {
       }
       setIsModalOpen(false);
     } catch (err) {
-      console.error('Failed to create invite codes:', err);
+      logError('AdminBootcampInviteCodesPage:handleCreateCodes', err);
       window.alert(
         `Failed to create codes: ${err instanceof Error ? err.message : 'Unknown error'}`
       );
@@ -123,7 +124,7 @@ const AdminBootcampInviteCodesPage: React.FC = () => {
         updates: { status: code.status === 'Active' ? 'Disabled' : 'Active' },
       });
     } catch (err) {
-      console.error('Failed to toggle invite code:', err);
+      logError('AdminBootcampInviteCodesPage:handleToggleStatus', err);
       window.alert(
         `Failed to update code: ${err instanceof Error ? err.message : 'Unknown error'}`
       );
@@ -136,7 +137,7 @@ const AdminBootcampInviteCodesPage: React.FC = () => {
         await deleteMutation.mutateAsync(deletingCode.id);
         setDeletingCode(null);
       } catch (err) {
-        console.error('Failed to delete invite code:', err);
+        logError('AdminBootcampInviteCodesPage:handleDeleteCode', err);
         window.alert(
           `Failed to delete code: ${err instanceof Error ? err.message : 'Unknown error'}`
         );

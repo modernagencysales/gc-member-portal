@@ -7,6 +7,7 @@ import {
   createContentBlock,
 } from '../../../services/blueprint-supabase';
 import { queryKeys } from '../../../lib/queryClient';
+import { logError } from '../../../lib/logError';
 
 interface ContentEditorProps {
   isOpen: boolean;
@@ -260,7 +261,7 @@ const ContentEditor: React.FC<ContentEditorProps> = ({ isOpen, onClose }) => {
         await handleSaveBlock(stickyCta);
       }
     } catch (err) {
-      console.error('Save all failed:', err);
+      logError('ContentEditor:handleSaveAll', err);
     }
   };
 

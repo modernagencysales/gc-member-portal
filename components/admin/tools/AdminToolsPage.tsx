@@ -14,6 +14,7 @@ import ToolFormModal from './ToolFormModal';
 import ConfirmDeleteModal from '../shared/ConfirmDeleteModal';
 import StatusBadge from '../../shared/StatusBadge';
 import { Plus, Pencil, Trash2, ExternalLink } from 'lucide-react';
+import { logError } from '../../../lib/logError';
 
 const AdminToolsPage: React.FC = () => {
   const { isDarkMode } = useTheme();
@@ -52,7 +53,7 @@ const AdminToolsPage: React.FC = () => {
       setIsModalOpen(false);
       setEditingTool(null);
     } catch (err) {
-      console.error('Failed to save tool:', err);
+      logError('AdminToolsPage:handleSaveTool', err);
       window.alert(`Failed to save tool: ${err instanceof Error ? err.message : 'Unknown error'}`);
     }
   };
@@ -63,7 +64,7 @@ const AdminToolsPage: React.FC = () => {
         await deleteMutation.mutateAsync(deletingTool.id);
         setDeletingTool(null);
       } catch (err) {
-        console.error('Failed to delete tool:', err);
+        logError('AdminToolsPage:handleDeleteTool', err);
         window.alert(
           `Failed to delete tool: ${err instanceof Error ? err.message : 'Unknown error'}`
         );

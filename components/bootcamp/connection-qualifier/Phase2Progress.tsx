@@ -12,6 +12,7 @@ import {
   updateRunStatus,
   finalizeRanking,
 } from '../../../services/connection-ranker-supabase';
+import { logError } from '../../../lib/logError';
 
 interface Phase2ProgressProps {
   run: RankingRun;
@@ -97,7 +98,7 @@ export default function Phase2Progress({ run, onComplete, onPause }: Phase2Progr
               await updateEnrichmentFailed(conn.id, result?.error || 'No result returned');
             }
           } catch (err) {
-            console.error(`Enrichment failed for ${conn.id}:`, err);
+            logError('Phase2Progress:enrichConnection', err, { connectionId: conn.id });
             await updateEnrichmentFailed(conn.id, String(err));
           }
 
@@ -135,7 +136,7 @@ export default function Phase2Progress({ run, onComplete, onPause }: Phase2Progr
         if (updatedRun) onCompleteRef.current(updatedRun);
       }
     } catch (err) {
-      console.error('Phase 2 error:', err);
+      logError('Phase2Progress:runPhase2', err);
       setError(String(err));
     } finally {
       runningRef.current = false;

@@ -12,6 +12,7 @@ import {
   generateSlug,
   updateProspectSlug,
 } from '../../../services/blueprint-supabase';
+import { logError, logWarn } from '../../../lib/logError';
 
 interface BlueprintDetailPanelProps {
   prospect: Prospect | null;
@@ -70,13 +71,13 @@ const BlueprintDetailPanel: React.FC<BlueprintDetailPanelProps> = ({
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (error) {
-      console.error('Failed to copy URL:', error);
+      logError('BlueprintDetailPanel:handleCopyUrl', error);
     }
   };
 
   const handleGenerateSlug = async () => {
     if (!prospect.fullName && !prospect.firstName) {
-      console.error('Cannot generate slug without a name');
+      logWarn('BlueprintDetailPanel:handleGenerateSlug', 'Cannot generate slug without a name');
       return;
     }
 
@@ -88,7 +89,7 @@ const BlueprintDetailPanel: React.FC<BlueprintDetailPanelProps> = ({
       await updateProspectSlug(prospect.id, slug);
       onUpdate();
     } catch (error) {
-      console.error('Failed to generate slug:', error);
+      logError('BlueprintDetailPanel:handleGenerateSlug', error);
     } finally {
       setIsGeneratingSlug(false);
     }
@@ -105,7 +106,7 @@ const BlueprintDetailPanel: React.FC<BlueprintDetailPanelProps> = ({
       setHasChanges(false);
       onUpdate(updated);
     } catch (error) {
-      console.error('Failed to save changes:', error);
+      logError('BlueprintDetailPanel:handleSave', error);
     } finally {
       setIsSaving(false);
     }

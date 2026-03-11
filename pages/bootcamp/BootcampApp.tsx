@@ -57,6 +57,7 @@ import { queryKeys } from '../../lib/queryClient';
 import { Menu, X, Terminal, Users, AlertCircle } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import ErrorBoundary from '../../components/shared/ErrorBoundary';
+import { logError } from '../../lib/logError';
 
 const TamBuilder = lazy(() => import('../../components/tam/TamBuilder'));
 const ConnectionQualifier = lazy(
@@ -229,7 +230,7 @@ const BootcampApp: React.FC = () => {
         if (parsed.notes) setTaskNotes(parsed.notes);
         if (parsed.submitted) setSubmittedWeeks(parsed.submitted);
       } catch (e) {
-        console.error('Progress error', e);
+        logError('BootcampApp:loadProgress', e);
       }
     } else {
       setCompletedItems(new Set());
@@ -274,7 +275,7 @@ const BootcampApp: React.FC = () => {
         });
       }
     } catch (error) {
-      console.error('Failed to load curriculum:', error);
+      logError('BootcampApp:loadCurriculum', error);
       if (loadRequestRef.current !== thisLoadId) return;
       setLoadError('Unable to load your content. Please refresh the page to try again.');
     } finally {

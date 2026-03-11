@@ -20,6 +20,7 @@ import { DFY_OFFER } from './dfy-offer-data';
 import { FAQAccordionItem, TestimonialInline, SenjaEmbed } from './offer-components';
 import ThemeToggle from './ThemeToggle';
 import { useIClosedLiftWidget } from '../shared/IClosedBooking';
+import { logError } from '../../lib/logError';
 
 // ============================================
 // Types
@@ -185,7 +186,7 @@ const OfferPage: React.FC = () => {
 
       setData({ prospect, settings });
     } catch (err) {
-      console.error('Failed to load offer data:', err);
+      logError('OfferPage:loadOfferData', err);
       setError(err instanceof Error ? err.message : 'An unexpected error occurred');
     } finally {
       setLoading(false);

@@ -2,6 +2,7 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { createTamJob, fetchTamJobs } from '../services/tam-supabase';
 import { TamJobType, TamJob } from '../types/tam-types';
+import { logWarn } from '../lib/logError';
 
 export type PipelineStep = 'source_companies' | 'qualify' | 'find_contacts';
 export type StepStatus = 'pending' | 'running' | 'completed' | 'failed';
@@ -195,7 +196,10 @@ export function useTamPipeline(): UseTamPipelineReturn {
         try {
           existingJobs = await fetchTamJobs(projectId);
         } catch (err) {
-          console.warn('Failed to fetch existing jobs, proceeding without dedup:', err);
+          logWarn(
+            'useTamPipeline:startPipeline',
+            'Failed to fetch existing jobs, proceeding without dedup'
+          );
         }
 
         for (const stepDef of PIPELINE_STEPS) {

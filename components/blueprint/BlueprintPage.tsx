@@ -41,6 +41,7 @@ import TestimonialQuote from './TestimonialQuote';
 import ThemeToggle from './ThemeToggle';
 import ScrollReveal from './ScrollReveal';
 import { useTenantBranding, getTenantColors } from '../../services/tenant-branding';
+import { logError } from '../../lib/logError';
 
 // ============================================
 // Helpers
@@ -297,7 +298,7 @@ const BlueprintPage: React.FC = () => {
         clientLogos,
       });
     } catch (err) {
-      console.error('Failed to load blueprint data:', err);
+      logError('BlueprintPage:fetchBlueprintData', err);
       setError(err instanceof Error ? err.message : 'An unexpected error occurred');
     } finally {
       setLoading(false);
@@ -316,7 +317,7 @@ const BlueprintPage: React.FC = () => {
       .getQualification(data.prospect.email)
       .then(setQualState)
       .catch((err) => {
-        console.error('Failed to fetch qualification:', err);
+        logError('BlueprintPage:fetchQualification', err);
         setQualState({ qualified: true, iclosed_event_url: '', phone: '', source_channel: '' });
       });
   }, [data?.prospect?.email]);

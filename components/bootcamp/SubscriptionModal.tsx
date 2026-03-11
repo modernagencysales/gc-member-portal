@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { X, Sparkles, MessageSquare, Users, Bot } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import { supabase } from '../../lib/supabaseClient';
+import { logError } from '../../lib/logError';
 
 interface SubscriptionModalProps {
   isOpen: boolean;
@@ -37,7 +38,7 @@ const SubscriptionModal: React.FC<SubscriptionModalProps> = ({
         window.location.href = data.url;
       }
     } catch (error) {
-      console.error('Failed to create checkout session:', error);
+      logError('SubscriptionModal:createCheckout', error);
       window.alert('Failed to start checkout. Please try again.');
     } finally {
       setIsLoading(false);

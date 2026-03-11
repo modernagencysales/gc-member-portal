@@ -11,6 +11,7 @@ import type { CsvParseResult } from '../../../../types/cold-email-recipe-types';
 import CsvUploader from './CsvUploader';
 import ColumnMapper from './ColumnMapper';
 import ContactTable from './ContactTable';
+import { logError } from '../../../../lib/logError';
 
 interface Props {
   userId: string;
@@ -98,7 +99,7 @@ export default function ContactListManager({ userId }: Props) {
         setImportError(null);
         setExpandedListId(list.id);
       } catch (err) {
-        console.error('Import failed:', err);
+        logError('ContactListManager:handleImport', err);
         setImportError(err instanceof Error ? err.message : 'Import failed. Please try again.');
       } finally {
         setImporting(false);

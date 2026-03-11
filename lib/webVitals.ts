@@ -22,9 +22,10 @@ function getRating(name: MetricName, value: number): 'good' | 'needs-improvement
 function reportMetric(metric: Metric) {
   const rating = getRating(metric.name as MetricName, metric.value);
 
-  // Log to console in development
+  // Log to console in development (styled output intentionally uses console.log for color formatting)
   if (import.meta.env.DEV) {
     const color = rating === 'good' ? 'green' : rating === 'needs-improvement' ? 'orange' : 'red';
+
     console.log(
       `%c[Web Vitals] ${metric.name}: ${metric.value.toFixed(2)} (${rating})`,
       `color: ${color}; font-weight: bold`

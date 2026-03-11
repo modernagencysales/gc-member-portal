@@ -19,6 +19,7 @@ import {
   SenjaEmbed,
 } from './offer-components';
 import ThemeToggle from './ThemeToggle';
+import { logError } from '../../lib/logError';
 
 // ============================================
 // Helpers
@@ -107,7 +108,7 @@ const GenericOfferPage: React.FC = () => {
       const s = await getBlueprintSettings();
       setSettings(s);
     } catch (err) {
-      console.error('Failed to load offer settings:', err);
+      logError('GenericOfferPage:loadSettings', err);
       setError(err instanceof Error ? err.message : 'An unexpected error occurred');
     } finally {
       setLoading(false);

@@ -24,6 +24,7 @@ import LessonDescription from './LessonDescription';
 import SopLinksCard from './SopLinksCard';
 import LessonNavigation from './LessonNavigation';
 import { BootcampStudent } from '../../types/bootcamp-types';
+import { logError } from '../../lib/logError';
 
 // Preprocess text content to normalize non-standard formatting into proper markdown
 const preprocessTextContent = (content: string): string => {
@@ -228,7 +229,7 @@ const LessonView: React.FC<LessonViewProps> = ({
       setCopiedField(field);
       setTimeout(() => setCopiedField(null), 2000);
     } catch (err) {
-      console.error('Failed to copy:', err);
+      logError('LessonView:handleCopy', err);
     }
   };
 

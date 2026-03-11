@@ -20,6 +20,7 @@ import {
 } from '../../services/blueprint-supabase';
 
 import { GTM_SYSTEM_URL } from '../../lib/api-config';
+import { logError, logWarn } from '../../lib/logError';
 
 const INTAKE_API_URL = `${GTM_SYSTEM_URL}/api/webhooks/blueprint-form`;
 
@@ -949,8 +950,7 @@ const BlueprintLandingPage: React.FC = () => {
         })(),
       };
 
-      console.log('[Blueprint] Submitting to:', INTAKE_API_URL);
-      console.log('[Blueprint] Payload:', payload);
+      logWarn('BlueprintLandingPage:submit', 'Submitting blueprint form', { url: INTAKE_API_URL });
 
       const response = await fetch(INTAKE_API_URL, {
         method: 'POST',
@@ -958,14 +958,19 @@ const BlueprintLandingPage: React.FC = () => {
         body: JSON.stringify(payload),
       });
 
-      console.log('[Blueprint] Response status:', response.status);
+      logWarn('BlueprintLandingPage:submit', 'Blueprint form response received', {
+        status: response.status,
+      });
 
       let data;
       try {
         data = await response.json();
       } catch {
         const text = await response.text().catch(() => '(no body)');
-        console.error('[Blueprint] Non-JSON response:', response.status, text);
+        logError('BlueprintLandingPage:submit', new Error('Non-JSON response'), {
+          status: response.status,
+          text,
+        });
         setError(`Server error (${response.status}). Please try again.`);
         // Re-enable on error so user can retry
         submittingRef.current = false;
@@ -973,7 +978,9 @@ const BlueprintLandingPage: React.FC = () => {
         return;
       }
 
-      console.log('[Blueprint] Response data:', data);
+      logWarn('BlueprintLandingPage:submit', 'Blueprint form response data received', {
+        status: response.status,
+      });
 
       if (response.ok) {
         // Success — keep button disabled, navigate away
@@ -1004,7 +1011,9 @@ const BlueprintLandingPage: React.FC = () => {
           },
         });
       } else {
-        console.error('[Blueprint] Error response:', response.status, data);
+        logError('BlueprintLandingPage:submit', new Error('Error response from server'), {
+          status: response.status,
+        });
         setError(
           data.error ||
             data.message ||
@@ -1015,7 +1024,7 @@ const BlueprintLandingPage: React.FC = () => {
         setIsSubmitting(false);
       }
     } catch (err) {
-      console.error('[Blueprint] Network/fetch error:', err);
+      logError('BlueprintLandingPage:submit', err);
       setError('Something went wrong. Please check your connection and try again.');
       // Re-enable on error so user can retry
       submittingRef.current = false;

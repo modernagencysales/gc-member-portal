@@ -12,6 +12,7 @@ import {
 import ChecklistItemModal from './ChecklistItemModal';
 import ConfirmDeleteModal from '../shared/ConfirmDeleteModal';
 import { Plus, Pencil, Trash2, ChevronUp, ChevronDown, ExternalLink } from 'lucide-react';
+import { logError } from '../../../lib/logError';
 
 const CATEGORY_ORDER: OnboardingCategory[] = [
   'Before Kickoff',
@@ -81,7 +82,7 @@ const AdminOnboardingPage: React.FC = () => {
       setIsModalOpen(false);
       setEditingItem(null);
     } catch (err) {
-      console.error('Failed to save checklist item:', err);
+      logError('AdminOnboardingPage:handleSaveItem', err);
       window.alert(`Failed to save: ${err instanceof Error ? err.message : 'Unknown error'}`);
     }
   };
@@ -92,7 +93,7 @@ const AdminOnboardingPage: React.FC = () => {
         await deleteMutation.mutateAsync(deletingItem.item.id);
         setDeletingItem(null);
       } catch (err) {
-        console.error('Failed to delete checklist item:', err);
+        logError('AdminOnboardingPage:handleDelete', err);
         window.alert(`Failed to delete: ${err instanceof Error ? err.message : 'Unknown error'}`);
       }
     }

@@ -21,6 +21,7 @@ import StudentSurveyModal from './StudentSurveyModal';
 import GenerateBlueprintModal from './GenerateBlueprintModal';
 import { Plus, Search, Filter, RefreshCw, Upload } from 'lucide-react';
 import StudentCsvImportModal from './StudentCsvImportModal';
+import { logError, logWarn } from '../../../../lib/logError';
 
 interface StudentWithProgress extends BootcampStudent {
   onboardingProgress: number;
@@ -120,7 +121,7 @@ const AdminStudentsPage: React.FC = () => {
           studentId = (created as { id: string }).id;
         }
       } catch (err) {
-        console.error('Failed to save student:', err);
+        logError('AdminStudentsPage:handleSaveStudent', err);
         window.alert(
           `Failed to save student: ${err instanceof Error ? err.message : 'Unknown error'}`
         );
@@ -148,7 +149,7 @@ const AdminStudentsPage: React.FC = () => {
           }
         }
       } catch (err) {
-        console.error('Failed to sync enrollments:', err);
+        logError('AdminStudentsPage:syncEnrollments', err);
         window.alert(
           `Student saved but enrollment failed: ${err instanceof Error ? err.message : 'Unknown error'}`
         );
@@ -167,7 +168,7 @@ const AdminStudentsPage: React.FC = () => {
       try {
         await slackMutation.mutateAsync(student.id);
       } catch (error) {
-        console.error('Mark Slack done failed:', error);
+        logError('AdminStudentsPage:handleMarkSlackDone', error);
       } finally {
         setSlackLoadingId(undefined);
       }
@@ -181,7 +182,7 @@ const AdminStudentsPage: React.FC = () => {
       try {
         await calendarMutation.mutateAsync(student.id);
       } catch (error) {
-        console.error('Mark calendar done failed:', error);
+        logError('AdminStudentsPage:handleMarkCalendarDone', error);
       } finally {
         setCalendarLoadingId(undefined);
       }
@@ -191,7 +192,9 @@ const AdminStudentsPage: React.FC = () => {
 
   const handleViewProgress = useCallback((student: BootcampStudent) => {
     // Could open a progress modal or navigate to a detail page
-    console.log('View progress for:', student.id);
+    logWarn('AdminStudentsPage:handleViewProgress', 'View progress not yet implemented', {
+      studentId: student.id,
+    });
   }, []);
 
   const handleViewSurvey = useCallback((student: StudentWithProgress) => {

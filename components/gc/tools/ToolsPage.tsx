@@ -6,6 +6,7 @@ import StatusBadge from '../../shared/StatusBadge';
 import { LoadingState } from '../../shared/LoadingSpinner';
 import { fetchMemberTools } from '../../../services/supabase';
 import { ToolAccess } from '../../../types/gc-types';
+import { logError } from '../../../lib/logError';
 
 // Tool icons/colors mapping
 const toolColors: Record<string, { bg: string; darkBg: string; icon: string }> = {
@@ -35,7 +36,7 @@ const ToolsPage: React.FC = () => {
         const data = await fetchMemberTools(gcMember.id);
         setTools(data);
       } catch (error) {
-        console.error('Failed to load tools:', error);
+        logError('ToolsPage:loadTools', error);
       } finally {
         setLoading(false);
       }

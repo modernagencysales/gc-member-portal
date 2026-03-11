@@ -4,6 +4,7 @@ import { Settings, Search, Filter, RefreshCw, FileText } from 'lucide-react';
 import { listProspects } from '../../../services/blueprint-supabase';
 import { queryKeys } from '../../../lib/queryClient';
 import { useTheme } from '../../../context/ThemeContext';
+import { logError, logWarn } from '../../../lib/logError';
 import { Prospect } from '../../../types/blueprint-types';
 import BlueprintTable from './BlueprintTable';
 import BlueprintDetailPanel from './BlueprintDetailPanel';
@@ -112,10 +113,9 @@ const AdminBlueprintsPage: React.FC = () => {
     const url = `${window.location.origin}/blueprint/${prospect.slug}`;
     try {
       await navigator.clipboard.writeText(url);
-      // TODO: Add toast notification
-      console.log('URL copied:', url);
+      logWarn('AdminBlueprintsPage:handleCopyUrl', 'URL copied', { url });
     } catch (error) {
-      console.error('Failed to copy URL:', error);
+      logError('AdminBlueprintsPage:handleCopyUrl', error);
     }
   };
 

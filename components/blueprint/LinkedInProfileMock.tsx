@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { MapPin, Users, Copy, Check } from 'lucide-react';
 import { Prospect } from '../../types/blueprint-types';
+import { logError } from '../../lib/logError';
 
 // ============================================
 // Types
@@ -41,7 +42,7 @@ const CopyInlineButton: React.FC<{ text: string }> = ({ text }) => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
-      console.error('Failed to copy:', err);
+      logError('LinkedInProfileMock:handleCopy', err);
     }
   };
 

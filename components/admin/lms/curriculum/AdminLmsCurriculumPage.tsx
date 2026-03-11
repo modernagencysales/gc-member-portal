@@ -41,6 +41,7 @@ import InlineAddInput from './InlineAddInput';
 import { ArrowLeft, ChevronDown, AlertCircle, Upload, Download } from 'lucide-react';
 import CsvImportModal from './CsvImportModal';
 import ImportCurriculumModal from './ImportCurriculumModal';
+import { logError } from '../../../../lib/logError';
 
 const AdminLmsCurriculumPage: React.FC = () => {
   const { isDarkMode } = useTheme();
@@ -424,7 +425,7 @@ const AdminLmsCurriculumPage: React.FC = () => {
               }
               setContentModal(null);
             } catch (err) {
-              console.error('Failed to save content item:', err);
+              logError('AdminLmsCurriculumPage:handleSaveContentItem', err);
               window.alert(
                 `Failed to save: ${err instanceof Error ? err.message : 'Unknown error'}`
               );

@@ -14,6 +14,7 @@ import {
 import { ProspectPost } from '../../types/blueprint-types';
 import { getProspectPosts } from '../../services/blueprint-supabase';
 import PostFinalizerPanel from './PostFinalizerPanel';
+import { logError } from '../../lib/logError';
 
 interface MyPostsProps {
   prospectId?: string;
@@ -57,7 +58,7 @@ const MyPosts: React.FC<MyPostsProps> = ({ prospectId, studentId }) => {
         const data = await getProspectPosts(prospectId);
         setPosts(data);
       } catch (err) {
-        console.error('Failed to fetch posts:', err);
+        logError('MyPosts:fetchPosts', err);
         setError('Failed to load your posts. Please try again.');
       } finally {
         setLoading(false);

@@ -15,6 +15,7 @@ import TamDashboard from './TamDashboard';
 import PipelineProgress from './PipelineProgress';
 import TamCsvImport from './TamCsvImport';
 import { ChatInterface } from '../chat';
+import { logError } from '../../lib/logError';
 
 type Phase = 'wizard' | 'pipeline' | 'chat' | 'dashboard' | 'import';
 type TabView = 'strategy' | 'pipeline' | 'list';
@@ -135,7 +136,7 @@ const TamBuilder: React.FC<TamBuilderProps> = ({ userId }) => {
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Unknown error';
       setWizardError(`Failed to create project: ${message}`);
-      console.error('Failed to create TAM project:', err);
+      logError('TamBuilder:handleCreateProject', err);
     } finally {
       setIsCreating(false);
     }

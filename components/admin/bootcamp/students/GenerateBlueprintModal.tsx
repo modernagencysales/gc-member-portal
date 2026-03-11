@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { X, Sparkles, Loader2 } from 'lucide-react';
 import { useTheme } from '../../../../context/ThemeContext';
 import { GTM_SYSTEM_URL } from '../../../../lib/api-config';
+import { logError } from '../../../../lib/logError';
 
 const INTAKE_API_URL = `${GTM_SYSTEM_URL}/api/webhooks/blueprint-form`;
 
@@ -70,7 +71,7 @@ const GenerateBlueprintModal: React.FC<GenerateBlueprintModalProps> = ({
         setError(data.message || data.error || `Request failed with status ${response.status}`);
       }
     } catch (err) {
-      console.error('Blueprint generation failed:', err);
+      logError('GenerateBlueprintModal:handleGenerate', err);
       setError('Network error. Please check the connection and try again.');
     } finally {
       setIsSubmitting(false);

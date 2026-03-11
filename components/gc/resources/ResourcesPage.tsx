@@ -5,6 +5,7 @@ import { useTheme } from '../../../context/ThemeContext';
 import { LoadingState } from '../../shared/LoadingSpinner';
 import { fetchResources } from '../../../services/supabase';
 import { Resource, ResourceCategory, ResourceTool } from '../../../types/gc-types';
+import { logError } from '../../../lib/logError';
 
 const categoryOrder: ResourceCategory[] = [
   'Getting Started',
@@ -45,7 +46,7 @@ const ResourcesPage: React.FC = () => {
         const data = await fetchResources(gcMember.plan);
         setResources(data);
       } catch (error) {
-        console.error('Failed to load resources:', error);
+        logError('ResourcesPage:loadResources', error);
       } finally {
         setLoading(false);
       }

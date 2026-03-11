@@ -3,6 +3,7 @@ import { GCMember, AppMode, AuthState } from '../types/gc-types';
 import { User } from '../types';
 import { verifyGCMember } from '../services/supabase';
 import { verifyUser } from '../services/airtable';
+import { logError } from '../lib/logError';
 
 interface AuthContextType extends AuthState {
   loginGC: (email: string) => Promise<boolean>;
@@ -64,7 +65,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // No saved auth
         setState((prev) => ({ ...prev, isLoading: false }));
       } catch (error) {
-        console.error('Failed to load saved auth:', error);
+        logError('auth:loadSavedAuth', error);
         setState((prev) => ({ ...prev, isLoading: false }));
       }
     };
@@ -99,7 +100,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return false;
       }
     } catch (error) {
-      console.error('GC login failed:', error);
+      logError('auth:loginGC', error);
       setState({
         isAuthenticated: false,
         isLoading: false,
@@ -139,7 +140,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return false;
       }
     } catch (error) {
-      console.error('Bootcamp login failed:', error);
+      logError('auth:loginBootcamp', error);
       setState({
         isAuthenticated: false,
         isLoading: false,

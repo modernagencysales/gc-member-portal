@@ -17,6 +17,7 @@ import type {
 import EnrichmentProgress from './EnrichmentProgress';
 import EmailPreview from './EmailPreview';
 import ExportButton from './ExportButton';
+import { logError } from '../../../../lib/logError';
 
 interface Props {
   userId: string;
@@ -184,7 +185,7 @@ export default function GeneratePanel({ userId }: Props) {
               }
             }
           } catch (err) {
-            console.error('Batch failed:', err);
+            logError('GeneratePanel:processBatch', err);
             for (const c of batch) {
               failedIds.add(c.id);
             }

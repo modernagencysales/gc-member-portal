@@ -36,6 +36,7 @@ import {
   PROSPECT_STATUS_LABELS,
 } from '../../types/blueprint-types';
 import { getProspectById, getProspectByEmail } from '../../services/blueprint-supabase';
+import { logError } from '../../lib/logError';
 
 // ============================================
 // Types
@@ -115,7 +116,7 @@ const MyBlueprint: React.FC<MyBlueprintProps> = ({ student }) => {
           setProspect(data);
         }
       } catch (err) {
-        console.error('Failed to fetch Blueprint data:', err);
+        logError('MyBlueprint:fetchBlueprintData', err);
         if (!cancelled) {
           setError('Failed to load your Blueprint data. Please try again later.');
         }

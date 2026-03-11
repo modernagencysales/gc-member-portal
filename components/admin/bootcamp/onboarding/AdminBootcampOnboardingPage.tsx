@@ -28,6 +28,7 @@ import {
   Eye,
   EyeOff,
 } from 'lucide-react';
+import { logError } from '../../../../lib/logError';
 
 const AdminBootcampOnboardingPage: React.FC = () => {
   const { isDarkMode } = useTheme();
@@ -89,7 +90,7 @@ const AdminBootcampOnboardingPage: React.FC = () => {
       setIsModalOpen(false);
       setEditingItem(null);
     } catch (err) {
-      console.error('Failed to save checklist item:', err);
+      logError('AdminBootcampOnboardingPage:handleSaveItem', err);
       window.alert(`Failed to save: ${err instanceof Error ? err.message : 'Unknown error'}`);
     }
   };
@@ -100,7 +101,7 @@ const AdminBootcampOnboardingPage: React.FC = () => {
         await deleteMutation.mutateAsync(deletingItem.item.id);
         setDeletingItem(null);
       } catch (err) {
-        console.error('Failed to delete checklist item:', err);
+        logError('AdminBootcampOnboardingPage:handleDelete', err);
         window.alert(`Failed to delete: ${err instanceof Error ? err.message : 'Unknown error'}`);
       }
     }
@@ -113,7 +114,7 @@ const AdminBootcampOnboardingPage: React.FC = () => {
         updates: { isVisible: !item.isVisible },
       });
     } catch (err) {
-      console.error('Failed to toggle visibility:', err);
+      logError('AdminBootcampOnboardingPage:handleToggleVisibility', err);
       window.alert(`Failed to update: ${err instanceof Error ? err.message : 'Unknown error'}`);
     }
   };

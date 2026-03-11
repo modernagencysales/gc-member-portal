@@ -12,6 +12,7 @@ import { getProposalById } from '../../../services/proposal-supabase';
 import { queryKeys } from '../../../lib/queryClient';
 import type { ProposalPackageConfig } from '../../../types/proposal-types';
 import type { Prospect } from '../../../types/blueprint-types';
+import { logError } from '../../../lib/logError';
 
 const INPUT_CLASS =
   'w-full px-3 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm';
@@ -92,7 +93,7 @@ const AdminProposalNew: React.FC = () => {
         setTranscriptText(text);
       }
     } catch (err) {
-      console.error('Failed to fetch transcript:', err);
+      logError('AdminProposalNew:fetchTranscript', err);
     } finally {
       setFetchingTranscript(false);
     }

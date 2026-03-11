@@ -33,6 +33,7 @@ import {
   Minus,
   Upload,
 } from 'lucide-react';
+import { logError, logWarn } from '../../../../lib/logError';
 
 interface LmsContentItemModalProps {
   isOpen: boolean;
@@ -81,10 +82,12 @@ const TextContentEditor: React.FC<{
           setShowPreview(true);
         }
         if (result.messages.length > 0) {
-          console.warn('[DOCX Import] Warnings:', result.messages);
+          logWarn('LmsContentItemModal:docxImport', 'DOCX import warnings', {
+            messages: result.messages,
+          });
         }
       } catch (err) {
-        console.error('[DOCX Import] Error:', err);
+        logError('LmsContentItemModal:docxImport', err);
         window.alert('Failed to import DOCX file. Please try again.');
       } finally {
         setImporting(false);

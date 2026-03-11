@@ -11,6 +11,7 @@ import {
 import { BootcampCohort } from '../../../../types/bootcamp-types';
 import CohortModal from './CohortModal';
 import { Plus, Search, RefreshCw, Users, Edit2, Trash2, Archive, CheckCircle } from 'lucide-react';
+import { logError } from '../../../../lib/logError';
 
 const AdminBootcampCohortsPage: React.FC = () => {
   const { isDarkMode } = useTheme();
@@ -86,7 +87,7 @@ const AdminBootcampCohortsPage: React.FC = () => {
       setIsModalOpen(false);
       setEditingCohort(null);
     } catch (err) {
-      console.error('Failed to save cohort:', err);
+      logError('AdminBootcampCohortsPage:handleSaveCohort', err);
       window.alert(
         `Failed to save cohort: ${err instanceof Error ? err.message : 'Unknown error'}`
       );
@@ -99,7 +100,7 @@ const AdminBootcampCohortsPage: React.FC = () => {
         await deleteMutation.mutateAsync(deletingCohort.id);
         setDeletingCohort(null);
       } catch (err) {
-        console.error('Failed to delete cohort:', err);
+        logError('AdminBootcampCohortsPage:handleDeleteCohort', err);
         window.alert(
           `Failed to delete cohort: ${err instanceof Error ? err.message : 'Unknown error'}`
         );
@@ -114,7 +115,7 @@ const AdminBootcampCohortsPage: React.FC = () => {
         updates: { status: cohort.status === 'Active' ? 'Archived' : 'Active' },
       });
     } catch (err) {
-      console.error('Failed to toggle status:', err);
+      logError('AdminBootcampCohortsPage:handleToggleStatus', err);
       window.alert(
         `Failed to update status: ${err instanceof Error ? err.message : 'Unknown error'}`
       );

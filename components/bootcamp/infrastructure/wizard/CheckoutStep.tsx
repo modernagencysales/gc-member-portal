@@ -18,6 +18,7 @@ import type {
   ServiceProvider,
   ProductType,
 } from '../../../../types/infrastructure-types';
+import { logError } from '../../../../lib/logError';
 
 interface CheckoutStepProps {
   userId: string;
@@ -105,7 +106,7 @@ const CheckoutStep: React.FC<CheckoutStepProps> = ({
 
       window.location.href = checkoutData.url;
     } catch (err) {
-      console.error('Checkout error:', err);
+      logError('CheckoutStep:handleCheckout', err);
       setError(err instanceof Error ? err.message : 'Failed to start checkout');
       setIsLoading(false);
     }

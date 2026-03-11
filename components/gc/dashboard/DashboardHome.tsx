@@ -21,6 +21,7 @@ import {
   fetchFeaturedResources,
 } from '../../../services/supabase';
 import { ToolAccess, Campaign, Resource, OnboardingCategoryGroup } from '../../../types/gc-types';
+import { logError } from '../../../lib/logError';
 
 const DashboardHome: React.FC = () => {
   const { gcMember } = useAuth();
@@ -52,7 +53,7 @@ const DashboardHome: React.FC = () => {
         setCampaigns(campaignsData);
         setFeaturedResources(resources);
       } catch (error) {
-        console.error('Failed to load dashboard data:', error);
+        logError('DashboardHome:loadData', error);
       } finally {
         setLoading(false);
       }
