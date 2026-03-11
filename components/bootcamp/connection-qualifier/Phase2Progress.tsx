@@ -66,14 +66,14 @@ export default function Phase2Progress({ run, onComplete, onPause }: Phase2Progr
               connections: [
                 {
                   id: conn.id,
-                  firstName: conn.firstName,
-                  lastName: conn.lastName,
-                  company: conn.company,
-                  position: conn.position,
+                  firstName: conn.firstName ?? '',
+                  lastName: conn.lastName ?? '',
+                  company: conn.company ?? '',
+                  position: conn.position ?? '',
                   deterministicScore: conn.deterministicScore,
                 },
               ],
-              criteria: run.criteria,
+              criteria: run.criteria!,
             });
 
             if (fnError) throw fnError;

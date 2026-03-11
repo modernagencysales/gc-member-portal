@@ -48,14 +48,24 @@ function parsePlainTextFAQ(content: string): FAQItem[] | null {
 }
 
 /**
- * Parse content that could be a string or JSON object
+ * Parse content that could be a string, JSON object, or JSON array of FAQ items.
+ * Handles multiple storage formats:
+ * - JSON object: {title?, body?, items?: FAQItem[]}
+ * - JSON array: [{question, answer}, ...] (ContentEditor saves FAQs this way)
+ * - Plain text: markdown-formatted string
  */
 function parseContent(content: string | undefined): string | ContentWithItems {
-  if (!content) return '';
+  if (!content || content === 'undefined' || content === 'null') return '';
 
   // Try to parse as JSON first
   try {
     const parsed = JSON.parse(content);
+
+    // JSON array of FAQ items — wrap into ContentWithItems format
+    if (Array.isArray(parsed)) {
+      return { items: parsed } as ContentWithItems;
+    }
+
     if (typeof parsed === 'object' && parsed !== null) {
       return parsed as ContentWithItems;
     }

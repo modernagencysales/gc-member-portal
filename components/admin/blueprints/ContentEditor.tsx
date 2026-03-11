@@ -109,24 +109,32 @@ const ContentEditor: React.FC<ContentEditorProps> = ({ isOpen, onClose }) => {
             content: block.content || '',
           });
           break;
-        case 'faqs':
-          try {
-            const items = block.content ? JSON.parse(block.content) : [];
-            setFaqs({
-              id: block.id,
-              title: block.title || 'FAQs',
-              content: block.content || '',
-              items: Array.isArray(items) ? items : [],
-            });
-          } catch {
-            setFaqs({
-              id: block.id,
-              title: block.title || 'FAQs',
-              content: '',
-              items: [],
-            });
+        case 'faqs': {
+          let faqItems: FAQItem[] = [];
+          // Try JSON first (ContentEditor saves as JSON array)
+          if (block.content) {
+            try {
+              const parsed = JSON.parse(block.content);
+              faqItems = Array.isArray(parsed) ? parsed : (parsed?.items ?? []);
+            } catch {
+              // Plain-text markdown format: **Question**\nAnswer separated by \n\n
+              const blocks = block.content.split(/\n\n+/).filter((b: string) => b.trim());
+              for (const b of blocks) {
+                const match = b.match(/^\*\*(.+?)\*\*\s*\n([\s\S]+)$/);
+                if (match) {
+                  faqItems.push({ question: match[1].trim(), answer: match[2].trim() });
+                }
+              }
+            }
           }
+          setFaqs({
+            id: block.id,
+            title: block.title || 'FAQs',
+            content: block.content || '',
+            items: faqItems,
+          });
           break;
+        }
         case 'offer_foundations':
         case 'foundations':
           setOfferFoundations({
