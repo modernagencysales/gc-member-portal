@@ -1,6 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { supabase } from '../lib/supabaseClient';
-import { createTamJob, fetchTamJobs } from '../services/tam-supabase';
+import { createTamJob, fetchTamJobs, invokeTamJob } from '../services/tam-supabase';
 import { TamJobType, TamJob } from '../types/tam-types';
 import { logWarn } from '../lib/logError';
 
@@ -158,9 +157,7 @@ export function useTamPipeline(): UseTamPipelineReturn {
       });
 
       // Invoke the edge function and check for errors
-      const { error: invokeError } = await supabase.functions.invoke('tam-run-job', {
-        body: { jobId: job.id },
-      });
+      const { error: invokeError } = await invokeTamJob(job.id);
 
       if (invokeError) {
         updateStepState(step, { status: 'failed' });

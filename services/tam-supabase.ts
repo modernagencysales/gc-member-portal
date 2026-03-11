@@ -428,6 +428,16 @@ export async function updateTamJob(jobId: string, updates: Partial<TamJob>): Pro
 }
 
 // ============================================
+// Edge Function Wrappers
+// ============================================
+
+export async function invokeTamJob(jobId: string) {
+  return supabase.functions.invoke('tam-run-job', {
+    body: { jobId },
+  });
+}
+
+// ============================================
 // TAM Project Stats
 // ============================================
 

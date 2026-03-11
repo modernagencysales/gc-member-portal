@@ -1,6 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { supabase } from '../lib/supabaseClient';
-import { createTamJob, fetchTamJobs } from '../services/tam-supabase';
+import { createTamJob, fetchTamJobs, invokeTamJob } from '../services/tam-supabase';
 import { TamJob } from '../types/tam-types';
 
 interface UseTamRefineReturn {
@@ -105,9 +104,7 @@ export function useTamRefine(): UseTamRefineReturn {
         });
 
         // Fire-and-forget — don't await the edge function response
-        supabase.functions.invoke('tam-run-job', {
-          body: { jobId: job.id },
-        });
+        invokeTamJob(job.id);
 
         // Poll for completion
         await waitForCompletion(projectId, job.id);

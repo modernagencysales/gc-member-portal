@@ -1,6 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
-import { supabase } from '../lib/supabaseClient';
-import { createTamJob, fetchTamJobs } from '../services/tam-supabase';
+import { createTamJob, fetchTamJobs, invokeTamJob } from '../services/tam-supabase';
 
 const MAX_POLL_ATTEMPTS = 600; // 3s * 600 = 30 minutes
 const MAX_CONSECUTIVE_ERRORS = 10;
@@ -41,9 +40,7 @@ export function useTamLinkedinCheck(): UseTamLinkedinCheckReturn {
         jobType: 'check_linkedin',
       });
 
-      const { error: invokeError } = await supabase.functions.invoke('tam-run-job', {
-        body: { jobId: job.id },
-      });
+      const { error: invokeError } = await invokeTamJob(job.id);
 
       if (invokeError) {
         throw new Error(`Failed to start LinkedIn check: ${invokeError.message}`);
