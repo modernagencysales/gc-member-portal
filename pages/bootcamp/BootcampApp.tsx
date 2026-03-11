@@ -6,12 +6,11 @@ import {
   completeEnrollmentOnboarding,
 } from '../../services/lms-supabase';
 import {
-  verifyBootcampStudent,
   saveBootcampStudentSurvey,
   fetchAllBootcampSettings,
   completeStudentOnboarding,
-  redeemCode,
 } from '../../services/bootcamp-supabase';
+import { useBootcampAuth } from '../../hooks/useBootcampAuth';
 import Sidebar from '../../components/bootcamp/Sidebar';
 import LessonView from '../../components/bootcamp/LessonView';
 import Breadcrumbs from '../../components/bootcamp/Breadcrumbs';
@@ -47,14 +46,9 @@ import RedeemCodeModal from '../../components/bootcamp/RedeemCodeModal';
 import { StudentSettingsModal } from '../../components/bootcamp/settings';
 import { FeedbackWidget } from '../../components/feedback/FeedbackWidget';
 import { CourseData, Lesson, User } from '../../types';
-import {
-  BootcampStudent,
-  BootcampSurveyFormData,
-  OnboardingStep,
-} from '../../types/bootcamp-types';
+import { BootcampSurveyFormData, OnboardingStep } from '../../types/bootcamp-types';
 import { queryKeys } from '../../lib/queryClient';
 import { Menu, X, Terminal, Users, AlertCircle } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
 import ErrorBoundary from '../../components/shared/ErrorBoundary';
 import { logError } from '../../lib/logError';
 
@@ -75,18 +69,10 @@ const IntroOffer = lazy(() => import('../../components/bootcamp/IntroOffer'));
 
 const BootcampApp: React.FC = () => {
   const queryClient = useQueryClient();
-  const { logout } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
 
   // Check for invite code in URL
   const inviteCodeFromUrl = searchParams.get('code');
-  const _isRegisterPath = window.location.pathname.includes('/register');
-
-  // Registration mode state - check URL directly on init
-  const [showRegister, setShowRegister] = useState(() => {
-    const params = new URLSearchParams(window.location.search);
-    return !!params.get('code') || window.location.pathname.includes('/register');
-  });
 
   // Legacy state for curriculum
   const loadRequestRef = useRef(0);
@@ -99,9 +85,28 @@ const BootcampApp: React.FC = () => {
     return localStorage.getItem('gtm_os_theme') === 'dark';
   });
 
-  // User state
-  const [user, setUser] = useState<User | null>(null);
-  const [bootcampStudent, setBootcampStudent] = useState<BootcampStudent | null>(null);
+  // Stable callback refs passed to useBootcampAuth so the hook can call functions
+  // that are defined later in this component without temporal dead zone errors.
+  const loadUserDataRef = useRef<((u: User) => void) | undefined>(undefined);
+  const refetchGrantsRef = useRef<(() => void) | undefined>(undefined);
+
+  // Auth state — managed by hook
+  const {
+    user,
+    setUser,
+    bootcampStudent,
+    setBootcampStudent,
+    showRegister,
+    setShowRegister,
+    handleLogin,
+    handleRegister,
+    handleLogout,
+    handleStudentUpdate,
+  } = useBootcampAuth({
+    loadUserDataRef,
+    refetchGrantsRef,
+    setLoading,
+  });
 
   // Onboarding flow state
   const [onboardingStep, setOnboardingStep] = useState<OnboardingStep>('welcome');
@@ -184,31 +189,6 @@ const BootcampApp: React.FC = () => {
     bootcampStudent.status === 'Onboarding' &&
     !bootcampStudent.onboardingCompletedAt;
 
-  useEffect(() => {
-    const init = async () => {
-      const storedUser = localStorage.getItem('lms_user_obj');
-      if (storedUser) {
-        try {
-          const parsedUser = JSON.parse(storedUser);
-          setUser(parsedUser);
-
-          // Try to find in Supabase first
-          const student = await verifyBootcampStudent(parsedUser.email);
-          if (student) {
-            setBootcampStudent(student);
-          }
-
-          await loadUserData(parsedUser);
-        } catch {
-          localStorage.removeItem('lms_user_obj');
-        }
-      }
-      setLoading(false);
-    };
-    init();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   const getStorageKey = (email: string) => {
     const domain = email.split('@')[1] || 'global';
     return `lms_progress_v2_${domain}`;
@@ -278,6 +258,11 @@ const BootcampApp: React.FC = () => {
     }
   };
 
+  // Wire up callback refs so useBootcampAuth can call loadUserData and refetchGrants
+  // after they are defined. These refs are updated on every render.
+  loadUserDataRef.current = loadUserData;
+  refetchGrantsRef.current = refetchGrants;
+
   // Reload curriculum when active enrollment changes
   useEffect(() => {
     if (!user || !activeEnrollment || showDashboard) return;
@@ -340,67 +325,6 @@ const BootcampApp: React.FC = () => {
     setSubmittedWeeks(newSubmitted);
     saveProgress(completedItems, proofOfWork, taskNotes, newSubmitted);
   };
-
-  const handleLogin = async (newUser: User) => {
-    setUser(newUser);
-    localStorage.setItem('lms_user_obj', JSON.stringify(newUser));
-
-    // Check if user exists in Supabase
-    const student = await verifyBootcampStudent(newUser.email);
-    if (student) {
-      setBootcampStudent(student);
-    }
-
-    loadUserData(newUser);
-  };
-
-  const handleRegister = async (newUser: User) => {
-    setUser(newUser);
-    localStorage.setItem('lms_user_obj', JSON.stringify(newUser));
-
-    // Get the newly created student from Supabase
-    const student = await verifyBootcampStudent(newUser.email);
-    if (student) {
-      setBootcampStudent(student);
-    }
-
-    // Clear the invite code from URL
-    setSearchParams({});
-
-    loadUserData(newUser);
-  };
-
-  // Auto-redeem code from URL when logged in
-  useEffect(() => {
-    const autoRedeem = async () => {
-      if (!bootcampStudent || !inviteCodeFromUrl) return;
-
-      try {
-        const result = await redeemCode(bootcampStudent.id, inviteCodeFromUrl);
-        // Refresh grants after successful redeem
-        refetchGrants();
-
-        // Update user access level if upgraded
-        if (result.accessUpgraded && user) {
-          const updatedUser: User = { ...user, status: 'Full Access' };
-          setUser(updatedUser);
-          localStorage.setItem('lms_user_obj', JSON.stringify(updatedUser));
-
-          const student = await verifyBootcampStudent(user.email);
-          if (student) setBootcampStudent(student);
-        }
-
-        // Clear the code param from URL
-        setSearchParams({});
-      } catch {
-        // Silently ignore (already redeemed or invalid)
-        setSearchParams({});
-      }
-    };
-
-    autoRedeem();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [bootcampStudent?.id, inviteCodeFromUrl]);
 
   const handleShowRegister = () => {
     setShowRegister(true);
@@ -492,16 +416,6 @@ const BootcampApp: React.FC = () => {
     if (!bootcampStudent || !activeCourseId) return;
     await completeEnrollmentOnboarding(bootcampStudent.id, activeCourseId);
     refetchEnrollments();
-  };
-
-  // Handle student update from settings (e.g., Blueprint connection)
-  const handleStudentUpdate = async () => {
-    if (user) {
-      const student = await verifyBootcampStudent(user.email);
-      if (student) {
-        setBootcampStudent(student);
-      }
-    }
   };
 
   // Loading state
@@ -968,10 +882,7 @@ const BootcampApp: React.FC = () => {
         onShowDashboard={() => setShowDashboard(true)}
         onOpenSettings={bootcampStudent ? () => setShowSettingsModal(true) : undefined}
         onToggleTheme={() => setIsDarkMode(!isDarkMode)}
-        onLogout={() => {
-          logout();
-          window.location.reload();
-        }}
+        onLogout={handleLogout}
         isDarkMode={isDarkMode}
         hasMultipleCourses={enrollments.length > 1}
       />
