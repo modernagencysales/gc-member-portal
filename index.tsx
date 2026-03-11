@@ -17,14 +17,6 @@ initSentry();
 // Initialize Web Vitals for performance monitoring
 initWebVitals();
 
-// Enable MSW in development (optional - uncomment to mock API)
-// async function enableMocking() {
-//   if (import.meta.env.DEV) {
-//     const { worker } = await import('./mocks/browser');
-//     return worker.start({ onUnhandledRequest: 'bypass' });
-//   }
-// }
-
 const rootElement = document.getElementById('root');
 if (!rootElement) {
   throw new Error('Could not find root element to mount to');
@@ -32,7 +24,6 @@ if (!rootElement) {
 
 const root = ReactDOM.createRoot(rootElement);
 
-// Render the app (add enableMocking().then() wrapper if using MSW)
 root.render(
   <React.StrictMode>
     <ErrorBoundary>
