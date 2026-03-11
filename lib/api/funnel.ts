@@ -1,30 +1,64 @@
-const GTM_BASE = import.meta.env.VITE_GTM_SYSTEM_URL || 'https://gtmconductor.com';
-const ADMIN_KEY = import.meta.env.VITE_ADMIN_API_KEY;
+import { gtmAdminFetch } from './gtm-fetch';
 
-async function funnelFetch(path: string) {
-  const res = await fetch(`${GTM_BASE}/api/funnel${path}`, {
-    headers: { 'x-admin-key': ADMIN_KEY },
-  });
-  if (!res.ok) throw new Error(`Funnel API error: ${res.status}`);
-  return res.json();
+// ─── Response shapes (GTM API wraps results in { data: [...] }) ───────────────
+
+interface FunnelStage {
+  id: string;
+  slug: string;
+  name: string;
+  display_order: number;
+  color: string;
 }
 
+interface StageMetric {
+  stage_slug: string;
+  stage_name: string;
+  lead_count: number;
+  conversion_rate: number;
+}
+
+interface ChannelAttribution {
+  channel: string;
+  leads: number;
+  qualified: number;
+  calls: number;
+  customers: number;
+  revenue_cents: number;
+}
+
+interface ConfigItem {
+  key: string;
+  value: string;
+  type: 'number' | 'text' | 'url' | 'textarea';
+  label: string;
+  description: string;
+  category: string;
+}
+
+interface QualificationResult {
+  qualification?: { qualified?: boolean; source_channel?: string };
+  iclosed_event_url?: string;
+  phone?: string;
+}
+
+// ─── API ─────────────────────────────────────────────────────────────────────
+
 export const funnelApi = {
-  getStages: () => funnelFetch('/stages'),
+  getStages: () => gtmAdminFetch<{ data: FunnelStage[] }>('/api/funnel/stages'),
   getMetrics: (params?: { channel?: string; from?: string; to?: string }) => {
     const qs = new URLSearchParams();
     if (params?.channel) qs.set('channel', params.channel);
     if (params?.from) qs.set('from', params.from);
     if (params?.to) qs.set('to', params.to);
-    return funnelFetch(`/metrics?${qs}`);
+    return gtmAdminFetch<{ data: StageMetric[] }>(`/api/funnel/metrics?${qs}`);
   },
   getAttribution: (params?: { from?: string; to?: string }) => {
     const qs = new URLSearchParams();
     if (params?.from) qs.set('from', params.from);
     if (params?.to) qs.set('to', params.to);
-    return funnelFetch(`/attribution?${qs}`);
+    return gtmAdminFetch<{ data: ChannelAttribution[] }>(`/api/funnel/attribution?${qs}`);
   },
-  getConfig: () => funnelFetch('/config'),
+  getConfig: () => gtmAdminFetch<{ data: ConfigItem[] }>('/api/funnel/config'),
   getQualification: async (
     email: string
   ): Promise<{
@@ -33,7 +67,9 @@ export const funnelApi = {
     phone: string;
     source_channel: string;
   }> => {
-    const data = await funnelFetch(`/qualification/${encodeURIComponent(email)}`);
+    const data = await gtmAdminFetch<QualificationResult>(
+      `/api/funnel/qualification/${encodeURIComponent(email)}`
+    );
     // Default to qualified=true when no record exists — don't block prospects
     // who haven't been through the qualification process yet
     return {
@@ -43,13 +79,9 @@ export const funnelApi = {
       source_channel: data.qualification?.source_channel || '',
     };
   },
-  updateConfig: async (key: string, value: string) => {
-    const res = await fetch(`${GTM_BASE}/api/funnel/config`, {
+  updateConfig: (key: string, value: string) =>
+    gtmAdminFetch('/api/funnel/config', {
       method: 'PUT',
-      headers: { 'x-admin-key': ADMIN_KEY, 'Content-Type': 'application/json' },
       body: JSON.stringify({ key, value }),
-    });
-    if (!res.ok) throw new Error(`Config update error: ${res.status}`);
-    return res.json();
-  },
+    }),
 };

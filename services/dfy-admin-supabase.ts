@@ -1,4 +1,5 @@
 import { supabase } from '../lib/supabaseClient';
+import { gtmAdminFetch } from '../lib/api/gtm-fetch';
 import type {
   DfyAdminEngagement,
   DfyAdminDeliverable,
@@ -17,29 +18,6 @@ const AUTOMATION_RUN_COLUMNS =
   'id, engagement_id, deliverable_id, automation_type, status, trigger_run_id, error_log, started_at, completed_at, created_at';
 const ACTIVITY_COLUMNS =
   'id, engagement_id, deliverable_id, action, description, actor, metadata, client_visible, created_at';
-
-// ============================================
-// GTM Admin API helper (x-admin-key auth)
-// ============================================
-
-const GTM_API_BASE = import.meta.env.VITE_GTM_SYSTEM_URL || 'https://gtmconductor.com';
-const ADMIN_API_KEY = import.meta.env.VITE_ADMIN_API_KEY;
-
-async function gtmAdminFetch(path: string, options: RequestInit = {}) {
-  const res = await fetch(`${GTM_API_BASE}${path}`, {
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      'x-admin-key': ADMIN_API_KEY,
-      ...options.headers,
-    },
-  });
-  if (!res.ok) {
-    const body = await res.json().catch(() => ({}));
-    throw new Error(body.error || `Request failed: ${res.status}`);
-  }
-  return res.json();
-}
 
 // ============================================
 // Read functions (direct Supabase)
@@ -268,7 +246,9 @@ export async function postEngagementUpdate(engagementId: string, message: string
 export async function fetchIntakeFileUrls(
   engagementId: string
 ): Promise<Array<{ name: string; url: string | null; size: number; type: string }>> {
-  const result = await gtmAdminFetch(`/api/dfy/admin/intake-files/${engagementId}`);
+  const result = await gtmAdminFetch<{
+    files?: Array<{ name: string; url: string | null; size: number; type: string }>;
+  }>(`/api/dfy/admin/intake-files/${engagementId}`);
   return result.files || [];
 }
 
@@ -277,7 +257,9 @@ export async function fetchIntakeFileUrls(
 // ============================================
 
 export async function fetchEngagementFiles(engagementId: string): Promise<DfyIntakeFile[]> {
-  const result = await gtmAdminFetch(`/api/dfy/admin/engagements/${engagementId}/files`);
+  const result = await gtmAdminFetch<{ files?: DfyIntakeFile[] }>(
+    `/api/dfy/admin/engagements/${engagementId}/files`
+  );
   return result.files || [];
 }
 
