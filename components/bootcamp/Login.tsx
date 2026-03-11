@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Mail, ArrowRight, ShieldCheck, Loader2 } from 'lucide-react';
-import { verifyUser } from '../../services/airtable';
 import { verifyBootcampStudent } from '../../services/bootcamp-supabase';
 import { User } from '../../types';
 
@@ -21,10 +20,8 @@ const Login: React.FC<LoginProps> = ({ onLogin, onRegisterClick }) => {
     setLoading(true);
     setError(null);
 
-    // Try Supabase first (new bootcamp students)
     const bootcampStudent = await verifyBootcampStudent(email.trim());
     if (bootcampStudent) {
-      // Convert bootcamp student to User format for compatibility
       const user: User = {
         id: bootcampStudent.id,
         email: bootcampStudent.email,
@@ -32,14 +29,6 @@ const Login: React.FC<LoginProps> = ({ onLogin, onRegisterClick }) => {
         cohort: bootcampStudent.cohort || 'Global',
         status: (bootcampStudent.accessLevel as 'Full Access' | 'Curriculum Only') || 'Full Access',
       };
-      onLogin(user);
-      setLoading(false);
-      return;
-    }
-
-    // Fall back to Airtable (legacy users)
-    const user = await verifyUser(email.trim());
-    if (user) {
       onLogin(user);
     } else {
       setError('Email not found. Please check your spelling.');

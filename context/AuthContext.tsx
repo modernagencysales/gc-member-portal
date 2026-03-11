@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useCallback } fr
 import { GCMember, AppMode, AuthState } from '../types/gc-types';
 import { User } from '../types';
 import { verifyGCMember } from '../services/supabase';
-import { verifyUser } from '../services/airtable';
+import { verifyBootcampStudent } from '../services/bootcamp-supabase';
 import { logError } from '../lib/logError';
 
 interface AuthContextType extends AuthState {
@@ -116,7 +116,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setState((prev) => ({ ...prev, isLoading: true, error: null }));
 
     try {
-      const user = await verifyUser(email);
+      const student = await verifyBootcampStudent(email);
+      const user = student
+        ? {
+            id: student.id,
+            email: student.email,
+            name: student.name || '',
+            cohort: student.cohort || 'Global',
+            status: (student.accessLevel as 'Full Access' | 'Curriculum Only') || 'Full Access',
+          }
+        : null;
 
       if (user) {
         localStorage.setItem(BOOTCAMP_USER_KEY, JSON.stringify(user));

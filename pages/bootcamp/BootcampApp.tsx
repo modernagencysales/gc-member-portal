@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef, lazy, Suspense } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSearchParams } from 'react-router-dom';
-import { fetchCourseData } from '../../services/airtable';
 import {
   fetchStudentCurriculumAsLegacy,
   completeEnrollmentOnboarding,
@@ -100,7 +99,7 @@ const BootcampApp: React.FC = () => {
     return localStorage.getItem('gtm_os_theme') === 'dark';
   });
 
-  // User state (can be legacy Airtable user or Supabase student)
+  // User state
   const [user, setUser] = useState<User | null>(null);
   const [bootcampStudent, setBootcampStudent] = useState<BootcampStudent | null>(null);
 
@@ -244,13 +243,7 @@ const BootcampApp: React.FC = () => {
     try {
       setLoadError(null);
 
-      // Try new Supabase LMS first, fall back to Airtable if no content
-      let data = await fetchStudentCurriculumAsLegacy(cohortName, activeUser.email);
-
-      // If Supabase LMS has no weeks, fall back to Airtable
-      if (!data.weeks.length) {
-        data = await fetchCourseData(cohortName, activeUser.email);
-      }
+      const data = await fetchStudentCurriculumAsLegacy(cohortName, activeUser.email);
 
       // Prevent stale data from overwriting (race condition between init + enrollment load)
       if (loadRequestRef.current !== thisLoadId) return;

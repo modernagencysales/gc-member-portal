@@ -1,31 +1,8 @@
 /**
  * Growth Collective Member Portal Types
  *
- * These types map to the Airtable database schema for the GC Member Portal.
- * Base ID: appxQJMeJCq5tqgjW
+ * These types map to the Supabase database schema for the GC Member Portal.
  */
-
-// ============================================
-// Airtable Table IDs (for reference)
-// ============================================
-export const GC_TABLE_IDS = {
-  GC_MEMBERS: 'tblCUYvanbJPMKpcd',
-  TOOL_ACCESS: 'tbl6WPJzf9BsCYUbE',
-  ONBOARDING_CHECKLIST: 'tbl3m2PpabdeyqOpb',
-  MEMBER_PROGRESS: 'tblpTPONdNydnRQQ3',
-  MEMBER_ICP: 'tblpunEDDXbhq3ojc',
-  CAMPAIGNS: 'tblPb8i1PyfpqT98c',
-  RESOURCES: 'tblCHPQexaXAvglGq',
-} as const;
-
-// ============================================
-// Base Airtable Record Type
-// ============================================
-export interface AirtableRecord<T> {
-  id: string;
-  fields: T;
-  createdTime?: string;
-}
 
 // ============================================
 // GC Members (tblCUYvanbJPMKpcd)

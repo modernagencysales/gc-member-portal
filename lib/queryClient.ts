@@ -48,12 +48,6 @@ export const queryKeys = {
   adminChecklist: () => ['admin', 'checklist'] as const,
   adminMemberProgress: (checklistItemId: string) => ['admin', 'progress', checklistItemId] as const,
 
-  // Bootcamp (Legacy - Airtable)
-  bootcampUser: (email: string) => ['bootcamp', 'user', email] as const,
-  bootcampModules: () => ['bootcamp', 'modules'] as const,
-  bootcampLessons: (moduleId: string) => ['bootcamp', 'lessons', moduleId] as const,
-  bootcampProgress: (userId: string) => ['bootcamp', 'progress', userId] as const,
-
   // Bootcamp Students (Supabase)
   bootcampStudent: (email: string) => ['bootcamp', 'student', email] as const,
   bootcampStudentById: (studentId: string) => ['bootcamp', 'student', 'id', studentId] as const,
