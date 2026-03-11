@@ -28,6 +28,7 @@ import {
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { useTheme } from '../../../context/ThemeContext';
+import { logError } from '../../../lib/logError';
 import { queryKeys } from '../../../lib/queryClient';
 import { formatCurrency } from '../../../lib/formatCurrency';
 import {
@@ -38,6 +39,10 @@ import {
   uploadAdminFileToStorage,
   createLinearCustomer,
 } from '../../../services/dfy-admin-supabase';
+import {
+  DELIVERABLE_STATUS_CONFIGS,
+  DEFAULT_ONBOARDING_CHECKLIST,
+} from '../../../types/dfy-admin-types';
 import type {
   DfyAdminEngagement,
   DfyAdminDeliverable,
@@ -48,10 +53,6 @@ import type {
   ProfileRewriteOutput,
   OnboardingChecklist,
   DfyCommunicationPreference,
-} from '../../../types/dfy-admin-types';
-import {
-  DELIVERABLE_STATUS_CONFIGS,
-  DEFAULT_ONBOARDING_CHECKLIST,
 } from '../../../types/dfy-admin-types';
 import DfyStatusBadge from './DfyStatusBadge';
 import { useDfyEngagementData } from '../../../hooks/useDfyEngagementData';
@@ -397,7 +398,8 @@ const DfyEngagementDetail: React.FC = () => {
                             } else {
                               window.alert(`Error: ${data.error}`);
                             }
-                          } catch {
+                          } catch (err) {
+                            logError('DfyEngagementDetail:createLinearCustomer', err);
                             window.alert('Failed to create customer');
                           }
                         }}
@@ -419,7 +421,8 @@ const DfyEngagementDetail: React.FC = () => {
                           } else {
                             window.alert(`Error: ${data.error}`);
                           }
-                        } catch {
+                        } catch (err) {
+                          logError('DfyEngagementDetail:createLinearCustomer', err);
                           window.alert('Failed to create customer');
                         }
                       }}
@@ -1970,7 +1973,8 @@ function IntakeFileRow({
       } else {
         setError(true);
       }
-    } catch {
+    } catch (error) {
+      logError('DfyEngagementDetail:intakeFileDownload', error);
       setError(true);
     } finally {
       setLoading(false);
