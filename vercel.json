@@ -3,10 +3,6 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "framework": "vite",
-  "redirects": [
-    { "source": "/offer/dfy-VT", "destination": "https://buy.stripe.com/9B6cN71Vkfm6eF75k50000v", "permanent": false },
-    { "source": "/offer/dfy-CT", "destination": "https://buy.stripe.com/dRm5kF6bAei2bsV3bX0000w", "permanent": false }
-  ],
   "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }],
   "headers": [
     {
