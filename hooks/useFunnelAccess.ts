@@ -1,3 +1,7 @@
+/**
+ * useFunnelAccess. Derives funnel-tier access state and nudge urgency from a student's subscription and cohort data.
+ * Constraint: Pure derived state — no side effects, no API calls. Depends on useSubscription.
+ */
 import { useMemo } from 'react';
 import { BootcampStudent } from '../types/bootcamp-types';
 import { useSubscription } from './useSubscription';

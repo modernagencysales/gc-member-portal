@@ -1,3 +1,7 @@
+/**
+ * useScrollReveal. IntersectionObserver hook that triggers a visibility transition when an element scrolls into view.
+ * Constraint: Pure UI — no data fetching. Respects prefers-reduced-motion.
+ */
 import { useEffect, useRef, useState } from 'react';
 
 export function useScrollReveal(options: { threshold?: number; rootMargin?: string } = {}) {

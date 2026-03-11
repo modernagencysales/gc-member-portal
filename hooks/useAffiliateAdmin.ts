@@ -1,3 +1,7 @@
+/**
+ * useAffiliateAdmin. TanStack Query hooks for admin management of affiliates, referrals, payouts, and marketing assets.
+ * Constraint: Admin-only. Never used in affiliate-facing components.
+ */
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   fetchAllAffiliates,

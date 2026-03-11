@@ -1,3 +1,7 @@
+/**
+ * useEmailEnrichment. Starts and polls a batch email enrichment run, reporting progress until completion or timeout (30 min).
+ * Constraint: Single-purpose — batch email enrichment only. Tolerates up to 10 consecutive polling errors before failing.
+ */
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { fetchBatchRun, triggerBatchEnrichment } from '../services/enrichment-batch-supabase';
 

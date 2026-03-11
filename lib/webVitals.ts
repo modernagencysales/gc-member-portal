@@ -1,3 +1,7 @@
+/**
+ * webVitals. Measures Core Web Vitals (CLS, LCP, FCP, TTFB, INP) and reports poor scores to Sentry.
+ * Constraint: Call reportWebVitals() once at app bootstrap only. Never import in components.
+ */
 import { onCLS, onLCP, onFCP, onTTFB, onINP, type Metric } from 'web-vitals';
 import * as Sentry from '@sentry/react';
 

@@ -1,3 +1,7 @@
+/**
+ * useTamPipeline. Orchestrates the multi-step TAM pipeline (source → qualify → find contacts), polling each job to completion.
+ * Constraint: Never fires steps out of order. Tolerates up to 10 consecutive polling errors per step before failing.
+ */
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { createTamJob, fetchTamJobs, invokeTamJob } from '../services/tam-supabase';
 import { TamJobType, TamJob } from '../types/tam-types';

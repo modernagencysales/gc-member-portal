@@ -1,3 +1,7 @@
+/**
+ * useSubscription. Derives a student's subscription access state (active/expiring/expired/subscribed) and AI tool permissions from their student record and cohort data.
+ * Constraint: Pure derived state — no API calls, no side effects.
+ */
 import { useMemo } from 'react';
 import { BootcampStudent } from '../types/bootcamp-types';
 import { LmsCohort } from '../types/lms-types';

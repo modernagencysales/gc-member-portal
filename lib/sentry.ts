@@ -1,3 +1,7 @@
+/**
+ * sentry. Initializes Sentry error tracking and performance monitoring for production environments.
+ * Constraint: Call initSentry() once at app bootstrap only. Never import Sentry directly in components — use logError from lib/logError.ts.
+ */
 import * as Sentry from '@sentry/react';
 
 export function initSentry() {

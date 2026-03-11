@@ -1,3 +1,7 @@
+/**
+ * useOnboardingMutation. TanStack Query mutation hook for updating GC member onboarding progress status.
+ * Constraint: Single-purpose — only updates progress status. Never reads or manages onboarding structure.
+ */
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { updateMemberProgress } from '../services/supabase';
 import { queryKeys } from '../lib/queryClient';

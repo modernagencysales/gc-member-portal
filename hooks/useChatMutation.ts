@@ -1,3 +1,7 @@
+/**
+ * useChatMutation. TanStack Query mutation hooks for creating, updating, and deleting AI tools, conversations, and messages.
+ * Constraint: Write-only. Use useChatHistory for read queries.
+ */
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { queryKeys } from '../lib/queryClient';
 import {

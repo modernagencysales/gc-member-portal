@@ -1,3 +1,7 @@
+/**
+ * useAffiliate. Loads affiliate profile, stats, referrals, payouts, and assets for the currently logged-in affiliate user.
+ * Constraint: Reads only — no mutations. Use useAffiliateAdmin for write operations.
+ */
 import { useState, useEffect } from 'react';
 import {
   Affiliate,

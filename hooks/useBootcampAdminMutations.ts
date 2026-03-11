@@ -1,3 +1,7 @@
+/**
+ * useBootcampAdminMutations. TanStack Query mutation hooks for admin management of bootcamp students, checklist items, settings, cohorts, and student progress.
+ * Constraint: Admin-only. Never used in student-facing bootcamp components.
+ */
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   createBootcampStudent,

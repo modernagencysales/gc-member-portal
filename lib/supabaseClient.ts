@@ -1,3 +1,7 @@
+/**
+ * supabaseClient. Creates and exports the shared Supabase client for all DB and auth operations.
+ * Constraint: Use this singleton — never call createClient() directly elsewhere. Degrades gracefully when env vars are missing.
+ */
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { logWarn } from './logError';
 

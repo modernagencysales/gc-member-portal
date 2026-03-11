@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { fetchAutomationOutput } from '../../services/dfy-service';
+import { logError } from '../../lib/logError';
 
 interface ProfileRewriteOutput {
   headline_options?: string[];
@@ -23,8 +24,8 @@ const ProfileRewriteCard: React.FC<ProfileRewriteCardProps> = ({ portalSlug }) =
         if (data?.output) {
           setOutput(data.output as ProfileRewriteOutput);
         }
-      } catch {
-        // silently handle
+      } catch (err) {
+        logError('ProfileRewriteCard:fetchAutomationOutput', err);
       } finally {
         setLoading(false);
       }

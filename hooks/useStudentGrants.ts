@@ -1,3 +1,7 @@
+/**
+ * useStudentGrants. Fetches per-tool AI credit grants for a bootcamp student based on their access level.
+ * Constraint: Only queries for Lead Magnet and Sprint + AI Tools access levels — returns null for full access tiers.
+ */
 import { useQuery } from '@tanstack/react-query';
 import { getStudentGrants, StudentGrants } from '../services/bootcamp-supabase';
 

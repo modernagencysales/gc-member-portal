@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { getClientMetrics } from '../../services/dfy-service';
+import { logError } from '../../lib/logError';
 import MetricsCard from './MetricsCard';
 import ProfileRewriteCard from './ProfileRewriteCard';
 
@@ -44,8 +45,8 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ portalSlug, deliverab
       try {
         const data = await getClientMetrics(portalSlug);
         setMetrics(data);
-      } catch {
-        // silently handle
+      } catch (err) {
+        logError('ClientDashboard:getClientMetrics', err);
       } finally {
         setLoading(false);
       }
@@ -79,8 +80,9 @@ const ClientDashboard: React.FC<ClientDashboardProps> = ({ portalSlug, deliverab
     <div className="space-y-6">
       {/* Profile Rewrite */}
       {(() => {
-        const prDeliverable = deliverables.find(d => d.automation_type === 'profile_rewrite');
-        const isShipped = prDeliverable && ['review', 'approved', 'completed'].includes(prDeliverable.status);
+        const prDeliverable = deliverables.find((d) => d.automation_type === 'profile_rewrite');
+        const isShipped =
+          prDeliverable && ['review', 'approved', 'completed'].includes(prDeliverable.status);
         return isShipped ? <ProfileRewriteCard portalSlug={portalSlug} /> : null;
       })()}
 

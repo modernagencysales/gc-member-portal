@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
+import { logError } from '../../lib/logError';
 import type { DfyEngagement, DfyDeliverable, DfyActivityEntry } from '../../services/dfy-service';
 import {
   getEngagementBySlug,
@@ -75,7 +76,11 @@ const ClientPortalPage: React.FC = () => {
   const deliverableParam = searchParams.get('deliverable');
 
   const [activeTab, setActiveTab] = useState<'dashboard' | 'deliverables' | 'activity'>(
-    tabParam === 'deliverables' ? 'deliverables' : tabParam === 'activity' ? 'activity' : 'dashboard'
+    tabParam === 'deliverables'
+      ? 'deliverables'
+      : tabParam === 'activity'
+        ? 'activity'
+        : 'dashboard'
   );
   const [linkedInLoading, setLinkedInLoading] = useState(false);
   const [recorderTool, setRecorderTool] = useState('');
@@ -320,8 +325,8 @@ const ClientPortalPage: React.FC = () => {
                       try {
                         const { url } = await requestLinkedInConnect(slug!);
                         window.open(url, '_blank');
-                      } catch {
-                        // Silently handle — user can retry
+                      } catch (err) {
+                        logError('ClientPortalPage:linkedInConnect', err);
                       } finally {
                         setLinkedInLoading(false);
                       }
@@ -399,8 +404,8 @@ const ClientPortalPage: React.FC = () => {
                         },
                       });
                       setRecorderSaved(true);
-                    } catch {
-                      // Silently handle
+                    } catch (err) {
+                      logError('ClientPortalPage:saveRecorderTool', err);
                     }
                   }}
                   disabled={!recorderTool}

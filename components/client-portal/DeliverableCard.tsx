@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import type { DfyDeliverable } from '../../services/dfy-service';
-import { approveDeliverable, requestRevision, fetchAutomationOutput } from '../../services/dfy-service';
+import {
+  approveDeliverable,
+  requestRevision,
+  fetchAutomationOutput,
+} from '../../services/dfy-service';
+import { logError } from '../../lib/logError';
 import ProfileRewriteModal from './ProfileRewriteModal';
 
 interface ProfileRewriteOutput {
@@ -92,7 +97,8 @@ const DeliverableCard: React.FC<DeliverableCardProps> = ({
   const [loadingOutput, setLoadingOutput] = useState(false);
 
   const isProfileRewrite = deliverable.automation_type === 'profile_rewrite';
-  const canShowOutput = isProfileRewrite && ['review', 'approved', 'completed'].includes(deliverable.status);
+  const canShowOutput =
+    isProfileRewrite && ['review', 'approved', 'completed'].includes(deliverable.status);
 
   useEffect(() => {
     if (!canShowOutput || !portalSlug) return;
@@ -101,7 +107,7 @@ const DeliverableCard: React.FC<DeliverableCardProps> = ({
       .then((data) => {
         if (data?.output) setRewriteOutput(data.output as ProfileRewriteOutput);
       })
-      .catch(() => {})
+      .catch((err) => logError('DeliverableCard:fetchAutomationOutput', err))
       .finally(() => setLoadingOutput(false));
   }, [canShowOutput, portalSlug]);
 

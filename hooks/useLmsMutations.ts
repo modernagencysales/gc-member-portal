@@ -1,3 +1,7 @@
+/**
+ * useLmsMutations. TanStack Query mutation hooks for full LMS CRUD: cohorts, weeks, lessons, content items, action items, and student progress.
+ * Constraint: Write-only. Never fetches data — use services/lms-supabase queries directly or via TanStack Query.
+ */
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   createLmsCohort,

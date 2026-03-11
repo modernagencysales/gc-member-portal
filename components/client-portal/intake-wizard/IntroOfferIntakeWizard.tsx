@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import type { IntakeWizardData } from '../../../types/dfy-intake-types';
 import { INTAKE_STEPS, STEP_TITLES } from '../../../types/dfy-intake-types';
 import { submitIntakeWizard, fetchBlueprintData } from '../../../services/dfy-intake-service';
+import { logError } from '../../../lib/logError';
 import StepBestClients from './StepBestClients';
 import StepDreamClients from './StepDreamClients';
 import StepDataDump from './StepDataDump';
@@ -78,8 +79,8 @@ const IntroOfferIntakeWizard: React.FC<IntroOfferIntakeWizardProps> = ({
           },
         }));
         setBlueprintLoaded(true);
-      } catch {
-        // Silently handle — user can still fill in manually
+      } catch (err) {
+        logError('IntroOfferIntakeWizard:blueprintPreload', err);
         setBlueprintLoaded(true);
       }
     }

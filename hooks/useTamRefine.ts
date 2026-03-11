@@ -1,3 +1,7 @@
+/**
+ * useTamRefine. Starts and polls a TAM Discolike refinement job, reporting progress until completion or timeout (10 min).
+ * Constraint: Single job type — Discolike refinement only. Tolerates up to 10 consecutive polling errors before failing.
+ */
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { createTamJob, fetchTamJobs, invokeTamJob } from '../services/tam-supabase';
 import { TamJob } from '../types/tam-types';

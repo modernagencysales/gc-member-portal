@@ -259,7 +259,9 @@ export default function ConnectionQualifier({ userId }: ConnectionQualifierProps
       } catch (err) {
         logError('ConnectionQualifier:phase1', err);
         if (run) {
-          await updateRunStatus(run.id, 'failed').catch(() => {});
+          await updateRunStatus(run.id, 'failed').catch((updateErr) =>
+            logError('ConnectionQualifier:updateRunStatus', updateErr)
+          );
         }
       }
     },

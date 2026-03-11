@@ -1,3 +1,7 @@
+/**
+ * useEnrollments. Fetches and manages a student's LMS cohort enrollments, with active course selection persisted to localStorage.
+ * Constraint: Read-only — never mutates enrollment records.
+ */
 import { useState, useCallback, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchStudentEnrollments } from '../services/lms-supabase';

@@ -1,3 +1,7 @@
+/**
+ * useChatHistory. TanStack Query read hooks for AI tools, student conversations, and chat message history.
+ * Constraint: Read-only. Use useChatMutation for write operations.
+ */
 import { useQuery } from '@tanstack/react-query';
 import { queryKeys } from '../lib/queryClient';
 import {

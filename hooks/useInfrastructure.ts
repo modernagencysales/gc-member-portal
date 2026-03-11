@@ -1,3 +1,7 @@
+/**
+ * useInfrastructure. TanStack Query read hooks for GTM infrastructure tiers, student provisions, provisioning logs, and outreach pricing.
+ * Constraint: Read-only. Never triggers provisioning — use the infrastructure API for that.
+ */
 import { useQuery } from '@tanstack/react-query';
 import {
   fetchActiveTiers,

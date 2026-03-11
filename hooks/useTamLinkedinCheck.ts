@@ -1,3 +1,7 @@
+/**
+ * useTamLinkedinCheck. Starts and polls a TAM LinkedIn check job, reporting progress until completion or timeout (30 min).
+ * Constraint: Single job type — LinkedIn check only. Tolerates up to 10 consecutive polling errors before failing.
+ */
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { createTamJob, fetchTamJobs, invokeTamJob } from '../services/tam-supabase';
 

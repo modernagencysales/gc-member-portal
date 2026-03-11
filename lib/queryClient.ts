@@ -1,3 +1,7 @@
+/**
+ * queryClient. Shared TanStack Query client with global defaults: 5-min stale time, 30-min cache, no retry on 4xx.
+ * Constraint: Export only — never import from components. Use hooks or useQueryClient() instead.
+ */
 import { QueryClient } from '@tanstack/react-query';
 
 export const queryClient = new QueryClient({

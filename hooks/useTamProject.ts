@@ -1,3 +1,7 @@
+/**
+ * useTamProject. TanStack Query hooks for TAM project CRUD, company/contact reads, job management, and feedback mutations.
+ * Constraint: All TAM data access must go through this hook — never call tam-supabase directly from components.
+ */
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { queryKeys } from '../lib/queryClient';
 import {

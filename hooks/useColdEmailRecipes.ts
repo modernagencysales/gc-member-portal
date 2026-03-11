@@ -1,3 +1,7 @@
+/**
+ * useColdEmailRecipes. TanStack Query hooks for cold email recipe management: recipes, contact lists, and contact enrichment.
+ * Constraint: Never imports from the GTM System API directly — all data access goes through services/cold-email-supabase.
+ */
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { queryKeys } from '../lib/queryClient';
 import {

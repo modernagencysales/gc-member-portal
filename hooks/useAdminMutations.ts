@@ -1,3 +1,7 @@
+/**
+ * useAdminMutations. TanStack Query mutation hooks for admin-level GC tool access and onboarding checklist CRUD.
+ * Constraint: Never called outside admin components. Never reads — write/invalidate only.
+ */
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   createToolAccess,

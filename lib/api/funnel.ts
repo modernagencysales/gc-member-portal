@@ -1,3 +1,7 @@
+/**
+ * lib/api/funnel.ts. Client-side API module for fetching funnel analytics from the GTM System (stages, metrics, channel attribution).
+ * Constraint: Never called server-side. All requests are authenticated via gtmAdminFetch — never call the GTM API directly.
+ */
 import { gtmAdminFetch } from './gtm-fetch';
 
 // ─── Response shapes (GTM API wraps results in { data: [...] }) ───────────────
