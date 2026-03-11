@@ -24,23 +24,6 @@ export async function mockSupabaseQuery(page: Page, table: string, data: unknown
 }
 
 // ---------------------------------------------------------------------------
-// Airtable API mock
-// ---------------------------------------------------------------------------
-
-/**
- * Intercept Airtable API calls and return mock data.
- */
-export async function mockAirtableQuery(page: Page, data: unknown, status = 200) {
-  await page.route('**/api.airtable.com/**', (route) =>
-    route.fulfill({
-      status,
-      contentType: 'application/json',
-      body: JSON.stringify({ records: Array.isArray(data) ? data : [data] }),
-    })
-  );
-}
-
-// ---------------------------------------------------------------------------
 // SPA navigation helpers
 // ---------------------------------------------------------------------------
 

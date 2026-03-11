@@ -1,11 +1,5 @@
 import { test, expect } from '@playwright/test';
-import {
-  mockSupabaseQuery,
-  mockAirtableQuery,
-  navigateTo,
-  waitForSPALoad,
-  loginAsBootcampStudent,
-} from './helpers';
+import { mockSupabaseQuery, navigateTo, waitForSPALoad, loginAsBootcampStudent } from './helpers';
 import { bootcampStudent, lmsCohort } from './fixtures/test-data';
 
 test.describe('Bootcamp AI Tools', () => {
@@ -32,7 +26,6 @@ test.describe('Bootcamp AI Tools', () => {
         enabled: true,
       },
     ]);
-    await mockAirtableQuery(page, []);
   });
 
   test('AI tools page loads', async ({ page }) => {

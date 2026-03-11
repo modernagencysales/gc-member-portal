@@ -28,10 +28,6 @@ const localStorageMock = {
 };
 Object.defineProperty(window, 'localStorage', { value: localStorageMock });
 
-// Mock environment variables
-vi.stubEnv('VITE_AIRTABLE_API_KEY', 'test_api_key');
-vi.stubEnv('VITE_AIRTABLE_BASE_ID', 'test_base_id');
-
 // Reset mocks between tests
 beforeEach(() => {
   vi.clearAllMocks();

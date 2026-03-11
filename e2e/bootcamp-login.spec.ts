@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { mockSupabaseQuery, mockAirtableQuery, navigateTo, waitForSPALoad } from './helpers';
+import { mockSupabaseQuery, navigateTo, waitForSPALoad } from './helpers';
 import { bootcampStudent, bootcampInviteCode } from './fixtures/test-data';
 
 // Bootcamp login is public -- no pre-existing auth
@@ -39,7 +39,6 @@ test.describe('Bootcamp Login Page', () => {
     // Mock the invite code verification and student creation
     await mockSupabaseQuery(page, 'bootcamp_invite_codes', [bootcampInviteCode]);
     await mockSupabaseQuery(page, 'bootcamp_students', [bootcampStudent]);
-    await mockAirtableQuery(page, []);
 
     await navigateTo(page, '/bootcamp?code=' + bootcampInviteCode.code);
     await waitForSPALoad(page);

@@ -1,11 +1,5 @@
 import { test, expect } from '@playwright/test';
-import {
-  mockSupabaseQuery,
-  mockAirtableQuery,
-  navigateTo,
-  waitForSPALoad,
-  loginAsBootcampStudent,
-} from './helpers';
+import { mockSupabaseQuery, navigateTo, waitForSPALoad, loginAsBootcampStudent } from './helpers';
 import {
   bootcampStudent,
   lmsCohort,
@@ -32,7 +26,6 @@ test.describe('Bootcamp Curriculum', () => {
     await mockSupabaseQuery(page, 'lms_action_item_progress', []);
     await mockSupabaseQuery(page, 'bootcamp_student_progress', []);
     await mockSupabaseQuery(page, 'bootcamp_settings', []);
-    await mockAirtableQuery(page, []);
   });
 
   test('curriculum page loads with week navigation', async ({ page }) => {
