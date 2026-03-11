@@ -283,7 +283,8 @@ const App: React.FC = () => {
 
         {/* DFY (Done-For-You) offer page — optional closer suffix (e.g. /offer/dfy-VT) */}
         <Route path="/offer/dfy" element={<DFYOfferPage />} />
-        <Route path="/offer/dfy-:closer" element={<DFYOfferPage />} />
+        <Route path="/offer/dfy-VT" element={<DFYOfferPage />} />
+        <Route path="/offer/dfy-CT" element={<DFYOfferPage />} />
 
         {/* DFY Welcome / Post-Payment Onboarding */}
         <Route path="/dfy/welcome" element={<DfyWelcomePage />} />

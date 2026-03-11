@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import {
   AlertCircle,
   Check,
@@ -68,8 +68,9 @@ const DFYCta: React.FC<{ variant?: 'primary' | 'secondary'; checkoutUrl: string 
 // ============================================
 
 const DFYOfferPage: React.FC = () => {
-  const { closer } = useParams<{ closer?: string }>();
-  const checkoutUrl = getCheckoutUrl(closer);
+  const location = useLocation();
+  const closerMatch = location.pathname.match(/\/offer\/dfy-(\w+)/);
+  const checkoutUrl = getCheckoutUrl(closerMatch?.[1]);
   const [openFAQ, setOpenFAQ] = useState<number | null>(null);
 
   const offer = DFY_OFFER;
