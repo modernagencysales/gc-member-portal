@@ -1,12 +1,13 @@
 /** useBootcampAuth. Manages user auth state and handlers for BootcampApp. Never imports React Router components or UI elements. */
 
-import { useState, useEffect, useRef, MutableRefObject, Dispatch, SetStateAction } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import type { MutableRefObject, Dispatch, SetStateAction } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { useQueryClient } from '@tanstack/react-query';
 import { verifyBootcampStudent, redeemCode } from '../services/bootcamp-supabase';
 import { useAuth } from '../context/AuthContext';
-import { User } from '../types';
-import { BootcampStudent } from '../types/bootcamp-types';
+import { logError } from '../lib/logError';
+import type { User } from '../types';
+import type { BootcampStudent } from '../types/bootcamp-types';
 
 // ─── Return Interface ─────────────────────────────────────────────────────────
 
@@ -44,7 +45,6 @@ export interface UseBootcampAuthOptions {
 
 export function useBootcampAuth(options: UseBootcampAuthOptions = {}): UseBootcampAuthReturn {
   const { refetchGrantsRef, loadUserDataRef, setLoading } = options;
-  const queryClient = useQueryClient();
   const { logout } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -83,7 +83,8 @@ export function useBootcampAuth(options: UseBootcampAuthOptions = {}): UseBootca
           }
 
           await loadUserDataRef?.current?.(parsedUser);
-        } catch {
+        } catch (error) {
+          logError('useBootcampAuth:init', error);
           localStorage.removeItem('lms_user_obj');
         }
       }
@@ -115,7 +116,8 @@ export function useBootcampAuth(options: UseBootcampAuthOptions = {}): UseBootca
 
         // Clear the code param from URL
         setSearchParams({});
-      } catch {
+      } catch (error) {
+        logError('useBootcampAuth:autoRedeem', error, { code: inviteCodeFromUrl });
         // Silently ignore (already redeemed or invalid)
         setSearchParams({});
       }
@@ -126,32 +128,40 @@ export function useBootcampAuth(options: UseBootcampAuthOptions = {}): UseBootca
   }, [bootcampStudent?.id, inviteCodeFromUrl]);
 
   const handleLogin = async (newUser: User) => {
-    setUser(newUser);
-    localStorage.setItem('lms_user_obj', JSON.stringify(newUser));
+    try {
+      setUser(newUser);
+      localStorage.setItem('lms_user_obj', JSON.stringify(newUser));
 
-    // Check if user exists in Supabase
-    const student = await verifyBootcampStudent(newUser.email);
-    if (student) {
-      setBootcampStudent(student);
+      // Check if user exists in Supabase
+      const student = await verifyBootcampStudent(newUser.email);
+      if (student) {
+        setBootcampStudent(student);
+      }
+
+      loadUserDataRef?.current?.(newUser);
+    } catch (error) {
+      logError('useBootcampAuth:handleLogin', error, { email: newUser.email });
     }
-
-    loadUserDataRef?.current?.(newUser);
   };
 
   const handleRegister = async (newUser: User) => {
-    setUser(newUser);
-    localStorage.setItem('lms_user_obj', JSON.stringify(newUser));
+    try {
+      setUser(newUser);
+      localStorage.setItem('lms_user_obj', JSON.stringify(newUser));
 
-    // Get the newly created student from Supabase
-    const student = await verifyBootcampStudent(newUser.email);
-    if (student) {
-      setBootcampStudent(student);
+      // Get the newly created student from Supabase
+      const student = await verifyBootcampStudent(newUser.email);
+      if (student) {
+        setBootcampStudent(student);
+      }
+
+      // Clear the invite code from URL
+      setSearchParams({});
+
+      loadUserDataRef?.current?.(newUser);
+    } catch (error) {
+      logError('useBootcampAuth:handleRegister', error, { email: newUser.email });
     }
-
-    // Clear the invite code from URL
-    setSearchParams({});
-
-    loadUserDataRef?.current?.(newUser);
   };
 
   const handleLogout = () => {
@@ -161,16 +171,16 @@ export function useBootcampAuth(options: UseBootcampAuthOptions = {}): UseBootca
 
   // Handle student update from settings (e.g., Blueprint connection)
   const handleStudentUpdate = async () => {
-    if (user) {
+    if (!user) return;
+    try {
       const student = await verifyBootcampStudent(user.email);
       if (student) {
         setBootcampStudent(student);
       }
+    } catch (error) {
+      logError('useBootcampAuth:handleStudentUpdate', error, { email: user.email });
     }
   };
-
-  // queryClient is retained here for future hook callers (e.g., invalidating queries)
-  void queryClient;
 
   return {
     user,

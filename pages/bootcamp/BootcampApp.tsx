@@ -71,7 +71,10 @@ const BootcampApp: React.FC = () => {
   const queryClient = useQueryClient();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // Check for invite code in URL
+  // Check for invite code in URL.
+  // NOTE: This duplicates the read inside useBootcampAuth — the hook uses the
+  // code for auto-redeem logic, but the component also needs it here at render
+  // time to pass as `initialCode` to <Register /> before the hook has run.
   const inviteCodeFromUrl = searchParams.get('code');
 
   // Legacy state for curriculum
