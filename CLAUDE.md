@@ -45,6 +45,25 @@ src/
 - **Context providers**: Auth, Theme, Notifications wrap at root. Auth gates portal/bootcamp/admin routes.
 - **React Query + code splitting**: TanStack Query for server state; lazy-loaded route components per product area.
 
+## Database Access (Cross-Repo)
+
+This repo shares a Supabase database with 3 other repos. See gtm-system's `docs/database-ownership.md` for the full table registry.
+
+**This repo owns:** `bootcamp_students`, `bootcamp_settings`, `bootcamp_recipes`, `bootcamp_contacts`, `bootcamp_contact_lists`, `blueprint_settings`, `lms_*` tables, `tam_*` tables, `connection_ranking_*` tables, `ai_tools`, `chat_*` tables, `affiliates`, `referrals`, `infra_*` tables, `student_*` tables.
+
+**This repo reads from other repos:**
+- `prospects` + `posts` (owned by leadmagnet-backend) — public Blueprint pages, prospect detail
+- `leads` (owned by gtm-system) — lead lookup for intro offers
+- `proposals` (owned by gtm-system) — read and write for proposal management
+- `intro_offers` + `dfy_engagements` (owned by gtm-system) — read and write for client portals
+
+**This repo writes to other repos' tables:**
+- `proposals` — status updates, view count increments
+- `intro_offers` — status updates from client portal
+- `dfy_client_sessions` — portal session tracking
+
+**Rule:** Use explicit column selects (never `select('*')`). Define column constants per service file. See `services/blueprint-supabase.ts` for the pattern.
+
 ## System Context
 
 ```
