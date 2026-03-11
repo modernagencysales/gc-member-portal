@@ -29,27 +29,13 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { useTheme } from '../../../context/ThemeContext';
 import { queryKeys } from '../../../lib/queryClient';
+import { formatCurrency } from '../../../lib/formatCurrency';
 import {
-  fetchDfyEngagementById,
-  fetchDfyDeliverables,
-  fetchDfyActivityLog,
-  fetchAutomationRuns,
-  fetchAdminAutomationOutput,
-  updateEngagement,
-  updateDeliverable,
-  retriggerOnboarding,
-  triggerAutomation,
-  retryAutomation,
-  syncPlaybooks,
-  resendMagicLink,
-  postEngagementUpdate,
   fetchIntakeFileUrls,
-  deleteEngagement,
   fetchEngagementFiles,
   createEngagementFileRecord,
   deleteEngagementFile,
   uploadAdminFileToStorage,
-  upgradeEngagement,
   createLinearCustomer,
 } from '../../../services/dfy-admin-supabase';
 import type {
@@ -62,17 +48,13 @@ import type {
   ProfileRewriteOutput,
   OnboardingChecklist,
   DfyCommunicationPreference,
-  DfyEngagementStatus,
 } from '../../../types/dfy-admin-types';
 import {
   DELIVERABLE_STATUS_CONFIGS,
   DEFAULT_ONBOARDING_CHECKLIST,
 } from '../../../types/dfy-admin-types';
 import DfyStatusBadge from './DfyStatusBadge';
-
-function formatCurrency(cents: number): string {
-  return `$${(cents / 100).toLocaleString('en-US', { minimumFractionDigits: 0 })}`;
-}
+import { useDfyEngagementData } from '../../../hooks/useDfyEngagementData';
 
 const DfyEngagementDetail: React.FC = () => {
   const { engagementId } = useParams<{ engagementId: string }>();
@@ -89,204 +71,42 @@ const DfyEngagementDetail: React.FC = () => {
   );
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
-  // ---- Queries ----
-  const { data: engagement, isLoading: engLoading } = useQuery({
-    queryKey: queryKeys.dfyEngagement(engagementId!),
-    queryFn: () => fetchDfyEngagementById(engagementId!),
-    enabled: !!engagementId,
+  const {
+    engagement,
+    engLoading,
+    deliverables,
+    delsLoading,
+    activity,
+    automationRuns,
+    profileRewriteOutput,
+    outputLoading,
+    contentCallPrepOutput,
+    callPrepLoading,
+    profileRewriteDeliverable,
+    contentCallPrepDeliverable,
+    milestoneGroups,
+    refreshAll,
+    engagementMutation,
+    deliverableMutation,
+    retriggerMutation,
+    triggerMutation,
+    retryMutation,
+    syncMutation,
+    magicLinkMutation,
+    postUpdateMutation,
+    upgradeMutation,
+    deleteMutation,
+  } = useDfyEngagementData(engagementId!, {
+    onError: (msg) => setError(msg || null),
+    onPostUpdateSuccess: () => {
+      setUpdateMessage('');
+      setShowUpdateForm(false);
+    },
+    onDeleteSuccess: () => navigate('/admin/dfy'),
   });
-
-  const { data: deliverables, isLoading: delsLoading } = useQuery({
-    queryKey: queryKeys.dfyDeliverables(engagementId!),
-    queryFn: () => fetchDfyDeliverables(engagementId!),
-    enabled: !!engagementId,
-  });
-
-  const { data: activity } = useQuery({
-    queryKey: queryKeys.dfyActivity(engagementId!),
-    queryFn: () => fetchDfyActivityLog(engagementId!),
-    enabled: !!engagementId,
-  });
-
-  const { data: automationRuns = [] } = useQuery({
-    queryKey: queryKeys.dfyAutomationRuns(engagementId!),
-    queryFn: () => fetchAutomationRuns(engagementId!),
-    enabled: !!engagementId,
-  });
-
-  const { data: profileRewriteOutput, isLoading: outputLoading } = useQuery({
-    queryKey: queryKeys.dfyAutomationOutput(engagementId!, 'profile_rewrite'),
-    queryFn: () => fetchAdminAutomationOutput(engagementId!, 'profile_rewrite'),
-    enabled: !!engagementId,
-  });
-
-  const { data: contentCallPrepOutput, isLoading: callPrepLoading } = useQuery({
-    queryKey: queryKeys.dfyAutomationOutput(engagementId!, 'prepare_content_call'),
-    queryFn: () => fetchAdminAutomationOutput(engagementId!, 'prepare_content_call'),
-    enabled: !!engagementId,
-  });
-
-  // ---- Derived: profile rewrite deliverable (for tab visibility) ----
-  const profileRewriteDeliverable = useMemo(
-    () => deliverables?.find((d) => d.automation_type === 'profile_rewrite') ?? null,
-    [deliverables]
-  );
-
-  const contentCallPrepDeliverable = useMemo(
-    () => deliverables?.find((d) => d.automation_type === 'prepare_content_call') ?? null,
-    [deliverables]
-  );
 
   const showProfileRewriteTab = !!profileRewriteDeliverable;
   const showContentCallPrepTab = !!contentCallPrepDeliverable;
-
-  // ---- Manual refresh (for header button) ----
-  const refreshAll = () => {
-    queryClient.invalidateQueries({ queryKey: queryKeys.dfyEngagement(engagementId!) });
-    queryClient.invalidateQueries({ queryKey: queryKeys.dfyDeliverables(engagementId!) });
-    queryClient.invalidateQueries({ queryKey: queryKeys.dfyActivity(engagementId!) });
-    queryClient.invalidateQueries({ queryKey: queryKeys.dfyAutomationRuns(engagementId!) });
-    queryClient.invalidateQueries({ queryKey: queryKeys.dfyIntakeFiles(engagementId!) });
-    queryClient.invalidateQueries({
-      queryKey: queryKeys.dfyAutomationOutput(engagementId!, 'profile_rewrite'),
-    });
-  };
-
-  // ---- Mutations ----
-  const engagementMutation = useMutation({
-    mutationFn: (data: {
-      status?: DfyEngagementStatus;
-      onboarding_checklist?: Record<string, unknown>;
-      communication_preference?: DfyCommunicationPreference;
-      linkedin_url?: string | null;
-      call_transcript?: string | null;
-    }) => updateEngagement(engagementId!, data),
-    onMutate: async (newData) => {
-      await queryClient.cancelQueries({ queryKey: queryKeys.dfyEngagement(engagementId!) });
-      const previousEngagement = queryClient.getQueryData<DfyAdminEngagement>(
-        queryKeys.dfyEngagement(engagementId!)
-      );
-      queryClient.setQueryData<DfyAdminEngagement | null>(
-        queryKeys.dfyEngagement(engagementId!),
-        (old) => (old ? ({ ...old, ...newData } as DfyAdminEngagement) : old)
-      );
-      return { previousEngagement };
-    },
-    onError: (err: Error, _newData, context) => {
-      if (context?.previousEngagement) {
-        queryClient.setQueryData(
-          queryKeys.dfyEngagement(engagementId!),
-          context.previousEngagement
-        );
-      }
-      setError(err.message);
-    },
-    onSuccess: () => setError(null),
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.dfyEngagement(engagementId!) });
-      queryClient.invalidateQueries({ queryKey: queryKeys.dfyEngagements() });
-    },
-  });
-
-  const deliverableMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: { status?: string } }) =>
-      updateDeliverable(id, data),
-    onSuccess: () => {
-      setError(null);
-      queryClient.invalidateQueries({ queryKey: queryKeys.dfyDeliverables(engagementId!) });
-      queryClient.invalidateQueries({ queryKey: queryKeys.dfyActivity(engagementId!) });
-    },
-    onError: (err: Error) => setError(err.message),
-  });
-
-  const retriggerMutation = useMutation({
-    mutationFn: () => retriggerOnboarding(engagementId!),
-    onSuccess: () => {
-      setError(null);
-      queryClient.invalidateQueries({ queryKey: queryKeys.dfyEngagement(engagementId!) });
-      queryClient.invalidateQueries({ queryKey: queryKeys.dfyActivity(engagementId!) });
-      queryClient.invalidateQueries({ queryKey: queryKeys.dfyEngagements() });
-    },
-    onError: (err: Error) => setError(err.message),
-  });
-
-  const triggerMutation = useMutation({
-    mutationFn: triggerAutomation,
-    onSuccess: () => {
-      setError(null);
-      queryClient.invalidateQueries({ queryKey: queryKeys.dfyAutomationRuns(engagementId!) });
-      queryClient.invalidateQueries({ queryKey: queryKeys.dfyDeliverables(engagementId!) });
-    },
-    onError: (err: Error) => setError(err.message),
-  });
-
-  const retryMutation = useMutation({
-    mutationFn: retryAutomation,
-    onSuccess: () => {
-      setError(null);
-      queryClient.invalidateQueries({ queryKey: queryKeys.dfyAutomationRuns(engagementId!) });
-      queryClient.invalidateQueries({ queryKey: queryKeys.dfyDeliverables(engagementId!) });
-    },
-    onError: (err: Error) => setError(err.message),
-  });
-
-  const syncMutation = useMutation({
-    mutationFn: () => syncPlaybooks(engagementId!),
-    onSuccess: () => {
-      setError(null);
-      queryClient.invalidateQueries({ queryKey: queryKeys.dfyDeliverables(engagementId!) });
-      queryClient.invalidateQueries({ queryKey: queryKeys.dfyActivity(engagementId!) });
-    },
-    onError: (err: Error) => setError(err.message),
-  });
-
-  const magicLinkMutation = useMutation({
-    mutationFn: () => resendMagicLink(engagementId!),
-    onSuccess: () => setError(null),
-    onError: (err: Error) => setError(err.message),
-  });
-
-  const postUpdateMutation = useMutation({
-    mutationFn: (message: string) => postEngagementUpdate(engagementId!, message),
-    onSuccess: () => {
-      setError(null);
-      setUpdateMessage('');
-      setShowUpdateForm(false);
-      queryClient.invalidateQueries({ queryKey: queryKeys.dfyActivity(engagementId!) });
-    },
-    onError: (err: Error) => setError(err.message),
-  });
-
-  const upgradeMutation = useMutation({
-    mutationFn: () => upgradeEngagement(engagementId!),
-    onSuccess: () => {
-      refreshAll();
-    },
-  });
-
-  const deleteMutation = useMutation({
-    mutationFn: () => deleteEngagement(engagementId!),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.dfyEngagements() });
-      navigate('/admin/dfy');
-    },
-    onError: (err: Error) => {
-      setError(err.message);
-      setShowDeleteConfirm(false);
-    },
-  });
-
-  // ---- Deliverables grouped by milestone ----
-  const milestoneGroups = useMemo(() => {
-    const groups = new Map<string | null, DfyAdminDeliverable[]>();
-    if (!deliverables) return groups;
-    for (const del of deliverables) {
-      const key = del.milestone_id || null;
-      if (!groups.has(key)) groups.set(key, []);
-      groups.get(key)!.push(del);
-    }
-    return groups;
-  }, [deliverables]);
 
   // ---- Loading / not found ----
   if (engLoading) {
@@ -900,7 +720,9 @@ const DfyEngagementDetail: React.FC = () => {
                 Cancel
               </button>
               <button
-                onClick={() => deleteMutation.mutate()}
+                onClick={() =>
+                  deleteMutation.mutateAsync().catch(() => setShowDeleteConfirm(false))
+                }
                 disabled={deleteMutation.isPending}
                 className="px-4 py-2 rounded-lg text-sm font-medium bg-red-600 text-white hover:bg-red-700 transition-colors disabled:opacity-50 flex items-center gap-2"
               >
