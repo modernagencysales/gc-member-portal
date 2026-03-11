@@ -56,7 +56,7 @@ export interface DFYOfferData {
 export const DFY_OFFER: DFYOfferData = {
   headline: 'Your ICP Sees You on Their Feed and in Their DMs. All Within 2 Weeks.',
   subheadline:
-    'We build your complete LinkedIn lead generation system — posts, lead magnet, funnel, DM sequences, and nurture emails — and hand it to you running.',
+    'We build your complete LinkedIn lead generation system — lead magnet, funnel, posts, prospect list, and outreach — and hand it to you running.',
 
   problemHeadline: "You've Tried This Before. Here's Why It Didn't Work.",
   painPoints: [
@@ -69,40 +69,44 @@ export const DFY_OFFER: DFYOfferData = {
 
   solutionHeadline: 'We Build Your Entire LinkedIn System. You Just Show Up.',
   solutionDescription:
-    "We build your entire lead generation engine in 10 business days. You do one 30-minute interview. We handle everything else. Here's what makes it work: your exact ICP sees your content on their LinkedIn feed and gets a personalized DM from you — both leading to the same high-value lead magnet with an automated funnel behind it. They're strangers on day one. By week two, they're booking calls.",
+    "We build your entire lead generation engine in 10 business days. You do one 30-minute interview. We handle everything else. Here's what makes it work: we connect with 500–1,000 of your exact ICP prospects on LinkedIn. Once connected, they see your lead magnet posts on their feed — driving them to a hosted opt-in page with a full conversion funnel behind it. They're strangers on day one. By week two, they're booking calls.",
   solutionBullets: [
-    'A lead magnet your ICP would actually download — fully researched, designed, and hosted with a complete funnel',
-    '10 LinkedIn posts written from your Blueprint, each driving opt-ins from your exact ICP',
-    'A verified prospect list of your ideal clients — enriched, not just scraped from Sales Navigator',
-    'LinkedIn DM sequences that deliver your lead magnet directly to prospects who say yes',
+    'A custom lead magnet your ICP actually wants — a calculator, assessment, scorecard, or guide — fully researched, designed, and hosted',
+    '10 LinkedIn posts written from your strategy interview, each driving your ICP to your lead magnet opt-in page',
+    '500–1,000 verified ICP prospects — enriched through Apollo and Clay, ready for connection requests',
+    'LinkedIn outreach that connects you with your ICP so they see your content — warm, not cold',
   ],
 
   deliverables: [
     {
-      icon: FileText,
-      title: '10 LinkedIn Posts',
-      description: 'Written from your Blueprint, each with a lead magnet CTA',
-    },
-    {
       icon: Magnet,
-      title: '1 Lead Magnet',
+      title: 'Custom Lead Magnet',
       description:
-        'Fully researched, designed, and hosted — built to make your ICP want to meet you',
-    },
-    {
-      icon: Users,
-      title: 'Verified Prospect List',
-      description: 'Your exact ICP — enriched with Apollo, Clay, and verified emails',
-    },
-    {
-      icon: Link2,
-      title: 'LinkedIn Outreach (HeyReach)',
-      description: 'Connection requests + DM sequences delivering your lead magnet',
+        "A high-value asset your ICP actually wants — an ROI calculator, diagnostic assessment, benchmark scorecard, or strategic guide. Fully researched from your strategy interview, designed, and hosted. Not a template — built around your expertise and your clients' real problems.",
     },
     {
       icon: Layout,
       title: 'MagnetLab Funnel',
-      description: 'Opt-in page, qualification form, thank-you page, and automated delivery',
+      description:
+        'Opt-in page, qualification form, thank-you page, and automated delivery — your lead magnet goes from "here\'s a PDF" to a full conversion engine that captures emails, qualifies leads, and books calls.',
+    },
+    {
+      icon: FileText,
+      title: '10 LinkedIn Posts',
+      description:
+        'Written from your strategy interview, each designed to drive your ICP to your lead magnet opt-in page. These are what your new connections see on their feed.',
+    },
+    {
+      icon: Users,
+      title: 'Verified Prospect List (500–1,000)',
+      description:
+        '500–1,000 verified ICP prospects — enriched through Apollo and Clay with company data and verified emails. Not your entire TAM. A focused, actionable list of the right people.',
+    },
+    {
+      icon: Link2,
+      title: 'LinkedIn Outreach (HeyReach)',
+      description:
+        'Automated connection requests to your ICP list. Once they accept, they see your lead magnet posts on their feed — building familiarity and trust before any direct conversation happens.',
     },
   ],
 
@@ -116,7 +120,7 @@ export const DFY_OFFER: DFYOfferData = {
       icon: Video,
       title: 'MagnetLab Access (3 Months Free)',
       description:
-        'AI-powered content engine that keeps creating posts from your meetings and knowledge base',
+        'Your forever content road map — connects to your meeting note-taker, extracts insights from client calls, and generates post ideas you just approve. One-time build, ongoing content. No retainer required.',
     },
   ],
 
@@ -131,18 +135,18 @@ export const DFY_OFFER: DFYOfferData = {
       number: 2,
       title: 'We Build Everything',
       description:
-        'Lead magnet, funnel, posts, prospect list, DM sequences — all built by our team using the exact tools and processes behind 300+ client systems. You connect your accounts. We do the rest.',
+        'Lead magnet, funnel, posts, prospect list, outreach sequences — all built by our team using the exact tools and processes behind 300+ client systems. You connect your accounts. We do the rest.',
     },
     {
       number: 3,
       title: 'Review, Approve, Go Live',
       description:
-        "You review what we've built. Approve it. Everything goes live. Your ICP starts seeing you on their feed and in their DMs — all within 10 business days.",
+        "You review what we've built. Approve it. Everything goes live — posts scheduled, connections sending, and your ICP seeing your content on their feed. All within 10 business days.",
     },
   ],
 
   resultStatement:
-    "In 10 days: 10 posts scheduled, a lead magnet that would've taken you 25 hours, and your exact ICP seeing you on their feed and in their DMs. By week 2, they're booking calls.",
+    "In 10 days: a custom lead magnet, 10 posts scheduled, 500–1,000 ICP prospects connected, and your content showing up on their feed. By week 2, they're booking calls.",
 
   valueItems: [],
 
@@ -161,12 +165,13 @@ export const DFY_OFFER: DFYOfferData = {
 
   price: '$2,500',
   priceFeatures: [
+    'Custom lead magnet (calculator, assessment, guide, or scorecard)',
+    'MagnetLab funnel (opt-in, qualification, delivery)',
     '10 LinkedIn posts written & scheduled',
-    '1 lead magnet + complete funnel',
-    'Verified prospect list for your ICP',
-    'LinkedIn DM sequences (HeyReach)',
-    '5-email nurture flow',
-    'MagnetLab access (3 months free)',
+    '500–1,000 verified ICP prospects',
+    'LinkedIn connection outreach (HeyReach)',
+    '5-email nurture sequence',
+    'MagnetLab access — 3 months free (your forever content road map)',
   ],
 
   guarantee: 'Zero Risk. Five Guarantees.',
@@ -180,7 +185,7 @@ export const DFY_OFFER: DFYOfferData = {
     {
       label: 'You approve everything before it goes live',
       detail:
-        'Nothing touches your LinkedIn without your sign-off. Every post, every DM sequence, every lead magnet page — you review and approve it first. Your reputation stays in your hands.',
+        'Nothing touches your LinkedIn without your sign-off. Every post, every outreach sequence, every lead magnet page — you review and approve it first. Your reputation stays in your hands.',
     },
     {
       label: 'If something breaks, we fix it',
@@ -195,7 +200,7 @@ export const DFY_OFFER: DFYOfferData = {
     {
       label: 'The system is yours to keep',
       detail:
-        "Even if you never work with us again, you keep everything — the lead magnet, the funnel, the posts, the prospect list, the DM sequences. It's built on your accounts. Nothing is held hostage.",
+        "Even if you never work with us again, you keep everything — the lead magnet, the funnel, the posts, the prospect list, the outreach sequences. It's built on your accounts. Nothing is held hostage.",
     },
   ],
 
@@ -256,12 +261,12 @@ export const DFY_OFFER: DFYOfferData = {
     {
       question: "Isn't this just cold outreach to a list of strangers?",
       answer:
-        "On day one, yes — they don't know you yet. But that's why the system works. They see your posts on their LinkedIn feed. They get a personalized DM offering a free, valuable asset. By the time they opt in and go through your funnel, they already feel like they know you. And if they don't book right away, the nurture sequence keeps you top of mind. That's the difference between cold outreach and a warm system.",
+        "It starts with a connection request — not a cold DM. Once they accept, they see your lead magnet posts on their feed. That's the warm-up. They're seeing your expertise, your insights, your offer — organically. When they click through to your opt-in page and go through your funnel, they already feel like they know you. And if they don't book right away, the nurture sequence keeps you top of mind. It's a system designed to warm people up, not blast them.",
     },
     {
       question: 'I can pull a list from Sales Navigator myself. Why do I need yours?',
       answer:
-        "Sales Nav gives you names and titles. We give you enriched, verified contacts with company data and behavioral signals — pulled from Apollo and enriched through Clay. Plus, the list isn't just for browsing. It's loaded directly into your HeyReach DM sequences so outreach starts immediately. The list is the fuel. The system is the engine.",
+        "Sales Nav gives you names and titles. We give you 500–1,000 enriched, verified contacts with company data — pulled from Apollo and enriched through Clay. Plus, the list isn't just for browsing. It's loaded directly into HeyReach so connection requests go out immediately. Once those prospects accept, they start seeing your lead magnet posts on their feed. The list is focused and actionable — not your entire TAM, but the right 500–1,000 people to start conversations with.",
     },
     {
       question: "What's the difference between this and the Bootcamp?",
@@ -271,12 +276,12 @@ export const DFY_OFFER: DFYOfferData = {
     {
       question: 'What is MagnetLab and will I need to use it ongoing?',
       answer:
-        "MagnetLab is our in-house platform — it hosts your lead magnet, opt-in pages, funnel, and email sequences. It also connects to your meeting note-taker (Grain, Fathom, etc.) and uses AI to extract insights from your client calls, then suggests content based on real conversations. It keeps your content pipeline running even when you're too busy to think about marketing. You get 3 months free, then it's ~$100/month (includes HeyReach for LinkedIn outreach, normally $79/month on its own).",
+        "MagnetLab is your forever content road map. It hosts your lead magnet, opt-in pages, funnel, and email sequences — but the real value is what happens after launch. It connects to your meeting note-taker (Grain, Fathom, etc.), uses AI to extract insights from every client call, and turns them into ready-to-post content. You're paying $2,500 once to build a system that keeps producing content indefinitely — no ongoing content agency, no ghostwriter retainer. You get 3 months free, then it's ~$100/month (includes HeyReach for LinkedIn outreach, normally $79/month on its own). Most clients find that replaces $3–5K/month in content services.",
     },
     {
       question: 'What happens after everything is built? Can you run it for me ongoing?',
       answer:
-        'After the build, you have a running system. Posts are scheduled, DM outreach is sending, and leads are being captured. Most clients maintain it themselves — MagnetLab makes it easy to approve new content and the automations keep running. If you want fully hands-off ongoing management (content, outreach, optimization), we offer that too starting at $3,500/month. But many clients never need it.',
+        'After the build, you have a running system. Posts are scheduled, connection requests are sending, and leads are being captured. Most clients maintain it themselves — MagnetLab makes it easy to approve new content and the automations keep running. If you want fully hands-off ongoing management (content, outreach, optimization), we offer that too starting at $3,500/month. But many clients never need it.',
     },
     {
       question: 'Only 10 posts — then what?',
@@ -286,7 +291,7 @@ export const DFY_OFFER: DFYOfferData = {
     {
       question: 'How long does the whole thing take?',
       answer:
-        '10 business days from your interview to a fully live system. Posts scheduled, lead magnet hosted, DM outreach running, funnel delivering.',
+        '10 business days from your interview to a fully live system. Posts scheduled, lead magnet hosted, connection outreach running, funnel delivering.',
     },
     {
       question: "Can I see examples of lead magnets you've built?",

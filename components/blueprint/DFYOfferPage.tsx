@@ -236,6 +236,45 @@ const DFYOfferPage: React.FC = () => {
                 </p>
               </a>
             </div>
+
+            {/* Lead Magnet Format Examples */}
+            <div className="mt-8">
+              <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mb-2">
+                Lead magnets we build for clients:
+              </h3>
+              <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-4">
+                Every lead magnet is custom-built from your strategy interview. Here are some of the
+                formats we use:
+              </p>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                {[
+                  {
+                    name: 'ROI Calculators',
+                    desc: 'Prospects input their numbers, see the gap',
+                  },
+                  {
+                    name: 'Diagnostic Assessments',
+                    desc: 'Score their approach against best practices',
+                  },
+                  {
+                    name: 'Industry Benchmarks',
+                    desc: 'How they compare to peers in their space',
+                  },
+                  {
+                    name: 'Strategic Playbooks',
+                    desc: 'Step-by-step guides they can start using today',
+                  },
+                ].map((fmt) => (
+                  <div
+                    key={fmt.name}
+                    className="p-4 bg-violet-50 dark:bg-violet-500/5 border border-violet-200 dark:border-violet-500/20 rounded-lg text-center"
+                  >
+                    <p className="font-medium text-sm text-zinc-900 dark:text-white">{fmt.name}</p>
+                    <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-1">{fmt.desc}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
           </section>
 
           {/* ===== DELIVERABLES GRID ===== */}
@@ -247,14 +286,14 @@ const DFYOfferPage: React.FC = () => {
               Everything built, configured, and launched for you.
             </p>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {offer.deliverables.map((item) => (
+            <div className="space-y-4">
+              {offer.deliverables.map((item, i) => (
                 <div
                   key={item.title}
                   className="flex items-start gap-4 p-5 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl"
                 >
-                  <div className="w-10 h-10 rounded-lg bg-violet-100 dark:bg-violet-500/10 flex items-center justify-center shrink-0">
-                    <item.icon size={20} className="text-violet-600 dark:text-violet-400" />
+                  <div className="w-10 h-10 rounded-full bg-violet-500 text-white flex items-center justify-center font-bold text-lg shrink-0">
+                    {i + 1}
                   </div>
                   <div>
                     <h3 className="font-semibold text-zinc-900 dark:text-white">{item.title}</h3>
@@ -292,6 +331,23 @@ const DFYOfferPage: React.FC = () => {
                   </div>
                 ))}
               </div>
+            </div>
+
+            {/* MagnetLab: Forever Content Road Map */}
+            <div className="mt-6 p-6 bg-gradient-to-r from-violet-50 to-violet-100/50 dark:from-violet-500/5 dark:to-violet-500/10 rounded-xl border border-violet-200 dark:border-violet-500/20">
+              <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-100 mb-2">
+                Your Forever Content Road Map
+              </h3>
+              <p className="text-zinc-700 dark:text-zinc-300 text-sm leading-relaxed mb-3">
+                MagnetLab doesn&rsquo;t just host your funnel &mdash; it builds your content engine.
+                Connect your meeting note-taker (Grain, Fathom, etc.), and it extracts insights from
+                every client call and turns them into post ideas you just approve and publish. The
+                $2,500 you invest builds a system that keeps producing content indefinitely &mdash;
+                no ongoing retainer, no content agency, no wondering what to post next.
+              </p>
+              <p className="text-sm font-medium text-violet-600 dark:text-violet-400">
+                One-time build. Ongoing content. That&rsquo;s the point.
+              </p>
             </div>
           </section>
 
@@ -381,6 +437,96 @@ const DFYOfferPage: React.FC = () => {
                   ))}
                 </ul>
               </div>
+            </div>
+          </section>
+
+          {/* ===== CASE STUDIES ===== */}
+          <section>
+            <h2 className="text-3xl font-bold text-zinc-900 dark:text-zinc-100 mb-2">
+              Real Results From Real Clients
+            </h2>
+            <p className="text-zinc-600 dark:text-zinc-400 mb-8">
+              These are the kinds of results the system produces.
+            </p>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {[
+                {
+                  name: 'Alex Olim',
+                  business: 'Content Creation Agency',
+                  metric: '2x Revenue',
+                  metricDetail: '$20K → $40K/mo in 2 months',
+                  quote:
+                    'Some simple details and tips that were actionable, easy to understand... broke our limiting beliefs.',
+                  videoId: 's7QDYug_ya8',
+                },
+                {
+                  name: 'Caterina Mariani',
+                  business: 'Ecommerce Google Ads',
+                  metric: '$70K/mo Client',
+                  metricDetail: 'From a cold LinkedIn DM',
+                  quote:
+                    'Someone wrote to me randomly and they spend $70K a month. I got the call today and sold the audit.',
+                  videoId: 'GRfRh_0q_5A',
+                },
+                {
+                  name: 'Jessie Healy',
+                  business: 'Performance Marketing Coach',
+                  metric: '~$400K Revenue',
+                  metricDetail: 'Fully booked from LinkedIn',
+                  quote:
+                    "I have too many leads right now. The number of booked calls with qualified leads... I'm really fully booked.",
+                  videoId: 'pO98lKHWSr0',
+                },
+                {
+                  name: 'Tyler Cook',
+                  business: 'B2B Email Marketing Agency',
+                  metric: '5+ New Clients',
+                  metricDetail: 'Including OfferPad (enterprise)',
+                  quote:
+                    "I booked two calls off of the general connection requests this last week. Total we've signed on five new clients.",
+                  videoId: 'EmaDGqWFdn4',
+                },
+              ].map((cs) => (
+                <div
+                  key={cs.name}
+                  className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-6"
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <div>
+                      <h3 className="font-semibold text-zinc-900 dark:text-white">{cs.name}</h3>
+                      <p className="text-xs text-zinc-500 dark:text-zinc-400">{cs.business}</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-lg font-bold text-violet-600 dark:text-violet-400">
+                        {cs.metric}
+                      </p>
+                      <p className="text-xs text-zinc-500 dark:text-zinc-400">{cs.metricDetail}</p>
+                    </div>
+                  </div>
+                  <p className="text-sm text-zinc-600 dark:text-zinc-300 italic mb-3">
+                    &ldquo;{cs.quote}&rdquo;
+                  </p>
+                  <a
+                    href={`https://www.youtube.com/watch?v=${cs.videoId}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs font-medium text-violet-500 hover:text-violet-600 dark:hover:text-violet-300 transition-colors"
+                  >
+                    Watch full interview &rarr;
+                  </a>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-6 text-center">
+              <a
+                href="/case-studies"
+                className="inline-flex items-center gap-2 text-sm font-medium text-violet-500 hover:text-violet-600 dark:hover:text-violet-300 transition-colors"
+              >
+                See all case studies
+                <ArrowRight size={14} />
+              </a>
             </div>
           </section>
 
