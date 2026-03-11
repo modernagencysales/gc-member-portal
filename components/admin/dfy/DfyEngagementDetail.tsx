@@ -49,6 +49,8 @@ import {
   createEngagementFileRecord,
   deleteEngagementFile,
   uploadAdminFileToStorage,
+  upgradeEngagement,
+  createLinearCustomer,
 } from '../../../services/dfy-admin-supabase';
 import type {
   DfyAdminEngagement,
@@ -256,21 +258,7 @@ const DfyEngagementDetail: React.FC = () => {
   });
 
   const upgradeMutation = useMutation({
-    mutationFn: async () => {
-      const res = await fetch(
-        `${import.meta.env.VITE_GTM_SYSTEM_URL || 'https://gtmconductor.com'}/api/dfy/admin/engagements/${engagementId}/upgrade`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'x-admin-key': import.meta.env.VITE_ADMIN_API_KEY,
-          },
-          body: JSON.stringify({ monthly_rate: 250000 }),
-        }
-      );
-      if (!res.ok) throw new Error('Upgrade failed');
-      return res.json();
-    },
+    mutationFn: () => upgradeEngagement(engagementId!),
     onSuccess: () => {
       refreshAll();
     },
@@ -578,18 +566,9 @@ const DfyEngagementDetail: React.FC = () => {
                           )
                             return;
                           try {
-                            const res = await fetch(
-                              `${import.meta.env.VITE_GTM_SYSTEM_URL || 'https://gtmconductor.com'}/api/dfy/admin/engagements/${engagement.id}/create-customer`,
-                              {
-                                method: 'POST',
-                                headers: {
-                                  'Content-Type': 'application/json',
-                                  'x-admin-key': import.meta.env.VITE_ADMIN_API_KEY || '',
-                                },
-                                body: JSON.stringify({ suffix: `#${Date.now().toString(36)}` }),
-                              }
-                            );
-                            const data = await res.json();
+                            const data = await createLinearCustomer(engagement.id, {
+                              suffix: `#${Date.now().toString(36)}`,
+                            });
                             if (data.success) {
                               window.alert(`Created: ${data.name}`);
                               queryClient.invalidateQueries({
@@ -611,17 +590,7 @@ const DfyEngagementDetail: React.FC = () => {
                     <button
                       onClick={async () => {
                         try {
-                          const res = await fetch(
-                            `${import.meta.env.VITE_GTM_SYSTEM_URL || 'https://gtmconductor.com'}/api/dfy/admin/engagements/${engagement.id}/create-customer`,
-                            {
-                              method: 'POST',
-                              headers: {
-                                'Content-Type': 'application/json',
-                                'x-admin-key': import.meta.env.VITE_ADMIN_API_KEY || '',
-                              },
-                            }
-                          );
-                          const data = await res.json();
+                          const data = await createLinearCustomer(engagement.id);
                           if (data.success) {
                             window.alert(`Customer created: ${data.name}`);
                             queryClient.invalidateQueries({

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Link2, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
+import { createConnectAccount } from '../../services/affiliate-supabase';
 
 const AffiliateOnboard: React.FC = () => {
   const navigate = useNavigate();
@@ -20,18 +21,10 @@ const AffiliateOnboard: React.FC = () => {
 
     try {
       const { email } = JSON.parse(saved);
-      const res = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-connect-account`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email }),
-        }
-      );
-      const data = await res.json();
-      if (data.error) {
-        setError(data.error);
-      } else if (data.url) {
+      const { data, error: fnError } = await createConnectAccount(email);
+      if (fnError || data?.error) {
+        setError(fnError?.message || data?.error || 'Failed to start Stripe setup.');
+      } else if (data?.url) {
         window.location.href = data.url;
       }
     } catch (_err) {

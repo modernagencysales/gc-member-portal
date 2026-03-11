@@ -602,3 +602,15 @@ export async function fetchAllPayouts(): Promise<AffiliatePayout[]> {
   if (error) throw new Error(error.message);
   return (data || []).map(mapPayout);
 }
+
+// ============================================
+// Edge Function Wrappers
+// ============================================
+
+export async function createConnectAccount(email: string) {
+  return supabase.functions.invoke('create-connect-account', { body: { email } });
+}
+
+export async function getConnectLoginLink(affiliateId: string) {
+  return supabase.functions.invoke('create-connect-login-link', { body: { affiliateId } });
+}

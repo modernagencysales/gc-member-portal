@@ -5,7 +5,7 @@ import {
   InfraTier,
   ServiceProvider,
 } from '../../../../types/infrastructure-types';
-import { buildGtmHeaders } from '../../../../lib/api-config';
+import { checkDomainAvailability } from '../../../../services/infrastructure-supabase';
 import { logError } from '../../../../lib/logError';
 
 interface Props {
@@ -20,7 +20,6 @@ export default function DomainPicker({
   tier,
   selectedDomains,
   onDomainsChange,
-  gtmSystemUrl,
   defaultServiceProvider,
 }: Props) {
   const [brandName, setBrandName] = useState('');
@@ -39,17 +38,7 @@ export default function DomainPicker({
     setChecking(true);
     setFetchError(null);
     try {
-      const headers = buildGtmHeaders();
-      const res = await fetch(`${gtmSystemUrl}/api/infrastructure/domains/check`, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify({ domain: `${clean}.com` }),
-      });
-      if (!res.ok) {
-        const errData = await res.json().catch(() => ({}));
-        throw new Error(errData.error || `Domain check failed (${res.status})`);
-      }
-      const data = await res.json();
+      const data = await checkDomainAvailability(`${clean}.com`);
       const domainsWithProvider = (data.domains || []).map(
         (d: Omit<DomainAvailability, 'serviceProvider'>) => ({
           ...d,

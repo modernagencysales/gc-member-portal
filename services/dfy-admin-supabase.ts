@@ -292,3 +292,20 @@ export async function uploadAdminFileToStorage(
   if (error) throw new Error(`Upload failed: ${error.message}`);
   return { storage_path: storagePath };
 }
+
+export async function upgradeEngagement(engagementId: string): Promise<unknown> {
+  return gtmAdminFetch(`/api/dfy/admin/engagements/${engagementId}/upgrade`, {
+    method: 'POST',
+    body: JSON.stringify({ monthly_rate: 250000 }),
+  });
+}
+
+export async function createLinearCustomer(
+  engagementId: string,
+  options?: { suffix?: string }
+): Promise<{ success: boolean; name?: string; error?: string }> {
+  return gtmAdminFetch(`/api/dfy/admin/engagements/${engagementId}/create-customer`, {
+    method: 'POST',
+    body: options ? JSON.stringify(options) : undefined,
+  });
+}

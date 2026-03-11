@@ -4,6 +4,7 @@ import { ExternalLink, Loader2 } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import { Affiliate, AffiliateStats } from '../../types/affiliate-types';
 import { logError } from '../../lib/logError';
+import { getConnectLoginLink } from '../../services/affiliate-supabase';
 
 const AffiliateSettingsPage: React.FC = () => {
   const { affiliate } = useOutletContext<{ affiliate: Affiliate; stats: AffiliateStats }>();
@@ -13,16 +14,8 @@ const AffiliateSettingsPage: React.FC = () => {
   const openStripeDashboard = async () => {
     setLoadingStripe(true);
     try {
-      const res = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-connect-login-link`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ affiliateId: affiliate.id }),
-        }
-      );
-      const data = await res.json();
-      if (data.url) window.open(data.url, '_blank');
+      const { data } = await getConnectLoginLink(affiliate.id);
+      if (data?.url) window.open(data.url, '_blank');
     } catch (err) {
       logError('AffiliateSettingsPage:openStripeDashboard', err);
     } finally {
