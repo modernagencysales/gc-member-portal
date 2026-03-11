@@ -16,8 +16,8 @@ import {
   BlueprintContentBlockType,
 } from '../types/blueprint-types';
 
-// Explicit column lists (select('*') fails silently on Vercel)
-// Lightweight list for admin table — only columns needed for display + filtering
+// ─── Column Selects ────────────────────────────────────────────────────────
+
 const PROSPECT_LIST_COLUMNS =
   'id, full_name, first_name, last_name, email, company, authority_score, status, processing_step, slug, offer_unlocked, recommended_offer, created_at, updated_at';
 
@@ -36,9 +36,7 @@ const CONTENT_BLOCK_COLUMNS =
 
 const CLIENT_LOGO_COLUMNS = 'id, name, image_url, sort_order, is_visible, created_at';
 
-// ============================================
-// Prospect Filters Interface
-// ============================================
+// ─── Types ─────────────────────────────────────────────────────────────────
 
 export interface ProspectFilters {
   status?: ProspectStatus;
@@ -50,9 +48,7 @@ export interface ProspectFilters {
   offset?: number;
 }
 
-// ============================================
-// Slug Generation
-// ============================================
+// ─── Slug Generation ───────────────────────────────────────────────────────
 
 /**
  * Generate a unique slug for a prospect
@@ -79,9 +75,7 @@ export function generateSlug(fullName: string): string {
   return `${nameSlug}-${suffix}`;
 }
 
-// ============================================
-// Mapper Functions
-// ============================================
+// ─── Mappers ───────────────────────────────────────────────────────────────
 
 function mapProspect(record: Record<string, unknown>): Prospect {
   return {
@@ -300,9 +294,7 @@ function mapBlueprintContentBlock(record: Record<string, unknown>): BlueprintCon
   };
 }
 
-// ============================================
-// Prospect Functions
-// ============================================
+// ─── Prospect Reads ────────────────────────────────────────────────────────
 
 /**
  * Fetch a prospect by their unique slug
@@ -475,9 +467,7 @@ export async function updateProspectSlug(id: string, slug: string): Promise<Pros
   return mapProspect(data);
 }
 
-// ============================================
-// Landing Page Prospect Creation
-// ============================================
+// ─── Prospect Writes ───────────────────────────────────────────────────────
 
 /**
  * Create a new prospect from the landing page opt-in form
@@ -525,9 +515,7 @@ export async function createProspectFromLanding(data: {
   return { slug };
 }
 
-// ============================================
-// Prospect Posts Functions
-// ============================================
+// ─── Prospect Posts ────────────────────────────────────────────────────────
 
 /**
  * Fetch all posts for a prospect
@@ -581,9 +569,7 @@ export async function updatePostFinalizedContent(
   }
 }
 
-// ============================================
-// Prospect Count Function
-// ============================================
+// ─── Prospect Count ────────────────────────────────────────────────────────
 
 /**
  * Get total number of prospects (scorecards delivered)
@@ -606,9 +592,7 @@ export async function getProspectCount(): Promise<number> {
   }
 }
 
-// ============================================
-// Blueprint Settings Functions
-// ============================================
+// ─── Blueprint Settings ────────────────────────────────────────────────────
 
 /**
  * Fetch global blueprint settings
@@ -793,9 +777,7 @@ export async function updateBlueprintSettings(
   return mapBlueprintSettings(data);
 }
 
-// ============================================
-// Content Block Functions
-// ============================================
+// ─── Content Blocks ────────────────────────────────────────────────────────
 
 /**
  * Fetch a single content block by key (block_type)
@@ -988,9 +970,7 @@ export async function deleteContentBlock(id: string): Promise<void> {
   }
 }
 
-// ============================================
-// Client Logos Functions
-// ============================================
+// ─── Client Logos ──────────────────────────────────────────────────────────
 
 export interface ClientLogo {
   id: string;
@@ -1145,9 +1125,7 @@ export async function deleteClientLogo(id: string): Promise<void> {
   }
 }
 
-// ============================================
-// Composite Functions
-// ============================================
+// ─── Composite Reads ───────────────────────────────────────────────────────
 
 /**
  * Fetch all data needed for a blueprint page
@@ -1175,9 +1153,7 @@ export async function getBlueprintPageData(slug: string): Promise<{
   };
 }
 
-// ============================================
-// Blueprint Data Lookup by Email
-// ============================================
+// ─── AI Summary Helpers ────────────────────────────────────────────────────
 
 /**
  * Fetch a prospect by their email address (case-insensitive)

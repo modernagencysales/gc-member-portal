@@ -28,7 +28,8 @@ import {
   EnrollmentConfig,
 } from '../types/bootcamp-types';
 
-// Explicit column lists (avoid select('*'))
+// ─── Column Selects ────────────────────────────────────────────────────────
+
 const BOOTCAMP_STUDENT_COLUMNS =
   'id, email, name, company, cohort, status, access_level, purchase_date, onboarding_completed_at, slack_invited, slack_invited_at, calendar_added, calendar_added_at, payment_source, payment_id, subscription_status, subscription_id, subscription_started_at, subscription_ends_at, stripe_customer_id, notes, prospect_id, access_expires_at, created_at, updated_at';
 
@@ -42,9 +43,7 @@ const BOOTCAMP_SURVEY_COLUMNS =
 
 const BOOTCAMP_COHORT_COLUMNS = 'id, name, description, status, created_at, start_date, end_date';
 
-// ============================================
-// Bootcamp Students
-// ============================================
+// ─── Student Reads & Writes ────────────────────────────────────────────────
 
 export async function verifyBootcampStudent(email: string): Promise<BootcampStudent | null> {
   try {
@@ -221,9 +220,7 @@ function mapBootcampStudent(record: Record<string, unknown>): BootcampStudent {
   };
 }
 
-// ============================================
-// Onboarding Checklist
-// ============================================
+// ─── Onboarding Checklist ──────────────────────────────────────────────────
 
 export async function fetchBootcampOnboardingChecklist(): Promise<BootcampChecklistItem[]> {
   try {
@@ -330,9 +327,7 @@ function mapBootcampChecklistItem(record: Record<string, unknown>): BootcampChec
   };
 }
 
-// ============================================
-// Student Progress
-// ============================================
+// ─── Student Progress ──────────────────────────────────────────────────────
 
 export async function fetchBootcampStudentProgress(
   studentId: string
@@ -478,9 +473,7 @@ function mapBootcampStudentProgress(record: Record<string, unknown>): BootcampSt
   };
 }
 
-// ============================================
-// Student Survey
-// ============================================
+// ─── Student Survey ────────────────────────────────────────────────────────
 
 export async function fetchBootcampStudentSurvey(
   studentId: string
@@ -572,9 +565,7 @@ function mapBootcampStudentSurvey(record: Record<string, unknown>): BootcampStud
   };
 }
 
-// ============================================
-// Settings
-// ============================================
+// ─── Settings ──────────────────────────────────────────────────────────────
 
 // Map camelCase TypeScript keys to snake_case database keys
 const SETTINGS_KEY_MAP: Record<keyof BootcampSettings, string> = {
@@ -650,9 +641,7 @@ export async function updateBootcampSetting<K extends keyof BootcampSettings>(
   await upsertBootcampSetting(dbKey, value, '');
 }
 
-// ============================================
-// Admin: Progress Calculations
-// ============================================
+// ─── Admin: Progress Calculations ─────────────────────────────────────────
 
 export async function calculateStudentOnboardingProgress(studentId: string): Promise<number> {
   const { totalProgress } = await fetchBootcampOnboardingWithProgress(studentId);
@@ -733,9 +722,7 @@ export async function fetchStudentsWithProgress(): Promise<
   });
 }
 
-// ============================================
-// Admin: Automation Helpers
-// ============================================
+// ─── Admin: Automation Helpers ─────────────────────────────────────────────
 
 export async function markStudentSlackInvited(studentId: string): Promise<BootcampStudent> {
   return updateBootcampStudent(studentId, {
@@ -751,9 +738,7 @@ export async function markStudentCalendarAdded(studentId: string): Promise<Bootc
   });
 }
 
-// ============================================
-// Admin: Check Progress Exists
-// ============================================
+// ─── Admin: Check Progress Exists ─────────────────────────────────────────
 
 export async function checkBootcampProgressExists(checklistItemId: string): Promise<number> {
   const { count, error } = await supabase
@@ -765,9 +750,7 @@ export async function checkBootcampProgressExists(checklistItemId: string): Prom
   return count || 0;
 }
 
-// ============================================
-// Cohorts
-// ============================================
+// ─── Cohorts ───────────────────────────────────────────────────────────────
 
 export async function fetchAllCohorts(): Promise<BootcampCohort[]> {
   const { data, error } = await supabase
@@ -870,9 +853,7 @@ function mapBootcampCohort(record: Record<string, unknown>): BootcampCohort {
   };
 }
 
-// ============================================
-// Invite Codes
-// ============================================
+// ─── Invite Codes ──────────────────────────────────────────────────────────
 
 export function generateInviteCode(): string {
   // 8-char alphanumeric, uppercase, no confusing chars (0/O/1/I)
@@ -1066,9 +1047,7 @@ function mapBootcampInviteCode(record: Record<string, unknown>): BootcampInviteC
   };
 }
 
-// ============================================
-// Prospect Linking
-// ============================================
+// ─── Prospect Linking ──────────────────────────────────────────────────────
 
 /**
  * Find a prospect by their email address
@@ -1125,9 +1104,7 @@ export async function linkStudentToProspect(
   return mapBootcampStudent(data);
 }
 
-// ============================================
-// Self-Registration
-// ============================================
+// ─── Self-Registration ─────────────────────────────────────────────────────
 
 export async function registerBootcampStudent(
   email: string,
@@ -1230,9 +1207,7 @@ export async function registerBootcampStudent(
   return student;
 }
 
-// ============================================
-// Lead Magnet Grant Helpers
-// ============================================
+// ─── Grant Helpers ─────────────────────────────────────────────────────────
 
 async function grantToolCredits(
   studentId: string,
@@ -1304,9 +1279,7 @@ async function recordRedeemedCode(studentId: string, code: string): Promise<void
   }
 }
 
-// ============================================
-// Code Redemption (for logged-in users)
-// ============================================
+// ─── Code Redemption ───────────────────────────────────────────────────────
 
 export interface RedeemResult {
   toolsUnlocked: string[];
@@ -1366,9 +1339,7 @@ export async function redeemCode(studentId: string, code: string): Promise<Redee
   return result;
 }
 
-// ============================================
-// Student Grants Query
-// ============================================
+// ─── Student Grants ────────────────────────────────────────────────────────
 
 export interface StudentGrants {
   tools: Array<{
@@ -1445,9 +1416,7 @@ export async function getStudentGrants(studentId: string): Promise<StudentGrants
   return { tools, weekIds };
 }
 
-// ============================================
-// Funnel Tool Presets
-// ============================================
+// ─── Funnel Tool Presets ───────────────────────────────────────────────────
 
 export async function fetchFunnelToolPresets(): Promise<FunnelToolPresets> {
   try {
@@ -1523,9 +1492,7 @@ export async function saveFunnelToolPresets(presets: FunnelToolPresets): Promise
   );
 }
 
-// ============================================
-// Call Grant Config
-// ============================================
+// ─── Call Grant Config ─────────────────────────────────────────────────────
 
 const DEFAULT_CALL_GRANT_CONFIG: CallGrantConfig = {
   enabled: false,
@@ -1560,9 +1527,7 @@ export async function saveCallGrantConfig(config: CallGrantConfig): Promise<void
   );
 }
 
-// ============================================
-// Sprint Product Config
-// ============================================
+// ─── Sprint Product Config ─────────────────────────────────────────────────
 
 const DEFAULT_SPRINT_PRODUCT_CONFIG: SprintProductConfig = {
   enabled: false,
@@ -1612,9 +1577,7 @@ export async function saveSprintProductConfig(config: SprintProductConfig): Prom
   );
 }
 
-// ============================================
-// Enrollment Config
-// ============================================
+// ─── Enrollment Config ─────────────────────────────────────────────────────
 
 export async function fetchEnrollmentConfig(): Promise<EnrollmentConfig | null> {
   try {

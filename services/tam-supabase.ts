@@ -14,7 +14,8 @@ import {
   TamProjectStats,
 } from '../types/tam-types';
 
-// Explicit column lists (avoid select('*'))
+// ─── Column Selects ────────────────────────────────────────────────────────
+
 const TAM_PROJECT_COLUMNS =
   'id, user_id, name, status, icp_profile, sourcing_strategy, created_at, updated_at';
 

@@ -27,7 +27,8 @@ import {
 } from '../types/lms-types';
 import { StudentEnrollment } from '../types/bootcamp-types';
 
-// Explicit column lists (avoid select('*'))
+// ─── Column Selects ────────────────────────────────────────────────────────
+
 const LMS_COHORT_COLUMNS =
   'id, name, description, status, start_date, end_date, sidebar_label, icon, sort_order, product_type, thrivecart_product_id, onboarding_config, created_at, updated_at';
 
@@ -48,9 +49,7 @@ const LMS_LESSON_PROGRESS_COLUMNS = 'id, student_id, lesson_id, completed_at, no
 const LMS_ACTION_ITEM_PROGRESS_COLUMNS =
   'id, student_id, action_item_id, completed_at, proof_of_work, notes, created_at';
 
-// ============================================
-// Cohorts
-// ============================================
+// ─── Cohort Reads & Writes ─────────────────────────────────────────────────
 
 export async function fetchAllLmsCohorts(): Promise<LmsCohort[]> {
   const { data, error } = await supabase
@@ -191,9 +190,7 @@ function mapLmsCohort(record: Record<string, unknown>): LmsCohort {
   };
 }
 
-// ============================================
-// Weeks
-// ============================================
+// ─── Week Reads & Writes ───────────────────────────────────────────────────
 
 export async function fetchLmsWeeksByCohort(cohortId: string): Promise<LmsWeek[]> {
   const { data, error } = await supabase
@@ -303,9 +300,7 @@ function mapLmsWeek(record: Record<string, unknown>): LmsWeek {
   };
 }
 
-// ============================================
-// Lessons
-// ============================================
+// ─── Lesson Reads & Writes ─────────────────────────────────────────────────
 
 export async function fetchLmsLessonsByWeek(weekId: string): Promise<LmsLesson[]> {
   const { data, error } = await supabase
@@ -414,9 +409,7 @@ function mapLmsLesson(record: Record<string, unknown>): LmsLesson {
   };
 }
 
-// ============================================
-// Content Items
-// ============================================
+// ─── Content Item Reads & Writes ───────────────────────────────────────────
 
 export async function fetchLmsContentItemsByLesson(lessonId: string): Promise<LmsContentItem[]> {
   const { data, error } = await supabase
@@ -548,9 +541,7 @@ function mapLmsContentItem(record: Record<string, unknown>): LmsContentItem {
   };
 }
 
-// ============================================
-// Action Items
-// ============================================
+// ─── Action Item Reads & Writes ────────────────────────────────────────────
 
 export async function fetchLmsActionItemsByWeek(weekId: string): Promise<LmsActionItem[]> {
   const { data, error } = await supabase
@@ -685,9 +676,7 @@ function mapLmsActionItem(record: Record<string, unknown>): LmsActionItem {
   };
 }
 
-// ============================================
-// Student Progress
-// ============================================
+// ─── Student Progress ──────────────────────────────────────────────────────
 
 export async function fetchLessonProgress(
   studentId: string,
@@ -835,9 +824,7 @@ function mapLmsActionItemProgress(record: Record<string, unknown>): LmsActionIte
   };
 }
 
-// ============================================
-// Student Enrollments
-// ============================================
+// ─── Student Enrollments ───────────────────────────────────────────────────
 
 export async function fetchStudentEnrollments(studentId: string): Promise<StudentEnrollment[]> {
   const { data, error } = await supabase
@@ -962,9 +949,7 @@ export async function fetchCohortByProductId(productId: string): Promise<LmsCoho
   return mapLmsCohort(data);
 }
 
-// ============================================
-// Aggregate Queries for UI
-// ============================================
+// ─── Aggregate Curriculum Queries ─────────────────────────────────────────
 
 /**
  * Fetch complete curriculum data for a cohort
@@ -1081,9 +1066,7 @@ async function fetchLmsCurriculumByCohortForStudent(
   };
 }
 
-// ============================================
-// Import Curriculum from Another Cohort
-// ============================================
+// ─── Curriculum Import ─────────────────────────────────────────────────────
 
 export interface ImportCurriculumOptions {
   sourceCohortId: string;
@@ -1217,10 +1200,7 @@ function isRecordingOnlyLesson(lesson: LmsLessonWithContent): boolean {
   );
 }
 
-// ============================================
-// Legacy Adapter for Student Portal
-// Converts new LMS data to existing CourseData format
-// ============================================
+// ─── Legacy Adapter (LMS → CourseData) ────────────────────────────────────
 
 import { CourseData, Week, Lesson, ActionItem } from '../types/bootcamp-types';
 

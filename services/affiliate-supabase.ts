@@ -19,7 +19,8 @@ import {
   AssetType,
 } from '../types/affiliate-types';
 
-// Explicit column lists (avoid select('*'))
+// ─── Column Selects ────────────────────────────────────────────────────────
+
 const AFFILIATE_COLUMNS =
   'id, email, name, company, slug, code, status, commission_amount, stripe_connect_account_id, stripe_connect_onboarded, bootcamp_student_id, photo_url, bio, application_note, created_at, updated_at';
 

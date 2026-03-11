@@ -15,7 +15,8 @@ import {
   ConversationWithMessages,
 } from '../types/chat-types';
 
-// Explicit column lists (avoid select('*'))
+// ─── Column Selects ────────────────────────────────────────────────────────
+
 const AI_TOOL_COLUMNS =
   'id, slug, name, description, category, system_prompt, model, max_tokens, welcome_message, suggested_prompts, is_active, sort_order, created_at, updated_at';
 

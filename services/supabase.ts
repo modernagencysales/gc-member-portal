@@ -21,7 +21,8 @@ import {
   ProgressStatus,
 } from '../types/gc-types';
 
-// Explicit column lists (avoid select('*'))
+// ─── Column Selects ────────────────────────────────────────────────────────
+
 const GC_MEMBER_COLUMNS =
   'id, email, name, company, website, linkedin, plan, status, start_date, slack_handle, calendar_link, notes';
 

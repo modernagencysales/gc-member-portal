@@ -127,6 +127,8 @@ export async function signProposal(
 // Portal Data Fetching (for client portal)
 // ============================================
 
+// ─── Column Selects ────────────────────────────────────────────────────────
+
 const DFY_ENGAGEMENT_COLUMNS =
   'id, proposal_id, client_name, client_email, client_company, portal_slug, status, monthly_rate, start_date, onboarding_checklist, unipile_account_id, linkedin_connected_at, intake_data, intake_submitted_at, engagement_type, blueprint_prospect_id, intake_status, processed_intake, magnetlab_user_id, created_at';
 const DFY_DELIVERABLE_COLUMNS =

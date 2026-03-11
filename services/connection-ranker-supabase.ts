@@ -17,9 +17,7 @@ import type {
 } from '../types/connection-qualifier-types';
 import { assignTier } from '../components/bootcamp/connection-qualifier/scoring';
 
-// ============================================
-// Column Lists (never select('*'))
-// ============================================
+// ─── Column Selects ────────────────────────────────────────────────────────
 
 const RUN_COLUMNS = [
   'id',

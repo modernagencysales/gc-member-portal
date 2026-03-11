@@ -15,7 +15,8 @@ import type {
   DfyIntakeFile,
 } from '../types/dfy-admin-types';
 
-// Column constants — must match DB schema (never select('*'))
+// ─── Column Selects ────────────────────────────────────────────────────────
+
 const ADMIN_ENGAGEMENT_COLUMNS =
   'id, proposal_id, tenant_id, client_name, client_email, client_company, portal_slug, status, monthly_rate, start_date, linear_project_id, slack_channel_id, stripe_subscription_id, onboarding_checklist, linkedin_url, call_transcript, unipile_account_id, linkedin_connected_at, communication_preference, intake_data, intake_submitted_at, engagement_type, blueprint_prospect_id, intake_status, processed_intake, magnetlab_user_id, linear_customer_id, created_at';
 const DELIVERABLE_COLUMNS =
