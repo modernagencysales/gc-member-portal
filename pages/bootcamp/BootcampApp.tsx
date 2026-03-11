@@ -1,16 +1,16 @@
 import React, { useState, useEffect, useCallback, useRef, lazy, Suspense } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSearchParams } from 'react-router-dom';
-import {
-  fetchStudentCurriculumAsLegacy,
-  completeEnrollmentOnboarding,
-} from '../../services/lms-supabase';
+import { completeEnrollmentOnboarding } from '../../services/lms-supabase';
 import {
   saveBootcampStudentSurvey,
   fetchAllBootcampSettings,
   completeStudentOnboarding,
 } from '../../services/bootcamp-supabase';
 import { useBootcampAuth } from '../../hooks/useBootcampAuth';
+import { useBootcampCurriculum } from '../../hooks/useBootcampCurriculum';
+import type { ProgressSnapshot } from '../../hooks/useBootcampCurriculum';
+import { useBootcampProgress } from '../../hooks/useBootcampProgress';
 import Sidebar from '../../components/bootcamp/Sidebar';
 import LessonView from '../../components/bootcamp/LessonView';
 import Breadcrumbs from '../../components/bootcamp/Breadcrumbs';
@@ -45,12 +45,11 @@ import {
 import RedeemCodeModal from '../../components/bootcamp/RedeemCodeModal';
 import { StudentSettingsModal } from '../../components/bootcamp/settings';
 import { FeedbackWidget } from '../../components/feedback/FeedbackWidget';
-import { CourseData, Lesson, User } from '../../types';
+import type { User } from '../../types';
 import { BootcampSurveyFormData, OnboardingStep } from '../../types/bootcamp-types';
 import { queryKeys } from '../../lib/queryClient';
 import { Menu, X, Terminal, Users, AlertCircle } from 'lucide-react';
 import ErrorBoundary from '../../components/shared/ErrorBoundary';
-import { logError } from '../../lib/logError';
 
 const TamBuilder = lazy(() => import('../../components/tam/TamBuilder'));
 const ConnectionQualifier = lazy(
@@ -77,21 +76,30 @@ const BootcampApp: React.FC = () => {
   // time to pass as `initialCode` to <Register /> before the hook has run.
   const inviteCodeFromUrl = searchParams.get('code');
 
-  // Legacy state for curriculum
-  const loadRequestRef = useRef(0);
-  const [courseData, setCourseData] = useState<CourseData | null>(null);
-  const [currentLesson, setCurrentLesson] = useState<Lesson | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [loadError, setLoadError] = useState<string | null>(null);
   const [isDarkMode, setIsDarkMode] = useState(() => {
     return localStorage.getItem('gtm_os_theme') === 'dark';
   });
 
-  // Stable callback refs passed to useBootcampAuth so the hook can call functions
-  // that are defined later in this component without temporal dead zone errors.
+  // Stable callback refs so hooks can call functions defined later in the component
+  // without temporal dead zone errors. Updated on every render (see bottom of hook block).
+  const onProgressLoadedRef = useRef<((snapshot: ProgressSnapshot) => void) | undefined>(undefined);
   const loadUserDataRef = useRef<((u: User) => void) | undefined>(undefined);
   const refetchGrantsRef = useRef<(() => void) | undefined>(undefined);
+
+  // Curriculum state — managed by hook
+  const {
+    courseData,
+    currentLesson,
+    setCurrentLesson,
+    loading,
+    setLoading,
+    loadError,
+    loadUserData,
+    getStorageKey,
+  } = useBootcampCurriculum({
+    onProgressLoaded: (snapshot) => onProgressLoadedRef.current?.(snapshot),
+  });
 
   // Auth state — managed by hook
   const {
@@ -110,6 +118,23 @@ const BootcampApp: React.FC = () => {
     refetchGrantsRef,
     setLoading,
   });
+
+  // Progress state — managed by hook. Depends on getStorageKey (curriculum) and
+  // user?.email (auth). Both are available by this point in the render order.
+  const {
+    completedItems,
+    proofOfWork,
+    taskNotes,
+    submittedWeeks,
+    setProgressFromLoad,
+    toggleActionItem,
+    updateProofOfWork,
+    updateTaskNote,
+    handleWeekSubmit,
+  } = useBootcampProgress({ userEmail: user?.email ?? null, getStorageKey });
+
+  // Wire callback refs. Updated on every render so hooks always see the latest values.
+  onProgressLoadedRef.current = setProgressFromLoad;
 
   // Onboarding flow state
   const [onboardingStep, setOnboardingStep] = useState<OnboardingStep>('welcome');
@@ -158,12 +183,6 @@ const BootcampApp: React.FC = () => {
   // Dashboard view state (null activeCourseId = show dashboard)
   const [showDashboard, setShowDashboard] = useState(false);
 
-  // Legacy progress state
-  const [completedItems, setCompletedItems] = useState<Set<string>>(new Set<string>());
-  const [proofOfWork, setProofOfWork] = useState<Record<string, string>>({});
-  const [taskNotes, setTaskNotes] = useState<Record<string, string>>({});
-  const [submittedWeeks, setSubmittedWeeks] = useState<Record<string, boolean>>({});
-
   // Fetch settings
   const { data: settings } = useQuery({
     queryKey: queryKeys.bootcampSettings(),
@@ -191,75 +210,6 @@ const BootcampApp: React.FC = () => {
     bootcampStudent &&
     bootcampStudent.status === 'Onboarding' &&
     !bootcampStudent.onboardingCompletedAt;
-
-  const getStorageKey = (email: string) => {
-    const domain = email.split('@')[1] || 'global';
-    return `lms_progress_v2_${domain}`;
-  };
-
-  const loadUserData = async (activeUser: User, cohortNameOverride?: string) => {
-    const thisLoadId = ++loadRequestRef.current;
-    setLoading(true);
-
-    const storageKey = getStorageKey(activeUser.email);
-    const storedProgress = localStorage.getItem(storageKey);
-
-    if (storedProgress) {
-      try {
-        const parsed = JSON.parse(storedProgress);
-        if (parsed.items) setCompletedItems(new Set<string>(parsed.items));
-        if (parsed.proof) setProofOfWork(parsed.proof);
-        if (parsed.notes) setTaskNotes(parsed.notes);
-        if (parsed.submitted) setSubmittedWeeks(parsed.submitted);
-      } catch (e) {
-        logError('BootcampApp:loadProgress', e);
-      }
-    } else {
-      setCompletedItems(new Set());
-      setProofOfWork({});
-      setTaskNotes({});
-      setSubmittedWeeks({});
-    }
-
-    const cohortName = cohortNameOverride || activeUser.cohort;
-
-    try {
-      setLoadError(null);
-
-      const data = await fetchStudentCurriculumAsLegacy(cohortName, activeUser.email);
-
-      // Prevent stale data from overwriting (race condition between init + enrollment load)
-      if (loadRequestRef.current !== thisLoadId) return;
-
-      setCourseData(data);
-
-      // Lead Magnet users with no content grants should land on My Blueprint, not Week 1
-      if (activeUser.status === 'Lead Magnet') {
-        setCurrentLesson({
-          id: 'my-blueprint',
-          title: 'My Blueprint',
-          embedUrl: 'virtual:my-blueprint',
-        });
-      } else if (data.weeks.length > 0 && data.weeks[0].lessons.length > 0) {
-        setCurrentLesson(data.weeks[0].lessons[0]);
-      } else {
-        // Fallback: no lessons available yet
-        setCurrentLesson({
-          id: 'no-content',
-          title: 'No Content Available',
-          embedUrl: '',
-        });
-      }
-    } catch (error) {
-      logError('BootcampApp:loadCurriculum', error);
-      if (loadRequestRef.current !== thisLoadId) return;
-      setLoadError('Unable to load your content. Please refresh the page to try again.');
-    } finally {
-      if (loadRequestRef.current === thisLoadId) {
-        setLoading(false);
-      }
-    }
-  };
 
   // Wire up callback refs so useBootcampAuth can call loadUserData and refetchGrants
   // after they are defined. These refs are updated on every render.
@@ -291,43 +241,6 @@ const BootcampApp: React.FC = () => {
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
   }, []);
-
-  const saveProgress = (
-    items: Set<string>,
-    proof: Record<string, string>,
-    notes: Record<string, string>,
-    submitted: Record<string, boolean>
-  ) => {
-    if (!user) return;
-    const payload = { items: Array.from(items), proof, notes, submitted };
-    localStorage.setItem(getStorageKey(user.email), JSON.stringify(payload));
-  };
-
-  const toggleActionItem = (id: string) => {
-    const newSet = new Set<string>(completedItems);
-    if (newSet.has(id)) newSet.delete(id);
-    else newSet.add(id);
-    setCompletedItems(newSet);
-    saveProgress(newSet, proofOfWork, taskNotes, submittedWeeks);
-  };
-
-  const updateProofOfWork = (id: string, proof: string) => {
-    const newProof = { ...proofOfWork, [id]: proof };
-    setProofOfWork(newProof);
-    saveProgress(completedItems, newProof, taskNotes, submittedWeeks);
-  };
-
-  const updateTaskNote = (id: string, note: string) => {
-    const newNotes = { ...taskNotes, [id]: note };
-    setTaskNotes(newNotes);
-    saveProgress(completedItems, proofOfWork, newNotes, submittedWeeks);
-  };
-
-  const handleWeekSubmit = (weekId: string) => {
-    const newSubmitted = { ...submittedWeeks, [weekId]: true };
-    setSubmittedWeeks(newSubmitted);
-    saveProgress(completedItems, proofOfWork, taskNotes, newSubmitted);
-  };
 
   const handleShowRegister = () => {
     setShowRegister(true);
