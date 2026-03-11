@@ -4,7 +4,7 @@
 
 ## Identity
 
-Multi-purpose SaaS frontend (React SPA) hosting public LinkedIn Authority Blueprint pages, Growth Collective member portal, Bootcamp LMS, and admin dashboard -- backed by Supabase, Airtable, and companion backend services.
+Multi-purpose SaaS frontend (React SPA) hosting public LinkedIn Authority Blueprint pages, Growth Collective member portal, Bootcamp LMS, DFY client portal, and admin dashboard — backed by Supabase and companion backend services.
 
 ## Tech Stack
 
@@ -12,9 +12,10 @@ Multi-purpose SaaS frontend (React SPA) hosting public LinkedIn Authority Bluepr
 - **Routing**: React Router v6 (lazy-loaded)
 - **Styling**: Tailwind CSS
 - **State**: React Context (Auth, Theme, Notifications) + TanStack Query
-- **Database**: Supabase (primary) + Airtable (legacy)
+- **Database**: Supabase (all data access via service layer)
 - **AI**: Claude (via Supabase edge functions) + Google Gemini
 - **Payments**: Stripe
+- **Error Tracking**: Sentry (via `@sentry/react`, wired through `logError`/`logWarn`)
 - **Testing**: Vitest + Playwright + React Testing Library + MSW
 - **Deploy**: Vercel
 
@@ -23,27 +24,93 @@ Multi-purpose SaaS frontend (React SPA) hosting public LinkedIn Authority Bluepr
 ### Directory Structure
 
 ```
-src/
 ├── components/
-│   ├── blueprint/       - Public Blueprint pages
-│   ├── bootcamp/        - Student app
-│   ├── gc/              - Growth Collective portal
-│   ├── admin/           - Admin dashboards
-│   ├── chat/            - AI chat interface
-│   ├── tam/             - TAM builder
-│   └── shared/          - Reusable UI
-├── context/             - AuthContext, NotificationContext, ThemeContext
-├── services/            - API/data layer (Supabase, Airtable, AI)
-├── types/               - TypeScript type definitions per product area
-├── hooks/               - Custom React hooks
-└── lib/                 - queryClient, supabaseClient, sentry, webVitals
+│   ├── admin/             - Admin dashboards (dfy, lms, blueprints, proposals, affiliates)
+│   ├── affiliate/         - Affiliate program pages
+│   ├── blueprint/         - Public Blueprint pages + landing/
+│   ├── bootcamp/          - Student app (email-enrichment, connection-qualifier, sidebar, etc.)
+│   ├── chat/              - AI chat interface
+│   ├── client-portal/     - DFY client portal (intake wizard, dashboard, deliverables)
+│   ├── gc/                - Growth Collective portal (dashboard, campaigns, tools, icp)
+│   ├── proposal/          - Public proposal viewer
+│   ├── shared/            - Reusable UI components
+│   └── tam/               - TAM builder (wizard, dashboard)
+├── context/               - AuthContext, NotificationContext, ThemeContext
+├── hooks/                 - 31 custom React hooks (domain-specific state + mutations)
+├── services/              - 21 service files (all Supabase/API access)
+├── types/                 - 16 type definition files (one per domain)
+├── lib/                   - Utilities: logError, supabaseClient, queryClient, sentry, csv-parser
+│   └── api/               - gtm-fetch (shared GTM System API client), funnel
+├── pages/bootcamp/        - BootcampApp.tsx (thin orchestrator)
+├── config/                - App configuration
+├── design-system/         - Design tokens and component library
+├── supabase/              - Edge functions + migrations
+├── tests/                 - Test suites
+└── e2e/                   - Playwright E2E tests
 ```
+
+**Note:** This repo has NO `src/` directory. All source files live at the root level.
 
 ### Patterns
 
-- **Service layer**: All DB calls live in `services/`. Components never call the database directly.
+- **Service layer**: All DB calls live in `services/`. Components and hooks never import `supabaseClient` directly.
+- **Hook extraction**: Domain state lives in custom hooks (`useBootcampAuth`, `useDfyEngagementData`, `useProposalForm`, etc.). Components are thin renderers.
+- **Structured logging**: All error/warning logging uses `logError(context, error, metadata)` and `logWarn(context, message, metadata)` from `lib/logError.ts`. Never use raw `console.log`/`console.error`. Both capture to Sentry in production.
+- **Update whitelists**: Every service that writes to DB uses `ALLOWED_UPDATE_FIELDS` constants with `filterAllowedFields()` to prevent arbitrary field injection.
+- **GTM API client**: All cross-origin calls to gtm-system use `gtmAdminFetch()` from `lib/api/gtm-fetch.ts` (attaches `x-admin-key` header).
 - **Context providers**: Auth, Theme, Notifications wrap at root. Auth gates portal/bootcamp/admin routes.
 - **React Query + code splitting**: TanStack Query for server state; lazy-loaded route components per product area.
+
+### Service Layer Contracts
+
+Every service file follows this structure:
+```
+/** JSDoc module header. Purpose. Constraint: Never imports React/UI. */
+import { supabase } from '../lib/supabaseClient';
+import { logError } from '../lib/logError';
+import type { ... } from '../types/...';
+
+// ─── Column Selects ─────
+const TABLE_COLUMNS = 'id, name, ...';
+
+// ─── Types ─────
+export type FooUpdateInput = Partial<Record<FooUpdateField, unknown>>;
+
+// ─── Helpers ─────
+const ALLOWED_UPDATE_FIELDS = ['field1', 'field2'] as const;
+function filterAllowedFields(...) { ... }
+
+// ─── Reads ─────
+export async function getFoo(...): Promise<Foo | null> { ... }
+
+// ─── Writes ─────
+export async function updateFoo(...): Promise<Foo | null> { ... }
+```
+
+### Hook Patterns
+
+Domain hooks encapsulate state + mutations, keeping components under 300 lines:
+
+| Hook | Purpose |
+|------|---------|
+| `useBootcampAuth` | Auth state, login/register/logout, ref-forwarding for temporal deps |
+| `useBootcampCurriculum` | Course data loading, lesson navigation, `onProgressLoaded` callback |
+| `useBootcampProgress` | Completed items, proof-of-work, task notes, `setProgressFromLoad` |
+| `useBootcampOnboarding` | Onboarding steps, survey data, needs-onboarding derived state |
+| `useDfyEngagementData` | 10 mutations + 6 queries for DFY engagement detail |
+| `useDfyTemplateEditor` | Template CRUD, milestone/deliverable state |
+| `useProposalForm` | 20+ form helpers, formData state, proposalToForm mapper |
+| `useBlueprintForm` | Phase state machine, form data, session restore |
+| `useEnrichmentPageState` | 11 useState for email enrichment pipeline |
+| `useContentItemForm` | LMS content item form state + URL handlers |
+| `usePickaxeEmbed` | MutationObserver + script injection for Pickaxe AI tools |
+
+### Component Conventions
+
+- **Max 300 lines** per component. Oversized components are split into sub-components + hooks.
+- **Sub-component directories**: `components/admin/dfy/shared/`, `components/admin/dfy/panels/`, `components/admin/proposals/sections/`, `components/blueprint/landing/`, `components/bootcamp/email-enrichment/`.
+- **JSDoc headers** on all files: `/** Name. Purpose. Constraint. */`
+- **Section dividers** in files > 50 lines: `// ─── Section Name ─────`
 
 ## Database Access (Cross-Repo)
 
@@ -130,8 +197,11 @@ This repo shares a Supabase database with 3 other repos. See gtm-system's `docs/
 
 **Admin DFY pages** (`components/admin/dfy/`):
 - `DfyEngagementList.tsx` — List all DFY engagements with status filters
-- `DfyEngagementDetail.tsx` — Single engagement: deliverables, activity timeline, admin actions. Intro offers show violet "Intro Offer" badge + upgrade button (intro_offer → full_service with `window.confirm()`)
-- `DfyTemplateEditor.tsx` — Edit deliverable templates
+- `DfyEngagementDetail.tsx` — Thin orchestrator (295 lines). State in `useDfyEngagementData` hook. Sub-components in `shared/` (InfoPair, ActionButtons, AutomationStatusBadge, DeliverableRow, MilestoneSection, AutomationHistoryPanel, ActivityRow, DeleteConfirmationModal) and `panels/` (OnboardingChecklistSection, ContentCallPrepPanel, ProfileRewriteReviewPanel, CallTranscriptSection, ResourceFilesSection, IntakeFormSection)
+- `DfyOverviewCard.tsx` — Client details grid, LinkedIn edit, Linear customer
+- `DfyActivityPanel.tsx` — Activity log + post update form
+- `DfyDeliverablesPanel.tsx` — Milestone groups + deliverable rows
+- `DfyTemplateEditor.tsx` — Edit deliverable templates. State in `useDfyTemplateEditor` hook. Sub-components in `template/` (MilestonesEditor, DeliverableRow, DeliverableEditForm, DeliverablesSection, constants)
 - `DfyStatusBadge.tsx` — Reusable status badge component
 
 **Client portal** (`components/client-portal/`):
@@ -165,7 +235,7 @@ This repo shares a Supabase database with 3 other repos. See gtm-system's `docs/
 | Webhook ingestion from 3rd parties | gtm-system | Central webhook hub for 14+ integrations |
 | Lead routing/pipeline orchestration | gtm-system | Owns lead lifecycle from capture to sales handoff |
 | Cold email campaigns | gtm-system | Owns all cold email: UI, campaign management, enrichment, pipeline |
-| Content scheduling/publishing | gtm-system | Owns content pipeline and auto-publishing |
+| Content scheduling/publishing | magnetlab | Owns content pipeline and auto-publishing |
 | Reply classification/delivery | gtm-system | Owns the reply pipeline (AI classify → Blueprint → deliver) |
 | Funnel pages/opt-in pages | magnetlab | Owns funnel builder, opt-in, thank-you, content pages |
 | Stripe billing/subscriptions | magnetlab (SaaS billing) or copy-of-gtm-os (bootcamp subs) | Depends on which product the billing is for |
@@ -175,8 +245,7 @@ This repo shares a Supabase database with 3 other repos. See gtm-system's `docs/
 
 - **Supabase** -- Primary DB. The `prospects` table is shared with `leadmagnet-backend` (scrape/enrich/generate). Edge functions proxy Claude AI calls.
 - **Blueprint Backend** (`VITE_BLUEPRINT_BACKEND_URL`) -- Blueprint-specific backend operations.
-- **GTM System** (`VITE_GTM_SYSTEM_URL`) -- Cross-system GTM operations.
-- **Airtable** -- Legacy data via `services/airtable.ts`.
+- **GTM System** (`VITE_GTM_SYSTEM_URL`) -- Cross-system GTM operations via `gtmAdminFetch()` in `lib/api/gtm-fetch.ts`.
 - **Call Access Grants** -- Config stored in `bootcamp_settings` key `call_grant_config` (`CallGrantConfig` type). Admin UI at `components/admin/bootcamp/settings/CallGrantConfigEditor.tsx`. gtm-system's `grant-call-access` Trigger.dev task reads this config to auto-create student accounts with AI tool credits when prospects attend Cal.com calls.
 
 ## Environment Variables
@@ -184,15 +253,15 @@ This repo shares a Supabase database with 3 other repos. See gtm-system's `docs/
 - `VITE_SUPABASE_URL` -- Supabase project URL
 - `VITE_SUPABASE_ANON_KEY` -- Supabase public key
 - `SUPABASE_SERVICE_ROLE_KEY` -- Supabase service role (server-side)
-- `VITE_AIRTABLE_API_KEY` -- Airtable API key
-- `VITE_AIRTABLE_BASE_ID` -- Airtable base ID
 - `ANTHROPIC_API_KEY` -- Claude AI key
 - `VITE_SENTRY_DSN` -- Sentry error tracking
 - `VITE_CALCOM_BOOKING_URL` -- Cal.com booking
 - `VITE_SENJA_WIDGET_ID` -- Senja testimonials
 - `VITE_BLUEPRINT_BACKEND_URL` -- Blueprint backend URL
 - `VITE_GTM_SYSTEM_URL` -- GTM system URL
+- `VITE_ADMIN_API_KEY` -- Admin API key (x-admin-key header for gtm-system calls)
 - `VITE_ADMIN_EMAILS` -- Admin email addresses (comma-separated)
+- `VITE_INFRA_API_KEY` -- Infrastructure provisioning API key
 
 ## Development
 
