@@ -2560,10 +2560,76 @@ function ResourceFilesSection({ engagementId }: { engagementId: string }) {
   );
 }
 
+function ProcessedIntakeSection({
+  processed,
+  isDarkMode,
+}: {
+  processed: Record<string, unknown>;
+  isDarkMode: boolean;
+}) {
+  const labelClass = `text-[11px] font-semibold uppercase tracking-wider ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`;
+  const textClass = `text-sm font-medium ${isDarkMode ? 'text-zinc-200' : 'text-zinc-900'}`;
+
+  const icp = processed.icp as
+    | { industry?: string; company_size?: string; job_titles?: string[]; pain_points?: string[] }
+    | undefined;
+  const content = processed.content as { key_topics?: string[]; tone_notes?: string } | undefined;
+  const outreach = processed.outreach as
+    | { target_companies?: string[]; geographic_focus?: string }
+    | undefined;
+
+  return (
+    <div className={`mt-4 pt-4 border-t ${isDarkMode ? 'border-zinc-800' : 'border-zinc-100'}`}>
+      <p className={`${labelClass} mb-3`}>AI-Processed Intake Summary</p>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {icp && (
+          <>
+            <InfoPair label="Industry" value={icp.industry || '\u2014'} />
+            <InfoPair label="Company Size" value={icp.company_size || '\u2014'} />
+            {icp.job_titles?.length ? (
+              <InfoPair label="Target Titles" value={icp.job_titles.join(', ')} />
+            ) : null}
+            {icp.pain_points?.length ? (
+              <div className="md:col-span-2">
+                <p className={labelClass}>Pain Points</p>
+                <ul className={`mt-1 list-disc list-inside ${textClass}`}>
+                  {icp.pain_points.map((p, i) => (
+                    <li key={i}>{p}</li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
+          </>
+        )}
+        {content?.key_topics?.length ? (
+          <InfoPair label="Key Topics" value={content.key_topics.join(', ')} />
+        ) : null}
+        {content?.tone_notes ? <InfoPair label="Tone" value={content.tone_notes} /> : null}
+        {outreach?.geographic_focus ? (
+          <InfoPair label="Geographic Focus" value={outreach.geographic_focus} />
+        ) : null}
+        {outreach?.target_companies?.length ? (
+          <InfoPair label="Target Companies" value={outreach.target_companies.join(', ')} />
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
 function IntakeFormSection({ engagement }: { engagement: DfyAdminEngagement }) {
   const { isDarkMode } = useTheme();
 
-  const intakeData = engagement.intake_data as {
+  const intakeData = engagement.intake_data;
+
+  // Detect wizard (intro offer) vs legacy form data shape
+  const isWizard = intakeData
+    ? 'best_client_urls' in intakeData ||
+      'dream_client_urls' in intakeData ||
+      'raw_text_dump' in intakeData
+    : false;
+
+  // Files come from different keys depending on flow
+  const legacyData = intakeData as {
     ideal_client?: string;
     crm_type?: string;
     crm_access?: string;
@@ -2572,8 +2638,16 @@ function IntakeFormSection({ engagement }: { engagement: DfyAdminEngagement }) {
     linkedin_url?: string;
     files?: Array<{ name: string; path: string; size: number; type: string }>;
   } | null;
+  const wizardData = intakeData as {
+    best_client_urls?: Array<{ url?: string; notes?: string }>;
+    dream_client_urls?: Array<{ url?: string; notes?: string }>;
+    raw_text_dump?: string;
+    confirms?: Record<string, string | string[]>;
+    file_records?: Array<{ name: string; path: string; size: number; type: string }>;
+  } | null;
 
-  const hasFiles = (intakeData?.files?.length ?? 0) > 0;
+  const files = isWizard ? wizardData?.file_records : legacyData?.files;
+  const hasFiles = (files?.length ?? 0) > 0;
 
   if (!engagement.intake_submitted_at) {
     return (
@@ -2592,10 +2666,8 @@ function IntakeFormSection({ engagement }: { engagement: DfyAdminEngagement }) {
     );
   }
 
-  const notetaker = intakeData?.notetaker_tool
-    ? intakeData.notetaker_tool +
-      (intakeData.notetaker_other ? ` (${intakeData.notetaker_other})` : '')
-    : '\u2014';
+  const labelClass = `text-[11px] font-semibold uppercase tracking-wider ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`;
+  const textClass = `text-sm font-medium mt-0.5 whitespace-pre-wrap ${isDarkMode ? 'text-zinc-200' : 'text-zinc-900'}`;
 
   return (
     <div
@@ -2612,34 +2684,136 @@ function IntakeFormSection({ engagement }: { engagement: DfyAdminEngagement }) {
         </span>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <div className="lg:col-span-3">
-          <p
-            className={`text-[11px] font-semibold uppercase tracking-wider ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}
-          >
-            Ideal Client
-          </p>
-          <p
-            className={`text-sm font-medium mt-0.5 whitespace-pre-wrap ${isDarkMode ? 'text-zinc-200' : 'text-zinc-900'}`}
-          >
-            {intakeData?.ideal_client || '\u2014'}
-          </p>
+      {isWizard ? (
+        /* ─── Wizard (Intro Offer) intake ─── */
+        <div className="space-y-4">
+          <div>
+            <p className={labelClass}>Best Client LinkedIn URLs</p>
+            <div className="mt-1 space-y-1.5">
+              {(wizardData?.best_client_urls || [])
+                .filter((u) => u?.url?.trim())
+                .map((item, i) => (
+                  <div key={i} className="flex items-start gap-2">
+                    <a
+                      href={item.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`text-sm font-medium flex items-center gap-1 ${isDarkMode ? 'text-violet-400 hover:text-violet-300' : 'text-violet-600 hover:text-violet-700'}`}
+                    >
+                      {item
+                        .url!.replace(/^https?:\/\/(www\.)?linkedin\.com\/in\//, '')
+                        .replace(/\/$/, '')}
+                      <ExternalLink className="w-3 h-3 flex-shrink-0" />
+                    </a>
+                    {item.notes && (
+                      <span className={`text-xs ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
+                        — {item.notes}
+                      </span>
+                    )}
+                  </div>
+                ))}
+              {!(wizardData?.best_client_urls || []).some((u) => u?.url?.trim()) && (
+                <p className={textClass}>{'\u2014'}</p>
+              )}
+            </div>
+          </div>
+
+          <div>
+            <p className={labelClass}>Dream Client LinkedIn URLs</p>
+            <div className="mt-1 space-y-1.5">
+              {(wizardData?.dream_client_urls || [])
+                .filter((u) => u?.url?.trim())
+                .map((item, i) => (
+                  <div key={i} className="flex items-start gap-2">
+                    <a
+                      href={item.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`text-sm font-medium flex items-center gap-1 ${isDarkMode ? 'text-violet-400 hover:text-violet-300' : 'text-violet-600 hover:text-violet-700'}`}
+                    >
+                      {item
+                        .url!.replace(/^https?:\/\/(www\.)?linkedin\.com\/in\//, '')
+                        .replace(/\/$/, '')}
+                      <ExternalLink className="w-3 h-3 flex-shrink-0" />
+                    </a>
+                    {item.notes && (
+                      <span className={`text-xs ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
+                        — {item.notes}
+                      </span>
+                    )}
+                  </div>
+                ))}
+              {!(wizardData?.dream_client_urls || []).some((u) => u?.url?.trim()) && (
+                <p className={textClass}>{'\u2014'}</p>
+              )}
+            </div>
+          </div>
+
+          {wizardData?.raw_text_dump && (
+            <div>
+              <p className={labelClass}>Additional Context</p>
+              <p className={textClass}>{wizardData.raw_text_dump}</p>
+            </div>
+          )}
+
+          {wizardData?.confirms && Object.keys(wizardData.confirms).length > 0 && (
+            <div>
+              <p className={labelClass}>Quick Confirms</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-1">
+                {Object.entries(wizardData.confirms).map(([key, value]) => (
+                  <div key={key}>
+                    <p
+                      className={`text-xs capitalize ${isDarkMode ? 'text-zinc-400' : 'text-zinc-500'}`}
+                    >
+                      {key.replace(/_/g, ' ')}
+                    </p>
+                    <p
+                      className={`text-sm font-medium ${isDarkMode ? 'text-zinc-200' : 'text-zinc-900'}`}
+                    >
+                      {Array.isArray(value) ? value.join(', ') : String(value) || '\u2014'}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
-        <InfoPair label="CRM Type" value={intakeData?.crm_type || '\u2014'} />
-        <InfoPair label="CRM Access" value={intakeData?.crm_access || '\u2014'} />
-        <InfoPair label="Notetaker Tool" value={notetaker} />
-        <InfoPair
-          label="LinkedIn URL"
-          value={
-            intakeData?.linkedin_url
-              ? intakeData.linkedin_url
-                  .replace(/^https?:\/\/(www\.)?linkedin\.com\/in\//, '')
-                  .replace(/\/$/, '')
-              : '\u2014'
-          }
-          href={intakeData?.linkedin_url || undefined}
-        />
-      </div>
+      ) : (
+        /* ─── Legacy intake form ─── */
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="lg:col-span-3">
+            <p className={labelClass}>Ideal Client</p>
+            <p className={textClass}>{legacyData?.ideal_client || '\u2014'}</p>
+          </div>
+          <InfoPair label="CRM Type" value={legacyData?.crm_type || '\u2014'} />
+          <InfoPair label="CRM Access" value={legacyData?.crm_access || '\u2014'} />
+          <InfoPair
+            label="Notetaker Tool"
+            value={
+              legacyData?.notetaker_tool
+                ? legacyData.notetaker_tool +
+                  (legacyData.notetaker_other ? ` (${legacyData.notetaker_other})` : '')
+                : '\u2014'
+            }
+          />
+          <InfoPair
+            label="LinkedIn URL"
+            value={
+              legacyData?.linkedin_url
+                ? legacyData.linkedin_url
+                    .replace(/^https?:\/\/(www\.)?linkedin\.com\/in\//, '')
+                    .replace(/\/$/, '')
+                : '\u2014'
+            }
+            href={legacyData?.linkedin_url || undefined}
+          />
+        </div>
+      )}
+
+      {/* AI-Processed Intake (shown when available, typically for wizard submissions) */}
+      {engagement.processed_intake && Object.keys(engagement.processed_intake).length > 0 && (
+        <ProcessedIntakeSection processed={engagement.processed_intake} isDarkMode={isDarkMode} />
+      )}
 
       {/* Files */}
       {hasFiles && (
@@ -2647,10 +2821,10 @@ function IntakeFormSection({ engagement }: { engagement: DfyAdminEngagement }) {
           <p
             className={`text-[11px] font-semibold uppercase tracking-wider mb-2 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}
           >
-            Uploaded Files ({intakeData!.files!.length})
+            Uploaded Files ({files!.length})
           </p>
           <div className="space-y-1.5">
-            {intakeData!.files!.map((file, i) => (
+            {files!.map((file, i) => (
               <IntakeFileRow
                 key={i}
                 file={file}
