@@ -13,8 +13,11 @@ import {
 import DeliverableCard from './DeliverableCard';
 import ActivityTimeline from './ActivityTimeline';
 import ClientDashboard from './ClientDashboard';
+import ClientContentSection from './ClientContentSection';
 import IntakeForm from './IntakeForm';
 import IntroOfferIntakeWizard from './intake-wizard/IntroOfferIntakeWizard';
+import { getContentItems } from '../../services/dfy-content-service';
+import type { DfyContentItem } from '../../types/dfy-content-types';
 
 // ── Category config ────────────────────────────────────
 const CATEGORIES = ['onboarding', 'content', 'funnel', 'outbound'] as const;
@@ -65,6 +68,7 @@ const ClientPortalPage: React.FC = () => {
 
   const [engagement, setEngagement] = useState<DfyEngagement | null>(null);
   const [deliverables, setDeliverables] = useState<DfyDeliverable[]>([]);
+  const [contentItems, setContentItems] = useState<DfyContentItem[]>([]);
   const [activity, setActivity] = useState<DfyActivityEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -75,7 +79,11 @@ const ClientPortalPage: React.FC = () => {
   const deliverableParam = searchParams.get('deliverable');
 
   const [activeTab, setActiveTab] = useState<'dashboard' | 'deliverables' | 'activity'>(
-    tabParam === 'deliverables' ? 'deliverables' : tabParam === 'activity' ? 'activity' : 'dashboard'
+    tabParam === 'deliverables'
+      ? 'deliverables'
+      : tabParam === 'activity'
+        ? 'activity'
+        : 'dashboard'
   );
   const [linkedInLoading, setLinkedInLoading] = useState(false);
   const [recorderTool, setRecorderTool] = useState('');
@@ -83,12 +91,14 @@ const ClientPortalPage: React.FC = () => {
   const [recorderSaved, setRecorderSaved] = useState(false);
 
   const loadData = useCallback(async (engagementId: string) => {
-    const [dels, acts] = await Promise.all([
+    const [dels, acts, content] = await Promise.all([
       getDeliverables(engagementId),
       getActivityLog(engagementId),
+      getContentItems(engagementId),
     ]);
     setDeliverables(dels);
     setActivity(acts);
+    setContentItems(content);
   }, []);
 
   useEffect(() => {
@@ -118,10 +128,15 @@ const ClientPortalPage: React.FC = () => {
 
         setEngagement(eng);
 
-        const [dels, acts] = await Promise.all([getDeliverables(eng.id), getActivityLog(eng.id)]);
+        const [dels, acts, content] = await Promise.all([
+          getDeliverables(eng.id),
+          getActivityLog(eng.id),
+          getContentItems(eng.id),
+        ]);
         if (cancelled) return;
         setDeliverables(dels);
         setActivity(acts);
+        setContentItems(content);
       } catch (err) {
         if (cancelled) return;
         setError(err instanceof Error ? err.message : 'Something went wrong');
@@ -512,6 +527,13 @@ const ClientPortalPage: React.FC = () => {
         {/* ── Deliverables Tab ────────────────────── */}
         {activeTab === 'deliverables' && (
           <>
+            {/* Content items for review (posts) */}
+            {contentItems.length > 0 && (
+              <div className="mb-8">
+                <ClientContentSection items={contentItems} onRefresh={reload} />
+              </div>
+            )}
+
             {total > 0 ? (
               <div className="space-y-8">
                 {CATEGORIES.map((cat) => {
