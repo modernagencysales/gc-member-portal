@@ -10,12 +10,12 @@ interface StepDreamClientsProps {
   onChange: (entries: ClientEntry[]) => void;
 }
 
-const LINKEDIN_URL_RE = /^https?:\/\/(www\.)?linkedin\.com\/in\//i;
+const LINKEDIN_URL_RE = /^https?:\/\/(www\.)?linkedin\.com\/(in|company)\//i;
 
 function validateLinkedInUrl(url: string): string | null {
   if (!url.trim()) return null;
   if (!LINKEDIN_URL_RE.test(url.trim())) {
-    return 'Must start with https://linkedin.com/in/ or https://www.linkedin.com/in/';
+    return 'Must be a LinkedIn profile or company URL (linkedin.com/in/... or linkedin.com/company/...)';
   }
   return null;
 }
@@ -104,7 +104,7 @@ const StepDreamClients: React.FC<StepDreamClientsProps> = ({ entries, onChange }
                     value={entry.url}
                     onChange={(e) => updateEntry(index, 'url', e.target.value)}
                     onBlur={() => markTouched(index)}
-                    placeholder="https://linkedin.com/in/dream-client"
+                    placeholder="https://linkedin.com/in/name or /company/name"
                     className={`w-full text-sm bg-white dark:bg-zinc-900 border rounded-md px-3 py-2 focus:ring-2 focus:ring-violet-500 focus:border-violet-500 outline-none transition-colors ${
                       urlError
                         ? 'border-red-400 dark:border-red-600'
