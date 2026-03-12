@@ -1,6 +1,6 @@
 /** IntakeFormSection. Displays intake form responses and uploaded files with download. Handles both legacy form and wizard (intro offer) data shapes. */
 import { useState } from 'react';
-import { FileText, Download, Loader2, ExternalLink } from 'lucide-react';
+import { FileText, Download, Loader2, ExternalLink, SkipForward } from 'lucide-react';
 import { useTheme } from '../../../../context/ThemeContext';
 import { logError } from '../../../../lib/logError';
 import { fetchIntakeFileUrls } from '../../../../services/dfy-admin-supabase';
@@ -11,6 +11,8 @@ import type { DfyAdminEngagement } from '../../../../types/dfy-admin-types';
 // ─── Types ─────────────────────────────────────────────
 export interface IntakeFormSectionProps {
   engagement: DfyAdminEngagement;
+  onSkipIntake?: () => void;
+  isSkippingIntake?: boolean;
 }
 
 interface IntakeFileRowProps {
@@ -206,7 +208,11 @@ function ProcessedIntakeSection({
 }
 
 // ─── Component ─────────────────────────────────────────
-export default function IntakeFormSection({ engagement }: IntakeFormSectionProps) {
+export default function IntakeFormSection({
+  engagement,
+  onSkipIntake,
+  isSkippingIntake,
+}: IntakeFormSectionProps) {
   const { isDarkMode } = useTheme();
 
   const intakeData = engagement.intake_data;
@@ -217,6 +223,11 @@ export default function IntakeFormSection({ engagement }: IntakeFormSectionProps
   const files = isWizard ? wizardData?.file_records : legacyData?.files;
   const hasFiles = (files?.length ?? 0) > 0;
 
+  const canSkipIntake =
+    !engagement.intake_submitted_at &&
+    !!engagement.call_transcript &&
+    engagement.intake_status === 'pending';
+
   if (!engagement.intake_submitted_at) {
     return (
       <div
@@ -224,12 +235,38 @@ export default function IntakeFormSection({ engagement }: IntakeFormSectionProps
           isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-200'
         }`}
       >
-        <h3 className={`text-sm font-semibold mb-2 ${isDarkMode ? 'text-white' : 'text-zinc-900'}`}>
-          Intake Form Responses
-        </h3>
-        <p className={`text-sm ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
-          Not yet submitted
-        </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h3
+              className={`text-sm font-semibold mb-1 ${isDarkMode ? 'text-white' : 'text-zinc-900'}`}
+            >
+              Intake Form Responses
+            </h3>
+            <p className={`text-sm ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
+              {engagement.intake_status === 'processing'
+                ? 'Processing intake from transcript...'
+                : 'Not yet submitted'}
+            </p>
+          </div>
+          {canSkipIntake && onSkipIntake && (
+            <button
+              onClick={onSkipIntake}
+              disabled={isSkippingIntake}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                isDarkMode
+                  ? 'bg-amber-900/30 text-amber-400 hover:bg-amber-900/50 border border-amber-800/50'
+                  : 'bg-amber-50 text-amber-700 hover:bg-amber-100 border border-amber-200'
+              } disabled:opacity-50`}
+            >
+              {isSkippingIntake ? (
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              ) : (
+                <SkipForward className="w-3.5 h-3.5" />
+              )}
+              {isSkippingIntake ? 'Processing...' : 'Skip Intake — Use Transcript'}
+            </button>
+          )}
+        </div>
       </div>
     );
   }

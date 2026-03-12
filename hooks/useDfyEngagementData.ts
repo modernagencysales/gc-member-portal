@@ -19,6 +19,7 @@ import {
   retriggerOnboarding,
   triggerAutomation,
   retryAutomation,
+  skipIntake,
   syncPlaybooks,
   resendMagicLink,
   postEngagementUpdate,
@@ -210,6 +211,17 @@ export function useDfyEngagementData(
     onError: (err: Error) => onError?.(err.message),
   });
 
+  const skipIntakeMutation = useMutation({
+    mutationFn: () => skipIntake(engagementId),
+    onSuccess: () => {
+      onError?.('');
+      queryClient.invalidateQueries({ queryKey: queryKeys.dfyEngagement(engagementId) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dfyDeliverables(engagementId) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.dfyActivity(engagementId) });
+    },
+    onError: (err: Error) => onError?.(err.message),
+  });
+
   const syncMutation = useMutation({
     mutationFn: () => syncPlaybooks(engagementId),
     onSuccess: () => {
@@ -283,6 +295,7 @@ export function useDfyEngagementData(
     retriggerMutation,
     triggerMutation,
     retryMutation,
+    skipIntakeMutation,
     syncMutation,
     magicLinkMutation,
     postUpdateMutation,

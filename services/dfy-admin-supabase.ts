@@ -207,6 +207,12 @@ export async function triggerAutomation(deliverableId: string) {
   });
 }
 
+export async function skipIntake(engagementId: string) {
+  return gtmAdminFetch(`/api/dfy/admin/engagements/${engagementId}/skip-intake`, {
+    method: 'POST',
+  });
+}
+
 export async function retryAutomation(runId: string) {
   return gtmAdminFetch('/api/dfy/admin/trigger-automation', {
     method: 'POST',

@@ -59,6 +59,7 @@ const DfyEngagementDetail = () => {
     retriggerMutation,
     triggerMutation,
     retryMutation,
+    skipIntakeMutation,
     syncMutation,
     magicLinkMutation,
     postUpdateMutation,
@@ -235,7 +236,11 @@ const DfyEngagementDetail = () => {
             isUpgrading={upgradeMutation.isPending}
           />
 
-          <IntakeFormSection engagement={engagement} />
+          <IntakeFormSection
+            engagement={engagement}
+            onSkipIntake={() => skipIntakeMutation.mutate()}
+            isSkippingIntake={skipIntakeMutation.isPending}
+          />
 
           <CallTranscriptSection
             engagement={engagement}
