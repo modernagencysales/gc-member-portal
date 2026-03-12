@@ -227,6 +227,49 @@ export async function approveContentItem(itemId: string, engagementId: string): 
 }
 
 /**
+ * Requests a revision on a single content item. Sets status='revision_requested',
+ * stores feedback, and increments revision_count.
+ * Throws with statusCode on error.
+ */
+export async function requestContentItemRevision(
+  itemId: string,
+  engagementId: string,
+  feedback: string
+): Promise<void> {
+  // Get current revision_count
+  const { data: current, error: fetchError } = await supabase
+    .from('dfy_content_items')
+    .select('revision_count')
+    .eq('id', itemId)
+    .eq('engagement_id', engagementId)
+    .single();
+
+  if (fetchError || !current) {
+    logError('requestContentItemRevision:fetch', fetchError ?? new Error('Not found'), { itemId });
+    throw Object.assign(new Error('Content item not found'), { statusCode: 404 });
+  }
+
+  const rawUpdate = {
+    status: 'revision_requested' as const,
+    feedback,
+    revision_count: ((current as { revision_count: number }).revision_count ?? 0) + 1,
+  };
+
+  const updates = filterFields(rawUpdate, REVISION_ALLOWED_FIELDS);
+
+  const { error } = await supabase
+    .from('dfy_content_items')
+    .update(updates)
+    .eq('id', itemId)
+    .eq('engagement_id', engagementId);
+
+  if (error) {
+    logError('requestContentItemRevision', error, { itemId, engagementId });
+    throw Object.assign(new Error('Failed to request revision'), { statusCode: 500 });
+  }
+}
+
+/**
  * Bulk-approves all content items with status='review' for an engagement.
  * Returns the count of updated items. Returns 0 on error.
  */
