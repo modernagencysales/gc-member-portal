@@ -3,6 +3,7 @@
 export interface IntakeWizardData {
   bestClientUrls: Array<{ url: string; notes: string }>;
   dreamClientUrls: Array<{ url: string; notes: string }>;
+  inspirationUrls: Array<{ url: string; notes: string }>;
   files: File[];
   rawTextDump: string;
   confirms: {
@@ -14,11 +15,17 @@ export interface IntakeWizardData {
   };
 }
 
-export type IntakeStep = 'best-clients' | 'dream-clients' | 'data-dump' | 'quick-confirms';
+export type IntakeStep =
+  | 'best-clients'
+  | 'dream-clients'
+  | 'content-inspiration'
+  | 'data-dump'
+  | 'quick-confirms';
 
 export const INTAKE_STEPS: IntakeStep[] = [
   'best-clients',
   'dream-clients',
+  'content-inspiration',
   'data-dump',
   'quick-confirms',
 ];
@@ -26,6 +33,7 @@ export const INTAKE_STEPS: IntakeStep[] = [
 export const STEP_TITLES: Record<IntakeStep, string> = {
   'best-clients': 'Your Best Clients',
   'dream-clients': 'Your Dream Clients',
+  'content-inspiration': 'Content Inspiration',
   'data-dump': 'The Data Dump',
   'quick-confirms': 'Quick Confirms',
 };

@@ -5,6 +5,7 @@ import { submitIntakeWizard, fetchBlueprintData } from '../../../services/dfy-in
 import { logError } from '../../../lib/logError';
 import StepBestClients from './StepBestClients';
 import StepDreamClients from './StepDreamClients';
+import StepContentInspiration from './StepContentInspiration';
 import StepDataDump from './StepDataDump';
 import StepQuickConfirms from './StepQuickConfirms';
 
@@ -26,6 +27,10 @@ function createInitialData(): IntakeWizardData {
     ],
     dreamClientUrls: [
       { url: '', notes: '' },
+      { url: '', notes: '' },
+      { url: '', notes: '' },
+    ],
+    inspirationUrls: [
       { url: '', notes: '' },
       { url: '', notes: '' },
     ],
@@ -92,14 +97,21 @@ const IntroOfferIntakeWizard: React.FC<IntroOfferIntakeWizardProps> = ({
   }, [blueprintProspectId, blueprintLoaded]);
 
   const canAdvance = (): boolean => {
-    const linkedinRe = /linkedin\.com\/(in|company)\//i;
+    const httpsUrlRe = /^https?:\/\/.+\..+/i;
+    const linkedinPersonRe = /linkedin\.com\/in\//i;
     switch (currentStep) {
       case 0: {
-        const valid = data.bestClientUrls.filter((e) => e.url.trim() && linkedinRe.test(e.url));
+        const valid = data.bestClientUrls.filter((e) => e.url.trim() && httpsUrlRe.test(e.url));
         return valid.length >= 2;
       }
       case 1: {
-        const valid = data.dreamClientUrls.filter((e) => e.url.trim() && linkedinRe.test(e.url));
+        const valid = data.dreamClientUrls.filter((e) => e.url.trim() && httpsUrlRe.test(e.url));
+        return valid.length >= 2;
+      }
+      case 2: {
+        const valid = data.inspirationUrls.filter(
+          (e) => e.url.trim() && linkedinPersonRe.test(e.url)
+        );
         return valid.length >= 2;
       }
       default:
@@ -153,6 +165,13 @@ const IntroOfferIntakeWizard: React.FC<IntroOfferIntakeWizardProps> = ({
         );
       case 2:
         return (
+          <StepContentInspiration
+            entries={data.inspirationUrls}
+            onChange={(inspirationUrls) => setData((prev) => ({ ...prev, inspirationUrls }))}
+          />
+        );
+      case 3:
+        return (
           <StepDataDump
             files={data.files}
             rawTextDump={data.rawTextDump}
@@ -160,7 +179,7 @@ const IntroOfferIntakeWizard: React.FC<IntroOfferIntakeWizardProps> = ({
             onTextChange={(rawTextDump) => setData((prev) => ({ ...prev, rawTextDump }))}
           />
         );
-      case 3:
+      case 4:
         return (
           <StepQuickConfirms
             confirms={data.confirms}

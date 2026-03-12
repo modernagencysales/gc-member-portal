@@ -34,6 +34,7 @@ interface LegacyIntakeData {
 interface WizardIntakeData {
   best_client_urls?: Array<{ url?: string; notes?: string }>;
   dream_client_urls?: Array<{ url?: string; notes?: string }>;
+  inspiration_urls?: Array<{ url?: string; notes?: string }>;
   raw_text_dump?: string;
   confirms?: Record<string, string | string[]>;
   file_records?: Array<{ name: string; path: string; size: number; type: string }>;
@@ -122,6 +123,27 @@ function UrlList({
 }) {
   const validUrls = urls.filter((u) => u?.url?.trim());
   if (!validUrls.length) return <span>{'\u2014'}</span>;
+
+  const formatUrlDisplay = (url: string) => {
+    try {
+      const parsed = new URL(url);
+      // For LinkedIn, show just the path slug
+      if (parsed.hostname.includes('linkedin.com')) {
+        return parsed.pathname
+          .replace(/^\/in\//, '')
+          .replace(/^\/company\//, '')
+          .replace(/\/$/, '');
+      }
+      // For other URLs, show domain + path
+      return (
+        parsed.hostname.replace(/^www\./, '') +
+        (parsed.pathname !== '/' ? parsed.pathname.replace(/\/$/, '') : '')
+      );
+    } catch {
+      return url.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '');
+    }
+  };
+
   return (
     <div className="space-y-1.5">
       {validUrls.map((item, i) => (
@@ -136,7 +158,7 @@ function UrlList({
                 : 'text-violet-600 hover:text-violet-700'
             }`}
           >
-            {item.url!.replace(/^https?:\/\/(www\.)?linkedin\.com\/in\//, '').replace(/\/$/, '')}
+            {formatUrlDisplay(item.url!)}
             <ExternalLink className="w-3 h-3 flex-shrink-0" />
           </a>
           {item.notes && (
@@ -293,16 +315,23 @@ export default function IntakeFormSection({
         /* ─── Wizard (Intro Offer) intake ─── */
         <div className="space-y-4">
           <div>
-            <p className={labelClass}>Best Client LinkedIn URLs</p>
+            <p className={labelClass}>Best Client Company URLs</p>
             <div className="mt-1">
               <UrlList urls={wizardData?.best_client_urls || []} isDarkMode={isDarkMode} />
             </div>
           </div>
 
           <div>
-            <p className={labelClass}>Dream Client LinkedIn URLs</p>
+            <p className={labelClass}>Dream Client Company URLs</p>
             <div className="mt-1">
               <UrlList urls={wizardData?.dream_client_urls || []} isDarkMode={isDarkMode} />
+            </div>
+          </div>
+
+          <div>
+            <p className={labelClass}>Content Inspiration (LinkedIn)</p>
+            <div className="mt-1">
+              <UrlList urls={wizardData?.inspiration_urls || []} isDarkMode={isDarkMode} />
             </div>
           </div>
 

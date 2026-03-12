@@ -47,6 +47,7 @@ export async function submitIntakeWizard(
   const wizardPayload = {
     best_client_urls: data.bestClientUrls.filter((u) => u.url.trim()),
     dream_client_urls: data.dreamClientUrls.filter((u) => u.url.trim()),
+    inspiration_urls: data.inspirationUrls.filter((u) => u.url.trim()),
     raw_text_dump: data.rawTextDump,
     confirms: {
       niche: data.confirms.niche,
