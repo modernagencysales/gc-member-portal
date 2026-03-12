@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { Search, Briefcase, RefreshCw, ExternalLink, Plus, X } from 'lucide-react';
+import { Search, Briefcase, RefreshCw, ExternalLink, Plus, X, Settings, Check } from 'lucide-react';
 import { useTheme } from '../../../context/ThemeContext';
 import { queryKeys } from '../../../lib/queryClient';
 import {
@@ -10,6 +10,8 @@ import {
   fetchDfyDeliverables,
   fetchDfyEngagementById,
   manualOnboard,
+  fetchDfyContentCallLink,
+  saveDfyContentCallLink,
 } from '../../../services/dfy-admin-supabase';
 import type { DfyAdminEngagement } from '../../../types/dfy-admin-types';
 import DfyStatusBadge from './DfyStatusBadge';
@@ -25,6 +27,7 @@ const DfyEngagementList: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [showOnboardModal, setShowOnboardModal] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
 
   const {
     data: engagements,
@@ -102,6 +105,16 @@ const DfyEngagementList: React.FC = () => {
             New Client
           </button>
           <button
+            onClick={() => setShowSettings((s) => !s)}
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+              isDarkMode
+                ? 'text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200'
+                : 'text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900'
+            }`}
+          >
+            <Settings className="w-4 h-4" />
+          </button>
+          <button
             onClick={() => refetch()}
             className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
               isDarkMode
@@ -138,6 +151,9 @@ const DfyEngagementList: React.FC = () => {
           </div>
         ))}
       </div>
+
+      {/* Settings */}
+      {showSettings && <ContentCallSettings />}
 
       {/* Search + Filter */}
       <div className="flex flex-col sm:flex-row gap-4">
@@ -532,6 +548,70 @@ function EngagementRow({
         )}
       </td>
     </tr>
+  );
+}
+
+function ContentCallSettings() {
+  const { isDarkMode } = useTheme();
+  const [calLink, setCalLink] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+
+  useEffect(() => {
+    fetchDfyContentCallLink().then(setCalLink);
+  }, []);
+
+  const handleSave = async () => {
+    setSaving(true);
+    setSaved(false);
+    try {
+      await saveDfyContentCallLink(calLink.trim());
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div
+      className={`p-4 rounded-xl border ${
+        isDarkMode ? 'bg-zinc-900 border-zinc-800' : 'bg-white border-zinc-200'
+      }`}
+    >
+      <p className={`text-sm font-medium mb-2 ${isDarkMode ? 'text-zinc-300' : 'text-zinc-700'}`}>
+        Content Call Booking Link
+      </p>
+      <div className="flex items-center gap-2">
+        <span className={`text-sm shrink-0 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
+          cal.com/
+        </span>
+        <input
+          type="text"
+          value={calLink}
+          onChange={(e) => setCalLink(e.target.value)}
+          placeholder="tim-keen-mas/30min"
+          className={`flex-1 px-3 py-1.5 rounded-lg border text-sm ${
+            isDarkMode
+              ? 'bg-zinc-800 border-zinc-700 text-white placeholder:text-zinc-500'
+              : 'bg-white border-zinc-300 text-zinc-900 placeholder:text-zinc-400'
+          } focus:ring-2 focus:ring-violet-500 focus:border-transparent`}
+        />
+        <button
+          onClick={handleSave}
+          disabled={saving}
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+            saved ? 'bg-green-600 text-white' : 'bg-violet-600 text-white hover:bg-violet-700'
+          } disabled:opacity-50`}
+        >
+          {saved ? <Check className="w-3.5 h-3.5" /> : null}
+          {saving ? 'Saving...' : saved ? 'Saved' : 'Save'}
+        </button>
+      </div>
+      <p className={`text-xs mt-1.5 ${isDarkMode ? 'text-zinc-500' : 'text-zinc-400'}`}>
+        Shown on the post-purchase thank you page
+      </p>
+    </div>
   );
 }
 

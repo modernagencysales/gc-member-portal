@@ -105,6 +105,29 @@ export async function saveDfyTemplateBySlug(slug: string, template: unknown) {
   });
 }
 
+// ─── DFY Settings ─────
+
+const DFY_CONTENT_CALL_KEY = 'dfy_content_call_link';
+const DFY_CONTENT_CALL_DEFAULT = 'tim-keen-mas/30min';
+
+export async function fetchDfyContentCallLink(): Promise<string> {
+  const { data } = await supabase
+    .from('bootcamp_settings')
+    .select('value')
+    .eq('key', DFY_CONTENT_CALL_KEY)
+    .maybeSingle();
+
+  return (data?.value as string) || DFY_CONTENT_CALL_DEFAULT;
+}
+
+export async function saveDfyContentCallLink(calLink: string): Promise<void> {
+  const { error } = await supabase
+    .from('bootcamp_settings')
+    .upsert({ key: DFY_CONTENT_CALL_KEY, value: calLink }, { onConflict: 'key' });
+
+  if (error) throw new Error(`Failed to save content call link: ${error.message}`);
+}
+
 export async function fetchAdminAutomationOutput(
   engagementId: string,
   automationType: string

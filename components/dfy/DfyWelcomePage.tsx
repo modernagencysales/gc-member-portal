@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { CheckCircle2, Mail, ClipboardList, Rocket } from 'lucide-react';
 import CalEmbed from '../blueprint/CalEmbed';
 import ThemeToggle from '../blueprint/ThemeToggle';
+import { fetchDfyContentCallLink } from '../../services/dfy-admin-supabase';
 
-const CONTENT_CALL_LINK = 'masonmas/60min';
+const DEFAULT_CALL_LINK = 'tim-keen-mas/30min';
 
 const steps = [
   {
@@ -24,6 +25,12 @@ const steps = [
 ];
 
 const DfyWelcomePage: React.FC = () => {
+  const [calLink, setCalLink] = useState(DEFAULT_CALL_LINK);
+
+  useEffect(() => {
+    fetchDfyContentCallLink().then(setCalLink);
+  }, []);
+
   return (
     <div className="min-h-screen bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 font-sans">
       <ThemeToggle />
@@ -47,7 +54,7 @@ const DfyWelcomePage: React.FC = () => {
             This call is where we learn about your business, clients, and goals — so we can build a
             system that actually sounds like you.
           </p>
-          <CalEmbed calLink={CONTENT_CALL_LINK} />
+          <CalEmbed calLink={calLink} />
         </div>
 
         {/* Next Steps */}
