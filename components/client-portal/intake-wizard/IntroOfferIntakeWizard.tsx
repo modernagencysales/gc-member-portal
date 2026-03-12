@@ -91,7 +91,7 @@ const IntroOfferIntakeWizard: React.FC<IntroOfferIntakeWizardProps> = ({
   }, [blueprintProspectId, blueprintLoaded]);
 
   const canAdvance = (): boolean => {
-    const linkedinRe = /linkedin\.com\/in\//i;
+    const linkedinRe = /linkedin\.com\/(in|company)\//i;
     switch (currentStep) {
       case 0: {
         const valid = data.bestClientUrls.filter((e) => e.url.trim() && linkedinRe.test(e.url));
