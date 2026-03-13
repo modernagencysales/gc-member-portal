@@ -76,13 +76,6 @@ const ProposalPromptsEditor = lazy(
   () => import('./components/admin/proposals/ProposalPromptsEditor')
 );
 
-// Lazy-loaded: Intro Offer
-const AdminIntroOfferList = lazy(() => import('./components/admin/intro-offer/IntroOfferList'));
-const AdminIntroOfferDetail = lazy(() => import('./components/admin/intro-offer/IntroOfferDetail'));
-const OfferProgressTracker = lazy(
-  () => import('./components/portal/intro-offer/OfferProgressTracker')
-);
-
 // Lazy-loaded: DFY Admin
 const AdminDfyList = lazy(() => import('./components/admin/dfy/DfyEngagementList'));
 const AdminDfyDetail = lazy(() => import('./components/admin/dfy/DfyEngagementDetail'));
@@ -191,9 +184,6 @@ const App: React.FC = () => {
           <Route path="proposals/new" element={<AdminProposalNew />} />
           <Route path="proposals/prompts" element={<ProposalPromptsEditor />} />
           <Route path="proposals/:proposalId" element={<AdminProposalEdit />} />
-          {/* Intro Offers */}
-          <Route path="intro-offers" element={<AdminIntroOfferList />} />
-          <Route path="intro-offers/:offerId" element={<AdminIntroOfferDetail />} />
           {/* DFY Engagements */}
           <Route path="dfy" element={<AdminDfyList />} />
           <Route path="dfy/templates" element={<AdminDfyTemplates />} />
@@ -277,9 +267,6 @@ const App: React.FC = () => {
 
         {/* Community */}
         <Route path="/community" element={<CommunityPage />} />
-
-        {/* Intro Offer progress tracker (public, client-facing) */}
-        <Route path="/intro-offer/:offerId" element={<OfferProgressTracker />} />
 
         {/* DFY (Done-For-You) offer page */}
         <Route path="/offer/dfy" element={<DFYOfferPage />} />

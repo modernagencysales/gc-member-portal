@@ -1,7 +1,7 @@
 /**
- * Intro Offer Supabase Service. Reads and updates intro offer records and deliverables
- * from the shared Supabase database (table owned by gtm-system).
- * Constraint: Never imports React components or UI elements.
+ * @deprecated Use DFY engagement system instead. Manual intro offers now route through
+ * manualOnboard() in dfy-admin-supabase.ts → POST /api/dfy/admin/manual-onboard.
+ * This service reads from the deprecated intro_offers table.
  */
 
 import { supabase } from '../lib/supabaseClient';

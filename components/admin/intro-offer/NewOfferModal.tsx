@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { X } from 'lucide-react';
 import { useTheme } from '../../../context/ThemeContext';
-import { createIntroOffer } from '../../../services/intro-offer-supabase';
+import { manualOnboard } from '../../../services/dfy-admin-supabase';
 
 interface NewOfferModalProps {
   onClose: () => void;
@@ -15,9 +15,8 @@ const NewOfferModal: React.FC<NewOfferModalProps> = ({ onClose, onSuccess }) => 
   const [form, setForm] = useState({
     client_name: '',
     client_email: '',
-    amount_paid: '',
-    discount_code: '',
-    notes: '',
+    client_company: '',
+    linkedin_url: '',
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -26,17 +25,26 @@ const NewOfferModal: React.FC<NewOfferModalProps> = ({ onClose, onSuccess }) => 
       setError('Client name is required');
       return;
     }
+    if (!form.client_email.trim()) {
+      setError('Client email is required');
+      return;
+    }
+    if (!form.client_company.trim()) {
+      setError('Client company is required');
+      return;
+    }
 
     setIsSubmitting(true);
     setError(null);
 
     try {
-      await createIntroOffer({
+      await manualOnboard({
         client_name: form.client_name.trim(),
-        client_email: form.client_email.trim() || undefined,
-        amount_paid: form.amount_paid ? parseInt(form.amount_paid, 10) : undefined,
-        discount_code: form.discount_code.trim() || undefined,
-        notes: form.notes.trim() || undefined,
+        client_email: form.client_email.trim(),
+        client_company: form.client_company.trim(),
+        linkedin_url: form.linkedin_url.trim() || undefined,
+        engagement_type: 'intro_offer',
+        template_key: 'intro_offer',
       });
       onSuccess();
     } catch (err) {
@@ -103,7 +111,9 @@ const NewOfferModal: React.FC<NewOfferModalProps> = ({ onClose, onSuccess }) => 
           </div>
 
           <div>
-            <label className={labelClass}>Email</label>
+            <label className={labelClass}>
+              Email <span className="text-red-500">*</span>
+            </label>
             <input
               type="email"
               value={form.client_email}
@@ -113,36 +123,26 @@ const NewOfferModal: React.FC<NewOfferModalProps> = ({ onClose, onSuccess }) => 
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className={labelClass}>Amount Paid ($)</label>
-              <input
-                type="number"
-                value={form.amount_paid}
-                onChange={(e) => setForm({ ...form, amount_paid: e.target.value })}
-                placeholder="2500"
-                className={inputClass}
-              />
-            </div>
-            <div>
-              <label className={labelClass}>Discount Code</label>
-              <input
-                type="text"
-                value={form.discount_code}
-                onChange={(e) => setForm({ ...form, discount_code: e.target.value })}
-                placeholder="LAUNCH50"
-                className={inputClass}
-              />
-            </div>
+          <div>
+            <label className={labelClass}>
+              Company <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              value={form.client_company}
+              onChange={(e) => setForm({ ...form, client_company: e.target.value })}
+              placeholder="Acme Corp"
+              className={inputClass}
+            />
           </div>
 
           <div>
-            <label className={labelClass}>Notes</label>
-            <textarea
-              value={form.notes}
-              onChange={(e) => setForm({ ...form, notes: e.target.value })}
-              placeholder="Referral from X, paid via invoice, etc."
-              rows={3}
+            <label className={labelClass}>LinkedIn URL</label>
+            <input
+              type="url"
+              value={form.linkedin_url}
+              onChange={(e) => setForm({ ...form, linkedin_url: e.target.value })}
+              placeholder="https://linkedin.com/in/janedoe"
               className={inputClass}
             />
           </div>

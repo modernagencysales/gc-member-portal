@@ -258,6 +258,8 @@ export async function manualOnboard(data: {
   linkedin_url?: string;
   monthly_rate?: number;
   communication_preference?: string;
+  engagement_type?: 'full_dfy' | 'intro_offer';
+  template_key?: 'standard' | 'intro_offer';
 }): Promise<{ success: boolean; engagement_id: string; portal_slug: string }> {
   return gtmAdminFetch('/api/dfy/admin/manual-onboard', {
     method: 'POST',

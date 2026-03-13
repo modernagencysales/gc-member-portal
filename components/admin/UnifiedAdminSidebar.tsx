@@ -15,7 +15,6 @@ import {
   Wrench,
   FileText,
   Award,
-  Package,
   ScrollText,
   Briefcase,
   LayoutTemplate,
@@ -72,10 +71,6 @@ const sections: NavSection[] = [
       { to: '/admin/dfy', icon: Briefcase, label: 'Engagements', end: true },
       { to: '/admin/dfy/templates', icon: LayoutTemplate, label: 'Templates' },
     ],
-  },
-  {
-    label: 'Intro Offers',
-    items: [{ to: '/admin/intro-offers', icon: Package, label: 'Offers', end: true }],
   },
   {
     label: 'Affiliates',
